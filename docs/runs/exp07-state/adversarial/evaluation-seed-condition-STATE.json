@@ -1,0 +1,114 @@
+{
+ "entries": [
+  "py:proc.pipeline.Pipeline.execute"
+ ],
+ "ground_truth_edges": 4,
+ "claimed_edges": 7,
+ "true_positive": 4,
+ "false_positive": 3,
+ "false_negative": 0,
+ "precision": 0.571,
+ "recall": 1.0,
+ "by_evidence_kind": {
+  "composed": {
+   "claimed": 1,
+   "true": 1
+  },
+  "observed": {
+   "claimed": 6,
+   "true": 3
+  }
+ },
+ "by_join_strength": {
+  "STATE": {
+   "claimed": 1,
+   "true": 1
+  }
+ },
+ "probe_derived": {},
+ "false_composed_continuations": [],
+ "missing_continuations": [],
+ "missing_explained": {
+  "gap": [],
+  "unresolved": [],
+  "absent": []
+ },
+ "outcome_conflicts": [],
+ "alternate_fragments_total": 0,
+ "notes": [],
+ "paths": [
+  {
+   "entry": "py:proc.pipeline.Pipeline.execute",
+   "truth": 1,
+   "claimed": 1,
+   "matched": 1,
+   "extra": [],
+   "missed": [],
+   "outcome_mismatches": 0,
+   "explanations": []
+  }
+ ],
+ "seam_grades": [
+  {
+   "grade": "STATE",
+   "seams": 1,
+   "consistent": 1,
+   "matching": 1,
+   "outcome_ok": 1
+  }
+ ],
+ "join_matrix": [
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_disabled_skips",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u2717",
+   "exit": "same",
+   "truth": false,
+   "accepted": false,
+   "note": "state conflict: self.enabled bool:true\u2260bool:false; result differs: seed continued on it"
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_closed_repository_raises",
+   "symbol": "\u2713",
+   "arg_shape": "\u00b7",
+   "value": "\u00b7",
+   "state": "\u00b7",
+   "exit": "conflict",
+   "truth": true,
+   "accepted": false,
+   "note": "exit conflict: stand-in returned, fragment raised:py:proc.repository.RepositoryClosed"
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_persists",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u2713",
+   "exit": "same",
+   "truth": true,
+   "accepted": true,
+   "note": "state matched on 5 fact(s): global.settings.STRICT, self.enabled, self.repo, self.seen, self:type"
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_strict_audits",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u2717",
+   "exit": "same",
+   "truth": false,
+   "accepted": false,
+   "note": "state conflict: global.settings.STRICT bool:false\u2260bool:true"
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+--- FAIL: TestDiffgenomeProbe_TransferTx_ExecutesReal (0.00s)
+panic: runtime error: invalid memory address or nil pointer dereference [recovered, repanicked]
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x18 pc=0x10060dd84]
+
+goroutine 35 [running]:
+testing.tRunner.func1.2({0x100d9ed40, 0x100f49ab0})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:1977 +0x318
+panic({0x100d9ed40?, 0x100f49ab0?})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/panic.go:860 +0x12c
+github.com/techschool/simplebank/api.TestDiffgenomeProbe_TransferTx_ExecutesReal.func2()
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/api/diffgenome_probe_0_1_test.go:234 +0x6c
+panic({0x100d9ed40?, 0x100f49ab0?})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/panic.go:860 +0x12c
+github.com/techschool/simplebank/db/sqlc.(*SQLStore).TransferTx.func1()
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/db/sqlc/tx_transfer.go:31 +0xf4
+panic({0x100d9ed40?, 0x100f49ab0?})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/panic.go:860 +0x12c
+github.com/techschool/simplebank/db/sqlc.(*SQLStore).execTx.func1()
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/db/sqlc/exec_tx.go:17 +0xa8
+panic({0x100d9ed40?, 0x100f49ab0?})
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/runtime/panic.go:860 +0x12c
+github.com/jackc/pgx/v5/pgxpool.(*Pool).Acquire(0x0, {0x100e94f78, 0x100f96360})
+	/Users/ksnaik/go/pkg/mod/github.com/jackc/pgx/v5@v5.3.1/pgxpool/pool.go:491 +0x34
+github.com/jackc/pgx/v5/pgxpool.(*Pool).BeginTx(0x22ca3dc69990?, {0x100e94f78, 0x100f96360}, {{0x0, 0x0}, {0x0, 0x0}, {0x0, 0x0}})
+	/Users/ksnaik/go/pkg/mod/github.com/jackc/pgx/v5@v5.3.1/pgxpool/pool.go:650 +0x30
+github.com/jackc/pgx/v5/pgxpool.(*Pool).Begin(...)
+	/Users/ksnaik/go/pkg/mod/github.com/jackc/pgx/v5@v5.3.1/pgxpool/pool.go:642
+github.com/techschool/simplebank/db/sqlc.(*SQLStore).execTx(0x22ca3df32680, {0x100e94f78, 0x100f96360}, 0x22ca3df4adc0)
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/db/sqlc/exec_tx.go:22 +0x168
+github.com/techschool/simplebank/db/sqlc.(*SQLStore).TransferTx(_, {_, _}, {_, _, _})
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/db/sqlc/tx_transfer.go:38 +0x1fc
+github.com/techschool/simplebank/api.TestDiffgenomeProbe_TransferTx_ExecutesReal(0x22ca3dc61d48)
+	/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-go7/workspaces/ws-1790634016400/repo/api/diffgenome_probe_0_1_test.go:246 +0x1fc
+testing.tRunner(0x22ca3dc61d48, 0x100e85648)
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.26.5/libexec/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/techschool/simplebank/api	0.304s
+FAIL
+
+--- stderr ---

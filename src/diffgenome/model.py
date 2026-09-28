@@ -120,10 +120,31 @@ position: ``ARG_SHAPE`` compares types only; ``VALUE`` requires equal, non-empty
 at every observed position. Sizes are value-level and never affect ``ARG_SHAPE``."""
 
 Outcome = str
-"""How a call ended: ``"returned"``, ``"raised:<symbol of the exception type>"``, or
-``"unknown"`` when the collector could not observe it. Composition treats a returning seam
-joined to a raising fragment (or vice versa) as an outcome conflict: the seed's
-continuation after the stand-in assumed the other outcome, so the join is unsound."""
+"""How a call ended, as ``<category>`` or ``<category>:<identity>``. Categories are
+language-neutral exit kinds; adapters normalize their runtime's notions into them:
+
+- ``returned``          normal completion (Python return, Node resolve, Go nil error)
+- ``returned-error``    completion that signals failure by value (Go non-nil ``error``)
+- ``raised``            exception / throw / rejection, identity = the type's symbol
+- ``panic``             runtime abort (Go panic), identity = the panic value's type
+- ``cancelled``         cooperative cancellation
+- ``unknown``           not observed
+
+Exit compatibility (see compose) compares category first, then identity when both are
+known: a returning seam joined to a raising fragment, or an error-returning seam joined
+to a panicking fragment, is a conflict, and the join is unsound."""
+
+StateFacts = tuple[tuple[str, str, str], ...]
+"""Bounded execution-state summary at a call or a seam: ``((fact, bucket, digest), ...)``.
+Facts are *branch-relevant, low-cardinality* observations, never raw values:
+``self:type`` (concrete receiver type), ``self.<field>`` for receiver fields, and
+``global.<name>`` for module/package state the function reads. Buckets are language-
+neutral: ``bool:true|false``, ``none``, ``enum:<member>``, ``num:zero|pos|neg``,
+``str:empty|nonempty``, ``coll:empty|one|many``, ``obj:<type>`` (dependency identity).
+``digest`` is filled only for enum members and type names (already public identifiers);
+scalars are stored as buckets only, so persisted state exposes no values. The ``STATE``
+join compares facts by name: any differing bucket is a state conflict; all equal (and at
+least one compared) is a ``STATE`` match; no facts in common leaves the seam at ``VALUE``."""
 
 
 @dataclass(frozen=True)
@@ -138,6 +159,7 @@ class CallNode:
     thread: int = 0  # 0 is the stimulus thread; others numbered in order of first appearance
     outcome: Outcome = "unknown"
     result: str = ""  # digest of the returned value (same scheme as ArgShapes), "" if unavailable
+    state: StateFacts = ()  # receiver/global state at entry; the fragment side of STATE
 
 
 @dataclass(frozen=True)
@@ -174,6 +196,11 @@ class SubstitutionNode:
     """Digest of what the stand-in returned. The seed's continuation after this node is
     conditioned on this value; a composed fragment that returned something else leaves
     that continuation unsupported by any execution."""
+    state: StateFacts = ()
+    """State the real target would have seen at this seam, when the seed can observe it:
+    the receiver whose member was replaced (instance-attribute interposition, subclass
+    fakes) or the globals a patched module function reads. Empty when the stand-in
+    replaced the whole object, which is the honest common case."""
 
 
 class OsEventKind(Enum):
@@ -237,12 +264,13 @@ class BoundaryResolution:
 
 
 class JoinStrength(Enum):
-    """How a composed seam was matched. Each level implies the ones before it."""
+    """How a composed seam's ENTRY was matched. Each level implies the ones before it.
+    Join validity = entry compatibility x exit compatibility (see `Evidence.exit`)."""
 
     SYMBOL = 1  # same SymbolId on both sides
     ARG_SHAPE = 2  # and argument arity/types compatible
     VALUE = 3  # and argument values at the seam compatible
-    STATE = 4  # and relevant reachable state at the seam compatible
+    STATE = 4  # and branch-relevant receiver/global state at the seam compatible
 
 
 class EvidenceKind(Enum):
@@ -293,6 +321,10 @@ class Evidence:
     alternates: tuple[NodeRef, ...] = ()
     """COMPOSED only: other fragments with the same behavior shape as ``fragment`` that
     support this same edge. Merged for expansion, never dropped."""
+    exit: str | None = None
+    """COMPOSED only: exit compatibility of seam and fragment: ``same`` (category and
+    identity agree), ``kind`` (category agrees; an identity is unknown), or ``unknown``
+    (an outcome was not observed). Conflicts never become evidence."""
     probe_derived: bool = False
     """True if any execution this evidence cites was a generated probe rather than an
     existing test. Set by whoever builds the evidence and knows the executions."""

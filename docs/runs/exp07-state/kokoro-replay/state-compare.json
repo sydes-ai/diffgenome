@@ -1,0 +1,82 @@
+{
+ "value_only": {
+  "attempts": 711,
+  "by_grade": {
+   "ARG_SHAPE": 130,
+   "VALUE": 361,
+   "rejected": 68,
+   "SYMBOL": 152
+  },
+  "state_verdicts": {
+   "state_not_consulted": 711
+  },
+  "composed_edges": 14,
+  "seams": {
+   "get_manager": {
+    "attempts": 304,
+    "accepted": 304,
+    "by_grade": {
+     "SYMBOL": 152,
+     "VALUE": 152
+    },
+    "notes": {
+     "arity differs: arguments on one side only": 152,
+     "no arguments": 152
+    }
+   },
+   "TTSService.create": {
+    "attempts": 27,
+    "accepted": 27,
+    "by_grade": {
+     "VALUE": 27
+    },
+    "notes": {
+     "no arguments": 27
+    }
+   }
+  }
+ },
+ "with_state": {
+  "attempts": 711,
+  "by_grade": {
+   "ARG_SHAPE": 130,
+   "VALUE": 48,
+   "rejected": 215,
+   "STATE": 166,
+   "SYMBOL": 152
+  },
+  "state_verdicts": {
+   "state_not_consulted": 350,
+   "state_unavailable_one_side": 48,
+   "state_matched": 166,
+   "state_conflict": 147
+  },
+  "composed_edges": 14,
+  "seams": {
+   "get_manager": {
+    "attempts": 304,
+    "accepted": 285,
+    "by_grade": {
+     "SYMBOL": 152,
+     "STATE": 133,
+     "rejected": 19
+    },
+    "notes": {
+     "arity differs: arguments on one side only": 152,
+     "state matched on 1 fact(s): global.VoiceManager._instance": 133,
+     "state conflict: global.VoiceManager._instance obj:VoiceManag": 19
+    }
+   },
+   "TTSService.create": {
+    "attempts": 27,
+    "accepted": 27,
+    "by_grade": {
+     "VALUE": 27
+    },
+    "notes": {
+     "state unavailable on one side": 27
+    }
+   }
+  }
+ }
+}

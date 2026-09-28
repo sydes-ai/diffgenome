@@ -23,7 +23,9 @@ REPO = Path(__file__).parent.parent
 FIXTURE = REPO / "fixtures" / "exp01_shop"
 
 
-def trace(target: Path, out: Path, test_root: str = "tests") -> dict[str, Execution]:
+def trace(
+    target: Path, out: Path, test_root: str = "tests", paths: list[str] | None = None
+) -> dict[str, Execution]:
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": str(REPO / "src")}
     result = subprocess.run(
         [
@@ -32,6 +34,7 @@ def trace(target: Path, out: Path, test_root: str = "tests") -> dict[str, Execut
             "--diffgenome-out", str(out),
             "--diffgenome-source-root", ".",
             "--diffgenome-test-root", test_root,
+            *(paths or []),
         ],
         cwd=target, env=env, capture_output=True, text=True,
     )  # fmt: skip

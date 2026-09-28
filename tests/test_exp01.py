@@ -108,7 +108,7 @@ def test_s7_composed_provenance(composition: Composition, corpus: Corpus) -> Non
         a.fragment.execution.split("::")[1].split("@")[0]: a.note for a in composition.attempts
     }
     assert notes["test_quote_empty_cart_is_free"].startswith("values differ: skus")
-    assert notes["test_quote_sums_repository_prices"] == ""
+    assert notes["test_quote_sums_repository_prices"].startswith("state unavailable")
 
 
 def test_s8_no_laundering(composition: Composition, corpus: Corpus) -> None:
@@ -228,8 +228,7 @@ def test_p9_outcome_conflict_is_unsound_and_recursion_is_provenanced(corpus: Cor
     rejected = by_fragment["test_duplicate_skus_rejected"]
     assert rejected.grade is None and rejected.accepted is False
     assert (
-        rejected.note
-        == "outcome conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+        rejected.note == "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
     )
     assert by_fragment["test_place_order_returns_quoted_total"].grade is JoinStrength.VALUE
     unspecced = by_fragment["test_place_with_unspecced_mocks"]

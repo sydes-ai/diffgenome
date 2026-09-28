@@ -187,7 +187,7 @@ silently.
 | Type | Meaning |
 |---|---|
 | `BoundaryResolution` | `INTERNAL` / `EXTERNAL` / `UNRESOLVED`, target symbol, and the **rule** that decided it |
-| `JoinStrength` | `SYMBOL < ARG_SHAPE < VALUE < STATE`: how a composed seam was matched on *entry*. A returned/raised outcome conflict is unsound at every grade. Result compatibility (did the fragment return what the stand-in returned) is reported on the join attempt, independently of the grade. |
+| `JoinStrength` | `SYMBOL < ARG_SHAPE < VALUE < STATE`: how a composed seam was matched on *entry*. Join validity is entry × exit: `Evidence.exit` is `same` / `kind` / `unknown`; an exit conflict (different outcome categories, or two different known identities) is unsound at every grade. Result compatibility (did the fragment return what the stand-in returned) is reported on the join attempt, independently of the grade. |
 | `Evidence` | `kind`, `site` (the observed node grounding it), `rule` (derived kinds only), `fragment` + `join` + `alternates` (composed only), `probe_derived` |
 | `Edge` | caller → callee + one `Evidence`. A symbol pair may have many edges with different evidence. |
 
@@ -282,7 +282,7 @@ state of the fragment. The join lattice grades how much of that we checked:
 | `SYMBOL` | same `SymbolId` | nothing more |
 | `ARG_SHAPE` | arity and types compatible | bounded arg summaries at substitution sites and call nodes (already in protocol) |
 | `VALUE` | equal content digests at every observed position, outcomes known-compatible | bounded digests at seams (implemented; see experiment 02) |
-| `STATE` | relevant reachable state compatible | targeted state capture around seams: the receiver, the arguments' object graphs to a bounded depth. Never whole-process memory. |
+| `STATE` | receiver fields and the module/class state the target reads agree, by bucket (experiment 07) | bounded, value-free state facts on call nodes and seams: `self:type`, first 16 receiver fields, module/class names the code reads. Never whole-process memory, never values. Only consulted once VALUE holds; no common fact ⇒ stays VALUE. |
 
 Fragments are never flattened. Fragments for one target are grouped by **behavior shape**
 (symbols, kinds, outcomes, claims and paths of the subtree, not values); each shape is one
@@ -290,7 +290,8 @@ branch, expanded once, represented by its best-graded member with the others kep
 `Evidence.alternates`. On Kokoro-FastAPI this took composition from 11,524 to 406 composed
 edges with no provenance lost. Recursion is bounded by `on_path` and a depth limit.
 
-A seam with a known conflict (returned vs raised, or an argument-type conflict) is unsound
+A seam with a known conflict (an exit conflict such as returned vs raised or
+`returned-error` vs `panic`, an argument-type conflict, or a state conflict) is unsound
 and never composed, at any threshold; it is recorded as a rejected join. The lattice is not
 metadata. It is the mechanism that stops composed behavior being shown
 as stronger than the evidence: a `SYMBOL`-only seam renders and counts differently from an
@@ -321,6 +322,31 @@ The sandbox is a safety net and an observation mechanism, **not an exploration s
 Its block-and-observe behavior is tested with a synthetic canary that we control. An
 unexpected egress attempt from target code is a *finding* (an un-substituted external
 dependency), never something we provoke.
+
+### Privacy of state facts (experiment 07)
+
+State facts widen what a collector looks at, so their handling is explicit:
+
+- **Fields read.** Receiver: type and the first 16 own fields (`__dict__` / exported struct
+  fields / own enumerable properties). Globals (Python only): names in the function's
+  `co_names` that resolve in its own module, plus attributes read through an imported module
+  or class. Nothing else: no locals, no arguments' object graphs, no closures, no stack.
+- **Raw values are temporary.** They are read in the target process by the collector and
+  reduced to a bucket in the same call; the bucket is the only thing appended to the node.
+  No raw value is serialized, logged, or retained past the `bucket()` call.
+- **What is persisted.** `(name, bucket, digest)`. Buckets are one of ~12 coarse classes.
+  The digest is non-empty only for `obj:<Type>` and `enum:<member>` facts, and it is a
+  digest of the *type or member name*, never of a value.
+- **Low-entropy values.** A boolean, a small integer or a short string would be trivially
+  reversible from a content digest; that is why state uses buckets (`bool:true`,
+  `num:pos`, `str:nonempty`) and not the sha256 digests used for argument values. A secret
+  string is `str:nonempty`; a key byte slice is `coll:many`; a token object is `obj:<Type>`.
+- **Keyed digests.** Argument-value digests (VALUE rung) are unsalted sha256 over a
+  bounded JSON rendering; they are comparable across runs by design, which is also why they
+  are never taken of state. If cross-run comparability of argument digests becomes a
+  disclosure concern, a per-corpus key can be introduced without changing the protocol
+  (the digest is opaque to the composer); this is not done.
+- **Stand-ins.** A mock receiver contributes no fields (`obj:stand-in[:spec]` only).
 
 ## 9. Deterministic vs AI
 
@@ -374,6 +400,7 @@ Targets are local copies under `~/sample_repos`, always mounted read-only.
 | 04 | Generated probes: fill `INTERNAL_GAP`s under the sandbox guard; re-compose. | exp01 fixture, `fastapi-cross-file` |
 | 05 | Ground truth: compare composed paths with real end-to-end traces on a repo that *can* run whole. Precision/recall of composition; first real north-star number. | `demo-orders-api` (in-process end to end) |
 | 06 | Portability stress: compiled language, generated mocks, different runtime model. | `simplebank` (Go, gomock, uretprobe caveat) |
+| 07 | Does a bounded, value-free STATE rung change what is accepted where VALUE is vacuous? Exit categories; adversarial ground truth; VALUE-only vs STATE on the same corpus. | `fixtures/exp07_state`, Kokoro and simplebank replays |
 
 Big applications (Immich, Strapi, Flagsmith, GrowthBook) are out until 01–06 hold; they'd
 bury the research question under setup problems.

@@ -39,6 +39,7 @@ type Meta struct {
 	Params   []string
 	Claim    string // for test doubles: the in-repo symbol this method stands in for
 	Relation string // how Claim was established, e.g. "mocks-interface:Store"
+	Recv     any    // the receiver, for state facts (nil for functions)
 }
 
 type symbol struct {
@@ -53,29 +54,33 @@ type location struct {
 }
 
 type node struct {
-	Type      string     `json:"type"`
-	ID        int        `json:"id"`
-	Parent    *int       `json:"parent"`
-	Symbol    string     `json:"symbol,omitempty"`
-	Collector int        `json:"collector"`
+	Type      string      `json:"type"`
+	ID        int         `json:"id"`
+	Parent    *int        `json:"parent"`
+	Symbol    string      `json:"symbol,omitempty"`
+	Collector int         `json:"collector"`
 	Args      [][3]string `json:"args"`
-	Thread    int        `json:"thread,omitempty"`
-	Outcome   string     `json:"outcome"`
-	Result    string     `json:"result"`
+	Thread    int         `json:"thread,omitempty"`
+	Outcome   string      `json:"outcome"`
+	Result    string      `json:"result"`
 	// substitution fields (present only on substitution nodes; see MarshalJSON)
-	Mechanism  string   `json:"mechanism,omitempty"`
-	Substitute string   `json:"substitute,omitempty"`
-	Claimed    *string  `json:"-"`
-	Relation   string   `json:"relation,omitempty"`
-	Path       []string `json:"-"`
+	Mechanism  string      `json:"mechanism,omitempty"`
+	Substitute string      `json:"substitute,omitempty"`
+	Claimed    *string     `json:"-"`
+	Relation   string      `json:"relation,omitempty"`
+	Path       []string    `json:"-"`
+	State      [][3]string `json:"-"`
 }
 
 // MarshalJSON emits exactly the protocol's fields for each node type.
 func (n *node) MarshalJSON() ([]byte, error) {
 	m := map[string]any{"type": n.Type, "id": n.ID, "parent": n.Parent, "collector": n.Collector,
-		"args": n.Args, "outcome": n.Outcome, "result": n.Result}
+		"args": n.Args, "outcome": n.Outcome, "result": n.Result, "state": n.State}
 	if n.Args == nil {
 		m["args"] = [][3]string{}
+	}
+	if n.State == nil {
+		m["state"] = [][3]string{}
 	}
 	if n.Type == "call" {
 		m["symbol"] = n.Symbol
@@ -241,6 +246,95 @@ func digest(v any) string {
 	return hex.EncodeToString(h[:])[:16]
 }
 
+func bucket(rv reflect.Value) (string, bool) {
+	if !rv.IsValid() {
+		return "none", true
+	}
+	switch rv.Kind() {
+	case reflect.Bool:
+		if rv.Bool() {
+			return "bool:true", true
+		}
+		return "bool:false", true
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		v := rv.Int()
+		if v == 0 {
+			return "num:zero", true
+		} else if v > 0 {
+			return "num:pos", true
+		}
+		return "num:neg", true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		if rv.Uint() == 0 {
+			return "num:zero", true
+		}
+		return "num:pos", true
+	case reflect.Float32, reflect.Float64:
+		v := rv.Float()
+		if v == 0 {
+			return "num:zero", true
+		} else if v > 0 {
+			return "num:pos", true
+		}
+		return "num:neg", true
+	case reflect.String:
+		if rv.Len() == 0 {
+			return "str:empty", true
+		}
+		return "str:nonempty", true
+	case reflect.Slice, reflect.Map, reflect.Array:
+		n := rv.Len()
+		if n == 0 {
+			return "coll:empty", true
+		} else if n == 1 {
+			return "coll:one", true
+		}
+		return "coll:many", true
+	case reflect.Ptr, reflect.Interface:
+		if rv.IsNil() {
+			return "none", true
+		}
+		return "obj:" + rv.Elem().Type().String(), true
+	case reflect.Struct:
+		return "obj:" + rv.Type().String(), true
+	case reflect.Func, reflect.Chan:
+		return "", false
+	}
+	return "", false
+}
+
+func stateFacts(recv any) [][3]string {
+	facts := [][3]string{}
+	if recv == nil {
+		return facts
+	}
+	rv := reflect.ValueOf(recv)
+	for rv.Kind() == reflect.Ptr {
+		if rv.IsNil() {
+			return facts
+		}
+		rv = rv.Elem()
+	}
+	facts = append(facts, [3]string{"self:type", "obj:" + rv.Type().String(), digest(rv.Type().String())})
+	if rv.Kind() != reflect.Struct {
+		return facts
+	}
+	t := rv.Type()
+	for i := 0; i < rv.NumField() && i < digestWidth; i++ {
+		f := t.Field(i)
+		b, ok := bucket(rv.Field(i))
+		if !ok {
+			continue
+		}
+		d := ""
+		if strings.HasPrefix(b, "obj:") {
+			d = digest(b[4:])
+		}
+		facts = append(facts, [3]string{"self." + f.Name, b, d})
+	}
+	return facts
+}
+
 func argShapes(names []string, values []any) [][3]string {
 	out := [][3]string{}
 	for i, v := range values {
@@ -401,14 +495,15 @@ func Enter(m Meta, values ...any) *Ctx {
 		}
 		p := parent
 		n := &node{Type: "substitution", ID: len(e.nodes), Parent: &p, Collector: 0, Mechanism: mech,
-			Substitute: m.Sym, Claimed: claimed, Relation: relation, Path: []string{}, Args: args, Outcome: "unknown"}
+			Substitute: m.Sym, Claimed: claimed, Relation: relation, Path: []string{}, Args: args, Outcome: "unknown",
+			State: [][3]string{}}
 		e.nodes = append(e.nodes, n)
 		sub = n.ID
 		parent = sub
 	}
 	p := parent
 	n := &node{Type: "call", ID: len(e.nodes), Parent: &p, Symbol: m.Sym, Collector: 0, Args: args,
-		Thread: e.thread(gid), Outcome: "unknown"}
+		Thread: e.thread(gid), Outcome: "unknown", State: stateFacts(m.Recv)}
 	e.nodes = append(e.nodes, n)
 	e.stacks[gid] = append(stack, n.ID)
 	return &Ctx{id: n.ID, sub: sub, gid: gid, exec: e}
@@ -448,7 +543,7 @@ func Exit(c *Ctx, results ...any) {
 	vals := results
 	if n := len(results); n > 0 {
 		if err, ok := results[n-1].(error); ok && err != nil {
-			outcome = "raised:go:" + reflect.TypeOf(err).String()
+			outcome = "returned-error:go:" + reflect.TypeOf(err).String()
 			c.exec.intern("go:"+reflect.TypeOf(err).String(), "external", "", 0)
 			vals = results[:n-1]
 		} else if results[n-1] == nil {
@@ -479,14 +574,14 @@ func Panic(c *Ctx, r any) {
 	}
 	mu.Lock()
 	defer mu.Unlock()
-	t := "panic"
+	t := "go:panic"
 	if r != nil {
-		t = "panic:" + reflect.TypeOf(r).String()
+		t = "go:" + reflect.TypeOf(r).String()
 	}
-	c.exec.intern("go:"+t, "external", "", 0)
-	settle(c.exec, c.id, "raised:go:"+t, "")
+	c.exec.intern(t, "external", "", 0)
+	settle(c.exec, c.id, "panic:"+t, "")
 	if c.sub >= 0 {
-		settle(c.exec, c.sub, "raised:go:"+t, "")
+		settle(c.exec, c.sub, "panic:"+t, "")
 	}
 	c.exec.pop(c.gid, c.id)
 }

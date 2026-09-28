@@ -107,7 +107,9 @@ func main() {
 		})
 	}
 	if *indexFlag != "" {
-		sort.Slice(index, func(i, j int) bool { return index[i].Path < index[j].Path || (index[i].Path == index[j].Path && index[i].Start < index[j].Start) })
+		sort.Slice(index, func(i, j int) bool {
+			return index[i].Path < index[j].Path || (index[i].Path == index[j].Path && index[i].Start < index[j].Start)
+		})
 		data, _ := json.MarshalIndent(map[string]any{"root": absRoot, "definitions": index}, "", " ")
 		_ = os.WriteFile(*indexFlag, append(data, '\n'), 0o644)
 	}
@@ -291,7 +293,11 @@ func (fc *fileCtx) instrumentFunc(fd *ast.FuncDecl) {
 			}
 		}
 	}
-	fc.wrapBody(fd.Type, fd.Body, sym, line, claim, relation, isTestFunc(fd))
+	recv := ""
+	if fd.Recv != nil && len(fd.Recv.List) > 0 && len(fd.Recv.List[0].Names) > 0 && fd.Recv.List[0].Names[0].Name != "_" {
+		recv = fd.Recv.List[0].Names[0].Name
+	}
+	fc.wrapBody(fd.Type, fd.Body, sym, line, claim, relation, isTestFunc(fd), recv)
 	fc.markLits(fd.Body, qual)
 }
 
@@ -342,12 +348,12 @@ func (fc *fileCtx) instrumentLit(fl *ast.FuncLit) {
 	}
 	sym := fc.symbolFor(qual)
 	*fc.index = append(*fc.index, definition{Symbol: sym, Path: fc.rel, Start: line, End: fc.fset.Position(fl.End()).Line, Kind: "function"})
-	fc.wrapBody(fl.Type, fl.Body, sym, line, "", "", isSubtestLit(fl) && fc.origin == "test")
+	fc.wrapBody(fl.Type, fl.Body, sym, line, "", "", isSubtestLit(fl) && fc.origin == "test", "")
 	fc.markLits(fl.Body, qual)
 }
 
 // wrapBody prepends the entry call and the deferred exit to a function body.
-func (fc *fileCtx) wrapBody(ft *ast.FuncType, body *ast.BlockStmt, sym string, line int, claim, relation string, stimulus bool) {
+func (fc *fileCtx) wrapBody(ft *ast.FuncType, body *ast.BlockStmt, sym string, line int, claim, relation string, stimulus bool, recv string) {
 	// name unnamed results so the defer can read them
 	var resultNames []ast.Expr
 	if ft.Results != nil {
@@ -391,6 +397,9 @@ func (fc *fileCtx) wrapBody(ft *ast.FuncType, body *ast.BlockStmt, sym string, l
 	if claim != "" {
 		metaElts = append(metaElts, kv("Claim", strLit(claim)), kv("Relation", strLit(relation)))
 	}
+	if recv != "" {
+		metaElts = append(metaElts, kv("Recv", ast.NewIdent(recv)))
+	}
 	meta := &ast.CompositeLit{Type: sel("dg", "Meta"), Elts: metaElts}
 	enterArgs := append([]ast.Expr{meta}, paramValues...)
 	enter := &ast.AssignStmt{
@@ -430,8 +439,10 @@ func (fc *fileCtx) wrapBody(ft *ast.FuncType, body *ast.BlockStmt, sym string, l
 }
 
 func kv(k string, v ast.Expr) ast.Expr { return &ast.KeyValueExpr{Key: ast.NewIdent(k), Value: v} }
-func strLit(s string) ast.Expr           { return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(s)} }
-func sel(x, name string) ast.Expr        { return &ast.SelectorExpr{X: ast.NewIdent(x), Sel: ast.NewIdent(name)} }
+func strLit(s string) ast.Expr         { return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(s)} }
+func sel(x, name string) ast.Expr {
+	return &ast.SelectorExpr{X: ast.NewIdent(x), Sel: ast.NewIdent(name)}
+}
 func strLits(xs []string) []ast.Expr {
 	out := make([]ast.Expr, 0, len(xs))
 	for _, x := range xs {

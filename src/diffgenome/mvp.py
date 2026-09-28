@@ -89,6 +89,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--attempts", type=int, default=2)
     ap.add_argument("--up", type=int, default=3)
     ap.add_argument("--down", type=int, default=4)
+    ap.add_argument(
+        "--no-state", action="store_true", help="ignore state facts at seams (VALUE-only baseline)"
+    )
     args = ap.parse_args(argv)
 
     repo = args.repo.resolve()
@@ -128,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         # 2. map
         corpus = build_corpus(executions)
-        graph = build_graph(corpus)
+        graph = build_graph(corpus, use_state=not args.no_state)
         _log(f"map: {len(graph.edges)} edges, {len(graph.symbols)} symbols, {len(graph.gaps)} gaps")
         # 3. change
         change: ChangeSet
@@ -176,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
             notes.extend(f"not probeable: {s}" for s in skipped)
             accepted = sum(a.verdict == "accepted" for a in attempts)
             _log(f"probes: {accepted} accepted of {len(attempts)} attempts")
-        graph_after = build_graph(corpus_after) if attempts else None
+        graph_after = build_graph(corpus_after, use_state=not args.no_state) if attempts else None
         nb_after = (
             graph_after.neighborhood(seeds, up=args.up, down=args.down) if graph_after else None
         )

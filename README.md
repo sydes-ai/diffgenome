@@ -103,7 +103,8 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | **Second runtime**: Node/TypeScript collector behind the runtime seam; core model unchanged | done; see `docs/experiment-04.md` |
 | **Ground truth**: edge precision/recall and seam-level join grading against hidden whole executions | done; see `docs/experiment-05.md` |
 | **Third runtime (Go)**, behavioral projection (`map.md`), ambiguity report, path-level ground truth, three real-diff case studies | done; see `docs/experiment-06.md` and `docs/runs/cases/` |
-| STATE joins, goroutine/coroutine spawn causality, Linux OS-plane collector, larger targets | next |
+| **STATE rung** (bounded, value-free state facts on all three runtimes), exit categories (`returned-error`/`panic`), adversarial ground truth VALUE-only vs STATE, join matrix and path precision/recall with explanations, state-condition probe objective | done; see `docs/experiment-07.md` and `docs/runs/exp07-state/` |
+| Goroutine/coroutine spawn causality, Linux OS-plane collector, larger targets, state-condition probes against a live writer | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
 
@@ -129,7 +130,10 @@ provenance), `map.md` (the behavioral projection around the change: production b
 tests and probes as evidence), `map-evidence.md`, `slice.json`, `metrics.json`,
 `ambiguity.md` and `report.md`; `python -m diffgenome inspect
 --graph graph.json --symbol <id>` queries the graph, `python -m diffgenome evaluate` grades
-a reconstruction against hidden whole executions.
+a reconstruction against hidden whole executions (with `--traces`: path precision/recall,
+an explanation per extra and missed path, and the join matrix per seam; `--no-state`
+rebuilds the same corpus as the VALUE-only baseline). `mvp --no-state` does the same for a
+whole run.
 
 ## Documents
 
@@ -149,6 +153,9 @@ a reconstruction against hidden whole executions.
 - [docs/experiment-06.md](docs/experiment-06.md): three real changes across Python, Node and Go,
   the behavioral projection, ambiguity analysis, path-level ground truth, and the
   language-neutrality accounting after three runtimes.
+- [docs/experiment-07.md](docs/experiment-07.md): the STATE rung and the exit model, an
+  adversarial ground truth where VALUE must fail, VALUE-only vs STATE on the same corpus,
+  the Kokoro and Go replays, and the privacy accounting for state.
 
 ## Layout
 

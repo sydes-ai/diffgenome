@@ -38,6 +38,7 @@ from diffgenome.model import (
     OsEventNode,
     Plane,
     SourceLocation,
+    StateFacts,
     SubstitutionMechanism,
     SubstitutionNode,
     Symbol,
@@ -115,6 +116,84 @@ def _canonical(value: Any, depth: int) -> str | None:
             fields.append(f"{f.name}={c}")
         return f"{type(value).__qualname__}({','.join(fields)})"
     return None
+
+
+_STATE_WIDTH = 16
+
+
+def bucket(value: Any) -> tuple[str, str] | None:
+    """Language-neutral low-cardinality bucket of a value, or None when the value is not
+    branch-relevant enough to summarize (free-form objects, callables). Returns
+    (bucket, digest) where digest is filled only for public identifiers (enum members,
+    type names). Scalars are never stored: only their bucket."""
+    import enum
+
+    if value is None:
+        return "none", ""
+    if isinstance(value, bool):
+        return f"bool:{'true' if value else 'false'}", ""
+    if isinstance(value, enum.Enum):
+        return f"enum:{value.name}", digest_value(value.name)
+    if isinstance(value, int | float):
+        return ("num:zero" if value == 0 else "num:pos" if value > 0 else "num:neg"), ""
+    if isinstance(value, str | bytes):
+        return ("str:empty" if not value else "str:nonempty"), ""
+    if isinstance(value, list | tuple | set | frozenset | dict):
+        n = len(value)
+        return ("coll:empty" if n == 0 else "coll:one" if n == 1 else "coll:many"), ""
+    if isinstance(value, mock.NonCallableMock):
+        spec = getattr(value, "_spec_class", None)
+        return f"obj:stand-in{':' + spec.__qualname__ if spec else ''}", ""
+    if callable(value) and not isinstance(value, type):
+        return None
+    name = type(value).__qualname__
+    return f"obj:{name}", digest_value(name)
+
+
+def state_facts(
+    receiver: Any, code: CodeType | None, module_globals: dict[str, Any] | None
+) -> StateFacts:
+    """Receiver fields (first _STATE_WIDTH) and module globals the code reads, bucketed."""
+    facts: list[tuple[str, str, str]] = []
+    if receiver is not None and not isinstance(receiver, mock.NonCallableMock):
+        facts.append(
+            (
+                "self:type",
+                f"obj:{type(receiver).__qualname__}",
+                digest_value(type(receiver).__qualname__),
+            )
+        )
+        d = getattr(receiver, "__dict__", None)
+        if isinstance(d, dict):
+            for name, value in list(d.items())[:_STATE_WIDTH]:
+                b = bucket(value)
+                if b is not None:
+                    facts.append((f"self.{name}", b[0], b[1]))
+    if code is not None and module_globals:
+        names = code.co_names[: _STATE_WIDTH * 2]
+        for name in names:
+            if name in module_globals and not name.startswith("__"):
+                value = module_globals[name]
+                if isinstance(value, ModuleType | type):
+                    # state read through an imported module or a class attribute:
+                    # settings.STRICT, ModelManager._instance. Own namespace only.
+                    for attr in names:
+                        if attr != name and attr in vars(value):
+                            inner = vars(value)[attr]
+                            if isinstance(
+                                inner, type | ModuleType | property | classmethod | staticmethod
+                            ) or callable(inner):
+                                continue
+                            b = bucket(inner)
+                            if b is not None:
+                                facts.append((f"global.{name}.{attr}", b[0], b[1]))
+                    continue
+                if callable(value):
+                    continue
+                b = bucket(value)
+                if b is not None:
+                    facts.append((f"global.{name}", b[0], b[1]))
+    return tuple(facts[: _STATE_WIDTH * 2])
 
 
 def digest_value(value: Any) -> str:
@@ -379,6 +458,50 @@ class Tracer:
                         return cls, name, member
         return None
 
+    def _seam_state(self, callable_: Any, frame: Any, relation: str) -> StateFacts:
+        """State the real target would see at this seam, when the seed exposes it."""
+        if frame is None:
+            return ()
+        root = callable_
+        while isinstance(root, mock.NonCallableMock) and (
+            root._mock_parent or root._mock_new_parent
+        ):
+            root = root._mock_parent or root._mock_new_parent
+        if relation == "instance-attribute":
+            bound = self._bound_attribute(root, frame)
+            if bound is not None:
+                obj = None
+                for cand in list(frame.f_locals.values())[: _MAX_ARGS + 2]:
+                    d = getattr(cand, "__dict__", None)
+                    if isinstance(d, dict) and any(v is root for v in d.values()):
+                        obj = cand
+                        break
+                member = bound[2]
+                func = getattr(member, "__func__", getattr(member, "fget", member))
+                code = getattr(func, "__code__", None)
+                return state_facts(obj, code, getattr(func, "__globals__", None))
+        if relation == "patch-target":
+            patched = self._patched.get(id(root))
+            if patched is not None:
+                target_obj, _, original = patched
+                if (
+                    isinstance(target_obj, ModuleType)
+                    and getattr(original, "__code__", None) is not None
+                ):
+                    # the original's own globals: a function patched where it was imported
+                    # still reads state from the module that defined it
+                    return state_facts(
+                        None, original.__code__, getattr(original, "__globals__", vars(target_obj))
+                    )
+                if not isinstance(target_obj, type | ModuleType):
+                    func = getattr(original, "__func__", getattr(original, "fget", original))
+                    return state_facts(
+                        target_obj,
+                        getattr(func, "__code__", None),
+                        getattr(func, "__globals__", None),
+                    )
+        return ()
+
     def _record_substitution(
         self,
         parent: int,
@@ -387,9 +510,11 @@ class Tracer:
         args: ArgShapes,
         frame: Any = None,
     ) -> int:
+        state: StateFacts = ()
         if isinstance(callable_, mock.NonCallableMock):
             substitute = f"py:{type(callable_).__module__}.{type(callable_).__qualname__}"
             mechanism, claimed, relation, path = self._describe_mock(callable_, frame)
+            state = self._seam_state(callable_, frame, relation)
         else:
             substitute = self._intern_symbol(self.symbol_for_object(callable_))
             claimed, relation, path = None, "none", ()
@@ -403,6 +528,7 @@ class Tracer:
             relation=relation,
             path=path,
             args=args,
+            state=state,
         )
         self._nodes.append(node)
         return node.id
@@ -469,8 +595,22 @@ class Tracer:
                 else SubstitutionMechanism.STUB
             )
             sub_id = self._record_substitution(parent, mechanism, _CodeHolder(code), args)
+            recv = (
+                frame.f_locals.get("self")
+                if code.co_argcount and code.co_varnames[0] == "self"
+                else None
+            )
+            if recv is not None:
+                sub = self._nodes[sub_id]
+                assert isinstance(sub, SubstitutionNode)
+                self._nodes[sub_id] = dataclasses.replace(sub, state=state_facts(recv, None, None))
             parent = sub_id
         self._intern(scope.symbol, scope.origin, scope.location)
+        receiver = (
+            frame.f_locals.get("self")
+            if code.co_argcount and code.co_varnames[0] == "self"
+            else None
+        )
         node = CallNode(
             id=len(self._nodes),
             parent=parent,
@@ -478,6 +618,7 @@ class Tracer:
             collector=0,
             args=args,
             thread=self._threads[ident],
+            state=state_facts(receiver, code, frame.f_globals),
         )
         self._nodes.append(node)
         self._frame_nodes[id(frame)] = node.id

@@ -11,9 +11,18 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from itertools import pairwise
 
 from diffgenome.graph import BehavioralGraph, GraphEdge
-from diffgenome.model import CallNode, EvidenceKind, Execution, JoinStrength, Origin, SymbolId
+from diffgenome.model import (
+    CallNode,
+    EvidenceKind,
+    Execution,
+    JoinStrength,
+    NodeRef,
+    Origin,
+    SymbolId,
+)
 
 Edge = tuple[SymbolId, SymbolId]
 
@@ -365,7 +374,7 @@ def composed_paths(graph: BehavioralGraph, entry: SymbolId, depth: int = 8) -> s
 
     out: set[tuple[str, ...]] = set()
     for ex_id in graph.tests_by_symbol.get(entry, ()):
-        comp = compose(corpus, ex_id)
+        comp = compose(corpus, ex_id, use_state=graph.use_state)
 
         def expand(branches: list[Branch], d: int) -> list[list[str]]:
             # siblings concatenate; alternatives for one caller→callee pair multiply
@@ -450,6 +459,12 @@ def evaluate_paths(
     return PathEvaluation(entry, len(truth), len(claimed), len(matched), extra, missed, outcome_mm)
 
 
+def path_scores(pe: PathEvaluation) -> tuple[float, float]:
+    precision = pe.matched / pe.claimed_paths if pe.claimed_paths else 0.0
+    recall = pe.matched / pe.truth_paths if pe.truth_paths else 0.0
+    return precision, recall
+
+
 def render_paths(pe: PathEvaluation) -> str:
     def fmt(p: tuple[str, ...]) -> str:
         return " → ".join(
@@ -457,14 +472,198 @@ def render_paths(pe: PathEvaluation) -> str:
             for x in p
         )
 
+    pp, pr = path_scores(pe)
     lines = [
         f"### path-level: {pe.entry.split(':', 1)[1]}",
         f"ground-truth sequences {pe.truth_paths}, claimed {pe.claimed_paths}, "
         f"matched {pe.matched}, extra {len(pe.extra)} (of which outcome-only mismatches "
         f"{pe.outcome_mismatches}), missed {len(pe.missed)}",
+        f"path precision {pp:.3f}   path recall {pr:.3f}",
     ]
     for p in pe.extra[:8]:
         lines.append(f"  extra:  {fmt(p)}")
     for p in pe.missed[:8]:
         lines.append(f"  missed: {fmt(p)}")
     return "\n".join(lines) + "\n"
+
+
+# --------------------------------------------------------------------------- join matrix
+
+
+@dataclass
+class MatrixRow:
+    caller: SymbolId
+    target: SymbolId
+    fragment: str
+    symbol: str  # "✓" reached, "✗" failed at this rung, "·" not evaluated
+    arg_shape: str
+    value: str
+    state: str  # ✓ | ✗ (conflict) | n/a (no facts to compare) | · (not evaluated / disabled)
+    exit: str  # same | kind | unknown | conflict
+    truth: bool | None  # the fragment's continuation equals a ground-truth execution's
+    accepted: bool
+    note: str
+
+
+def join_matrix(
+    graph: BehavioralGraph,
+    corpus_graph_edges: dict[str, set[Edge]],
+    gt: GroundTruth,
+    truth_per_exec: list[set[Edge]] | None = None,
+) -> list[MatrixRow]:
+    """One row per (seam, candidate fragment) for seams whose target is on a ground-truth
+    path: which rungs the candidate reached, its exit verdict, whether its first-level
+    continuation is one some ground-truth execution actually took from that target, and
+    whether the composer accepted it. Rung marks are derived from the grade and the
+    rejection note, so a rejected candidate still shows how far it got."""
+    gt_out: dict[SymbolId, set[SymbolId]] = defaultdict(set)
+    for a, b in gt.edges:
+        gt_out[a].add(b)
+    truth_sets: dict[SymbolId, list[set[SymbolId]]] = defaultdict(list)
+    for edges in truth_per_exec or []:
+        outs: dict[SymbolId, set[SymbolId]] = defaultdict(set)
+        for a, b in edges:
+            outs[a].add(b)
+        for a, nxt in outs.items():
+            truth_sets[a].append(nxt)
+    targets = {b for _, b in gt.edges} | {a for a, _ in gt.edges}
+    callers: dict[tuple[NodeRef, str], str] = {}
+    for e in graph.edges.values():
+        for ev in e.evidence:
+            callers[(ev.site, e.callee)] = e.caller
+    rows: list[MatrixRow] = []
+    for att in graph.attempts:
+        if att.target not in targets:
+            continue
+        frag_next = {
+            b for a, b in corpus_graph_edges.get(att.fragment.execution, set()) if a == att.target
+        }
+        truth: bool | None
+        if truth_sets.get(att.target):
+            truth = frag_next in truth_sets[att.target]
+        elif att.target in gt_out:
+            truth = frag_next == gt_out[att.target]
+        else:
+            truth = None
+        g = att.grade.value if att.grade else 0
+        note = att.note
+        exit_ = att.exit if att.exit else "conflict"
+        sym = arg = val = state = "·"
+        if att.grade is not None:
+            sym = "✓"
+            arg = "✓" if g >= 2 else "✗"
+            val = "✓" if g >= 3 else ("·" if g < 2 else "✗")
+            if g >= 4:
+                state = "✓"
+            elif g == 3:
+                state = "n/a" if ("state unavailable" in note or "no common" in note) else "·"
+        elif "state conflict" in note:
+            sym = arg = val = "✓"
+            state = "✗"
+        elif "type conflict" in note:
+            sym, arg = "✓", "✗"
+        elif "exit conflict" in note:
+            sym = "✓"
+        rows.append(
+            MatrixRow(
+                callers.get((att.site, att.target), "?"),
+                att.target,
+                att.fragment.execution.split("::")[-1].split("@")[0],
+                sym,
+                arg,
+                val,
+                state,
+                exit_,
+                truth,
+                att.accepted,
+                note,
+            )
+        )
+    rows.sort(key=lambda r: (r.caller, r.target, r.fragment))
+    return rows
+
+
+def render_matrix(rows: list[MatrixRow]) -> str:
+    def yn(b: bool) -> str:
+        return "✓" if b else "✗"
+
+    lines = [
+        "| seam | candidate fragment | SYMBOL | ARG_SHAPE | VALUE | STATE | EXIT "
+        "| truth | accepted |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        seam = f"{r.caller.split('.')[-1]} ⇢ {r.target.split('.')[-1]}"
+        truth = "?" if r.truth is None else yn(r.truth)
+        lines.append(
+            f"| {seam} | {r.fragment} | {r.symbol} | {r.arg_shape} | {r.value} "
+            f"| {r.state} | {r.exit} | {truth} | {yn(r.accepted)} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def explain_paths(pe: PathEvaluation, graph: BehavioralGraph) -> list[str]:
+    """For each extra path, which seam and join grade admitted it; for each missed path,
+    what evidence was absent."""
+    out: list[str] = []
+    for p in pe.extra:
+        # the first symbol whose edge from its predecessor is composed is the admitting seam
+        found = False
+        for a, b in pairwise(p):
+            ca, cb = a.rsplit(":", 1)[0], b.rsplit(":", 1)[0]
+            e = graph.edges.get((ca, cb, EvidenceKind.COMPOSED))
+            if e is not None:
+                grades = sorted({ev.join.name for ev in e.evidence if ev.join})
+                out.append(
+                    f"extra {_fmt_path(p)}: admitted at seam {ca.split('.')[-1]} ⇢ "
+                    f"{cb.split('.')[-1]} with join {'/'.join(grades)}"
+                )
+                found = True
+                break
+        if not found:
+            out.append(
+                f"extra {_fmt_path(p)}: all edges observed in some execution "
+                "(a real path the ground truth did not take)"
+            )
+    for p in pe.missed:
+        syms = {x.rsplit(":", 1)[0] for x in p}
+        reasons: list[str] = []
+        # a rejected candidate whose target lies on the path: cite the rejection
+        seen: set[str] = set()
+        for att in graph.attempts:
+            if att.accepted or att.target not in syms:
+                continue
+            if graph.corpus is not None:
+                # only candidates that actually contain the missed continuation
+                frag_syms = {
+                    n.symbol
+                    for n in graph.corpus.executions[att.fragment.execution].nodes
+                    if isinstance(n, CallNode)
+                }
+                after = list(p)[[x.rsplit(":", 1)[0] for x in p].index(att.target) + 1 :]
+                if not all(x.rsplit(":", 1)[0] in frag_syms for x in after):
+                    continue
+            head = att.note.split(";")[0]
+            key = f"{att.target}|{head}"
+            if key in seen:
+                continue
+            seen.add(key)
+            reasons.append(
+                f"candidate {att.fragment.execution.split('::')[-1].split('@')[0]} at "
+                f"⇢ {att.target.split('.')[-1]} rejected: {head}"
+            )
+        unreached = [
+            x.split(".")[-1] for x in syms if x not in graph.inc and x != p[0].rsplit(":", 1)[0]
+        ]
+        if unreached:
+            reasons.append("no evidence reaches " + ", ".join(sorted(unreached)))
+        if not reasons:
+            reasons.append("the seed corpus never observed the entry under this exit path")
+        out.append(f"missed {_fmt_path(p)}: " + "; ".join(reasons))
+    return out
+
+
+def _fmt_path(p: tuple[str, ...]) -> str:
+    return " → ".join(
+        x.rsplit(":", 1)[0].split(".")[-1] + ("!" if x.endswith(":raised") else "") for x in p
+    )

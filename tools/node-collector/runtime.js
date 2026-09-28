@@ -106,6 +106,39 @@ function argShapes(names, values) {
   return out;
 }
 
+// ----------------------------------------------------------------------------- state facts
+
+const STATE_WIDTH = 16;
+
+function bucket(v) {
+  if (v === null || v === undefined) return ["none", ""];
+  const t = typeof v;
+  if (t === "boolean") return [`bool:${v}`, ""];
+  if (t === "number" || t === "bigint") return [v == 0 ? "num:zero" : v > 0 ? "num:pos" : "num:neg", ""];
+  if (t === "string") return [v.length ? "str:nonempty" : "str:empty", ""];
+  if (t === "function") return v._isMockFunction ? ["obj:stand-in", ""] : null;
+  if (ArrayIsArray(v)) return [v.length === 0 ? "coll:empty" : v.length === 1 ? "coll:one" : "coll:many", ""];
+  if (v instanceof Map || v instanceof Set) return [v.size === 0 ? "coll:empty" : v.size === 1 ? "coll:one" : "coll:many", ""];
+  if (v && typeof v === "object" && v._isMockObject) return ["obj:stand-in", ""];
+  const proto = ObjectGetPrototypeOf(v);
+  if (proto === null || proto === Object.prototype) return [`coll:${ObjectKeys(v).length === 0 ? "empty" : ObjectKeys(v).length === 1 ? "one" : "many"}`, ""];
+  const name = (proto.constructor && proto.constructor.name) || "object";
+  return [`obj:${name}`, digest(name)];
+}
+
+function stateFacts(receiver) {
+  if (receiver === undefined || receiver === null || typeof receiver !== "object") return [];
+  const facts = [];
+  const proto = ObjectGetPrototypeOf(receiver);
+  const name = (proto && proto.constructor && proto.constructor.name) || "object";
+  facts.push(["self:type", `obj:${name}`, digest(name)]);
+  for (const k of ObjectKeys(receiver).slice(0, STATE_WIDTH)) {
+    const b = bucket(receiver[k]);
+    if (b) facts.push([`self.${k}`, b[0], b[1]]);
+  }
+  return facts;
+}
+
 // ----------------------------------------------------------------------------- nodes
 
 function currentNode() {
@@ -126,19 +159,20 @@ function nodeOrigin(id) {
   return s ? s.origin : "unknown";
 }
 
-function newCall(symbol, args, parent) {
+function newCall(symbol, args, parent, facts) {
   const id = state.nodes.length;
   state.nodes.push({
     type: "call", id, parent, symbol, collector: 0, args, thread: 0, outcome: "unknown", result: "",
+    state: facts || [],
   });
   return id;
 }
 
-function newSubstitution(parent, mechanism, substitute, claimed, relation, pathParts, args) {
+function newSubstitution(parent, mechanism, substitute, claimed, relation, pathParts, args, facts) {
   const id = state.nodes.length;
   state.nodes.push({
     type: "substitution", id, parent, collector: 0, mechanism, substitute, claimed_target: claimed,
-    relation, path: pathParts, args, outcome: "unknown", result: "",
+    relation, path: pathParts, args, outcome: "unknown", result: "", state: facts || [],
   });
   return id;
 }
@@ -201,10 +235,11 @@ function enter(meta, values, thisArg) {
     let relation = "none";
     const overridden = overriddenMember(meta, thisArg);
     if (overridden) { claimed = overridden; relation = "overrides"; }
-    sub = newSubstitution(parent, mechanism, meta.sym, claimed, relation, [], args);
+    // A subclass fake's inherited fields are the real receiver's state.
+    sub = newSubstitution(parent, mechanism, meta.sym, claimed, relation, [], args, claimed ? stateFacts(thisArg) : []);
     parent = sub;
   }
-  const id = newCall(meta.sym, args, parent);
+  const id = newCall(meta.sym, args, parent, stateFacts(thisArg));
   const prev = als.getStore();
   als.enterWith({ node: id });
   return { id, prev, sub };

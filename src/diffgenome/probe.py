@@ -12,7 +12,7 @@ import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from diffgenome.compose import Corpus, build_corpus
+from diffgenome.compose import Corpus, JoinAttempt, build_corpus
 from diffgenome.graph import BehavioralGraph, GraphEdge, Metrics, Neighborhood, build_graph
 from diffgenome.llm import ProbeDraft, ProbeRequest, ProbeWriter
 from diffgenome.model import (
@@ -24,6 +24,7 @@ from diffgenome.model import (
     NodeRef,
     Origin,
     OsEventNode,
+    StateFacts,
     Stimulus,
     SubstitutionNode,
     SymbolId,
@@ -42,7 +43,7 @@ CONSTRAINTS = """- The probe is a unit-level stimulus, not an integration test.
 
 @dataclass
 class ProbeObjective:
-    kind: str  # "internal_gap" | "weak_join"
+    kind: str  # "uncovered_symbol" | "internal_gap" | "weak_join" | "state_condition"
     target: SymbolId
     caller: SymbolId
     site: NodeRef
@@ -51,6 +52,8 @@ class ProbeObjective:
     seam_outcome: str
     current_join: JoinStrength | None
     supporting_executions: int
+    seam_state: StateFacts = ()  # state facts the seam exposed (state_condition objectives)
+    state_conflicts: tuple[str, ...] = ()  # "self.enabled bool:true≠bool:false" per rejection
 
     def describe(self) -> str:
         if self.kind == "uncovered_symbol":
@@ -60,6 +63,17 @@ class ProbeObjective:
                 "Substitute its direct in-repo collaborators with stand-ins that keep their "
                 "identity (unittest.mock.patch(..., autospec=True) or jest.spyOn) so the seams "
                 "are recorded, and substitute any external dependency."
+            )
+        if self.kind == "state_condition":
+            cond = ", ".join(f"{n} is {b}" for n, b, _ in self.seam_state[:6])
+            why = "; ".join(self.state_conflicts[:3])
+            return (
+                f"`{self.caller}` reaches `{self.target}` through a stand-in while the receiver "
+                f"or module state is: {cond}. Every existing execution of the real "
+                f"`{self.target}` ran under a different state ({why}), so no observed "
+                f"continuation is valid for this seam. Write a probe that executes the real "
+                f"`{self.target}` with matching arguments ({_fmt_args(self.seam_args)}) and "
+                f"under that same state condition, with its external dependencies substituted."
             )
         if self.kind == "internal_gap":
             return (
@@ -142,13 +156,61 @@ def select_objectives(
         ((d, e) for d, e in nb.edges_of(EvidenceKind.COMPOSED) if not e.strong),
         key=lambda x: (x[0], -len(x[1].executions)),
     )
+
+    def state_rejections(callee: SymbolId) -> list[JoinAttempt]:
+        return [
+            a
+            for a in graph.attempts
+            if a.target == callee and not a.accepted and "state conflict" in a.note
+        ]
+
     for kind, edges in (("internal_gap", gaps), ("weak_join", weak)):
         for d, e in edges:
-            o = objective(kind, d, e)
+            rejected = state_rejections(e.callee) if kind == "internal_gap" else []
+            # The real target ran, but every candidate fragment was rejected on state alone:
+            # not a coverage gap but a state gap. "Execute X under state condition Y."
+            actual_kind = (
+                "state_condition" if rejected and e.callee in graph.tests_by_symbol else kind
+            )
+            o = objective(actual_kind, d, e)
             if o:
+                if actual_kind == "state_condition":
+                    assert graph.corpus is not None
+                    node = graph.corpus.executions[o.site.execution].nodes[o.site.node]
+                    o.seam_state = getattr(node, "state", ())
+                    o.state_conflicts = tuple(
+                        sorted(
+                            {a.note.split("state conflict: ", 1)[1].split(";")[0] for a in rejected}
+                        )
+                    )
                 out.append(o)
             if len(out) >= limit:
                 return out
+    return out
+    # Seams every candidate fragment was rejected at on state alone: the real target ran,
+    # but never under the state the seam exposes. "Execute X under state condition Y."
+    for d, e in gaps:
+        if e.callee in seen or e.callee not in graph.tests_by_symbol:
+            continue
+        rejected = [
+            a
+            for a in graph.attempts
+            if a.target == e.callee and not a.accepted and "state conflict" in a.note
+        ]
+        if not rejected:
+            continue
+        o = objective("state_condition", d, e)
+        if o is None:
+            continue
+        assert graph.corpus is not None
+        node = graph.corpus.executions[o.site.execution].nodes[o.site.node]
+        o.seam_state = getattr(node, "state", ())
+        o.state_conflicts = tuple(
+            sorted({a.note.split("state conflict: ", 1)[1].split(";")[0] for a in rejected})
+        )
+        out.append(o)
+        if len(out) >= limit:
+            return out
     return out
 
 

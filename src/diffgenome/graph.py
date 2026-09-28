@@ -87,6 +87,7 @@ class BehavioralGraph:
     attempts: list[JoinAttempt]  # every join attempt, accepted or not
     corpus: Corpus | None = None  # present when built from traces; None when loaded from JSON
     compositions: dict[str, Composition] = field(default_factory=dict)
+    use_state: bool = True  # whether the STATE rung was consulted when this graph was built
 
     def origin(self, symbol: SymbolId) -> Origin:
         s = self.symbols.get(symbol)
@@ -104,6 +105,7 @@ class BehavioralGraph:
                 else None,
                 "alternates": [{"execution": a.execution, "node": a.node} for a in e.alternates],
                 "join": e.join.name if e.join else None,
+                "exit": e.exit,
                 "rule": e.rule,
                 "probe_derived": e.probe_derived,
             }
@@ -158,6 +160,7 @@ class BehavioralGraph:
                     "accepted": a.accepted,
                     "note": a.note,
                     "result_compatible": a.result_compatible,
+                    "exit": a.exit,
                 }
                 for a in self.attempts
             ],
@@ -218,6 +221,7 @@ class BehavioralGraph:
                 a["accepted"],
                 a["note"],
                 a["result_compatible"],
+                a.get("exit"),
             )
             for a in doc["join_attempts"]
         ]
@@ -378,7 +382,9 @@ class Neighborhood:
         )
 
 
-def build_graph(corpus: Corpus, min_join: JoinStrength = JoinStrength.SYMBOL) -> BehavioralGraph:
+def build_graph(
+    corpus: Corpus, min_join: JoinStrength = JoinStrength.SYMBOL, use_state: bool = True
+) -> BehavioralGraph:
     edges: dict[tuple[SymbolId, SymbolId, EvidenceKind], GraphEdge] = {}
     gaps: list[Gap] = []
     attempts: list[JoinAttempt] = []
@@ -386,7 +392,7 @@ def build_graph(corpus: Corpus, min_join: JoinStrength = JoinStrength.SYMBOL) ->
     seen_gaps: set[tuple[NodeRef, SymbolId, str]] = set()
     seen_attempts: set[tuple[NodeRef, NodeRef]] = set()
     for ex_id in corpus.executions:
-        c = compose(corpus, ex_id, min_join=min_join)
+        c = compose(corpus, ex_id, min_join=min_join, use_state=use_state)
         compositions[ex_id] = c
         for edge in c.edges():
             key = (edge.caller, edge.callee, edge.evidence.kind)
@@ -416,4 +422,5 @@ def build_graph(corpus: Corpus, min_join: JoinStrength = JoinStrength.SYMBOL) ->
     return BehavioralGraph(
         dict(corpus.symbols), edges, dict(out), dict(inc), dict(tests_by_symbol), dict(outcomes),
         gaps, attempts, corpus, compositions,
+        use_state=use_state,
     )  # fmt: skip

@@ -1,0 +1,132 @@
+{
+ "entries": [
+  "py:proc.pipeline.Pipeline.execute"
+ ],
+ "ground_truth_edges": 4,
+ "claimed_edges": 7,
+ "true_positive": 4,
+ "false_positive": 3,
+ "false_negative": 0,
+ "precision": 0.571,
+ "recall": 1.0,
+ "by_evidence_kind": {
+  "composed": {
+   "claimed": 1,
+   "true": 1
+  },
+  "observed": {
+   "claimed": 6,
+   "true": 3
+  }
+ },
+ "by_join_strength": {
+  "VALUE": {
+   "claimed": 1,
+   "true": 1
+  }
+ },
+ "probe_derived": {},
+ "false_composed_continuations": [],
+ "missing_continuations": [],
+ "missing_explained": {
+  "gap": [],
+  "unresolved": [],
+  "absent": []
+ },
+ "outcome_conflicts": [],
+ "alternate_fragments_total": 0,
+ "notes": [],
+ "paths": [
+  {
+   "entry": "py:proc.pipeline.Pipeline.execute",
+   "truth": 1,
+   "claimed": 3,
+   "matched": 1,
+   "extra": [
+    [
+     "py:proc.pipeline.Pipeline.execute:returned",
+     "py:proc.processor.Processor.run:returned",
+     "py:proc.processor.Processor.skip:returned"
+    ],
+    [
+     "py:proc.pipeline.Pipeline.execute:returned",
+     "py:proc.processor.Processor.run:returned",
+     "py:proc.processor.Processor.validate:returned",
+     "py:proc.processor.Processor.audit:returned",
+     "py:proc.repository.Repository.save:returned",
+     "py:proc.processor.Processor.persist:returned",
+     "py:proc.repository.Repository.save:returned"
+    ]
+   ],
+   "missed": [],
+   "outcome_mismatches": 0,
+   "explanations": [
+    "extra execute \u2192 run \u2192 skip: admitted at seam execute \u21e2 run with join VALUE",
+    "extra execute \u2192 run \u2192 validate \u2192 audit \u2192 save \u2192 persist \u2192 save: admitted at seam execute \u21e2 run with join VALUE"
+   ]
+  }
+ ],
+ "seam_grades": [
+  {
+   "grade": "VALUE",
+   "seams": 3,
+   "consistent": 1,
+   "matching": 1,
+   "outcome_ok": 3
+  }
+ ],
+ "join_matrix": [
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_disabled_skips",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u00b7",
+   "exit": "same",
+   "truth": false,
+   "accepted": true,
+   "note": "result differs: seed continued on it"
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_closed_repository_raises",
+   "symbol": "\u2713",
+   "arg_shape": "\u00b7",
+   "value": "\u00b7",
+   "state": "\u00b7",
+   "exit": "conflict",
+   "truth": true,
+   "accepted": false,
+   "note": "exit conflict: stand-in returned, fragment raised:py:proc.repository.RepositoryClosed"
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_persists",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u00b7",
+   "exit": "same",
+   "truth": true,
+   "accepted": true,
+   "note": ""
+  },
+  {
+   "caller": "py:proc.pipeline.Pipeline.execute",
+   "target": "py:proc.processor.Processor.run",
+   "fragment": "test_run_enabled_strict_audits",
+   "symbol": "\u2713",
+   "arg_shape": "\u2713",
+   "value": "\u2713",
+   "state": "\u00b7",
+   "exit": "same",
+   "truth": false,
+   "accepted": true,
+   "note": ""
+  }
+ ]
+}

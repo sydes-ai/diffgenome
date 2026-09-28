@@ -91,10 +91,11 @@ class JoinAttempt:
     site: NodeRef
     fragment: NodeRef
     target: SymbolId
-    grade: JoinStrength | None  # None: known unsound (outcome conflict), never composable
+    grade: JoinStrength | None  # None: known unsound (exit/type/state conflict), never composable
     accepted: bool
     note: str = ""
     result_compatible: bool | None = None
+    exit: str | None = None  # exit compatibility: same | kind | unknown | None (conflict)
     """Whether the fragment returned what the stand-in returned (None: unknown). Entry
     compatibility (the grade) says the fragment could continue from the seam; result
     compatibility says the seed's continuation *after* the seam is supported. They are
@@ -198,32 +199,81 @@ def fragment_shape(corpus: Corpus, ref: NodeRef) -> tuple[object, ...]:
     return (root.symbol, root.outcome.split(":")[0], walk(ref.node))
 
 
-def outcomes_compatible(site: SubstitutionNode, fragment: CallNode) -> bool | None:
-    """None when either outcome is unknown. Returned-vs-raised is a conflict: the seed kept
-    running on the assumption of the outcome the stand-in produced, and the fragment's
-    continuation is the other one."""
-    a, b = site.outcome, fragment.outcome
-    if a == "unknown" or b == "unknown":
+def outcome_parts(outcome: str) -> tuple[str, str | None]:
+    """``category`` and ``identity`` of an Outcome string (see model.Outcome)."""
+    cat, _, ident = outcome.partition(":")
+    return cat, (ident or None)
+
+
+def exit_compatibility(site_outcome: str, fragment_outcome: str) -> str | None:
+    """EXIT half of join validity. ``same``: categories and known identities agree;
+    ``kind``: categories agree and an identity is unknown; ``unknown``: an outcome was not
+    observed; None: conflict (different categories, or same category with two different
+    known identities: an error-returning seam is not a panicking fragment, and a seam that
+    caught ValueError is not a fragment that raised KeyError)."""
+    ca, ia = outcome_parts(site_outcome)
+    cb, ib = outcome_parts(fragment_outcome)
+    if ca == "unknown" or cb == "unknown":
+        return "unknown"
+    if ca != cb:
         return None
-    return bool(a.startswith("raised") == b.startswith("raised"))
+    if ia and ib:
+        return "same" if ia == ib else None
+    return "same" if (ia is None and ib is None) else "kind"
 
 
-def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength | None, str]:
-    """Grade a seam, or return ``None`` when it is known unsound (outcome or type conflict).
+def outcomes_compatible(site: SubstitutionNode, fragment: CallNode) -> bool | None:
+    """Legacy view of exit compatibility: None when unknown, False on conflict."""
+    e = exit_compatibility(site.outcome, fragment.outcome)
+    return None if e == "unknown" else e is not None
 
-    ARG_SHAPE compares argument *types* by position. Sizes differ → still ARG_SHAPE, with
-    a note: sizes are value-level and would need the VALUE join, which no collector
-    supplies yet. A type conflict is evidence against the seam and is noted."""
-    compatible = outcomes_compatible(site, fragment)
-    if compatible is False:
-        return None, f"outcome conflict: stand-in {site.outcome}, fragment {fragment.outcome}"
+
+def state_compatibility(site: SubstitutionNode, fragment: CallNode) -> tuple[str, str]:
+    """STATE rung. Facts are compared by name over the names both sides observed.
+    Returns (verdict, note): ``match`` (>=1 fact compared, all equal), ``conflict`` (a
+    compared bucket differs: a different branch condition), ``unavailable`` (no common
+    facts, or no facts on a side)."""
+    a = {name: (bucket, digest) for name, bucket, digest in site.state}
+    b = {name: (bucket, digest) for name, bucket, digest in fragment.state}
+    common = sorted(set(a) & set(b))
+    if not common:
+        return (
+            "unavailable",
+            "state unavailable on one side" if not a or not b else "no common state facts",
+        )
+    differ = [n for n in common if a[n] != b[n]]
+    if differ:
+        return "conflict", "state conflict: " + ", ".join(
+            f"{n} {a[n][0]}≠{b[n][0]}" for n in differ
+        )
+    return "match", f"state matched on {len(common)} fact(s): " + ", ".join(common[:6])
+
+
+def grade_seam(
+    site: SubstitutionNode, fragment: CallNode, use_state: bool = True
+) -> tuple[JoinStrength | None, str]:
+    """ENTRY grade of a seam, or ``None`` when the join is known unsound (exit conflict,
+    decisive argument-kind conflict, or state conflict). Exit compatibility is computed
+    separately by `exit_compatibility`; `use_state=False` ignores state facts entirely
+    (the VALUE-only baseline of experiment 07)."""
+    exit_ = exit_compatibility(site.outcome, fragment.outcome)
+    if exit_ is None:
+        return None, f"exit conflict: stand-in {site.outcome}, fragment {fragment.outcome}"
+    compatible: bool | None = None if exit_ == "unknown" else True
     notes = [] if compatible else ["outcome unknown on one side"]
     if not site.args and not fragment.args:
         # No arguments on either side: argument compatibility holds vacuously. Entry
         # compatibility then rests entirely on receiver state, which is the STATE rung.
         if compatible is None:
             return JoinStrength.ARG_SHAPE, "; ".join([*notes, "no arguments"])
-        return JoinStrength.VALUE, "no arguments"
+        if not use_state:
+            return JoinStrength.VALUE, "no arguments"
+        verdict, snote = state_compatibility(site, fragment)
+        if verdict == "conflict":
+            return None, "no arguments; " + snote
+        if verdict == "match":
+            return JoinStrength.STATE, "no arguments; " + snote
+        return JoinStrength.VALUE, "no arguments; " + snote
     if not site.args or not fragment.args:
         return JoinStrength.SYMBOL, "; ".join([*notes, "arity differs: arguments on one side only"])
     pairs = list(zip(site.args, fragment.args, strict=False))
@@ -251,7 +301,14 @@ def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength
         return JoinStrength.ARG_SHAPE, "; ".join(notes)
     if compatible is None:
         return JoinStrength.ARG_SHAPE, "; ".join(notes)  # never VALUE with an unknown outcome
-    return JoinStrength.VALUE, ""
+    if not use_state:
+        return JoinStrength.VALUE, "; ".join(notes)
+    verdict, snote = state_compatibility(site, fragment)
+    if verdict == "conflict":
+        return None, snote
+    if verdict == "match":
+        return JoinStrength.STATE, snote
+    return JoinStrength.VALUE, "; ".join([*notes, snote])
 
 
 def _node_symbol(node: Node) -> SymbolId:
@@ -276,6 +333,7 @@ def compose(
     seed_id: str,
     min_join: JoinStrength = JoinStrength.SYMBOL,
     max_depth: int = 8,
+    use_state: bool = True,
 ) -> Composition:
     seed = corpus.executions[seed_id]
     attempts: list[JoinAttempt] = []
@@ -323,14 +381,15 @@ def compose(
                 frag_ex = corpus.executions[ref.execution]
                 frag_node = frag_ex.nodes[ref.node]
                 assert isinstance(frag_node, CallNode)
-                grade, note = grade_seam(child, frag_node)
+                grade, note = grade_seam(child, frag_node, use_state)
+                exit_ = exit_compatibility(child.outcome, frag_node.outcome)
                 ok = grade is not None and grade.value >= min_join.value
                 same_result = (
                     child.result == frag_node.result if child.result and frag_node.result else None
                 )
                 if same_result is False:
                     note = "; ".join(filter(None, [note, "result differs: seed continued on it"]))
-                attempts.append(JoinAttempt(site, ref, target, grade, ok, note, same_result))
+                attempts.append(JoinAttempt(site, ref, target, grade, ok, note, same_result, exit_))
                 if ok and grade is not None:
                     groups.setdefault(fragment_shape(corpus, ref), []).append(
                         (ref, grade, note, same_result)
@@ -341,9 +400,17 @@ def compose(
                 members.sort(key=lambda m: (-m[1].value, m[0].execution, m[0].node))
                 ref, grade, _, _ = members[0]
                 accepted_any = True
-                ev = Evidence(EvidenceKind.COMPOSED, site, rule=res.rule, fragment=ref, join=grade,
-                              probe_derived=probe(ex.id, ref.execution),
-                              alternates=tuple(m[0] for m in members[1:]))  # fmt: skip
+                frag_outcome = corpus.executions[ref.execution].nodes[ref.node].outcome
+                ev = Evidence(
+                    EvidenceKind.COMPOSED,
+                    site,
+                    rule=res.rule,
+                    fragment=ref,
+                    join=grade,
+                    probe_derived=probe(ex.id, ref.execution),
+                    alternates=tuple(m[0] for m in members[1:]),
+                    exit=exit_compatibility(child.outcome, frag_outcome),
+                )
                 frag_ex = corpus.executions[ref.execution]
                 if target in on_path:
                     gaps.append(Gap(site, target, "cycle"))

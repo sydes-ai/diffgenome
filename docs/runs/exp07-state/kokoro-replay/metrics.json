@@ -1,0 +1,40 @@
+{
+ "changed_symbols": 4,
+ "behavioral_symbols_in_neighborhood": 14,
+ "observed_edges": 9,
+ "composed_edges": 3,
+ "joins": {
+  "SYMBOL": 0,
+  "ARG_SHAPE": 0,
+  "VALUE": 2,
+  "STATE": 1
+ },
+ "rejected_joins": 31,
+ "ambiguous_joins": 3,
+ "internal_gaps": 1,
+ "declarations_no_in_repo_body": 0,
+ "unresolved_boundaries": 0,
+ "external_boundaries": 1,
+ "existing_tests_contributing": 30,
+ "probe_derived_edges": 4,
+ "llm_calls": 1,
+ "accepted_probes": 1,
+ "rejected_probes": 0,
+ "before_after": {
+  "before": {
+   "strong_joins": 4,
+   "weak_joins": 1,
+   "gaps": 1,
+   "observed": 10,
+   "composed": 5
+  },
+  "after": {
+   "strong_joins": 5,
+   "weak_joins": 1,
+   "gaps": 1,
+   "observed": 15,
+   "composed": 6
+  }
+ },
+ "structural_coverage_ratio_NOT_correctness": 0.909
+}
