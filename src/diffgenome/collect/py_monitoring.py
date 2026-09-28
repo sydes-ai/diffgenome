@@ -263,9 +263,17 @@ class Tracer:
         # C-implemented members carry no __module__; their defining class does (exp 01).
         return Symbol(f"py:{module_name}.{qualname}", Origin.EXTERNAL, None)
 
-    def _intern(self, symbol: SymbolId, origin: Origin, location: SourceLocation | None) -> None:
-        if symbol not in self._symbols:
-            self._symbols[symbol] = Symbol(symbol, origin, location)
+    def _intern(
+        self,
+        symbol: SymbolId,
+        origin: Origin,
+        location: SourceLocation | None,
+        kind: str = "callable",
+    ) -> None:
+        if symbol not in self._symbols or (
+            kind != "callable" and self._symbols[symbol].kind == "callable"
+        ):
+            self._symbols[symbol] = Symbol(symbol, origin, location, kind)
 
     def _intern_symbol(self, symbol: Symbol) -> SymbolId:
         self._intern(symbol.id, symbol.origin, symbol.location)
@@ -301,6 +309,15 @@ class Tracer:
                     init = _static_attr(original, "__init__")
                     if getattr(init, "__code__", None) is not None:
                         original = init
+                    else:
+                        sym = self.symbol_for_object(original)
+                        self._intern(sym.id, sym.origin, sym.location, "declaration")
+                        return (
+                            SubstitutionMechanism.INTERPOSITION,
+                            sym.id,
+                            "patch-target",
+                            tuple(path),
+                        )
                 claim = self._intern_symbol(self.symbol_for_object(original))
             return SubstitutionMechanism.INTERPOSITION, claim, "patch-target", tuple(path)
         spec = getattr(root, "_spec_class", None)
@@ -331,6 +348,11 @@ class Tracer:
             init = _static_attr(spec, "__init__")
             if getattr(init, "__code__", None) is not None:
                 member = init
+            else:
+                # No in-repo constructor body: the claim is a declaration, not a gap.
+                sym = self.symbol_for_object(spec)
+                self._intern(sym.id, sym.origin, sym.location, "declaration")
+                return SubstitutionMechanism.MOCK_OBJECT, sym.id, "spec", tuple(path)
         target = self._intern_symbol(self.symbol_for_object(member if member is not None else spec))
         return SubstitutionMechanism.MOCK_OBJECT, target, "spec", tuple(path)
 

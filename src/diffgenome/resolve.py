@@ -31,4 +31,7 @@ def resolve(sub: SubstitutionNode, symbols: dict[SymbolId, Symbol]) -> BoundaryR
     if "()" in sub.path:
         # The claim names the first member; what its *return value* is, nobody observed.
         return BoundaryResolution(BoundaryClass.UNRESOLVED, claim, "claim-return-chain")
+    if sub.relation.startswith("static-return-type"):
+        # Resolved through a declared return type: static evidence, said so on the edge.
+        return BoundaryResolution(BoundaryClass.INTERNAL, claim, "static-return-type")
     return BoundaryResolution(BoundaryClass.INTERNAL, claim, "claim-member")

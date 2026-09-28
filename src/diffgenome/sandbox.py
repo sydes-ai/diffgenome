@@ -42,11 +42,26 @@ class Workspace:
 
     @classmethod
     def create(
-        cls, target_repo: Path, base: Path, extra_read_paths: list[Path] | None = None
+        cls,
+        target_repo: Path,
+        base: Path,
+        extra_read_paths: list[Path] | None = None,
+        rev: str | None = None,
     ) -> Workspace:
         root = base / f"ws-{int(time.time() * 1000)}"
         repo = root / "repo"
-        shutil.copytree(target_repo, repo, ignore=_IGNORE, symlinks=False)
+        if rev:
+            # A specific revision without touching the checkout: `git archive` into the copy.
+            repo.mkdir(parents=True)
+            archive = subprocess.run(
+                ["git", "archive", "--format=tar", rev],
+                cwd=target_repo,
+                capture_output=True,
+                check=True,
+            )
+            subprocess.run(["tar", "-x", "-C", str(repo)], input=archive.stdout, check=True)
+        else:
+            shutil.copytree(target_repo, repo, ignore=_IGNORE, symlinks=False)
         home, tmp = root / "home", root / "tmp"
         home.mkdir()
         tmp.mkdir()

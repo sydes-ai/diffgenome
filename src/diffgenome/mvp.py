@@ -23,10 +23,12 @@ from diffgenome.graph import build_graph
 from diffgenome.llm import OpenAIProbeWriter, ProbeWriter, RecordedProbeWriter
 from diffgenome.model import Origin, Stimulus
 from diffgenome.probe import ProbeAttempt, ProbeRunner, run_probe_loop
+from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
+from diffgenome.static_types import apply_static_return_types
 
 
 def _log(msg: str) -> None:
@@ -50,12 +52,22 @@ def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -
         from diffgenome.collect.node_jest import NodeJestRuntime
 
         return NodeJestRuntime(repo, args.source_root, args.test_root, tests)
+    if args.runtime == "go":
+        from diffgenome.collect.go_test import GoTestRuntime
+
+        return GoTestRuntime(repo, args.source_root, args.test_root, tests, args.mock_dir)
     raise SystemExit(f"unknown runtime {args.runtime}")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="diffgenome mvp")
-    ap.add_argument("--runtime", default="python", choices=["python", "node"])
+    ap.add_argument("--runtime", default="python", choices=["python", "node", "go"])
+    ap.add_argument(
+        "--mock-dir",
+        action="append",
+        default=[],
+        help="go: generated mock package dirs (test origin)",
+    )
     ap.add_argument("--repo", required=True, type=Path)
     ap.add_argument("--python", type=Path, help="target interpreter (python runtime)")
     ap.add_argument("--source-root", default=".")
@@ -63,6 +75,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--tests", default=None, help="test target path (default: test root)")
     ap.add_argument("--pytest-arg", action="append", default=[])
     ap.add_argument("--diff", help="git revspec: base..head, or a commit (vs its parent)")
+    ap.add_argument(
+        "--rev", help="analyze this git revision (workspace from `git archive`), not the checkout"
+    )
     ap.add_argument("--symbol", action="append", default=[], help="explicit changed symbol")
     ap.add_argument("--traces", type=Path, help="reuse existing-test traces from this directory")
     ap.add_argument("--out", required=True, type=Path)
@@ -82,7 +97,7 @@ def main(argv: list[str] | None = None) -> int:
     runtime = make_runtime(args, repo, pytest_args)
     notes: list[str] = []
 
-    ws = Workspace.create(repo, args.workspaces or out / "workspaces")
+    ws = Workspace.create(repo, args.workspaces or out / "workspaces", rev=args.rev)
     _log(f"workspace {ws.root} (copy of {repo}; original never written) runtime={runtime.name}")
     try:
         index: SymbolIndex = runtime.prepare(ws)
@@ -104,6 +119,12 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         if not executions:
             notes.append("cold start: no existing executions; every changed symbol is uncovered")
+        executions, n_static = apply_static_return_types(executions, index)
+        if n_static:
+            notes.append(
+                f"{n_static} factory().member stand-ins resolved through declared return "
+                "types (rule static-return-type)"
+            )
         # 2. map
         corpus = build_corpus(executions)
         graph = build_graph(corpus)
@@ -162,12 +183,19 @@ def main(argv: list[str] | None = None) -> int:
         (out / "graph-before.json").write_text(json.dumps(graph.to_json(), indent=1) + "\n")
         final_graph = graph_after or graph
         (out / "graph.json").write_text(json.dumps(final_graph.to_json(), indent=1) + "\n")
-        map_slice = render_map_slice(final_graph, seeds, up=args.up, down=args.down)
-        (out / "map.md").write_text(map_slice)
-        text = render_report(change, graph, nb_before, attempts, graph_after, nb_after, notes)
-        text += (
-            "\n## Behavioral map slice around the changed symbols\n\n```\n" + map_slice + "```\n"
+        evidence_slice = render_map_slice(final_graph, seeds, up=args.up, down=args.down)
+        (out / "map-evidence.md").write_text(evidence_slice)
+        behavior_map = render_behavior_map(final_graph, seeds, up=args.up, down=args.down)
+        (out / "map.md").write_text(behavior_map)
+        (out / "slice.json").write_text(
+            json.dumps(slice_json(final_graph, seeds, args.up, args.down), indent=1) + "\n"
         )
+        metrics = case_metrics(
+            final_graph, seeds, args.up, args.down, attempts, graph if graph_after else None
+        )
+        (out / "metrics.json").write_text(json.dumps(metrics, indent=1) + "\n")
+        text = render_report(change, graph, nb_before, attempts, graph_after, nb_after, notes)
+        text += "\n## Behavioral map around the changed symbols\n\n```\n" + behavior_map + "```\n"
         text += (
             "\nThe full repo-level graph with every edge's provenance is `graph.json` next to this "
             "report (`graph-before.json` is the state before probes). Query it with "

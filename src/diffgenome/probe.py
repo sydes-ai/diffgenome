@@ -98,13 +98,16 @@ def select_objectives(
     def objective(kind: str, d: int, e: GraphEdge) -> ProbeObjective | None:
         if graph.origin(e.callee) is not Origin.REPO or e.callee in seen:
             return None
-        if index is not None:
+        sym = graph.symbols.get(e.callee)
+        is_declaration = sym is not None and sym.kind == "declaration"
+        if index is not None and not is_declaration:
             d_ = index.find(e.callee)
-            if d_ is not None and d_.kind == "class":
-                seen.add(e.callee)
-                if skipped is not None:
-                    skipped.append(f"{e.callee}: class construction with no in-repo __init__")
-                return None
+            is_declaration = d_ is not None and d_.kind == "class"
+        if is_declaration:
+            seen.add(e.callee)
+            if skipped is not None:
+                skipped.append(f"{e.callee}: declaration with no in-repo executable body")
+            return None
         ev = e.evidence[0]
         assert graph.corpus is not None
         ex = graph.corpus.executions[ev.site.execution]

@@ -320,3 +320,148 @@ def render_evaluation(ev: Evaluation) -> str:
     lines += ["", f"alternate fragments carried on claimed edges: {ev.alternates_total}"]
     lines += [f"note: {n}" for n in ev.notes]
     return "\n".join(lines) + "\n"
+
+
+# --------------------------------------------------------------------------- path level
+
+
+def execution_paths(
+    executions: list[Execution], entry: SymbolId, origins: dict[SymbolId, Origin]
+) -> set[tuple[str, ...]]:
+    """Pre-order sequences of in-repo (symbol, outcome-kind) under `entry` in whole executions.
+    One sequence per occurrence of the entry."""
+    paths: set[tuple[str, ...]] = set()
+    for ex in executions:
+        kids: dict[int, list[CallNode]] = defaultdict(list)
+        for n in ex.nodes:
+            if isinstance(n, CallNode) and n.parent is not None:
+                kids[n.parent].append(n)
+        for n in ex.nodes:
+            if isinstance(n, CallNode) and n.symbol == entry:
+                seq: list[str] = []
+                _walk_preorder(n, kids, origins, seq)
+                paths.add(tuple(seq))
+    return paths
+
+
+def _walk_preorder(
+    node: CallNode, kids: dict[int, list[CallNode]], origins: dict[SymbolId, Origin], seq: list[str]
+) -> None:
+    if origins.get(node.symbol) is Origin.REPO:
+        seq.append(f"{node.symbol}:{node.outcome.split(':')[0]}")
+    for k in kids.get(node.id, []):
+        _walk_preorder(k, kids, origins, seq)
+
+
+def composed_paths(graph: BehavioralGraph, entry: SymbolId, depth: int = 8) -> set[tuple[str, ...]]:
+    """Pre-order sequences the reconstruction implies from `entry`: one per combination of
+    composed alternatives, following the composition trees of every execution that ran the
+    entry (observed children in order, composed seams expanded to each accepted fragment)."""
+    corpus = graph.corpus
+    if corpus is None:
+        return set()
+    from diffgenome.compose import Branch, compose
+    from diffgenome.model import EvidenceKind as EK
+
+    out: set[tuple[str, ...]] = set()
+    for ex_id in graph.tests_by_symbol.get(entry, ()):
+        comp = compose(corpus, ex_id)
+
+        def expand(branches: list[Branch], d: int) -> list[list[str]]:
+            # siblings concatenate; alternatives for one caller→callee pair multiply
+            seqs: list[list[str]] = [[]]
+            groups: dict[tuple[str, str], list[Branch]] = defaultdict(list)
+            order: list[tuple[str, str]] = []
+            for b in branches:
+                key = (b.edge.caller, b.edge.callee)
+                if key not in groups:
+                    order.append(key)
+                groups[key].append(b)
+            for key in order:
+                alts = groups[key]
+                alt_seqs: list[list[str]] = []
+                for b in alts:
+                    kind = b.edge.evidence.kind
+                    if (
+                        kind in (EK.OBSERVED, EK.COMPOSED)
+                        and graph.origin(b.edge.callee) is Origin.REPO
+                    ):
+                        outcome = "?"
+                        ref = b.edge.evidence.fragment or b.edge.evidence.site
+                        node = corpus.executions[ref.execution].nodes[ref.node]
+                        if isinstance(node, CallNode):
+                            outcome = node.outcome.split(":")[0]
+                        head = [f"{b.edge.callee}:{outcome}"]
+                        tails = expand(b.children, d + 1) if d < depth else [[]]
+                        alt_seqs.extend(head + t for t in tails)
+                    else:
+                        alt_seqs.append([])
+                # dedupe alternatives
+                uniq = []
+                for a in alt_seqs:
+                    if a not in uniq:
+                        uniq.append(a)
+                seqs = [s_ + a for s_ in seqs for a in uniq]
+            return seqs
+
+        # find the entry branch(es) in the seed tree
+        stack = list(comp.branches)
+        while stack:
+            b = stack.pop()
+            if b.edge.callee == entry:
+                site = b.edge.evidence.site
+                node = corpus.executions[site.execution].nodes[site.node]
+                outcome = node.outcome.split(":")[0] if isinstance(node, CallNode) else "?"
+                for tail in expand(b.children, 1):
+                    out.add(tuple([f"{entry}:{outcome}", *tail]))
+            stack.extend(b.children)
+    return out
+
+
+@dataclass
+class PathEvaluation:
+    entry: SymbolId
+    truth_paths: int
+    claimed_paths: int
+    matched: int  # claimed sequences that equal a ground-truth sequence
+    extra: list[tuple[str, ...]]  # claimed, not in truth (wrong composition or untaken alternative)
+    missed: list[tuple[str, ...]]  # truth, not claimed
+    outcome_mismatches: (
+        int  # extra sequences whose symbol order matches a truth sequence but outcomes differ
+    )
+
+
+def evaluate_paths(
+    graph: BehavioralGraph,
+    gt_runs: list[Execution],
+    entry: SymbolId,
+    origins: dict[SymbolId, Origin],
+) -> PathEvaluation:
+    truth = execution_paths(gt_runs, entry, origins)
+    claimed = composed_paths(graph, entry)
+    matched = {p for p in claimed if p in truth}
+    extra = sorted(p for p in claimed if p not in truth)
+    missed = sorted(p for p in truth if p not in claimed)
+    order_only = {tuple(x.rsplit(":", 1)[0] for x in p) for p in truth}
+    outcome_mm = sum(1 for p in extra if tuple(x.rsplit(":", 1)[0] for x in p) in order_only)
+    return PathEvaluation(entry, len(truth), len(claimed), len(matched), extra, missed, outcome_mm)
+
+
+def render_paths(pe: PathEvaluation) -> str:
+    def fmt(p: tuple[str, ...]) -> str:
+        return " → ".join(
+            x.split(":", 1)[1].split(":")[0].split(".")[-1] + ("!" if x.endswith(":raised") else "")
+            for x in p
+        )
+
+    lines = [
+        f"### path-level: {pe.entry.split(':', 1)[1]}",
+        f"ground-truth sequences {pe.truth_paths}, claimed {pe.claimed_paths}, "
+        f"matched {pe.matched}, extra {len(pe.extra)} (of which outcome-only mismatches "
+        f"{pe.outcome_mismatches}), missed {len(pe.missed)}",
+    ]
+    for p in pe.extra[:8]:
+        lines.append(f"  extra:  {fmt(p)}")
+    for p in pe.missed[:8]:
+        lines.append(f"  missed: {fmt(p)}")
+    return "\n".join(lines) + "\n"

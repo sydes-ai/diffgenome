@@ -167,6 +167,48 @@ class PythonSymbolIndex:
         ]  # fmt: skip
         return max(classes, key=lambda c: c.start) if classes else None
 
+    def return_type_of(self, symbol: SymbolId) -> SymbolId | None:
+        d = self.find(symbol)
+        if d is None or d.kind != "function":
+            return None
+        try:
+            tree = ast.parse((self.repo_root / d.path).read_text(encoding="utf-8"))
+        except (SyntaxError, OSError):
+            return None
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and node.lineno == d.start:
+                ann = node.returns
+                if ann is None:
+                    return None
+                name = ast.unparse(ann)
+                if name.startswith("Optional[") and name.endswith("]"):
+                    name = name[len("Optional[") : -1]
+                if name.endswith(" | None"):
+                    name = name[: -len(" | None")]
+                cls = name.split(".")[-1]
+                if not cls.isidentifier():
+                    return None
+                candidates = [
+                    x
+                    for x in self.all_definitions()
+                    if x.kind == "class" and x.symbol.endswith("." + cls)
+                ]
+                return candidates[0].symbol if len(candidates) == 1 else None
+        return None
+
+    def all_definitions(self) -> list[Definition]:
+        if not getattr(self, "_all", None):
+            out: list[Definition] = []
+            for root in self.source_roots:
+                for f in sorted(root.rglob("*.py")):
+                    try:
+                        rel = str(f.resolve().relative_to(self.repo_root))
+                    except ValueError:
+                        continue
+                    out.extend(self.definitions(rel))
+            self._all = out
+        return self._all
+
     def module_of(self, symbol: SymbolId) -> str | None:
         """Dotted module of a symbol: the longest prefix of its qualified name that is a file."""
         rel = self.path_for(symbol)

@@ -60,6 +60,10 @@ class Symbol:
     id: SymbolId
     origin: Origin
     location: SourceLocation | None = None
+    kind: str = "callable"
+    """``callable`` (has an executable body) or ``declaration`` (a class/type/interface whose
+    construction or reference runs no in-repo code of its own). A stand-in that claims a
+    declaration is not a gap in behavior: there is no application-owned behavior there."""
 
 
 # --------------------------------------------------------------------------- observation

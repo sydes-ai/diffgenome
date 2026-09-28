@@ -97,6 +97,34 @@ def evaluate_main(argv: list[str]) -> int:
     print(render_evaluation(ev))
     doc = ev.as_dict()
     if args.traces:
+        # path level needs the corpus behind the graph
+        from diffgenome.compose import build_corpus
+        from diffgenome.evaluate import evaluate_paths, render_paths
+        from diffgenome.graph import build_graph
+
+        corpus_runs = [
+            execution_from_json(f.read_text())
+            for d in args.traces
+            for f in sorted(d.glob("*.json"))
+        ]
+        full = build_graph(build_corpus(corpus_runs))
+        path_docs: list[dict[str, object]] = []
+        for entry in args.entry:
+            pe = evaluate_paths(full, truth_runs, entry, origins)
+            print(render_paths(pe))
+            path_docs.append(
+                {
+                    "entry": entry,
+                    "truth": pe.truth_paths,
+                    "claimed": pe.claimed_paths,
+                    "matched": pe.matched,
+                    "extra": [list(p) for p in pe.extra],
+                    "missed": [list(p) for p in pe.missed],
+                    "outcome_mismatches": pe.outcome_mismatches,
+                }
+            )
+        doc["paths"] = path_docs
+    if args.traces:
         from diffgenome.model import CallNode
 
         per_exec: dict[str, set[tuple[str, str]]] = {}

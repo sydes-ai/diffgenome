@@ -78,6 +78,7 @@ def execution_from_json(text: str) -> Execution:
                 s["id"],
                 Origin(s["origin"]),
                 SourceLocation(**s["location"]) if s["location"] else None,
+                s.get("kind", "callable"),
             )
             for s in d["symbols"]
         ),

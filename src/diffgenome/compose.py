@@ -53,10 +53,15 @@ def _merge_symbol(table: dict[SymbolId, Symbol], sym: Symbol, execution: str) ->
         )
     if have.location and sym.location and have.location != sym.location:
         raise IdentityMismatch(f"{sym.id}: {have.location} vs {sym.location} (in {execution})")
-    if have.origin is Origin.UNKNOWN or (have.location is None and sym.location):
+    if (
+        have.origin is Origin.UNKNOWN
+        or (have.location is None and sym.location)
+        or (have.kind == "callable" and sym.kind != "callable")
+    ):
         table[sym.id] = Symbol(
             sym.id, sym.origin if have.origin is Origin.UNKNOWN else have.origin,
             have.location or sym.location,
+            sym.kind if sym.kind != "callable" else have.kind,
         )  # fmt: skip
 
 

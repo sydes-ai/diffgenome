@@ -117,6 +117,7 @@ class BehavioralGraph:
                     "location": {"path": s.location.path, "line": s.location.line}
                     if s.location
                     else None,
+                    "kind": s.kind,
                     "executed_by": sorted(self.tests_by_symbol.get(s.id, ())),
                     "outcomes": dict(self.outcomes_by_symbol.get(s.id, Counter())),
                 }
@@ -175,7 +176,7 @@ class BehavioralGraph:
                 if s["location"]
                 else None
             )
-            symbols[s["id"]] = Symbol(s["id"], Origin(s["origin"]), loc)
+            symbols[s["id"]] = Symbol(s["id"], Origin(s["origin"]), loc, s.get("kind", "callable"))
             tests[s["id"]] = set(s["executed_by"])
             outcomes[s["id"]] = Counter(s["outcomes"])
         edges: dict[tuple[SymbolId, SymbolId, EvidenceKind], GraphEdge] = {}
