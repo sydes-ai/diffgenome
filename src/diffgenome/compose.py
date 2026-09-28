@@ -89,6 +89,11 @@ class JoinAttempt:
     grade: JoinStrength | None  # None: known unsound (outcome conflict), never composable
     accepted: bool
     note: str = ""
+    result_compatible: bool | None = None
+    """Whether the fragment returned what the stand-in returned (None: unknown). Entry
+    compatibility (the grade) says the fragment could continue from the seam; result
+    compatibility says the seed's continuation *after* the seam is supported. They are
+    independent, and only the first is a join grade."""
 
 
 @dataclass
@@ -135,7 +140,7 @@ def outcomes_compatible(site: SubstitutionNode, fragment: CallNode) -> bool | No
     a, b = site.outcome, fragment.outcome
     if a == "unknown" or b == "unknown":
         return None
-    return a.startswith("raised") == b.startswith("raised")
+    return bool(a.startswith("raised") == b.startswith("raised"))
 
 
 def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength | None, str]:
@@ -151,13 +156,20 @@ def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength
     if not site.args or not fragment.args:
         return JoinStrength.SYMBOL, "; ".join([*notes, "no argument shapes on one side"])
     pairs = list(zip(site.args, fragment.args, strict=False))
-    conflicts = [f"{a}≠{b}" for (_, a), (_, b) in pairs if _shape_type(a) != _shape_type(b)]
+    conflicts = [f"{a}≠{b}" for (_, a, _), (_, b, _) in pairs if _shape_type(a) != _shape_type(b)]
     if conflicts:
         return JoinStrength.SYMBOL, "; ".join([*notes, "type conflict: " + ", ".join(conflicts)])
-    sizes = [f"{a}~{b}" for (_, a), (_, b) in pairs if a != b]
-    if sizes:
-        notes.append("size differs (value-level): " + ", ".join(sizes))
-    return JoinStrength.ARG_SHAPE, "; ".join(notes)
+    missing = [n for (_, _, da), (n, _, db) in pairs if not da or not db]
+    if missing:
+        notes.append("value unavailable: " + ", ".join(missing))
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)
+    differ = [n for (_, _, da), (n, _, db) in pairs if da != db]
+    if differ:
+        notes.append("values differ: " + ", ".join(differ))
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)
+    if compatible is None:
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)  # never VALUE with an unknown outcome
+    return JoinStrength.VALUE, ""
 
 
 def _node_symbol(node: Node) -> SymbolId:
@@ -228,7 +240,12 @@ def compose(
                 assert isinstance(frag_node, CallNode)
                 grade, note = grade_seam(child, frag_node)
                 ok = grade is not None and grade.value >= min_join.value
-                attempts.append(JoinAttempt(site, ref, target, grade, ok, note))
+                same_result = (
+                    child.result == frag_node.result if child.result and frag_node.result else None
+                )
+                if same_result is False:
+                    note = "; ".join(filter(None, [note, "result differs: seed continued on it"]))
+                attempts.append(JoinAttempt(site, ref, target, grade, ok, note, same_result))
                 if not ok or grade is None:
                     continue
                 accepted_any = True

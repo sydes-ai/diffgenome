@@ -106,13 +106,14 @@ class SubstitutionMechanism(Enum):
     UNKNOWN = "unknown"
 
 
-ArgShapes = tuple[tuple[str, str], ...]
-"""Bounded argument summary for seam matching: ``((name, shape), ...)`` in positional order,
-receiver excluded. ``shape`` is ``<type>`` or ``<type>[<size>]``; never a value repr. A
-stand-in call that only exposes positional arguments names them ``arg0``, ``arg1``...
-Composition compares by position, and ``ARG_SHAPE`` compares types only: sizes are
-value-level information and belong to the ``VALUE`` join."""
-
+ArgShapes = tuple[tuple[str, str, str], ...]
+"""Bounded argument summary for seam matching: ``((name, shape, digest), ...)`` in
+positional order, receiver excluded. ``shape`` is ``<type>`` or ``<type>[<size>]``.
+``digest`` is a stable content digest of the value to a bounded depth (never the value
+itself), or ``""`` when the collector could not summarize it. A stand-in call that only
+exposes positional arguments names them ``arg0``, ``arg1``... Composition compares by
+position: ``ARG_SHAPE`` compares types only; ``VALUE`` requires equal, non-empty digests
+at every observed position. Sizes are value-level and never affect ``ARG_SHAPE``."""
 
 Outcome = str
 """How a call ended: ``"returned"``, ``"raised:<symbol of the exception type>"``, or
@@ -132,6 +133,7 @@ class CallNode:
     args: ArgShapes = ()
     thread: int = 0  # 0 is the stimulus thread; others numbered in order of first appearance
     outcome: Outcome = "unknown"
+    result: str = ""  # digest of the returned value (same scheme as ArgShapes), "" if unavailable
 
 
 @dataclass(frozen=True)
@@ -164,6 +166,10 @@ class SubstitutionNode:
     ``"()"`` marks a call's return value."""
     args: ArgShapes = ()
     outcome: Outcome = "unknown"
+    result: str = ""
+    """Digest of what the stand-in returned. The seed's continuation after this node is
+    conditioned on this value; a composed fragment that returned something else leaves
+    that continuation unsupported by any execution."""
 
 
 class OsEventKind(Enum):

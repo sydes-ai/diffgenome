@@ -69,7 +69,7 @@ def test_s4_observed_chain_and_standin_attribution(fixture_traces: dict[str, Exe
     assert [s.parent for s in subs] == [place.id, place.id]
     assert [s.path for s in subs] == [("reserve",), ("quote",)]
     assert all(s.mechanism is SubstitutionMechanism.MOCK_OBJECT for s in subs)
-    assert all(s.args == (("arg0", "list[2]"),) for s in subs)  # single positional argument
+    assert all(s.args[0][:2] == ("arg0", "list[2]") for s in subs)  # single positional argument
 
 
 def test_s5_join_key_agrees_between_claim_and_frame(fixture_traces: dict[str, Execution]) -> None:
@@ -145,3 +145,29 @@ def test_outcomes_are_observed_for_calls_and_standins(fixture_traces: dict[str, 
 
     seed = fixture_traces["test_place_order_returns_quoted_total"]
     assert {s.outcome for s in substitutions(seed)} == {"returned"}
+
+
+def test_p12_unsummarizable_values_leave_digest_empty() -> None:
+    """A digest is all-or-nothing: an object we cannot canonicalize yields "", never a
+    partial digest that could make two different values look equal."""
+    from diffgenome.collect.py_monitoring import digest_value
+
+    class Opaque:
+        pass
+
+    assert digest_value("BOOK-001") == digest_value("BOOK-001") != digest_value("UNKNOWN")
+    assert digest_value(["A", "B"]) != digest_value(["B", "A"])
+    assert digest_value({"A", "B"}) == digest_value({"B", "A"})
+    assert digest_value(Opaque()) == ""
+    assert digest_value([1, Opaque()]) == ""
+    assert digest_value(list(range(17))) == ""  # beyond the bounded width
+
+
+def test_results_are_digested(fixture_traces: dict[str, Execution]) -> None:
+    fragment = fixture_traces["test_quote_sums_repository_prices"]
+    quote = calls(fragment)["py:shop.pricing_service.PricingService.quote"][0]
+    seed = fixture_traces["test_place_order_returns_quoted_total"]
+    stand_in = next(s for s in substitutions(seed) if s.path == ("quote",))
+    assert quote.result and quote.result == stand_in.result  # both 2500
+    raised = calls(fixture_traces["test_duplicate_skus_rejected"])
+    assert raised["py:shop.order_service.OrderService.place"][0].result == ""

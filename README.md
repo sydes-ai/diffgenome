@@ -96,7 +96,8 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | Event protocol and evidence model (two planes, join lattice, provenance invariants) | done: `src/diffgenome/model.py` |
 | Controlled fixture repository | done: `fixtures/exp01_shop/` |
 | Experiment 01: observability floor per plane + first composition | designed: `docs/experiment-01.md` |
-| Collectors (Python symbol plane; Linux OS plane), resolver, composer, renderer | next |
+| CPython symbol-plane collector, resolver, composer (SYMBOL/ARG_SHAPE/VALUE joins, outcome and result checks), renderers | done; see the findings logs in `docs/experiment-01.md` and `docs/experiment-02.md` |
+| Linux OS-plane collector and sandbox | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
 
@@ -105,8 +106,10 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 - [docs/architecture.md](docs/architecture.md): goal and north star, invariants, the two
   planes and the capture ladder, protocol, boundary resolution, composition and the join
   lattice, sandbox, deterministic vs AI, risks, experiment sequence.
-- [docs/experiment-01.md](docs/experiment-01.md): the first validation experiment and its
-  success and failure criteria.
+- [docs/experiment-01.md](docs/experiment-01.md): the first validation experiment, its
+  success and failure criteria, and a dated findings log.
+- [docs/experiment-02.md](docs/experiment-02.md): the `VALUE` join, the causality-after-seam
+  finding, and why the staged target could not be used.
 
 ## Layout
 

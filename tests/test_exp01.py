@@ -92,13 +92,20 @@ def test_s7_composed_provenance(composition: Composition, corpus: Corpus) -> Non
         node = corpus.executions[f.execution].nodes[f.node]
         assert isinstance(node, CallNode) and node.symbol == QUOTE
 
-    # Observed, not predicted: both fragments grade ARG_SHAPE. list[2] and list[0] share a
-    # type; the size that separates the two paths is value-level. See findings log.
-    assert {e.evidence.join for e in composed} == {JoinStrength.ARG_SHAPE}
+    # ARG_SHAPE cannot separate list[2] from list[0] (same type); VALUE can (exp 02).
+    joins = {
+        e.evidence.fragment.execution.split("::")[1].split("@")[0]: e.evidence.join
+        for e in composed
+        if e.evidence.fragment
+    }
+    assert joins == {
+        "test_quote_empty_cart_is_free": JoinStrength.ARG_SHAPE,
+        "test_quote_sums_repository_prices": JoinStrength.VALUE,
+    }
     notes = {
         a.fragment.execution.split("::")[1].split("@")[0]: a.note for a in composition.attempts
     }
-    assert notes["test_quote_empty_cart_is_free"] == "size differs (value-level): list[2]~list[0]"
+    assert notes["test_quote_empty_cart_is_free"].startswith("values differ: skus")
     assert notes["test_quote_sums_repository_prices"] == ""
 
 
@@ -164,11 +171,28 @@ def test_s10_gap_reported_as_probe_candidate(composition: Composition) -> None:
 
 
 def test_weak_joins_are_recorded_not_dropped(corpus: Corpus) -> None:
-    strict = compose(corpus, seed_id(corpus), min_join=JoinStrength.VALUE)
+    strict = compose(corpus, seed_id(corpus), min_join=JoinStrength.STATE)
     assert not any(e.evidence.kind is EvidenceKind.COMPOSED for e in strict.edges())
     assert ("no-compatible-fragment", QUOTE) in {(g.kind, g.target) for g in strict.gaps}
     rejected = [a for a in strict.attempts if not a.accepted and a.target == QUOTE]
-    assert len(rejected) == 2 and all(a.grade is JoinStrength.ARG_SHAPE for a in rejected)
+    assert len(rejected) == 2 and all(a.grade is not None for a in rejected)
+
+
+def test_p10_value_join_selects_between_fragments(corpus: Corpus) -> None:
+    """Experiment 02: at min_join=VALUE exactly one `quote` fragment composes, the one whose
+    entry values equal the seed's stand-in call; ARG_SHAPE alone could not choose."""
+    c = compose(corpus, seed_id(corpus), min_join=JoinStrength.VALUE)
+    composed = [e for e in c.edges() if e.evidence.kind is EvidenceKind.COMPOSED]
+    assert len(composed) == 1 and composed[0].evidence.join is JoinStrength.VALUE
+    assert composed[0].evidence.fragment is not None
+    assert "test_quote_sums_repository_prices" in composed[0].evidence.fragment.execution
+    rejected = [a for a in c.attempts if not a.accepted]
+    assert [(a.grade, a.note, a.result_compatible) for a in rejected] == [
+        (JoinStrength.ARG_SHAPE, "values differ: skus; result differs: seed continued on it", False)
+    ]
+    # Result compatibility is reported alongside, independently of the grade.
+    accepted = next(a for a in c.attempts if a.accepted)
+    assert accepted.result_compatible is True  # both produced 2500, by the fixture's authoring
 
 
 def test_identity_mismatch_is_loud() -> None:
@@ -205,11 +229,12 @@ def test_p9_outcome_conflict_is_unsound_and_recursion_is_provenanced(corpus: Cor
         rejected.note
         == "outcome conflict: stand-in returned, fragment raised:py:builtins.ValueError"
     )
-    assert by_fragment["test_place_order_returns_quoted_total"].accepted
-    assert by_fragment["test_place_with_unspecced_mocks"].accepted
-    assert by_fragment["test_place_with_unspecced_mocks"].note == (
-        "size differs (value-level): list[2]~list[1]"
-    )
+    assert by_fragment["test_place_order_returns_quoted_total"].grade is JoinStrength.VALUE
+    unspecced = by_fragment["test_place_with_unspecced_mocks"]
+    assert unspecced.accepted and unspecced.grade is JoinStrength.ARG_SHAPE
+    assert unspecced.note.startswith("values differ: customer_id, skus")
+    # P11: the fragment returned Order(..., 700); the stand-in returned Order(..., 4200).
+    assert unspecced.result_compatible is False and "result differs" in unspecced.note
 
     composed = [(e.caller, e.callee) for e in c.edges() if e.evidence.kind is EvidenceKind.COMPOSED]
     assert composed.count(("py:shop.controller.OrderController.place_order", PLACE)) == 2

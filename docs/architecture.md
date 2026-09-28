@@ -162,7 +162,7 @@ Defined in [`src/diffgenome/model.py`](../src/diffgenome/model.py).
 | `SymbolId` | `"<lang>:<qualified name>"`. **The join key for composition.** Both sides of a seam must produce it identically. |
 | `Collector` | `name`, `plane`, `fidelity`. Every node cites one. |
 | `Execution` | one stimulus on one process: `stimulus` kind + ref, outcome, revision, collectors, nodes |
-| `CallNode` | logical call on the symbol plane; `parent` forms the tree; bounded `args` summary for seam matching |
+| `CallNode` | logical call on the symbol plane; `parent` forms the tree; `args` as `(name, shape, digest)` per position; `outcome` (`returned` / `raised:<symbol>` / `unknown`); `result` digest; `thread` |
 | `SubstitutionNode` | control left the production symbol space into a stand-in. Keeps three facts apart: `substitute` (what actually executed), `claimed_target` (what production component it stands in for) and `relation` (how the two are related), plus the `mechanism` (mock object / fake / DI binding / interposition / stub) and the member `path` invoked. **Not necessarily a leaf**: a fake or in-memory repository executes code, and that code appears as its children. |
 | `OsEventNode` | kernel-visible event (`CONNECT`, `OPEN`, `EXEC`, `SPAWN`, ...) with target and outcome, attributed to the innermost symbol-plane call when possible |
 
@@ -181,7 +181,7 @@ silently.
 | Type | Meaning |
 |---|---|
 | `BoundaryResolution` | `INTERNAL` / `EXTERNAL` / `UNRESOLVED`, target symbol, and the **rule** that decided it |
-| `JoinStrength` | `SYMBOL < ARG_SHAPE < VALUE < STATE`: how a composed seam was matched |
+| `JoinStrength` | `SYMBOL < ARG_SHAPE < VALUE < STATE`: how a composed seam was matched on *entry*. A returned/raised outcome conflict is unsound at every grade. Result compatibility (did the fragment return what the stand-in returned) is reported on the join attempt, independently of the grade. |
 | `Evidence` | `kind`, `site` (the observed node grounding it), `rule` (derived kinds only), `fragment` + `join` (composed only), `probe_derived` |
 | `Edge` | caller → callee + one `Evidence`. A symbol pair may have many edges with different evidence. |
 
@@ -274,7 +274,7 @@ state of the fragment. The join lattice grades how much of that we checked:
 |---|---|---|
 | `SYMBOL` | same `SymbolId` | nothing more |
 | `ARG_SHAPE` | arity and types compatible | bounded arg summaries at substitution sites and call nodes (already in protocol) |
-| `VALUE` | values at the seed's seam appear among the fragment's entry values | value capture at seams |
+| `VALUE` | equal content digests at every observed position, outcomes known-compatible | bounded digests at seams (implemented; see experiment 02) |
 | `STATE` | relevant reachable state compatible | targeted state capture around seams: the receiver, the arguments' object graphs to a bounded depth. Never whole-process memory. |
 
 Fragments are never flattened. All fragments for a target are attached as alternatives with

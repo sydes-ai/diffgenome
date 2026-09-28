@@ -26,7 +26,7 @@ def fmt_outcome(outcome: str) -> str:
 
 
 def fmt_args(args: ArgShapes) -> str:
-    return f"  ({', '.join(f'{n}={s}' for n, s in args)})" if args else ""
+    return f"  ({', '.join(f'{n}={s}' for n, s, _ in args)})" if args else ""
 
 
 def _label(node: Node) -> str:

@@ -18,6 +18,7 @@ restored on stop).
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import inspect
 import sys
 import threading
@@ -34,6 +35,7 @@ from diffgenome.model import (
     Fidelity,
     Node,
     Origin,
+    OsEventNode,
     Plane,
     SourceLocation,
     SubstitutionMechanism,
@@ -62,6 +64,61 @@ def summarize_value(value: Any) -> str:
     if isinstance(value, list | tuple | set | frozenset | dict):
         return f"{type(value).__name__}[{len(value)}]"
     return type(value).__qualname__
+
+
+_DIGEST_DEPTH = 3
+_DIGEST_WIDTH = 16  # elements/fields considered per container level
+
+
+def _canonical(value: Any, depth: int) -> str | None:
+    """Canonical string of a value to a bounded depth, or None when not summarizable.
+    Anything None at any level makes the whole digest unavailable: a partial digest would
+    let two different values look equal."""
+    if value is None or isinstance(value, bool | int | str | bytes):
+        return f"{type(value).__name__}:{value!r}"
+    if isinstance(value, float):
+        return f"float:{value.hex()}"
+    if isinstance(value, mock.NonCallableMock) or depth == 0:
+        return None
+    if isinstance(value, list | tuple | set | frozenset):
+        if len(value) > _DIGEST_WIDTH:
+            return None
+        parts: list[str] = []
+        for v in value:
+            c = _canonical(v, depth - 1)
+            if c is None:
+                return None
+            parts.append(c)
+        if isinstance(value, set | frozenset):
+            parts.sort()
+        return f"{type(value).__name__}[{','.join(parts)}]"
+    if isinstance(value, dict):
+        if len(value) > _DIGEST_WIDTH:
+            return None
+        items: list[str] = []
+        for k, v in value.items():
+            ck, cv = _canonical(k, depth - 1), _canonical(v, depth - 1)
+            if ck is None or cv is None:
+                return None
+            items.append(f"{ck}={cv}")
+        return f"dict{{{','.join(sorted(items))}}}"
+    if dataclasses.is_dataclass(value) and not isinstance(value, type):
+        fields: list[str] = []
+        for f in dataclasses.fields(value)[:_DIGEST_WIDTH]:
+            c = _canonical(getattr(value, f.name), depth - 1)
+            if c is None:
+                return None
+            fields.append(f"{f.name}={c}")
+        return f"{type(value).__qualname__}({','.join(fields)})"
+    return None
+
+
+def digest_value(value: Any) -> str:
+    """Stable content digest of a value, or "" when unavailable. Uses sha256 (not hash())
+    so digests agree across processes and runs. Short scalars are trivially reversible by
+    brute force; the digest hides values from casual reading, not from an adversary."""
+    canonical = _canonical(value, _DIGEST_DEPTH)
+    return "" if canonical is None else hashlib.sha256(canonical.encode()).hexdigest()[:16]
 
 
 @dataclass
@@ -243,7 +300,7 @@ class Tracer:
         frame = sys._getframe(1)
         names = code.co_varnames[: code.co_argcount + code.co_kwonlyargcount][:_MAX_ARGS]
         args: ArgShapes = tuple(
-            (n, summarize_value(frame.f_locals[n]))
+            (n, summarize_value(frame.f_locals[n]), digest_value(frame.f_locals[n]))
             for n in names
             if n not in ("self", "cls") and n in frame.f_locals
         )
@@ -273,10 +330,12 @@ class Tracer:
         stack.append((code, node.id))
         return None
 
-    def _set_outcome(self, node_id: int, outcome: str) -> None:
-        self._nodes[node_id] = dataclasses.replace(self._nodes[node_id], outcome=outcome)
+    def _set_outcome(self, node_id: int, outcome: str, result: str = "") -> None:
+        node = self._nodes[node_id]
+        assert not isinstance(node, OsEventNode)
+        self._nodes[node_id] = dataclasses.replace(node, outcome=outcome, result=result)
 
-    def _pop(self, code: CodeType, outcome: str) -> None:
+    def _pop(self, code: CodeType, outcome: str, result: str = "") -> None:
         stack = self._stacks.get(threading.get_ident())
         if not stack:
             return
@@ -288,15 +347,15 @@ class Tracer:
                 return
         _, node_id = stack.pop()
         if node_id != 0:
-            self._set_outcome(node_id, outcome)
+            self._set_outcome(node_id, outcome, result)
         if stack and stack[-1][0] is None:  # the substitution wrapper of a fake ends too
-            self._set_outcome(stack.pop()[1], outcome)
+            self._set_outcome(stack.pop()[1], outcome, result)
 
     # PY_RETURN/PY_UNWIND cannot be disabled per location (CPython raises), so
     # out-of-scope returns are simply ignored; PY_START's DISABLE keeps the cost down.
-    def _on_return(self, code: CodeType, _offset: int, _value: object) -> Any:
+    def _on_return(self, code: CodeType, _offset: int, value: object) -> Any:
         if self.scope_for(code) is not None:
-            self._pop(code, "returned")
+            self._pop(code, "returned", digest_value(value))
         return None
 
     def _on_unwind(self, code: CodeType, _offset: int, exc: BaseException) -> Any:
@@ -312,8 +371,14 @@ class Tracer:
         if node_id is not None:
             # The CALL event only exposes the first argument; here all of them are visible.
             shapes: ArgShapes = tuple(
-                [(f"arg{i}", summarize_value(a)) for i, a in enumerate(args[:_MAX_ARGS])]
-                + [(k, summarize_value(v)) for k, v in list(kwargs.items())[:_MAX_ARGS]]
+                [
+                    (f"arg{i}", summarize_value(a), digest_value(a))
+                    for i, a in enumerate(args[:_MAX_ARGS])
+                ]
+                + [
+                    (k, summarize_value(v), digest_value(v))
+                    for k, v in list(kwargs.items())[:_MAX_ARGS]
+                ]
             )
             node = self._nodes[node_id]
             assert isinstance(node, SubstitutionNode)
@@ -327,14 +392,16 @@ class Tracer:
                 )
             raise
         if node_id is not None:
-            self._set_outcome(node_id, "returned")
+            self._set_outcome(node_id, "returned", digest_value(result))
         return result
 
     def _on_call(self, code: CodeType, _offset: int, callable_: object, arg0: object) -> Any:
         if self.scope_for(code) is None:
             return _DISABLE
         if isinstance(callable_, mock.NonCallableMock):
-            args: ArgShapes = () if arg0 is _MISSING else (("arg0", summarize_value(arg0)),)
+            args: ArgShapes = (
+                () if arg0 is _MISSING else (("arg0", summarize_value(arg0), digest_value(arg0)),)
+            )
             ident = self._thread()
             node_id = self._record_substitution(
                 ident, SubstitutionMechanism.MOCK_OBJECT, callable_, args

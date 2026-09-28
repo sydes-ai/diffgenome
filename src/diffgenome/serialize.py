@@ -52,7 +52,7 @@ def _node_from_dict(d: dict[str, Any]) -> Node:
     d = dict(d)
     cls = _NODE_TYPES[d.pop("type")]
     if "args" in d:
-        d["args"] = tuple((n, sh) for n, sh in d["args"])
+        d["args"] = tuple((n, sh, dg) for n, sh, dg in d["args"])
     if cls is SubstitutionNode:
         d["mechanism"] = SubstitutionMechanism(d["mechanism"])
         d["path"] = tuple(d["path"])
