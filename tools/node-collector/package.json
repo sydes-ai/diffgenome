@@ -1,0 +1,11 @@
+{
+  "name": "diffgenome-node-collector",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Source-instrumentation collector for Node/TypeScript targets; emits the diffgenome event protocol.",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "typescript": "5.9.3"
+  }
+}

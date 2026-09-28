@@ -9,3 +9,4 @@ build/
 .ruff_cache/
 # Trace output written by diffgenome runs
 .diffgenome/
+tools/node-collector/node_modules/

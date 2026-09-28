@@ -104,3 +104,29 @@ def test_probe_loop_closes_a_gap_under_confinement(graph: BehavioralGraph, tmp_p
     # The probe's own patch of urlopen is an external boundary, never crossed.
     assert (RESERVE, "py:urllib.request.urlopen", EvidenceKind.EXTERNAL_BOUNDARY) in after.edges
     assert not any(k is EvidenceKind.OS_BOUNDARY for _, _, k in after.edges)
+
+
+def test_graph_round_trips_through_json_with_provenance(
+    graph: BehavioralGraph, tmp_path: Path
+) -> None:
+    import json
+
+    from diffgenome.report import render_map_slice
+
+    doc = graph.to_json()
+    loaded = BehavioralGraph.from_json(json.loads(json.dumps(doc)))
+    assert loaded.corpus is None
+    assert set(loaded.edges) == set(graph.edges)
+    for key, e in graph.edges.items():
+        f = loaded.edges[key]
+        assert f.best_join == e.best_join and f.executions == e.executions and f.rules == e.rules
+        assert [(x.site, x.fragment, x.join, x.alternates) for x in f.evidence] == [
+            (x.site, x.fragment, x.join, x.alternates) for x in e.evidence
+        ]
+    assert (
+        loaded.neighborhood([PLACE], up=2, down=3).metrics().as_dict()
+        == graph.neighborhood([PLACE], up=2, down=3).metrics().as_dict()
+    )
+    slice_ = render_map_slice(loaded, [PLACE])
+    assert "⇢ shop.pricing_service.PricingService.quote" in slice_ and "→ [gap]" in slice_
+    assert render_map_slice(graph, [PLACE]) == slice_  # deterministic and source-independent

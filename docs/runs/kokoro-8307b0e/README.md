@@ -9,6 +9,13 @@ Date: 2026-09-28. Model: `gpt-5` via the OpenAI chat completions API.
 - `report-live-first-pass.md`: the live run that produced the drafts. Same probes, one
   collector inconsistency (a patched class claimed the class rather than its `__init__`),
   hence one gap more in its "after" column.
+- `graph.json` / `graph-before.json`: the materialized repo-level behavioral graph after /
+  before probes (`diffgenome-graph/1`): every symbol with origin, location, executing tests
+  and outcomes; every edge with kind, join histogram, rules, executions, probe flag and the
+  full evidence list (site, fragment, alternates); gaps; all join attempts incl. rejected.
+  Query: `uv run python -m diffgenome inspect --graph graph.json --symbol ModelManager.ensure_backend`.
+- `map.md`: the rendered slice of that graph around the 23 changed symbols (upstream callers,
+  downstream continuations, gaps, boundaries), also embedded at the end of `report.md`.
 - `probes/probe-{0,1,2}.py`: the generated probes, verbatim. They were written to a
   disposable workspace copy only and executed under Seatbelt with no network.
 

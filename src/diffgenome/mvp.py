@@ -9,6 +9,7 @@ gaps with generated unit probes under confinement, re-compose, report.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shlex
 import sys
@@ -22,7 +23,7 @@ from diffgenome.graph import build_graph
 from diffgenome.llm import OpenAIProbeWriter, ProbeWriter, RecordedProbeWriter
 from diffgenome.model import Execution, Origin
 from diffgenome.probe import ProbeAttempt, ProbeRunner, copy_probe_traces, run_probe_loop
-from diffgenome.report import render_report, report_json
+from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
 
@@ -176,12 +177,25 @@ def main(argv: list[str] | None = None) -> int:
         nb_after = (
             graph_after.neighborhood(seeds, up=args.up, down=args.down) if graph_after else None
         )
-        # 12. report
+        # 12. materialize the graph and the report
+        (out / "graph-before.json").write_text(json.dumps(graph.to_json(), indent=1) + "\n")
+        final_graph = graph_after or graph
+        (out / "graph.json").write_text(json.dumps(final_graph.to_json(), indent=1) + "\n")
+        map_slice = render_map_slice(final_graph, seeds, up=args.up, down=args.down)
+        (out / "map.md").write_text(map_slice)
         text = render_report(change, graph, nb_before, attempts, graph_after, nb_after, notes)
+        text += (
+            "\n## Behavioral map slice around the changed symbols\n\n```\n" + map_slice + "```\n"
+        )
+        text += (
+            "\nThe full repo-level graph with every edge's provenance is `graph.json` next to this "
+            "report (`graph-before.json` is the state before probes). Query it with "
+            "`python -m diffgenome inspect --graph graph.json --symbol <id or suffix>`.\n"
+        )
         (out / "report.md").write_text(text)
         (out / "report.json").write_text(report_json(change, nb_before, attempts, nb_after, notes))
         print(text)
-        _log(f"report: {out / 'report.md'}")
+        _log(f"report: {out / 'report.md'}  graph: {out / 'graph.json'}  map: {out / 'map.md'}")
     finally:
         ws.destroy()
     return 0

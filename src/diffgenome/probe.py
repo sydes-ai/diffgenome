@@ -100,6 +100,7 @@ def select_objectives(
                     skipped.append(f"{e.callee}: class construction with no in-repo __init__")
                 return None
         ev = e.evidence[0]
+        assert graph.corpus is not None
         ex = graph.corpus.executions[ev.site.execution]
         node = ex.nodes[ev.site.node]
         args: ArgShapes = node.args if isinstance(node, SubstitutionNode | CallNode) else ()
@@ -158,6 +159,7 @@ class SourceContext:
             parts.append(f"## Target `{o.target}` (source not located)")
         parts.append(f"## Caller `{o.caller}` (reaches the target through a stand-in)")
         parts.append(_clip(self.index.source(o.caller) or "(source not located)", 80))
+        assert self.graph.corpus is not None
         seed = self.graph.corpus.executions[o.site.execution]
         parts.append(f"## The existing test that produced this seam: {seed.stimulus_ref}")
         test_symbol = seed.nodes[0].symbol if isinstance(seed.nodes[0], CallNode) else None
@@ -387,6 +389,7 @@ def run_probe_loop(
     skipped: list[str] | None = None,
 ) -> tuple[list[ProbeAttempt], Corpus]:
     out_dir.mkdir(parents=True, exist_ok=True)
+    assert graph.corpus is not None
     corpus = graph.corpus
     seeds = list(neighborhood.seeds)
     attempts: list[ProbeAttempt] = []

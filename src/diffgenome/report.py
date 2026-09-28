@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from dataclasses import asdict
 from typing import Any
 
@@ -269,3 +270,94 @@ def report_json(
         "notes": notes,
     }
     return json.dumps(doc, indent=1) + "\n"
+
+
+# --------------------------------------------------------------------------- map slice
+
+
+def _annotate(e: GraphEdge, graph: BehavioralGraph) -> str:
+    bits = [e.kind.value]
+    if e.kind is EvidenceKind.COMPOSED and e.best_join:
+        bits.append(f"join={e.best_join.name.lower()}")
+        alt = sum(len(ev.alternates) for ev in e.evidence)
+        if alt:
+            bits.append(f"+{alt} same-shape")
+    if e.rules:
+        bits.append("rule=" + "/".join(sorted(e.rules)))
+    outs = graph.outcomes_by_symbol.get(e.callee)
+    if outs and e.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED):
+        bits.append("outcomes=" + ",".join(f"{k}:{v}" for k, v in sorted(outs.items())))
+    bits.append(f"tests={len(e.executions)}")
+    if e.probe_derived:
+        bits.append("probe-derived")
+    return "  [" + " ".join(bits) + "]"
+
+
+def render_map_slice(graph: BehavioralGraph, seeds: list[str], up: int = 3, down: int = 4) -> str:
+    """Human-readable slice of the repo-level graph around the seeds: callers above,
+    continuations below, every edge with its evidence. Deterministic. Cycles and repeats
+    are cut with `(see above)`."""
+    lines: list[str] = []
+    seen_down: set[tuple[str, str, EvidenceKind]] = set()
+
+    def down_tree(sym: str, prefix: str, depth: int, path: frozenset[str]) -> None:
+        kids = sorted(graph.out.get(sym, []), key=lambda e: (e.kind.value, e.callee))
+        for i, e in enumerate(kids):
+            last = i == len(kids) - 1
+            branch = "└" if last else "├"
+            key = (e.caller, e.callee, e.kind)
+            repeat = key in seen_down
+            seen_down.add(key)
+            label = f"{_GLYPH[e.kind]} {_short(e.callee)}"
+            lines.append(
+                f"{prefix}{branch}{label}{_annotate(e, graph)}"
+                + ("  (see above)" if repeat else "")
+            )
+            traversable = e.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+            if traversable and not repeat and depth < down and e.callee not in path:
+                down_tree(
+                    e.callee, prefix + ("   " if last else "│  "), depth + 1, path | {e.callee}
+                )
+
+    def up_tree(sym: str, prefix: str, depth: int, path: frozenset[str]) -> None:
+        parents = sorted(
+            (
+                e
+                for e in graph.inc.get(sym, [])
+                if e.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+            ),
+            key=lambda e: (e.kind.value, e.caller),
+        )
+        for i, e in enumerate(parents):
+            last = i == len(parents) - 1
+            branch = "└" if last else "├"
+            lines.append(
+                f"{prefix}{branch}{_short(e.caller)} {_GLYPH[e.kind]}{_annotate(e, graph)}"
+            )
+            if depth < up and e.caller not in path:
+                up_tree(e.caller, prefix + ("   " if last else "│  "), depth + 1, path | {e.caller})
+
+    for seed in seeds:
+        n_tests = len(graph.tests_by_symbol.get(seed, ()))
+        outs = graph.outcomes_by_symbol.get(seed, Counter())
+        origin = graph.origin(seed).value
+        lines.append(
+            f"# {_short(seed)}  [origin={origin} executed_by={n_tests} outcomes={dict(outs)}]"
+        )
+        lines.append("## upstream (who reaches it; each line is `caller →/⇢ this`)")
+        if graph.inc.get(seed):
+            up_tree(seed, "  ", 1, frozenset({seed}))
+        else:
+            lines.append("  (no observed or composed caller)")
+        lines.append("## downstream (what continues from it)")
+        if graph.out.get(seed):
+            down_tree(seed, "  ", 1, frozenset({seed}))
+        else:
+            lines.append("  (no observed continuation)")
+        lines.append("")
+    legend = (
+        "legend: → observed  ⇢ composed (join=symbol|arg_shape|value)  → [gap] internal gap  "
+        "→ [unresolved] stand-in not resolved  → [external] outside the repository  "
+        "→ [os] kernel boundary\n"
+    )
+    return legend + "\n" + "\n".join(lines)

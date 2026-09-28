@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
+from typing import Any
 
 from diffgenome.compose import Composition, Corpus, Gap, JoinAttempt, compose
 from diffgenome.model import (
@@ -73,7 +74,10 @@ class GraphEdge:
 
 @dataclass
 class BehavioralGraph:
-    corpus: Corpus
+    """One repository-level graph. Built once from a corpus; serializable to JSON with all
+    provenance and loadable back for queries without the corpus."""
+
+    symbols: dict[SymbolId, Symbol]
     edges: dict[tuple[SymbolId, SymbolId, EvidenceKind], GraphEdge]
     out: dict[SymbolId, list[GraphEdge]]
     inc: dict[SymbolId, list[GraphEdge]]
@@ -81,15 +85,142 @@ class BehavioralGraph:
     outcomes_by_symbol: dict[SymbolId, Counter[str]]
     gaps: list[Gap]
     attempts: list[JoinAttempt]  # every join attempt, accepted or not
-    compositions: dict[str, Composition]
-
-    @property
-    def symbols(self) -> dict[SymbolId, Symbol]:
-        return self.corpus.symbols
+    corpus: Corpus | None = None  # present when built from traces; None when loaded from JSON
+    compositions: dict[str, Composition] = field(default_factory=dict)
 
     def origin(self, symbol: SymbolId) -> Origin:
-        s = self.corpus.symbols.get(symbol)
+        s = self.symbols.get(symbol)
         return s.origin if s else Origin.UNKNOWN
+
+    # ------------------------------------------------------------------ materialization
+
+    def to_json(self) -> dict[str, object]:
+        def ev(e: Evidence) -> dict[str, object]:
+            return {
+                "kind": e.kind.value,
+                "site": {"execution": e.site.execution, "node": e.site.node},
+                "fragment": {"execution": e.fragment.execution, "node": e.fragment.node}
+                if e.fragment
+                else None,
+                "alternates": [{"execution": a.execution, "node": a.node} for a in e.alternates],
+                "join": e.join.name if e.join else None,
+                "rule": e.rule,
+                "probe_derived": e.probe_derived,
+            }
+
+        return {
+            "format": "diffgenome-graph/1",
+            "symbols": [
+                {
+                    "id": s.id,
+                    "origin": s.origin.value,
+                    "location": {"path": s.location.path, "line": s.location.line}
+                    if s.location
+                    else None,
+                    "executed_by": sorted(self.tests_by_symbol.get(s.id, ())),
+                    "outcomes": dict(self.outcomes_by_symbol.get(s.id, Counter())),
+                }
+                for s in sorted(self.symbols.values(), key=lambda x: x.id)
+            ],
+            "edges": [
+                {
+                    "caller": e.caller,
+                    "callee": e.callee,
+                    "kind": e.kind.value,
+                    "best_join": e.best_join.name if e.best_join else None,
+                    "joins": {
+                        j.name: n for j, n in sorted(e.joins.items(), key=lambda x: x[0].value)
+                    },
+                    "rules": sorted(e.rules),
+                    "executions": sorted(e.executions),
+                    "probe_derived": e.probe_derived,
+                    "evidence": [ev(x) for x in e.evidence],
+                }
+                for e in sorted(
+                    self.edges.values(), key=lambda x: (x.caller, x.callee, x.kind.value)
+                )
+            ],
+            "gaps": [
+                {
+                    "site": {"execution": g.site.execution, "node": g.site.node},
+                    "target": g.target,
+                    "kind": g.kind,
+                }
+                for g in self.gaps
+            ],
+            "join_attempts": [
+                {
+                    "site": {"execution": a.site.execution, "node": a.site.node},
+                    "fragment": {"execution": a.fragment.execution, "node": a.fragment.node},
+                    "target": a.target,
+                    "grade": a.grade.name if a.grade else None,
+                    "accepted": a.accepted,
+                    "note": a.note,
+                    "result_compatible": a.result_compatible,
+                }
+                for a in self.attempts
+            ],
+        }
+
+    @classmethod
+    def from_json(cls, doc: dict[str, Any]) -> BehavioralGraph:
+        from diffgenome.model import SourceLocation
+
+        symbols: dict[SymbolId, Symbol] = {}
+        tests: dict[SymbolId, set[str]] = {}
+        outcomes: dict[SymbolId, Counter[str]] = {}
+        for s in doc["symbols"]:
+            loc = (
+                SourceLocation(s["location"]["path"], s["location"]["line"])
+                if s["location"]
+                else None
+            )
+            symbols[s["id"]] = Symbol(s["id"], Origin(s["origin"]), loc)
+            tests[s["id"]] = set(s["executed_by"])
+            outcomes[s["id"]] = Counter(s["outcomes"])
+        edges: dict[tuple[SymbolId, SymbolId, EvidenceKind], GraphEdge] = {}
+        for e in doc["edges"]:
+            kind = EvidenceKind(e["kind"])
+            ge = GraphEdge(e["caller"], e["callee"], kind)
+            for x in e["evidence"]:
+                ge.add(
+                    Evidence(
+                        EvidenceKind(x["kind"]),
+                        NodeRef(x["site"]["execution"], x["site"]["node"]),
+                        rule=x["rule"],
+                        fragment=NodeRef(x["fragment"]["execution"], x["fragment"]["node"])
+                        if x["fragment"]
+                        else None,
+                        join=JoinStrength[x["join"]] if x["join"] else None,
+                        alternates=tuple(
+                            NodeRef(a["execution"], a["node"]) for a in x["alternates"]
+                        ),
+                        probe_derived=x["probe_derived"],
+                    )
+                )
+            edges[(ge.caller, ge.callee, kind)] = ge
+        out: dict[SymbolId, list[GraphEdge]] = defaultdict(list)
+        inc: dict[SymbolId, list[GraphEdge]] = defaultdict(list)
+        for ge in edges.values():
+            out[ge.caller].append(ge)
+            inc[ge.callee].append(ge)
+        gaps = [
+            Gap(NodeRef(g["site"]["execution"], g["site"]["node"]), g["target"], g["kind"])
+            for g in doc["gaps"]
+        ]
+        attempts = [
+            JoinAttempt(
+                NodeRef(a["site"]["execution"], a["site"]["node"]),
+                NodeRef(a["fragment"]["execution"], a["fragment"]["node"]),
+                a["target"],
+                JoinStrength[a["grade"]] if a["grade"] else None,
+                a["accepted"],
+                a["note"],
+                a["result_compatible"],
+            )
+            for a in doc["join_attempts"]
+        ]
+        return cls(symbols, edges, dict(out), dict(inc), tests, outcomes, gaps, attempts)
 
     # ------------------------------------------------------------------ queries
 
@@ -282,6 +413,6 @@ def build_graph(corpus: Corpus, min_join: JoinStrength = JoinStrength.SYMBOL) ->
                 tests_by_symbol[n.symbol].add(ex.id)
                 outcomes[n.symbol][n.outcome.split(":")[0]] += 1
     return BehavioralGraph(
-        corpus, edges, dict(out), dict(inc), dict(tests_by_symbol), dict(outcomes), gaps,
-        attempts, compositions,
+        dict(corpus.symbols), edges, dict(out), dict(inc), dict(tests_by_symbol), dict(outcomes),
+        gaps, attempts, corpus, compositions,
     )  # fmt: skip
