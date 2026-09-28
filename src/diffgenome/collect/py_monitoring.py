@@ -10,11 +10,14 @@ out of scope and its events are disabled at the first hit, so it costs nothing a
 
 Known limits (see docs/experiment-01.md): generators/coroutines are not modelled (a
 stack repair is counted instead), `side_effect`/`wraps` bodies run inside the stand-in
-call and are attributed to it, and only the first argument of a stand-in call is visible.
+call and are attributed to it. A stand-in call's arguments and outcome are observed by
+wrapping `unittest.mock`'s private `_mock_call` while tracing (a runtime-adapter detail,
+restored on stop).
 """
 
 from __future__ import annotations
 
+import dataclasses
 import inspect
 import sys
 import threading
@@ -25,6 +28,7 @@ from typing import Any
 from unittest import mock
 
 from diffgenome.model import (
+    ArgShapes,
     CallNode,
     Collector,
     Fidelity,
@@ -88,6 +92,8 @@ class Tracer:
     _threads: dict[int, int] = field(default_factory=dict, repr=False)
     _root_code: CodeType | None = None
     _stack_repairs: int = 0
+    _pending_mock_calls: dict[int, list[int]] = field(default_factory=dict, repr=False)
+    _orig_mock_call: Any = None
 
     # ------------------------------------------------------------------ symbol naming
 
@@ -130,15 +136,14 @@ class Tracer:
         scope = self.scope_for(code)
         return scope.symbol if scope else None
 
-    def symbol_for_object(self, obj: Any) -> SymbolId:
-        """Identity of a class/function reached by *object*, not by frame. Uses the same
-        file-based naming as frames when the object's file is in scope, so the two routes
-        must agree; that agreement is exactly what experiment 01 criterion S5 checks."""
+    def symbol_for_object(self, obj: Any) -> Symbol:
+        """Identity of a class/function reached by *object*, not by frame, with the origin
+        and location the collector can observe for it. Uses the same file-based naming as
+        frames when the object has a code object or an in-scope source file; otherwise a
+        module-based name, which is a second identity scheme (see exp 01 findings)."""
         code = getattr(obj, "__code__", None)
-        if isinstance(code, CodeType):
-            sym = self.symbol_for_code(code)
-            if sym:
-                return sym
+        if isinstance(code, CodeType) and (scope := self.scope_for(code)):
+            return Symbol(scope.symbol, scope.origin, scope.location)
         try:
             file = inspect.getsourcefile(obj)
         except TypeError:
@@ -147,21 +152,26 @@ class Tracer:
         if file:
             named = self._module_for(Path(file))
             if named:
-                return f"py:{named[1]}.{qualname}"
+                line = getattr(code, "co_firstlineno", None) if isinstance(code, CodeType) else None
+                loc = SourceLocation(str(Path(file).relative_to(self.repo_root)), line or 0)
+                return Symbol(f"py:{named[1]}.{qualname}", named[0], loc)
         # C-implemented members (method/getset descriptors) carry no __module__ of their
         # own; the defining class does. Falling back to type(obj).__module__ named
         # sqlite3.Connection.execute as "builtins": a wrong identity, caught in exp 01.
         owner = getattr(obj, "__objclass__", None)
-        module = (
-            getattr(obj, "__module__", None)
-            or (owner.__module__ if owner is not None else None)
-            or type(obj).__module__
-        )
-        return f"py:{module}.{qualname}"
+        module = getattr(obj, "__module__", None) or (owner.__module__ if owner else None)
+        if module is None:
+            return Symbol(f"py:{type(obj).__module__}.{qualname}", Origin.UNKNOWN, None)
+        # A real object in this process whose file is absent or out of scope: external.
+        return Symbol(f"py:{module}.{qualname}", Origin.EXTERNAL, None)
 
     def _intern(self, symbol: SymbolId, origin: Origin, location: SourceLocation | None) -> None:
         if symbol not in self._symbols:
             self._symbols[symbol] = Symbol(symbol, origin, location)
+
+    def _intern_symbol(self, symbol: Symbol) -> SymbolId:
+        self._intern(symbol.id, symbol.origin, symbol.location)
+        return symbol.id
 
     # ------------------------------------------------------------------ stand-ins
 
@@ -184,11 +194,11 @@ class Tracer:
         if path and path[0] != "()":
             member = inspect.getattr_static(spec, path[0], None)
             member = getattr(member, "__func__", getattr(member, "fget", member))
-        target = self.symbol_for_object(member if member is not None else spec)
+        target = self._intern_symbol(self.symbol_for_object(member if member is not None else spec))
         return target, "spec", tuple(path)
 
     def _record_substitution(
-        self, thread: int, mechanism: SubstitutionMechanism, callable_: Any, args: str | None
+        self, thread: int, mechanism: SubstitutionMechanism, callable_: Any, args: ArgShapes
     ) -> int:
         stack = self._stacks[thread]
         parent = stack[-1][1] if stack else 0
@@ -196,15 +206,8 @@ class Tracer:
             substitute = f"py:{type(callable_).__module__}.{type(callable_).__qualname__}"
             claimed, relation, path = self._describe_mock(callable_)
         else:
-            substitute, claimed, relation, path = (
-                self.symbol_for_object(callable_),
-                None,
-                "none",
-                (),
-            )
-        if claimed:
-            origin = Origin.REPO if claimed in self._symbols else Origin.UNKNOWN
-            self._intern(claimed, origin, None)
+            substitute = self._intern_symbol(self.symbol_for_object(callable_))
+            claimed, relation, path = None, "none", ()
         node = SubstitutionNode(
             id=len(self._nodes),
             parent=parent,
@@ -239,8 +242,8 @@ class Tracer:
             return None
         frame = sys._getframe(1)
         names = code.co_varnames[: code.co_argcount + code.co_kwonlyargcount][:_MAX_ARGS]
-        args = ", ".join(
-            f"{n}={summarize_value(frame.f_locals[n])}"
+        args: ArgShapes = tuple(
+            (n, summarize_value(frame.f_locals[n]))
             for n in names
             if n not in ("self", "cls") and n in frame.f_locals
         )
@@ -263,40 +266,80 @@ class Tracer:
             parent=parent,
             symbol=scope.symbol,
             collector=0,
-            args=args or None,
+            args=args,
             thread=self._threads[ident],
         )
         self._nodes.append(node)
         stack.append((code, node.id))
         return None
 
-    def _on_return(self, code: CodeType, _offset: int, _value: object) -> Any:
-        # PY_RETURN/PY_UNWIND cannot be disabled per location (CPython raises), so
-        # out-of-scope returns are simply ignored; PY_START's DISABLE keeps the cost down.
-        if self.scope_for(code) is None:
-            return None
+    def _set_outcome(self, node_id: int, outcome: str) -> None:
+        self._nodes[node_id] = dataclasses.replace(self._nodes[node_id], outcome=outcome)
+
+    def _pop(self, code: CodeType, outcome: str) -> None:
         stack = self._stacks.get(threading.get_ident())
         if not stack:
-            return None
+            return
         if stack[-1][0] is not code:
             self._stack_repairs += 1
             while stack and stack[-1][0] is not code:
                 stack.pop()
             if not stack:
-                return None
-        stack.pop()
-        if stack and stack[-1][0] is None:  # the substitution wrapper of a fake
-            stack.pop()
+                return
+        _, node_id = stack.pop()
+        if node_id != 0:
+            self._set_outcome(node_id, outcome)
+        if stack and stack[-1][0] is None:  # the substitution wrapper of a fake ends too
+            self._set_outcome(stack.pop()[1], outcome)
+
+    # PY_RETURN/PY_UNWIND cannot be disabled per location (CPython raises), so
+    # out-of-scope returns are simply ignored; PY_START's DISABLE keeps the cost down.
+    def _on_return(self, code: CodeType, _offset: int, _value: object) -> Any:
+        if self.scope_for(code) is not None:
+            self._pop(code, "returned")
         return None
+
+    def _on_unwind(self, code: CodeType, _offset: int, exc: BaseException) -> Any:
+        if self.scope_for(code) is not None:
+            self._pop(code, "raised:" + self._intern_symbol(self.symbol_for_object(type(exc))))
+        return None
+
+    def _mock_call(self, m: Any, /, *args: Any, **kwargs: Any) -> Any:
+        """Wraps unittest.mock's call path while tracing, so a stand-in call's outcome is
+        observed rather than inferred. The CALL event has already recorded the node."""
+        pending = self._pending_mock_calls.get(threading.get_ident())
+        node_id = pending.pop() if pending else None
+        if node_id is not None:
+            # The CALL event only exposes the first argument; here all of them are visible.
+            shapes: ArgShapes = tuple(
+                [(f"arg{i}", summarize_value(a)) for i, a in enumerate(args[:_MAX_ARGS])]
+                + [(k, summarize_value(v)) for k, v in list(kwargs.items())[:_MAX_ARGS]]
+            )
+            node = self._nodes[node_id]
+            assert isinstance(node, SubstitutionNode)
+            self._nodes[node_id] = dataclasses.replace(node, args=shapes)
+        try:
+            result = self._orig_mock_call(m, *args, **kwargs)
+        except BaseException as exc:
+            if node_id is not None:
+                self._set_outcome(
+                    node_id, "raised:" + self._intern_symbol(self.symbol_for_object(type(exc)))
+                )
+            raise
+        if node_id is not None:
+            self._set_outcome(node_id, "returned")
+        return result
 
     def _on_call(self, code: CodeType, _offset: int, callable_: object, arg0: object) -> Any:
         if self.scope_for(code) is None:
             return _DISABLE
         if isinstance(callable_, mock.NonCallableMock):
-            args = None if arg0 is _MISSING else f"arg0={summarize_value(arg0)}"
-            self._record_substitution(
-                self._thread(), SubstitutionMechanism.MOCK_OBJECT, callable_, args
+            args: ArgShapes = () if arg0 is _MISSING else (("arg0", summarize_value(arg0)),)
+            ident = self._thread()
+            node_id = self._record_substitution(
+                ident, SubstitutionMechanism.MOCK_OBJECT, callable_, args
             )
+            self._pending_mock_calls.setdefault(ident, []).append(node_id)
         return None
 
     # ------------------------------------------------------------------ lifecycle
@@ -308,19 +351,28 @@ class Tracer:
         self._stacks.clear()
         self._threads.clear()
         self._stack_repairs = 0
+        self._pending_mock_calls.clear()
         self._root_code = root_code
         origin = Origin.TEST
         location = None
         if root_code is not None and (scope := self.scope_for(root_code)):
             origin, location = scope.origin, scope.location
         self._intern(root_symbol, origin, location)
-        self._nodes.append(CallNode(0, None, root_symbol, 0, None, 0))
+        self._nodes.append(CallNode(0, None, root_symbol, 0, (), 0))
         self._thread()
         m.use_tool_id(_TOOL_ID, "diffgenome")
         m.register_callback(_TOOL_ID, m.events.PY_START, self._on_start)
         m.register_callback(_TOOL_ID, m.events.PY_RETURN, self._on_return)
-        m.register_callback(_TOOL_ID, m.events.PY_UNWIND, self._on_return)
+        m.register_callback(_TOOL_ID, m.events.PY_UNWIND, self._on_unwind)
         m.register_callback(_TOOL_ID, m.events.CALL, self._on_call)
+        mixin: Any = mock.CallableMixin  # private attribute, absent from typeshed
+        self._orig_mock_call = mixin._mock_call
+        tracer = self
+
+        def _traced_mock_call(mock_self: Any, /, *args: Any, **kwargs: Any) -> Any:
+            return tracer._mock_call(mock_self, *args, **kwargs)
+
+        mixin._mock_call = _traced_mock_call
         m.restart_events()
         m.set_events(
             _TOOL_ID, m.events.PY_START | m.events.PY_RETURN | m.events.PY_UNWIND | m.events.CALL
@@ -332,6 +384,10 @@ class Tracer:
         for ev in (m.events.PY_START, m.events.PY_RETURN, m.events.PY_UNWIND, m.events.CALL):
             m.register_callback(_TOOL_ID, ev, None)
         m.free_tool_id(_TOOL_ID)
+        if self._orig_mock_call is not None:
+            mixin: Any = mock.CallableMixin
+            mixin._mock_call = self._orig_mock_call
+            self._orig_mock_call = None
         return TraceResult(
             symbols=tuple(self._symbols[k] for k in sorted(self._symbols)),
             nodes=tuple(self._nodes),

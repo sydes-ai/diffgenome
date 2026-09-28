@@ -47,6 +47,8 @@ OrderController.place_order
 | `test_pricing_service.py::test_quote_sums_repository_prices` | **Fragment.** Real `PricingService`, `PriceRepository`; `sqlite3.Connection` stand-in (claim outside repo). |
 | `test_pricing_service.py::test_quote_empty_cart_is_free` | **Second fragment** for the same target on a different path; tests alternatives and join grading. |
 | `test_order_service.py::test_place_with_unspecced_mocks` | **Negative control.** Claim-less stand-ins; must stay unresolved despite `.quote` matching a real method name. |
+| `test_order_service.py::test_duplicate_skus_rejected` | **Raising fragment** for `OrderService.place` (added 2026-09-28 after the outcome finding). |
+| `test_controller.py::test_place_order_with_order_service_stand_in` | **Second seed** whose stand-in is `OrderService`: three fragments for `place`, one of which raised; exercises outcome conflict and two-hop recursion. |
 
 **B. `~/sample_repos/demo-orders-api`** (real-ish). FastAPI app, 6 tests through
 `TestClient`, in-memory repository, **no stand-ins at all**. Real path per request:
@@ -259,3 +261,57 @@ What this changes in the plan:
   that the symbol plane can only number?
 - Finding 3 goes on the protocol change list; finding 2 goes into the north-star
   denominator discussion in architecture §1.
+
+### 2026-09-28: composer, part 2 of the experiment
+
+Instrument: `diffgenome.resolve` (R1–R5), `diffgenome.compose` (fragment index, `expand`,
+seam grading), `render_composition`. Pinned in `tests/test_exp01.py` (S5–S10 and P9).
+
+| Prediction | Outcome | Evidence |
+|---|---|---|
+| **P5** (S6) rules classify every fixture stand-in without names | **holds** | `claim-member`, `claim-outside-repo`, `no-claim`; the negative control composes nothing. |
+| **P6** (S7) two `COMPOSED` edges `place ⇢ quote`; two-item fragment `ARG_SHAPE`, empty-cart fragment `SYMBOL` | **half wrong, and the prediction was the wrong half** | Both fragments grade `ARG_SHAPE`. `list[2]` and `list[0]` are the same *type*; size is value-level by the lattice's own definition. My expected rendering had folded size into shape. Kept the definition; the composer notes `size differs (value-level)` on the attempt. **Consequence:** `ARG_SHAPE` cannot separate the two paths of the simplest possible branching function. The `VALUE` join is needed at the first real branch, not later. |
+| **P7** (S8–S10) no laundering, boundaries terminate, gap reported | **holds** | `InventoryService.reserve` → `no-fragment` gap; at `min_join=VALUE` both `quote` joins are rejected and listed with notes (the probe queue). |
+| **P8** the composer needs something the protocol lacks | **holds** | `args` was a free-form string; seam grading needed structure. Protocol change: `ArgShapes = ((name, shape), ...)`, positional, receiver excluded, `type[size]`. |
+| **P9** a returned stand-in is never joined to a raised fragment; the rest compose; recursion continues through them | **holds after two instrument fixes** | The first run *accepted* the raising fragment: my outcome patch had silently not applied. Second run: `unsound … outcome conflict: stand-in returned, fragment raised:py:builtins.ValueError`; the two returning fragments compose at `ARG_SHAPE`; the borrowed `place` fragment expands into the `quote` seam (two hops), every edge citing its own execution. |
+
+Core-model issues exposed, and what was changed:
+
+1. **Outcome compatibility (protocol).** Found on `demo-orders-api` before any stand-in
+   was involved: `app.service.get_stock` was indexed four times as a fragment, two of which
+   *raised* `UnknownSkuError`, with identical argument shapes to the two that returned.
+   Any seed whose stand-in for `get_stock` returned a value would have been joined to a
+   raising continuation at `ARG_SHAPE`. The protocol had no call outcome. Added
+   `Outcome` (`returned` / `raised:<symbol>` / `unknown`) on `CallNode` and
+   `SubstitutionNode`; `grade_seam` returns *unsound* on a returned/raised conflict, and
+   `unknown` on either side is noted, never treated as compatible. This is a
+   language-neutral fact (every runtime distinguishes normal return from exceptional exit)
+   and it closes finding 3 of the previous entry.
+2. **Nested-seam provenance.** My S8 assertion ("everything below a seam cites the
+   fragment's execution") was wrong for two hops: below a seam, edges cite that fragment
+   *until the next seam*. The composer was right; the test was fixed.
+3. **First-argument-only stand-in capture weakened `ARG_SHAPE` silently.** For
+   `place(customer_id, skus)`, only `customer_id=str` was compared and the discriminating
+   `skus` was invisible, so a size difference went unreported. The runtime adapter now
+   records all arguments of a stand-in call (it sees them in the call wrapper). The
+   general lesson: an `ARG_SHAPE` grade is only as strong as the *coverage* of the
+   argument list on both sides; the protocol should probably say how many arguments were
+   observable. Not changed yet.
+4. **Chained calls on a return value** rendered as a duplicate of the first member. Edge
+   callee now carries the path suffix (`sqlite3.Connection.execute.().fetchone`). The
+   observed path was always in the node; only the edge label lost it.
+
+Instrument facts: patching `unittest.mock`'s private `_mock_call` gives stand-in outcomes
+and full argument lists; assigning a bound method there passes the wrong receiver (found
+by the fixture failing under trace, S1 doing its job).
+
+What this changes in the plan:
+
+- `VALUE`-level capture at seams moves up: it is required to select between fragments
+  of the first function that branches on an argument. Candidate: bounded, hashed value
+  summaries for scalars and sizes for containers at substitution sites and fragment roots.
+  This is targeted state capture around seams, not process memory.
+- Rejected joins are now first-class output (`attempts`, `gaps`): experiment 04's probe
+  generator has its queue.
+- `demo-orders-api` composes to pure `OBSERVED`, zero gaps, as a stand-in-free target
+  should; it remains the ground-truth candidate for experiment 05.

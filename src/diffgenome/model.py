@@ -106,6 +106,21 @@ class SubstitutionMechanism(Enum):
     UNKNOWN = "unknown"
 
 
+ArgShapes = tuple[tuple[str, str], ...]
+"""Bounded argument summary for seam matching: ``((name, shape), ...)`` in positional order,
+receiver excluded. ``shape`` is ``<type>`` or ``<type>[<size>]``; never a value repr. A
+stand-in call that only exposes positional arguments names them ``arg0``, ``arg1``...
+Composition compares by position, and ``ARG_SHAPE`` compares types only: sizes are
+value-level information and belong to the ``VALUE`` join."""
+
+
+Outcome = str
+"""How a call ended: ``"returned"``, ``"raised:<symbol of the exception type>"``, or
+``"unknown"`` when the collector could not observe it. Composition treats a returning seam
+joined to a raising fragment (or vice versa) as an outcome conflict: the seed's
+continuation after the stand-in assumed the other outcome, so the join is unsound."""
+
+
 @dataclass(frozen=True)
 class CallNode:
     """One logical call observed on the symbol plane. Nodes form a tree via ``parent``."""
@@ -114,8 +129,9 @@ class CallNode:
     parent: int | None  # None only for the execution's root (the stimulus itself)
     symbol: SymbolId
     collector: int  # index into Execution.collectors
-    args: str | None = None  # bounded summary of argument shapes/values, for seam matching
+    args: ArgShapes = ()
     thread: int = 0  # 0 is the stimulus thread; others numbered in order of first appearance
+    outcome: Outcome = "unknown"
 
 
 @dataclass(frozen=True)
@@ -146,7 +162,8 @@ class SubstitutionNode:
     path: tuple[str, ...] = ()
     """Member path invoked on the stand-in, e.g. ``("execute", "()", "fetchone")`` where
     ``"()"`` marks a call's return value."""
-    args: str | None = None
+    args: ArgShapes = ()
+    outcome: Outcome = "unknown"
 
 
 class OsEventKind(Enum):

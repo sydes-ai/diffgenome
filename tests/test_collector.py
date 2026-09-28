@@ -69,7 +69,7 @@ def test_s4_observed_chain_and_standin_attribution(fixture_traces: dict[str, Exe
     assert [s.parent for s in subs] == [place.id, place.id]
     assert [s.path for s in subs] == [("reserve",), ("quote",)]
     assert all(s.mechanism is SubstitutionMechanism.MOCK_OBJECT for s in subs)
-    assert all(s.args == "arg0=list[2]" for s in subs)
+    assert all(s.args == (("arg0", "list[2]"),) for s in subs)  # single positional argument
 
 
 def test_s5_join_key_agrees_between_claim_and_frame(fixture_traces: dict[str, Execution]) -> None:
@@ -132,3 +132,16 @@ def test_fake_is_a_substitution_that_executes(tmp_path: Path) -> None:
     save = calls(ex)["py:tests.test_fake.FakeRepo.save"][0]
     helper = calls(ex)["py:tests.test_fake._helper"][0]
     assert save.parent == fake.id and helper.parent == save.id  # not a leaf
+
+
+def test_outcomes_are_observed_for_calls_and_standins(fixture_traces: dict[str, Execution]) -> None:
+    raised = fixture_traces["test_duplicate_skus_rejected"]
+    c = calls(raised)
+    assert c["py:shop.order_service._validate"][0].outcome == "raised:py:builtins.ValueError"
+    assert (
+        c["py:shop.order_service.OrderService.place"][0].outcome == "raised:py:builtins.ValueError"
+    )
+    assert c["py:shop.order_service.OrderService.__init__"][0].outcome == "returned"
+
+    seed = fixture_traces["test_place_order_returns_quoted_total"]
+    assert {s.outcome for s in substitutions(seed)} == {"returned"}

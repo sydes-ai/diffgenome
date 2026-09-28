@@ -20,6 +20,8 @@ OrderController.place_order
 | `test_pricing_service.py::test_quote_sums_repository_prices` | PricingService, PriceRepository | `sqlite3.Connection` (autospec: claim outside repo → external) |
 | `test_pricing_service.py::test_quote_empty_cart_is_free` | PricingService (short-circuit) | `sqlite3.Connection` (never called) |
 | `test_order_service.py::test_place_with_unspecced_mocks` | OrderService | claim-less `MagicMock`s → must stay **unresolved** |
+| `test_order_service.py::test_duplicate_skus_rejected` | OrderService, `_validate` **raising** `ValueError` | autospec stand-ins (never reached) |
+| `test_controller.py::test_place_order_with_order_service_stand_in` | Controller only | `OrderService` (autospec → internal; seed for the outcome-conflict and two-hop cases) |
 
 The stand-ins here happen to be `unittest.mock` objects because the fixture is Python.
 diffgenome's model sees them only as `SubstitutionNode`s with mechanism `MOCK_OBJECT`.
