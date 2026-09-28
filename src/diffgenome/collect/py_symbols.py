@@ -167,6 +167,11 @@ class PythonSymbolIndex:
         ]  # fmt: skip
         return max(classes, key=lambda c: c.start) if classes else None
 
+    def module_of(self, symbol: SymbolId) -> str | None:
+        """Dotted module of a symbol: the longest prefix of its qualified name that is a file."""
+        rel = self.path_for(symbol)
+        return self.module_for(self.repo_root / rel) if rel else None
+
     def tests_importing(self, module: str, limit: int = 3) -> list[str]:
         """Test files that import the module (or its package), by name. Shallow and cheap."""
         hits: list[str] = []

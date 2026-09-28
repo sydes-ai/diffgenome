@@ -1,0 +1,32 @@
+  console.error ../../../../../../../../../../Users/ksnaik/sample_repos/express-typescript-boilerplate/node_modules/winston/lib/winston/logger.js:227
+    [winston] Attempt to write logs with no transports {"0":42,"level":"info","message":"[customScope] hello"}
+
+
+--- stderr ---
+FAIL test/unit/diffgenome_probe_0_1.test.ts
+  ✕ Logger.info delegates to winston.info with formatted scope and arg array (2ms)
+
+  ● Logger.info delegates to winston.info with formatted scope and arg array
+
+    expect(jest.fn()).toHaveBeenCalledTimes(1)
+
+    Expected mock function to have been called one time, but it was called zero times.
+
+      12 |     const logger = new Logger('customScope');
+      13 |     logger.info('hello', 42);
+    > 14 | 
+         | ^
+      15 |     expect(infoMock).toHaveBeenCalledTimes(1);
+      16 |     expect(infoMock).toHaveBeenCalledWith('[customScope] hello', [42]);
+      17 |   } finally {
+
+      at Object.<anonymous> (test/unit/diffgenome_probe_0_1.test.ts:14:26)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.2s
+Ran all test suites matching /test\/unit\/diffgenome_probe_0_1.test.ts/i.
+Force exiting Jest
+
+Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

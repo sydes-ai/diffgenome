@@ -204,7 +204,7 @@ function instrumentFile(file, ctxInfo, index) {
           // const c = __dg.enter(meta, [args]); try { body } catch (e) { __dg.throwed(c, e); throw e } finally { __dg.exit(c) }
           const e = f.createUniqueName("__dge");
           const decl = f.createVariableStatement(undefined, f.createVariableDeclarationList([
-            f.createVariableDeclaration(c, undefined, undefined, f.createCallExpression(f.createPropertyAccessExpression(DG, "enter"), undefined, [meta, values])),
+            f.createVariableDeclaration(c, undefined, undefined, f.createCallExpression(f.createPropertyAccessExpression(DG, "enter"), undefined, [meta, values, (ts.isArrowFunction(node) || isCtor) ? f.createIdentifier("undefined") : f.createThis()])),
           ], ts.NodeFlags.Const));
           const tryStmt = f.createTryStatement(
             visitedBody,
@@ -229,7 +229,25 @@ function instrumentFile(file, ctxInfo, index) {
       }
       return ts.visitEachChild(node, visit, context);
     }
-    return (root) => ts.visitNode(root, visit);
+    return (root) => {
+      const visited = ts.visitNode(root, visit);
+      // Register named top-level classes so the runtime can claim overriding fakes by
+      // prototype identity: __dg.registerClass(Name, "js:<module>.Name").
+      const extra = [];
+      for (const stmt of visited.statements) {
+        if (ts.isClassDeclaration(stmt) && stmt.name) {
+          const sym = `js:${mod}.${stmt.name.text}`;
+          extra.push({ after: stmt, stmt: f.createExpressionStatement(f.createCallExpression(f.createPropertyAccessExpression(DG, "registerClass"), undefined, [f.createIdentifier(stmt.name.text), f.createStringLiteral(sym), f.createStringLiteral(ctxInfo.origin)])) });
+        }
+      }
+      if (extra.length === 0) return visited;
+      const statements = [];
+      for (const stmt of visited.statements) {
+        statements.push(stmt);
+        for (const e of extra) if (e.after === stmt) { statements.push(e.stmt); changed = true; }
+      }
+      return f.updateSourceFile(visited, statements);
+    };
   };
 
   const result = ts.transform(sf, [transformer]);

@@ -1,9 +1,10 @@
 """One workflow: trace a repository's tests, build the map, centre on a change, probe the
 gaps with generated unit probes under confinement, re-compose, report.
 
-    python -m diffgenome mvp --repo ~/sample_repos/Kokoro-FastAPI --python .venv/bin/python \\
-        --test-root api/tests --diff 8307b0e --pytest-arg=--no-cov \\
-        --pytest-arg=--ignore=api/tests/integration --out out/kokoro
+    python -m diffgenome mvp --runtime python --repo <r> --python .venv/bin/python \\
+        --test-root tests --diff <rev> --writer openai --out out/run
+    python -m diffgenome mvp --runtime node --repo <r> --source-root src --test-root test/unit \\
+        --diff <rev> --writer openai --out out/run
 """
 
 from __future__ import annotations
@@ -17,63 +18,49 @@ import time
 from pathlib import Path
 
 from diffgenome.change import ChangeSet, changes_from_diff, changes_from_symbols, git_diff
-from diffgenome.collect.py_symbols import PythonSymbolIndex
 from diffgenome.compose import build_corpus
 from diffgenome.graph import build_graph
 from diffgenome.llm import OpenAIProbeWriter, ProbeWriter, RecordedProbeWriter
-from diffgenome.model import Execution, Origin
-from diffgenome.probe import ProbeAttempt, ProbeRunner, copy_probe_traces, run_probe_loop
+from diffgenome.model import Origin, Stimulus
+from diffgenome.probe import ProbeAttempt, ProbeRunner, run_probe_loop
 from diffgenome.report import render_map_slice, render_report, report_json
+from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
-
-DIFFGENOME_SRC = Path(__file__).resolve().parent.parent
 
 
 def _log(msg: str) -> None:
     print(f"[diffgenome {time.strftime('%H:%M:%S')}] {msg}", file=sys.stderr, flush=True)
 
 
-def trace_existing_tests(
-    ws: Workspace,
-    python: Path,
-    source_root: str,
-    test_root: str,
-    pytest_args: list[str],
-    tests: str,
-    out: Path,
-) -> list[Execution]:
-    # Traces are written inside the workspace (the sandbox refuses writes elsewhere) and
-    # copied out afterwards.
-    traces_ws = ws.root / "traces-existing"
-    traces_ws.mkdir(parents=True, exist_ok=True)
-    argv = [
-        str(python), "-m", "pytest", "-q", "-p", "no:cacheprovider",
-        "-p", "diffgenome.collect.pytest_plugin",
-        "--diffgenome-out", str(traces_ws),
-        "--diffgenome-source-root", source_root,
-        "--diffgenome-test-root", test_root,
-        "--diffgenome-egress-guard",
-        *pytest_args, tests,
-    ]  # fmt: skip
-    result = ws.run(argv, env={"PYTHONPATH": str(DIFFGENOME_SRC)}, timeout=1800)
-    traces = out / "traces-existing"
-    copy_probe_traces(traces_ws, traces)
-    (out / "existing-tests.log").write_text(result.stdout + "\n" + result.stderr)
-    summary = (
-        result.stdout.strip().splitlines()[-1] if result.stdout.strip() else result.stderr[-200:]
-    )
-    _log(f"existing tests: {summary} ({result.seconds:.0f}s, confined={result.confined})")
-    return [execution_from_json(f.read_text()) for f in sorted(traces.glob("*.json"))]
+def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -> RuntimeAdapter:
+    tests = args.tests or args.test_root
+    if args.runtime == "python":
+        from diffgenome.collect.py_runtime import PytestRuntime
+
+        if not args.python:
+            raise SystemExit("--python is required for --runtime python")
+        # Never resolve symlinks: a venv's python is a symlink to the base interpreter, and
+        # the venv is selected by the *unresolved* executable path.
+        python = Path(
+            os.path.abspath(args.python if args.python.is_absolute() else repo / args.python)
+        )
+        return PytestRuntime(repo, python, args.source_root, args.test_root, tests, pytest_args)
+    if args.runtime == "node":
+        from diffgenome.collect.node_jest import NodeJestRuntime
+
+        return NodeJestRuntime(repo, args.source_root, args.test_root, tests)
+    raise SystemExit(f"unknown runtime {args.runtime}")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="diffgenome mvp")
+    ap.add_argument("--runtime", default="python", choices=["python", "node"])
     ap.add_argument("--repo", required=True, type=Path)
-    ap.add_argument("--python", required=True, type=Path, help="target interpreter (its venv)")
+    ap.add_argument("--python", type=Path, help="target interpreter (python runtime)")
     ap.add_argument("--source-root", default=".")
     ap.add_argument("--test-root", required=True)
-    ap.add_argument("--tests", default=None, help="pytest target path (default: test root)")
+    ap.add_argument("--tests", default=None, help="test target path (default: test root)")
     ap.add_argument("--pytest-arg", action="append", default=[])
     ap.add_argument("--diff", help="git revspec: base..head, or a commit (vs its parent)")
     ap.add_argument("--symbol", action="append", default=[], help="explicit changed symbol")
@@ -91,16 +78,14 @@ def main(argv: list[str] | None = None) -> int:
     repo = args.repo.resolve()
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
-    # Never resolve symlinks here: a venv's python is a symlink to the base interpreter,
-    # and the venv is selected by the *unresolved* executable path.
-    python = Path(os.path.abspath(args.python if args.python.is_absolute() else repo / args.python))
     pytest_args = [a for chunk in args.pytest_arg for a in shlex.split(chunk)]
-    tests = args.tests or args.test_root
+    runtime = make_runtime(args, repo, pytest_args)
     notes: list[str] = []
 
     ws = Workspace.create(repo, args.workspaces or out / "workspaces")
-    _log(f"workspace {ws.root} (copy of {repo}; original never written)")
+    _log(f"workspace {ws.root} (copy of {repo}; original never written) runtime={runtime.name}")
     try:
+        index: SymbolIndex = runtime.prepare(ws)
         # 1. existing executions
         if args.traces:
             executions = [
@@ -108,15 +93,22 @@ def main(argv: list[str] | None = None) -> int:
             ]
             _log(f"reusing {len(executions)} existing-test traces from {args.traces}")
         else:
-            executions = trace_existing_tests(
-                ws, python, args.source_root, args.test_root, pytest_args, tests, out
+            executions, stdout, stderr = runtime.trace(
+                ws, out / "traces-existing", Stimulus.EXISTING_TEST, None
             )
+            (out / "existing-tests.log").write_text(stdout + "\n" + stderr)
+            tail = (stdout.strip() or stderr.strip()).splitlines()[-1:]
+            _log(f"existing tests: {tail} -> {len(executions)} executions")
+        if not executions and not args.traces:
+            _log("no executions captured; see existing-tests.log")
+            return 2
+        if not executions:
+            notes.append("cold start: no existing executions; every changed symbol is uncovered")
         # 2. map
         corpus = build_corpus(executions)
         graph = build_graph(corpus)
         _log(f"map: {len(graph.edges)} edges, {len(graph.symbols)} symbols, {len(graph.gaps)} gaps")
         # 3. change
-        index = PythonSymbolIndex(repo, [repo / args.source_root], [repo / args.test_root])
         change: ChangeSet
         if args.diff:
             change = changes_from_diff(git_diff(repo, args.diff), index, f"git diff {args.diff}")
@@ -125,10 +117,10 @@ def main(argv: list[str] | None = None) -> int:
         else:
             ap.error("one of --diff or --symbol is required")
         seeds = [
-            s for s in change.symbols if graph.origin(s) is Origin.REPO or s not in graph.symbols
-        ]
-        seeds = [
-            s for s in seeds if not any(s.startswith(f"py:{p}") for p in _test_prefixes(index))
+            s
+            for s in change.symbols
+            if (graph.origin(s) is Origin.REPO or s not in graph.symbols)
+            and not _under_test_root(s, index)
         ]
         never_run = [s for s in seeds if s not in graph.tests_by_symbol]
         if never_run:
@@ -153,23 +145,12 @@ def main(argv: list[str] | None = None) -> int:
         elif args.writer.startswith("recorded:"):
             writer = RecordedProbeWriter(Path(args.writer.split(":", 1)[1]))
         if writer is not None and args.probes > 0:
-            runner = ProbeRunner(
-                ws, python, DIFFGENOME_SRC, args.source_root, args.test_root, pytest_args
-            )
+            runner = ProbeRunner(ws, runtime)
             skipped: list[str] = []
             attempts, corpus_after = run_probe_loop(
-                graph,
-                nb_before,
-                index,
-                writer,
-                runner,
-                out,
-                args.probes,
-                args.attempts,
-                args.up,
-                args.down,
-                skipped,
-            )
+                graph, nb_before, index, writer, runner, out, args.probes, args.attempts,
+                args.up, args.down, skipped,
+            )  # fmt: skip
             notes.extend(f"not probeable: {s}" for s in skipped)
             accepted = sum(a.verdict == "accepted" for a in attempts)
             _log(f"probes: {accepted} accepted of {len(attempts)} attempts")
@@ -201,5 +182,11 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _test_prefixes(index: PythonSymbolIndex) -> list[str]:
-    return [".".join(r.relative_to(index.repo_root).parts) for r in index.test_roots]
+def _under_test_root(symbol: str, index: SymbolIndex) -> bool:
+    """True if the symbol's definition lives under a test root (uses the index, so the
+    naming scheme of each runtime is respected)."""
+    d = index.find(symbol)
+    if d is None:
+        return False
+    path = index.repo_root / d.path
+    return any(path.is_relative_to(r) for r in index.test_roots)

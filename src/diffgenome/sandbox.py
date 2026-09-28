@@ -57,8 +57,15 @@ class Workspace:
 
     # ------------------------------------------------------------------ confinement
 
-    def _seatbelt_profile(self) -> str:
+    def _seatbelt_profile(self, allow_loopback: bool = False) -> str:
         ws = str(self.root.resolve())
+        loopback = (
+            '(allow network-bind (local ip "localhost:*"))\n'
+            '(allow network-inbound (local ip "localhost:*"))\n'
+            '(allow network-outbound (remote ip "localhost:*"))\n'
+            if allow_loopback
+            else ""
+        )
         return f"""(version 1)
 (deny default)
 (allow process-fork)
@@ -71,16 +78,22 @@ class Workspace:
 (allow file-write* (subpath "{ws}"))
 (allow file-write* (literal "/dev/null") (literal "/dev/dtracehelper") (regex #"^/dev/tty"))
 (deny network*)
-"""
+{loopback}"""
 
     def command(
-        self, argv: list[str], cpu_seconds: int = 600, max_procs: int = 256
+        self,
+        argv: list[str],
+        cpu_seconds: int = 600,
+        max_procs: int = 4096,  # macOS counts the whole user; 256 broke Jest's `find` spawn
+        allow_loopback: bool = False,
     ) -> list[str] | None:
-        """Wrap argv for confined execution, or None if the host has no supported sandbox."""
+        """Wrap argv for confined execution, or None if the host has no supported sandbox.
+        `allow_loopback` permits localhost sockets only (in-process test servers); every
+        other network access stays denied."""
         limits = f'ulimit -t {cpu_seconds}; ulimit -u {max_procs}; ulimit -f 1048576; exec "$@"'
         inner = ["/bin/sh", "-c", limits, "sh", *argv]
         if platform.system() == "Darwin" and shutil.which("sandbox-exec"):
-            return ["/usr/bin/sandbox-exec", "-p", self._seatbelt_profile(), *inner]
+            return ["/usr/bin/sandbox-exec", "-p", self._seatbelt_profile(allow_loopback), *inner]
         return None
 
     def environment(self, extra: dict[str, str] | None = None) -> dict[str, str]:
@@ -103,8 +116,9 @@ class Workspace:
         cwd: Path | None = None,
         env: dict[str, str] | None = None,
         timeout: int = 900,
+        allow_loopback: bool = False,
     ) -> RunResult:
-        wrapped = self.command(argv)
+        wrapped = self.command(argv, allow_loopback=allow_loopback)
         if wrapped is None:
             raise RuntimeError("no OS sandbox available on this host; refusing to run unconfined")
         start = time.monotonic()

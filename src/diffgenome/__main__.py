@@ -58,10 +58,41 @@ def inspect_main(argv: list[str]) -> int:
     return 0
 
 
+def evaluate_main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(prog="diffgenome evaluate")
+    ap.add_argument("--graph", required=True, type=Path, help="reconstructed graph.json")
+    ap.add_argument("--ground-truth", required=True, type=Path, help="directory of complete traces")
+    ap.add_argument("--entry", action="append", required=True, help="entry symbol (exact id)")
+    ap.add_argument("--depth", type=int, default=6)
+    ap.add_argument("--json", type=Path, default=None, help="also write the evaluation as JSON")
+    args = ap.parse_args(argv)
+    from diffgenome.evaluate import evaluate, ground_truth_from, render_evaluation
+    from diffgenome.graph import BehavioralGraph
+    from diffgenome.model import Origin
+    from diffgenome.serialize import execution_from_json
+
+    graph = BehavioralGraph.from_json(json.loads(args.graph.read_text()))
+    truth_runs = [
+        execution_from_json(f.read_text()) for f in sorted(args.ground_truth.glob("*.json"))
+    ]
+    origins = {s.id: s.origin for e in truth_runs for s in e.symbols}
+    origins.update(
+        {sid: s.origin for sid, s in graph.symbols.items() if s.origin is not Origin.UNKNOWN}
+    )
+    gt = ground_truth_from(truth_runs, args.entry, origins)
+    ev = evaluate(graph, gt, args.entry, depth=args.depth)
+    print(render_evaluation(ev))
+    if args.json:
+        args.json.write_text(json.dumps(ev.as_dict(), indent=1) + "\n")
+    return 0
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if argv and argv[0] == "inspect":
         sys.exit(inspect_main(argv[1:]))
+    if argv and argv[0] == "evaluate":
+        sys.exit(evaluate_main(argv[1:]))
     if argv and argv[0] == "mvp":
         argv = argv[1:]
     sys.exit(mvp.main(argv))

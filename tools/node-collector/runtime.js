@@ -157,27 +157,51 @@ function errorSymbol(e) {
   return sym;
 }
 
+const classSymbols = new Map(); // constructor -> {sym, origin}
+
+/** Registered by instrumented modules after each named top-level class declaration. */
+function registerClass(ctor, sym, origin) {
+  if (typeof ctor === "function") classSymbols.set(ctor, { sym, origin });
+}
+
+/** A test-origin method overriding a repo class's member: the fake's claim is that member,
+ * found by walking `this`'s prototype chain to the nearest registered repo class that
+ * defines the same name. Identity through the prototype chain, not a name match. */
+function overriddenMember(meta, thisArg) {
+  if (thisArg === undefined || thisArg === null) return null;
+  const member = meta.sym.slice(meta.sym.lastIndexOf(".") + 1);
+  if (!member || member.startsWith("<")) return null;
+  let proto = ObjectGetPrototypeOf(thisArg);
+  let hops = 0;
+  while (proto && proto !== Object.prototype && hops < 20) {
+    const reg = classSymbols.get(proto.constructor);
+    if (reg && reg.origin === "repo" && Object.prototype.hasOwnProperty.call(proto, member)) {
+      const sym = `${reg.sym}.${member}`;
+      intern(sym, "repo", null, 0);
+      return sym;
+    }
+    proto = ObjectGetPrototypeOf(proto);
+    hops += 1;
+  }
+  return null;
+}
+
 /** Called on function entry. `meta`: {sym, origin, file, line, params}. Returns a context. */
-function enter(meta, values) {
+function enter(meta, values, thisArg) {
   if (!state.active) return null;
   intern(meta.sym, meta.origin, meta.file, meta.line);
   const args = argShapes(meta.params, values);
   let parent = currentNode();
-  if (parent === null) {
-    // First in-scope function of the stimulus: the root.
-    if (state.nodes.length === 0) {
-      const id = newCall(meta.sym, args, null);
-      const prev = als.getStore();
-      als.enterWith({ node: id });
-      return { id, prev, sub: null };
-    }
-    parent = 0;
-  }
+  if (parent === null) parent = 0; // the stimulus root created by begin()
   let sub = null;
   if (meta.origin === "test" && nodeOrigin(parent) === "repo") {
     // Production code called into test-defined code: a fake/stub that executes.
     const mechanism = meta.sym.includes(".") && !/\.<anon>@\d+$/.test(meta.sym) ? "fake" : "stub";
-    sub = newSubstitution(parent, mechanism, meta.sym, null, "none", [], args);
+    let claimed = null;
+    let relation = "none";
+    const overridden = overriddenMember(meta, thisArg);
+    if (overridden) { claimed = overridden; relation = "overrides"; }
+    sub = newSubstitution(parent, mechanism, meta.sym, claimed, relation, [], args);
     parent = sub;
   }
   const id = newCall(meta.sym, args, parent);
@@ -217,7 +241,7 @@ function throwed(ctx, e) {
 /** Async functions and generators: scope the store to the body via als.run. */
 function run(meta, values, thisArg, fn) {
   if (!state.active) return fn.call(thisArg, null);
-  const ctx = enter(meta, values);
+  const ctx = enter(meta, values, thisArg);
   // enter() used enterWith; undo that and use run() so the caller's store is restored on
   // the synchronous return and continuations inside keep the body's store.
   als.enterWith(ctx.prev || { node: null });
@@ -259,8 +283,11 @@ function finishStandIn(id, value) {
 
 /** obj.key(...args) */
 function callm(obj, key, args) {
-  const f = obj[key];
-  if (typeof f === "function" && f._isMockFunction) {
+  const f = obj == null ? undefined : obj[key];
+  if (typeof f !== "function") {
+    throw new TypeError(`${obj == null ? "undefined" : shape(obj)}.${String(key)} is not a function`);
+  }
+  if (f._isMockFunction) {
     const id = recordStandIn(f, args);
     try {
       return finishStandIn(id, f.apply(obj, args));
@@ -274,7 +301,8 @@ function callm(obj, key, args) {
 
 /** f(...args) */
 function callf(f, args) {
-  if (typeof f === "function" && f._isMockFunction) {
+  if (typeof f !== "function") throw new TypeError(`${String(f)} is not a function`);
+  if (f._isMockFunction) {
     const id = recordStandIn(f, args);
     try {
       return finishStandIn(id, f.apply(undefined, args));
@@ -327,17 +355,16 @@ function begin(ref) {
   state.symbols = new Map();
   state.diagnostics = [];
   state.egress = 0;
+  // Node 0 is the stimulus itself; every in-scope call with no in-scope caller hangs off it.
+  const sym = `js:${ref}`;
+  intern(sym, "test", null, 0);
+  newCall(sym, [], null);
   als.enterWith({ node: null });
 }
 
 function end(outcome) {
   state.active = false;
   if (!state.outDir || state.ref === null) return null;
-  if (state.nodes.length === 0) {
-    const sym = `js:${state.ref}`;
-    intern(sym, "test", null, 0);
-    newCall(sym, [], null);
-  }
   const execution = {
     id: `${state.ref}@${state.revision || "unknown"}`,
     stimulus: state.stimulus,
@@ -361,4 +388,4 @@ function end(outcome) {
 
 installEgressGuard();
 
-module.exports = { enter, exit, ret, throwed, run, callm, callf, begin, end, _state: state };
+module.exports = { enter, exit, ret, throwed, run, callm, callf, begin, end, registerClass, _state: state };

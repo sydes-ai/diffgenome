@@ -20,8 +20,9 @@ from typing import Protocol
 @dataclass
 class ProbeRequest:
     objective: str  # one paragraph: what the probe must make execute, and why
-    context: str  # bounded: sources, seam facts, nearby tests, conventions
+    context: str  # bounded: sources, seam facts, nearby tests
     constraints: str  # the safety and unit-level rules, verbatim
+    conventions: str = ""  # runtime/framework conventions from the runtime adapter
     previous_failures: list[str] = field(default_factory=list)
 
 
@@ -37,18 +38,19 @@ class ProbeWriter(Protocol):
     def write(self, request: ProbeRequest) -> ProbeDraft: ...
 
 
-_SYSTEM = """You write one minimal, isolated unit-level test ("probe") for a Python repository.
+_SYSTEM = """You write one minimal, isolated unit-level test ("probe") for a repository.
 The probe exists so that a specific in-repo function executes under tracing. It must:
-- be a pytest test file; import the target through the repository's own package paths;
+- be a test file for the repository's own test framework (stated in the request); import
+  the target through the repository's own module paths;
 - execute the real in-repo target and, where possible, the real in-repo code it calls;
 - keep every genuine external dependency substituted (network, model files, GPUs, disk
   outside a tmp_path, subprocesses, time-based waits): use unittest.mock / pytest fixtures;
 - never contact any real service, never sleep for long, never spawn processes;
-- follow the conventions visible in the nearby tests (fixtures, asyncio mode, imports);
+- follow the conventions visible in the nearby tests (fixtures, async style, imports);
 - be deterministic and fast; prefer the smallest stimulus that reaches the target.
 Reply with a single JSON object:
-{"filename": "test_<name>.py", "code": "<file>", "rationale": "<one paragraph>"}.
-The filename must start with test_ and the code must be a complete file."""
+{"filename": "<test file name>", "code": "<file>", "rationale": "<one paragraph>"}.
+The code must be a complete file; the filename is advisory (the harness places the file)."""
 
 
 _KEY_FILE = Path.home() / ".config" / "diffgenome" / "openai_api_key"
@@ -140,7 +142,7 @@ class OpenAIProbeWriter:
     def write(self, request: ProbeRequest) -> ProbeDraft:
         user = (
             f"OBJECTIVE\n{request.objective}\n\nCONSTRAINTS\n{request.constraints}\n\n"
-            f"CONTEXT\n{request.context}\n"
+            f"RUNTIME AND CONVENTIONS\n{request.conventions}\n\nCONTEXT\n{request.context}\n"
         )
         if request.previous_failures:
             user += "\nPREVIOUS ATTEMPTS FAILED VERIFICATION\n" + "\n---\n".join(
@@ -165,9 +167,7 @@ class OpenAIProbeWriter:
             obj = json.loads(content)
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"model returned non-JSON: {content[:200]}") from exc
-        filename = str(obj.get("filename", "test_diffgenome_probe.py"))
-        if not filename.startswith("test_") or not filename.endswith(".py") or "/" in filename:
-            filename = "test_diffgenome_probe.py"
+        filename = str(obj.get("filename", "probe"))
         return ProbeDraft(filename, str(obj["code"]), str(obj.get("rationale", "")), self.model)
 
 

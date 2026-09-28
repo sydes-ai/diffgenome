@@ -1,0 +1,9 @@
+tests traced: 13 {'passed': 13}
+in-repo call nodes: 74 symbols: 50 {'repo': 16, 'test': 33, 'external': 1}
+outcomes: {'returned': 73, 'raised': 1}  unknown-outcome calls: 0
+substitution nodes: 30 mechanism: {'fake': 15, 'mock_object': 15} relation: {'overrides': 10, 'none': 20}
+resolution: {('internal', 'claim-member'): 10, ('unresolved', 'no-claim'): 20}
+os events: 0
+graph edges: {'observed': 49, 'internal_gap': 5, 'unresolved_boundary': 10}  gaps: 10
+join attempts: 0 {}
+diagnostics: {('egress_attempts', '0'): 13}

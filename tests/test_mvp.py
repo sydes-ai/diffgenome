@@ -15,7 +15,7 @@ from diffgenome.llm import RecordedProbeWriter
 from diffgenome.model import EvidenceKind, JoinStrength, Stimulus
 from diffgenome.probe import ProbeRunner, run_probe_loop, select_objectives
 from diffgenome.sandbox import Workspace, host_supports_confinement
-from tests.test_collector import FIXTURE, REPO, trace
+from tests.test_collector import FIXTURE, trace
 
 PLACE = "py:shop.order_service.OrderService.place"
 RESERVE = "py:shop.inventory_service.InventoryService.reserve"
@@ -84,7 +84,11 @@ def test_probe_loop_closes_a_gap_under_confinement(graph: BehavioralGraph, tmp_p
     )
     ws = Workspace.create(FIXTURE, tmp_path / "ws")
     try:
-        runner = ProbeRunner(ws, Path(sys.executable), REPO / "src", ".", "tests", [])
+        from diffgenome.collect.py_runtime import PytestRuntime
+
+        runtime = PytestRuntime(FIXTURE, Path(sys.executable), ".", "tests", "tests", [])
+        runtime.prepare(ws)
+        runner = ProbeRunner(ws, runtime)
         index = PythonSymbolIndex(FIXTURE, [FIXTURE], [FIXTURE / "tests"])
         nb = graph.neighborhood([PLACE], up=2, down=3)
         attempts, corpus = run_probe_loop(

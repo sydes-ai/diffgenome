@@ -8,12 +8,10 @@ changed the map.
 
 from __future__ import annotations
 
-import ast
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from diffgenome.collect.py_symbols import PythonSymbolIndex
 from diffgenome.compose import Corpus, build_corpus
 from diffgenome.graph import BehavioralGraph, GraphEdge, Metrics, Neighborhood, build_graph
 from diffgenome.llm import ProbeDraft, ProbeRequest, ProbeWriter
@@ -30,8 +28,8 @@ from diffgenome.model import (
     SubstitutionNode,
     SymbolId,
 )
+from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.sandbox import Workspace
-from diffgenome.serialize import execution_from_json
 
 CONSTRAINTS = """- The probe is a unit-level stimulus, not an integration test.
 - Real in-repo code must execute; genuine external dependencies (network, model/weight
@@ -55,6 +53,14 @@ class ProbeObjective:
     supporting_executions: int
 
     def describe(self) -> str:
+        if self.kind == "uncovered_symbol":
+            return (
+                f"No existing execution reaches `{self.target}` at all (it is part of the "
+                f"change). Write a probe that executes the real `{self.target}` directly. "
+                "Substitute its direct in-repo collaborators with stand-ins that keep their "
+                "identity (unittest.mock.patch(..., autospec=True) or jest.spyOn) so the seams "
+                "are recorded, and substitute any external dependency."
+            )
         if self.kind == "internal_gap":
             return (
                 f"No existing test executes `{self.target}` for real. `{self.caller}` reaches it "
@@ -79,7 +85,7 @@ def select_objectives(
     nb: Neighborhood,
     graph: BehavioralGraph,
     limit: int,
-    index: PythonSymbolIndex | None = None,
+    index: SymbolIndex | None = None,
     skipped: list[str] | None = None,
 ) -> list[ProbeObjective]:
     """Deterministic priority: gaps before weak joins, nearer the change first, then the
@@ -110,6 +116,22 @@ def select_objectives(
             kind, e.callee, e.caller, ev.site, d, args, outcome, e.best_join, len(e.executions)
         )
 
+    # Changed symbols nothing executes: the change itself is dark. Distance 0.
+    for seed in nb.seeds:
+        if seed in graph.tests_by_symbol or seed in seen or graph.origin(seed) is Origin.TEST:
+            continue
+        if index is not None:
+            d_ = index.find(seed)
+            if d_ is None or d_.kind == "class":
+                continue
+        seen.add(seed)
+        out.append(
+            ProbeObjective(
+                "uncovered_symbol", seed, seed, NodeRef("", 0), 0, (), "unknown", None, 0
+            )
+        )
+        if len(out) >= limit:
+            return out
     gaps = sorted(
         nb.edges_of(EvidenceKind.INTERNAL_GAP), key=lambda x: (x[0], -len(x[1].executions))
     )
@@ -131,9 +153,10 @@ def select_objectives(
 
 
 class SourceContext:
-    """Python source adapter for probe context. Bounded on purpose."""
+    """Bounded probe context from the symbol index and the graph. Runtime-neutral: it asks
+    the index for sources and modules and the runtime adapter for conventions."""
 
-    def __init__(self, index: PythonSymbolIndex, graph: BehavioralGraph) -> None:
+    def __init__(self, index: SymbolIndex, graph: BehavioralGraph) -> None:
         self.index = index
         self.graph = graph
 
@@ -147,24 +170,35 @@ class SourceContext:
             parts.append(_clip(self.index.source(o.target) or "", 120))
             cls = self.index.enclosing_class(o.target)
             if cls:
-                parts.append(f"## Enclosing class `{cls.symbol}`: __init__ and signature")
-                init = self.index.source(cls.symbol + ".__init__")
-                head = _clip(self.index.source(cls.symbol) or "", 15)
-                parts.append(head)
-                if init:
-                    parts.append(_clip(init, 60))
+                # The whole class when it is small: the target usually delegates to
+                # siblings (private helpers, constructors) the probe must understand.
+                parts.append(f"## Enclosing class `{cls.symbol}`")
+                parts.append(_clip(self.index.source(cls.symbol) or "", 160))
             parts.append(f"## Imports of {target_def.path}")
             parts.append(_module_head(self.index.repo_root / target_def.path))
         else:
             parts.append(f"## Target `{o.target}` (source not located)")
+        if o.kind == "uncovered_symbol":
+            parts.append("## Runtime evidence about the target")
+            parts.append("- never executed by any existing test or probe")
+            mod = self.index.module_of(o.target) or ""
+            for tf in self.index.tests_importing(mod, limit=2) if mod else []:
+                parts.append(f"## Existing test file {tf} (conventions; first lines)")
+                text = (self.index.repo_root / tf).read_text(encoding="utf-8")
+                parts.append(_clip(_numbered(text), 70))
+            return "\n\n".join(parts)
         parts.append(f"## Caller `{o.caller}` (reaches the target through a stand-in)")
         parts.append(_clip(self.index.source(o.caller) or "(source not located)", 80))
         assert self.graph.corpus is not None
         seed = self.graph.corpus.executions[o.site.execution]
         parts.append(f"## The existing test that produced this seam: {seed.stimulus_ref}")
-        test_symbol = seed.nodes[0].symbol if isinstance(seed.nodes[0], CallNode) else None
-        if test_symbol:
-            parts.append(_clip(self.index.source(test_symbol) or "(source not located)", 80))
+        test_source = None
+        for n in seed.nodes:  # the root, or the first test-origin call under it
+            if isinstance(n, CallNode) and self.graph.origin(n.symbol) is Origin.TEST:
+                test_source = self.index.source(n.symbol)
+                if test_source:
+                    break
+        parts.append(_clip(test_source or "(source not located)", 80))
         subs = [n for n in seed.nodes if isinstance(n, SubstitutionNode)]
         if subs:
             parts.append(
@@ -181,53 +215,13 @@ class SourceContext:
         parts.append(f"- outcomes observed so far: {dict(outs) if outs else 'never executed'}")
         for e in self.graph.out.get(o.target, [])[:12]:
             parts.append(f"- {o.target.split('.')[-1]} → {e.callee} [{e.kind.value}]")
-        module = o.target.split(":", 1)[1].rsplit(".", 2)[0] if target_def else ""
+        module = self.index.module_of(o.target) if target_def else None
         for tf in self.index.tests_importing(module, limit=2) if module else []:
             parts.append(f"## Existing test file {tf} (conventions; first lines)")
             parts.append(
                 _clip(_numbered((self.index.repo_root / tf).read_text(encoding="utf-8")), 70)
             )
-        conftest = self._conftest()
-        if conftest:
-            parts.append("## conftest fixtures available")
-            parts.append(conftest)
-        cfg = self._pytest_config()
-        if cfg:
-            parts.append("## pytest configuration")
-            parts.append(cfg)
         return "\n\n".join(parts)
-
-    def _pytest_config(self) -> str:
-        out: list[str] = []
-        ini = self.index.repo_root / "pytest.ini"
-        if ini.is_file():
-            out.append(_clip(ini.read_text(encoding="utf-8"), 20))
-        pyproject = self.index.repo_root / "pyproject.toml"
-        if pyproject.is_file():
-            text = pyproject.read_text(encoding="utf-8")
-            if "[tool.pytest" in text:
-                section = text[text.index("[tool.pytest") :]
-                out.append(_clip(section, 15))
-        return "\n".join(out)
-
-    def _conftest(self) -> str:
-        lines: list[str] = []
-        for root in self.index.test_roots:
-            f = root / "conftest.py"
-            if f.is_file():
-                try:
-                    tree = ast.parse(f.read_text(encoding="utf-8"))
-                except SyntaxError:
-                    continue
-                for node in tree.body:
-                    if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and any(
-                        "fixture" in ast.unparse(d) for d in node.decorator_list
-                    ):
-                        doc = ast.get_docstring(node) or ""
-                        params = ", ".join(a.arg for a in node.args.args)
-                        first = doc.splitlines()[0] if doc else ""
-                        lines.append(f"- {node.name}({params}): {first}")
-        return "\n".join(lines[:30])
 
 
 def _numbered(text: str) -> str:
@@ -273,37 +267,20 @@ class ProbeAttempt:
 @dataclass
 class ProbeRunner:
     workspace: Workspace
-    python: Path  # target interpreter (read-only, outside the workspace)
-    diffgenome_src: Path
-    source_root: str  # relative to repo
-    test_root: str  # relative to repo
-    pytest_args: list[str]
-    env: dict[str, str] = field(default_factory=dict)  # extra variables (e.g. PYTHONPATH)
+    runtime: RuntimeAdapter
 
     def run(self, draft: ProbeDraft, tag: str, out_dir: Path) -> tuple[list[Execution], str, str]:
-        probe_dir = self.workspace.repo / self.test_root
-        name = f"test_diffgenome_probe_{tag}.py"
-        (probe_dir / name).write_text(draft.code)
-        traces_ws = self.workspace.root / f"traces-{tag}"
-        traces_ws.mkdir(parents=True, exist_ok=True)
-        argv = [
-            str(self.python), "-m", "pytest", "-q", "-p", "no:cacheprovider",
-            "-p", "diffgenome.collect.pytest_plugin",
-            "--diffgenome-out", str(traces_ws),
-            "--diffgenome-source-root", self.source_root,
-            "--diffgenome-test-root", self.test_root,
-            "--diffgenome-stimulus", Stimulus.GENERATED_PROBE.value,
-            "--diffgenome-egress-guard",
-            *self.pytest_args,
-            f"{self.test_root}/{name}",
-        ]  # fmt: skip
-        env = {"PYTHONPATH": str(self.diffgenome_src), **self.env}
-        result = self.workspace.run(argv, env=env, timeout=600)
-        traces = out_dir / f"traces-{tag}"
-        copy_probe_traces(traces_ws, traces)
-        executions = [execution_from_json(f.read_text()) for f in sorted(traces.glob("*.json"))]
-        (probe_dir / name).unlink(missing_ok=True)
-        return executions, result.stdout, result.stderr
+        rel = self.runtime.probe_relpath(tag)
+        probe_file = self.workspace.repo / rel
+        probe_file.parent.mkdir(parents=True, exist_ok=True)
+        probe_file.write_text(draft.code)
+        try:
+            executions, stdout, stderr = self.runtime.trace(
+                self.workspace, out_dir / f"traces-{tag}", Stimulus.GENERATED_PROBE, [rel]
+            )
+        finally:
+            probe_file.unlink(missing_ok=True)
+        return executions, stdout, stderr
 
 
 def verify(
@@ -330,7 +307,8 @@ def verify(
         )
     failed = [e for e in executions if e.outcome != "passed"]
     if failed:
-        tail = stdout.strip().splitlines()[-15:]
+        text = stdout if "failed" in stdout or "FAIL" in stdout else stderr
+        tail = [line for line in text.strip().splitlines() if line.strip()][-15:]
         reasons.append(f"{len(failed)} of {len(executions)} probe tests failed")
         reasons.extend(tail)
     egress = [
@@ -378,7 +356,7 @@ def verify(
 def run_probe_loop(
     graph: BehavioralGraph,
     neighborhood: Neighborhood,
-    index: PythonSymbolIndex,
+    index: SymbolIndex,
     writer: ProbeWriter,
     runner: ProbeRunner,
     out_dir: Path,
@@ -399,9 +377,10 @@ def run_probe_loop(
         current_graph = build_graph(corpus)
         before = current_graph.neighborhood(seeds, up=up, down=down).metrics()
         context = SourceContext(index, current_graph).build(o)
+        conventions = runner.runtime.conventions(index)
         for attempt in range(1, max_attempts + 1):
             tag = f"{i}_{attempt}"
-            request = ProbeRequest(o.describe(), context, CONSTRAINTS, failures)
+            request = ProbeRequest(o.describe(), context, CONSTRAINTS, conventions, failures)
             try:
                 draft = writer.write(request)
             except Exception as exc:  # the writer is an external service
@@ -410,6 +389,7 @@ def run_probe_loop(
             (out_dir / f"probe-{tag}.py").write_text(draft.code)
             try:
                 executions, stdout, stderr = runner.run(draft, tag, out_dir)
+                (out_dir / f"probe-{tag}.log").write_text(stdout + "\n--- stderr ---\n" + stderr)
             except Exception as exc:
                 attempts.append(ProbeAttempt(o, attempt, draft, "error", [f"runner error: {exc}"]))
                 break
