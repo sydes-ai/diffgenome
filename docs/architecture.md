@@ -376,7 +376,31 @@ Targets are local copies under `~/sample_repos`, always mounted read-only.
 Big applications (Immich, Strapi, Flagsmith, GrowthBook) are out until 01–06 hold; they'd
 bury the research question under setup problems.
 
-## 12. Deliberately not built
+## 12. MVP pipeline (built)
+
+```
+repo + diff ─► existing tests traced (confined) ─► Corpus ─► BehavioralGraph
+    ─► ChangeSet (diff lines → symbols via the language adapter's AST index)
+    ─► Neighborhood (bounded up/down walk) ─► Metrics (provisional)
+    ─► ProbeObjectives (gaps, then weak joins, nearest the change)
+    ─► ProbeWriter (LLM; replaceable) ─► ProbeRunner (workspace + Seatbelt + egress guard)
+    ─► verify (passed, target really ran, no egress, map improved) ─► re-compose ─► report
+```
+
+| Module | Layer | Specific to |
+|---|---|---|
+| `graph.py` | behavioral graph, queries, metrics | nothing |
+| `change.py` | diff → ranges → symbols | nothing (mapping via a `SymbolIndex` adapter) |
+| `collect/py_symbols.py` | AST symbol index, source extraction | Python |
+| `probe.py` | objectives, context, verification, loop | nothing above the source adapter and the pytest command |
+| `llm.py` | `ProbeWriter` seam; OpenAI and recorded writers | provider, behind one method |
+| `sandbox.py` | workspace, scrubbed env, limits, OS confinement | platform (macOS Seatbelt today; Linux runner later) |
+| `report.py`, `mvp.py` | deterministic text/JSON report; one command | nothing |
+
+AI proposes; execution establishes facts. A probe is accepted only on evidence from its
+own trace, and everything it contributes is marked `probe_derived`.
+
+## 13. Deliberately not built
 
 Persistent graph store, genome interning, commit-to-commit diffing, test selection, static
-analysis, LLM integration, non-Python collectors, UI, plugin frameworks.
+analysis, non-Python collectors, UI, plugin frameworks, learned exploration policy.

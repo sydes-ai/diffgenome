@@ -98,9 +98,27 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | Experiment 01: observability floor per plane + first composition | designed: `docs/experiment-01.md` |
 | CPython symbol-plane collector (frame-ancestry attribution, patch interposition claims, patch-proof scoping), resolver, composer (SYMBOL/ARG_SHAPE/VALUE joins, outcome and result checks, shape merging), renderers | done; findings logs in `docs/experiment-01.md` and `docs/experiment-02.md` |
 | First real target (Kokoro-FastAPI, 318 tests): 42% of stand-ins resolved, 406 composed edges, 11 gaps | measured; see experiment 02 |
-| Linux OS-plane collector and sandbox | next |
+| **MVP**: one command from repo + diff to a confined, AI-probed, before/after behavioral impact report | done; see `docs/experiment-03.md` and `docs/runs/kokoro-8307b0e/` |
+| Linux OS-plane collector, second runtime, ground-truth comparison | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
+
+## The MVP in one command
+
+```bash
+uv run python -m diffgenome mvp --repo <target> --python .venv/bin/python --test-root tests \
+  --diff <base..head | commit> --writer openai --out out/run
+```
+
+It traces the target's unit tests under confinement, builds the repo-level behavioral map,
+maps the diff to changed symbols, extracts their behavioral neighborhood, picks the most
+valuable gaps and weak joins near the change, asks the model for one isolated unit probe
+per deficit, executes each probe in a disposable sandboxed workspace (no network, no writes
+outside it, no inherited environment), accepts it only on evidence from its own trace, and
+reports before vs after with provenance on every edge. The OpenAI key is read from
+`OPENAI_API_KEY`, `~/.config/diffgenome/openai_api_key`, or a Keychain item
+`diffgenome-openai`; it never reaches the sandbox. `--writer recorded:<dir>` replays saved
+probes deterministically.
 
 ## Documents
 
@@ -110,7 +128,9 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 - [docs/experiment-01.md](docs/experiment-01.md): the first validation experiment, its
   success and failure criteria, and a dated findings log.
 - [docs/experiment-02.md](docs/experiment-02.md): the `VALUE` join, the causality-after-seam
-  finding, and why the staged target could not be used.
+  finding, the first real target (Kokoro-FastAPI).
+- [docs/experiment-03.md](docs/experiment-03.md): the MVP on a real change, before/after, and
+  what generated probes did and did not recover.
 
 ## Layout
 

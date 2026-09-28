@@ -295,6 +295,12 @@ class Tracer:
             claim = None
             if original is not mock.DEFAULT:
                 original = getattr(original, "__func__", getattr(original, "fget", original))
+                if len(path) <= 1 and isinstance(original, type):
+                    # Calling a patched *class* constructs it; the claim is its __init__
+                    # when that is in-repo Python (same rule as spec'd class stand-ins).
+                    init = _static_attr(original, "__init__")
+                    if getattr(init, "__code__", None) is not None:
+                        original = init
                 claim = self._intern_symbol(self.symbol_for_object(original))
             return SubstitutionMechanism.INTERPOSITION, claim, "patch-target", tuple(path)
         spec = getattr(root, "_spec_class", None)
