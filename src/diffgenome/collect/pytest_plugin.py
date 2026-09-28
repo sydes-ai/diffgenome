@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-from diffgenome.collect.py_monitoring import COLLECTOR, Tracer
-from diffgenome.model import Execution, Stimulus
+from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer
+from diffgenome.model import Collector, Execution, Stimulus
 from diffgenome.serialize import execution_to_json
 
 
@@ -34,6 +34,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     group.addoption(
         "--diffgenome-test-root", action="append", default=[], help="test root (repeatable)"
+    )
+    group.addoption(
+        "--diffgenome-stimulus",
+        default="existing_test",
+        choices=[s.value for s in Stimulus],
+        help="how these executions were caused (generated probes must say so)",
+    )
+    group.addoption(
+        "--diffgenome-egress-guard",
+        action="store_true",
+        help="refuse socket connects and record attempts as OS-plane evidence",
     )
 
 
@@ -57,6 +68,11 @@ class _Plugin:
         tests = [Path(p).resolve() for p in config.getoption("--diffgenome-test-root")]
         self.tracer = Tracer(repo_root=roots[0], source_roots=tuple(roots), test_roots=tuple(tests))
         self.tracer.install_patch_hook()
+        self.stimulus = Stimulus(config.getoption("--diffgenome-stimulus"))
+        self.collectors: tuple[Collector, ...] = (COLLECTOR,)
+        if config.getoption("--diffgenome-egress-guard"):
+            self.tracer.install_egress_guard()
+            self.collectors = (COLLECTOR, EGRESS_GUARD)
         self.revision = _revision(roots[0])
 
     @pytest.hookimpl(wrapper=True)
@@ -75,11 +91,11 @@ class _Plugin:
             result = self.tracer.stop()
             execution = Execution(
                 id=f"{item.nodeid}@{self.revision or 'unknown'}",
-                stimulus=Stimulus.EXISTING_TEST,
+                stimulus=self.stimulus,
                 stimulus_ref=item.nodeid,
                 outcome=outcome,
                 revision=self.revision,
-                collectors=(COLLECTOR,),
+                collectors=self.collectors,
                 symbols=result.symbols,
                 nodes=result.nodes,
                 diagnostics=(

@@ -23,7 +23,7 @@ import sys
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
-from types import CodeType
+from types import CodeType, ModuleType
 from typing import Any
 from unittest import mock
 
@@ -34,6 +34,7 @@ from diffgenome.model import (
     Fidelity,
     Node,
     Origin,
+    OsEventKind,
     OsEventNode,
     Plane,
     SourceLocation,
@@ -44,6 +45,9 @@ from diffgenome.model import (
 )
 
 COLLECTOR = Collector("py-sys-monitoring", Plane.SYMBOL, Fidelity.COMPLETE)
+EGRESS_GUARD = Collector("py-egress-guard", Plane.OS, Fidelity.COMPLETE)
+"""Connect attempts seen from inside the runtime. Kernel-boundary facts (OS plane) observed
+by a runtime hook rather than by the kernel; the collector name says so."""
 _TOOL_ID = 4  # sys.monitoring tool slot; coverage.py uses 2/3 by convention
 _MISSING = sys.monitoring.MISSING
 _DISABLE = sys.monitoring.DISABLE
@@ -162,6 +166,7 @@ class Tracer:
     _patched: dict[int, tuple[Any, str, Any]] = field(default_factory=dict, repr=False)
     _orig_patch_enter: Any = None
     _orig_patch_exit: Any = None
+    _egress_guard_installed: bool = False
 
     # ------------------------------------------------------------------ symbol naming
 
@@ -234,6 +239,13 @@ class Tracer:
         code = getattr(obj, "__code__", None)
         if isinstance(code, CodeType) and (scope := self.scope_for(code)):
             return Symbol(scope.symbol, scope.origin, scope.location)
+        if isinstance(obj, ModuleType):
+            # A patched module attribute (patch("pkg.mod.torch")) claims the module itself.
+            file = getattr(obj, "__file__", None)
+            named = self._module_for(file) if isinstance(file, str) else None
+            if named and isinstance(file, str):
+                return Symbol(f"py:{named[1]}", named[0], SourceLocation(self._relative(file), 0))
+            return Symbol(f"py:{obj.__name__}", Origin.EXTERNAL, None)
         qualname = getattr(obj, "__qualname__", type(obj).__qualname__)
         owner = getattr(obj, "__objclass__", None)
         module_name = getattr(obj, "__module__", None) or (owner.__module__ if owner else None)
@@ -262,7 +274,7 @@ class Tracer:
     # ------------------------------------------------------------------ stand-ins
 
     def _describe_mock(
-        self, m: Any
+        self, m: Any, frame: Any = None
     ) -> tuple[SubstitutionMechanism, SymbolId | None, str, tuple[str, ...]]:
         path: list[str] = []
         root = m
@@ -287,20 +299,69 @@ class Tracer:
             return SubstitutionMechanism.INTERPOSITION, claim, "patch-target", tuple(path)
         spec = getattr(root, "_spec_class", None)
         if spec is None:
+            bound = self._bound_attribute(root, frame)
+            if bound is not None:
+                # The root stand-in is stored as attribute `name` of a real object whose
+                # class defines `name`: it replaced that member. Identity, not naming.
+                _, name, bound_member = bound
+                bound_member = getattr(
+                    bound_member, "__func__", getattr(bound_member, "fget", bound_member)
+                )
+                claim = self._intern_symbol(self.symbol_for_object(bound_member))
+                return (
+                    SubstitutionMechanism.INTERPOSITION,
+                    claim,
+                    "instance-attribute",
+                    (name, *path[1:]) if path and path[0] == name else (name, *path),
+                )
             return SubstitutionMechanism.MOCK_OBJECT, None, "none", tuple(path)
         member: Any = None
         if path and path[0] != "()":
             member = _static_attr(spec, path[0])
             member = getattr(member, "__func__", getattr(member, "fget", member))
+        elif not path and isinstance(spec, type):
+            # Calling a stand-in for a class is constructing it: what really runs is the
+            # class's own __init__ (when it has one in Python), so that is the claim.
+            init = _static_attr(spec, "__init__")
+            if getattr(init, "__code__", None) is not None:
+                member = init
         target = self._intern_symbol(self.symbol_for_object(member if member is not None else spec))
         return SubstitutionMechanism.MOCK_OBJECT, target, "spec", tuple(path)
 
+    def _bound_attribute(self, root: Any, frame: Any) -> tuple[type, str, Any] | None:
+        """Find a real (non-mock) object among the caller's locals, `self` first, whose
+        instance dict holds `root` under a name its class also defines. Bounded scan; reads
+        only __dict__ so no descriptor or property runs."""
+        if frame is None:
+            return None
+        locals_ = frame.f_locals
+        candidates = [locals_[n] for n in ("self", "cls") if n in locals_]
+        candidates += [v for k, v in list(locals_.items())[:_MAX_ARGS] if k not in ("self", "cls")]
+        for obj in candidates:
+            if isinstance(obj, mock.NonCallableMock | type(None) | int | str | float | bool):
+                continue
+            d = getattr(obj, "__dict__", None)
+            if not isinstance(d, dict):
+                continue
+            for name, value in d.items():
+                if value is root:
+                    cls = obj if isinstance(obj, type) else type(obj)
+                    member = _static_attr(cls, name)
+                    if member is not None:
+                        return cls, name, member
+        return None
+
     def _record_substitution(
-        self, parent: int, mechanism: SubstitutionMechanism, callable_: Any, args: ArgShapes
+        self,
+        parent: int,
+        mechanism: SubstitutionMechanism,
+        callable_: Any,
+        args: ArgShapes,
+        frame: Any = None,
     ) -> int:
         if isinstance(callable_, mock.NonCallableMock):
             substitute = f"py:{type(callable_).__module__}.{type(callable_).__qualname__}"
-            mechanism, claimed, relation, path = self._describe_mock(callable_)
+            mechanism, claimed, relation, path = self._describe_mock(callable_, frame)
         else:
             substitute = self._intern_symbol(self.symbol_for_object(callable_))
             claimed, relation, path = None, "none", ()
@@ -475,10 +536,40 @@ class Tracer:
             frame = sys._getframe(1)
             parent = self._frame_nodes.get(id(frame), self._ancestor_node(frame))
             node_id = self._record_substitution(
-                parent, SubstitutionMechanism.MOCK_OBJECT, callable_, args
+                parent, SubstitutionMechanism.MOCK_OBJECT, callable_, args, frame
             )
             self._pending_mock_calls.setdefault(ident, []).append(node_id)
         return None
+
+    # ------------------------------------------------------------------ egress guard
+
+    def install_egress_guard(self) -> None:
+        """Refuse outbound connections and record each attempt as an OS-plane event. The
+        sandbox is the enforcement layer; this makes attempts *evidence* attributed to the
+        in-scope caller. Installed for the whole session."""
+        import socket
+
+        tracer = self
+
+        def connect(sock: Any, address: Any) -> Any:
+            target = address if isinstance(address, str) else ":".join(str(a) for a in address[:2])
+            if tracer._orig_mock_call is not None:  # tracing a stimulus
+                frame = sys._getframe(1)
+                parent = tracer._frame_nodes.get(id(frame), tracer._ancestor_node(frame))
+                tracer._nodes.append(
+                    OsEventNode(
+                        id=len(tracer._nodes),
+                        parent=parent,
+                        collector=1,
+                        kind=OsEventKind.CONNECT,
+                        target=target,
+                        outcome="refused:egress-guard",
+                    )
+                )
+            raise PermissionError(f"diffgenome egress guard: connect to {target} refused")
+
+        socket.socket.connect = connect  # type: ignore[method-assign]
+        self._egress_guard_installed = True
 
     # ------------------------------------------------------------------ patch registry
 

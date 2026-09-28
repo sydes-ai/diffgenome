@@ -232,7 +232,7 @@ def _invoked(sub: SubstitutionNode, target: SymbolId | None) -> SymbolId:
     of the path; a longer path (a call on a return value) is appended so that
     ``execute`` and ``execute.().fetchone`` are distinct callees."""
     if target is None:
-        return f"stand-in:{sub.substitute}.{'.'.join(sub.path)}"
+        return "stand-in:" + ".".join(filter(None, [sub.substitute or "?", *sub.path]))
     return target + "".join(f".{p}" for p in sub.path[1:])
 
 
