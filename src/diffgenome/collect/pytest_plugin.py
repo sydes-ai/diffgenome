@@ -10,6 +10,7 @@ PYTHONDONTWRITEBYTECODE=1 when the target is mounted read-only.
 
 from __future__ import annotations
 
+import hashlib
 import re
 import subprocess
 from collections.abc import Generator
@@ -55,6 +56,7 @@ class _Plugin:
             roots = [Path(config.rootpath).resolve()]
         tests = [Path(p).resolve() for p in config.getoption("--diffgenome-test-root")]
         self.tracer = Tracer(repo_root=roots[0], source_roots=tuple(roots), test_roots=tuple(tests))
+        self.tracer.install_patch_hook()
         self.revision = _revision(roots[0])
 
     @pytest.hookimpl(wrapper=True)
@@ -80,9 +82,16 @@ class _Plugin:
                 collectors=(COLLECTOR,),
                 symbols=result.symbols,
                 nodes=result.nodes,
+                diagnostics=(
+                    ("stack_repairs", str(result.stack_repairs)),
+                    ("attribution_disagreements", str(result.attribution_disagreements)),
+                ),
             )
-            name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)
-            (self.out / f"{name}.json").write_text(execution_to_json(execution))
+            # Sanitized ids can collide (parametrized ids differing only in punctuation)
+            # and can exceed filesystem limits; the digest keeps every execution distinct.
+            digest = hashlib.sha256(item.nodeid.encode()).hexdigest()[:12]
+            name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)[:100]
+            (self.out / f"{name}-{digest}.json").write_text(execution_to_json(execution))
             if result.stack_repairs:
                 item.add_report_section(
                     "call", "diffgenome", f"stack repairs: {result.stack_repairs}"

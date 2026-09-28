@@ -211,6 +211,9 @@ class Execution:
     collectors: tuple[Collector, ...]
     symbols: tuple[Symbol, ...]  # every SymbolId referenced by nodes, with origin and location
     nodes: tuple[Node, ...]
+    diagnostics: tuple[tuple[str, str], ...] = ()
+    """Collector self-reports as (key, value), e.g. ``("stack_repairs", "3")``. Facts about
+    the instrument, not about the target; a reader uses them to judge the trace."""
 
 
 # ------------------------------------------------------------------------ interpretation
@@ -283,6 +286,9 @@ class Evidence:
     some (usually different) execution."""
     join: JoinStrength | None = None
     """COMPOSED only: how strongly the seam was matched."""
+    alternates: tuple[NodeRef, ...] = ()
+    """COMPOSED only: other fragments with the same behavior shape as ``fragment`` that
+    support this same edge. Merged for expansion, never dropped."""
     probe_derived: bool = False
     """True if any execution this evidence cites was a generated probe rather than an
     existing test. Set by whoever builds the evidence and knows the executions."""
@@ -297,6 +303,8 @@ class Evidence:
             raise ValueError("a fragment is required for, and only for, composed evidence")
         if composed != (self.join is not None):
             raise ValueError("a join strength is required for, and only for, composed evidence")
+        if self.alternates and not composed:
+            raise ValueError("alternates only apply to composed evidence")
 
 
 @dataclass(frozen=True)

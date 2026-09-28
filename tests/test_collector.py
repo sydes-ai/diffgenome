@@ -171,3 +171,100 @@ def test_results_are_digested(fixture_traces: dict[str, Execution]) -> None:
     assert quote.result and quote.result == stand_in.result  # both 2500
     raised = calls(fixture_traces["test_duplicate_skus_rejected"])
     assert raised["py:shop.order_service.OrderService.place"][0].result == ""
+
+
+def test_patch_interposition_claims_the_original(tmp_path: Path) -> None:
+    """`patch("pkg.svc.load")` replaces a module attribute with a spec-less mock. The
+    patcher saved the original, so the stand-in's claim is a fact, not an inference."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "svc.py").write_text(
+        "def load(key): return {'k': key}\n"
+        "def run(key): return load(key)['k']\n"
+        "def chain(key): return load(key).get('k')\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_patch.py").write_text(
+        "from unittest.mock import patch\n"
+        "from pkg import svc\n"
+        "def test_run():\n"
+        "    with patch('pkg.svc.load') as load:\n"
+        "        load.return_value = {'k': 'v'}\n"
+        "        assert svc.run('a') == 'v'\n"
+        "        assert svc.chain('a') == 'v'\n"
+    )
+    (tmp_path / "pytest.ini").write_text("[pytest]\npythonpath = .\n")
+    ex = trace(tmp_path, tmp_path / "out")["test_run"]
+
+    subs = substitutions(ex)
+    assert [s.mechanism for s in subs] == [SubstitutionMechanism.INTERPOSITION] * 2
+    assert {s.claimed_target for s in subs} == {"py:pkg.svc.load"}
+    assert {s.relation for s in subs} == {"patch-target"}
+    assert [s.path for s in subs] == [("load",), ("load",)]
+    assert [s.args[0][:2] for s in subs] == [("arg0", "str"), ("arg0", "str")]
+    run = calls(ex)["py:pkg.svc.run"][0]
+    assert subs[0].parent == run.id
+    assert {s.id: s.origin for s in ex.symbols}["py:pkg.svc.load"] is Origin.REPO
+
+
+def test_generator_consumers_are_attributed_by_frame_ancestry(tmp_path: Path) -> None:
+    """While a generator is suspended, calls made by its consumer belong to the consumer.
+    A shadow stack parents them under the generator; frame ancestry does not."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "g.py").write_text(
+        "def leaf(): return 1\n"
+        "def gen():\n"
+        "    yield leaf()\n"
+        "    yield leaf()\n"
+        "def other(): return leaf()\n"
+        "def consumer():\n"
+        "    return [other() for _ in gen()]\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_g.py").write_text(
+        "from pkg.g import consumer\ndef test_consumer(): assert consumer() == [1, 1]\n"
+    )
+    (tmp_path / "pytest.ini").write_text("[pytest]\npythonpath = .\n")
+    ex = trace(tmp_path, tmp_path / "out")["test_consumer"]
+
+    c = calls(ex)
+    consumer = c["py:pkg.g.consumer"][0]
+    gen = c["py:pkg.g.gen"][0]
+    assert gen.parent == consumer.id
+    assert all(o.parent == consumer.id for o in c["py:pkg.g.other"])
+    assert {leaf.parent for leaf in c["py:pkg.g.leaf"]} == {
+        gen.id,
+        *(o.id for o in c["py:pkg.g.other"]),
+    }
+    diagnostics = dict(ex.diagnostics)
+    assert int(diagnostics["attribution_disagreements"]) >= 2  # the shadow stack was wrong
+    assert gen.outcome == "returned"
+
+
+def test_observer_is_not_hijacked_by_target_patches(tmp_path: Path) -> None:
+    """A target that patches os.path.join must not rename the collector's symbols. On
+    Kokoro-FastAPI, pathlib inside the collector picked up the target's patch and named a
+    function after the test's temp file, differently on every run."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "io.py").write_text(
+        "import os\ndef where(name): return os.path.join('/base', name)\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_io.py").write_text(
+        "from unittest.mock import patch\n"
+        "from pkg.io import where\n"
+        "def test_where():\n"
+        "    with patch('os.path.join', return_value='/tmp/hijacked/x.json'):\n"
+        "        assert where('a') == '/tmp/hijacked/x.json'\n"
+    )
+    (tmp_path / "pytest.ini").write_text("[pytest]\npythonpath = .\n")
+    ex = trace(tmp_path, tmp_path / "out")["test_where"]
+
+    assert "py:pkg.io.where" in calls(ex)
+    assert not any(s.id.startswith("py:/") or "hijacked" in s.id for s in ex.symbols)
+    [sub] = substitutions(ex)
+    assert sub.mechanism is SubstitutionMechanism.INTERPOSITION
+    assert sub.claimed_target == "py:posixpath.join"
+    assert {s.id: s.origin for s in ex.symbols}["py:posixpath.join"] is Origin.EXTERNAL

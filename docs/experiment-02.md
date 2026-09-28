@@ -76,3 +76,84 @@ is not it. Candidates already under `~/sample_repos`: `flask-sample-app`,
 existing tests with `unittest.mock`/`pytest-mock` usage against in-repo classes, so
 resolution rate by rule, gap counts and the falsification list (async, generators,
 `patch()`, fakes, dynamic dispatch) can be measured rather than assumed.
+
+### 2026-09-28: first real target, Kokoro-FastAPI (Q2)
+
+Selection: of the staged candidates, `flask-sample-app` and `school-portal-api` use no
+stand-ins (their `patch(` hits are Flask routes) and `SimpleFastPyAPI` has no tests.
+`Kokoro-FastAPI` (107 source files, 318 unit tests, 92 async, `Mock(spec=…)` and
+`patch("api.src…")` against in-repo code, a working venv) is the smallest target whose
+stand-in mix is the falsification list. `healthchecks` (Django, 346 in-repo `patch`
+targets) is the follow-up. Target read-only; its `--cov` disabled under trace so two
+tracers don't compete; overhead 2.06 s → 2.35 s.
+
+| Prediction | Outcome | Evidence |
+|---|---|---|
+| **P13** async breaks shadow-stack attribution; repairs > 0 and calls misattributed under suspended coroutines | **mechanism confirmed, magnitude overstated** | Stack repairs: 6 in 4 executions. Frame-ancestry attribution disagrees with the shadow stack on **49 calls in 13 executions** (4%), all in generator/async `tts_service` tests. Repairs undercount misattribution by 8×, as reasoned: a call parented under a suspended frame returns in order. The collector now attributes by real frame ancestry; the shadow stack remains only as this diagnostic. Coroutine *scheduling* is a spawn relation like the thread hop: when the loop resumes a task, its creator is not on the stack (spike confirmed). |
+| **P14** resolution dominated by `no-claim`; spec'd stand-ins resolve | **holds, then changed by the predicted rule** | Before: 306/336 (91%) `no-claim`, 29 `claim-member`. `patch()` installs spec-less mocks, but the patcher keeps the original object, so the claim is a fact. With the `interposition` mechanism and `patch-target` relation: **internal 108 (32%), external 34 (10%), unresolved 194 (58%)** = `no-claim` 125 + `claim-return-chain` 61 + `claim-unknown-origin` 8. |
+| **P15** a fragment gap or identity mismatch from the `api.src` layout | **an identity mismatch, different cause** | `build_corpus` raised `IdentityMismatch` on `handle_url.<locals>.<lambda>`: two lambdas in one function share a qualname. Anonymous code now carries its definition line (`<lambda>@341`); the same numbering problem exists for Java `lambda$0`, Go `func1`, Rust `{{closure}}`. |
+
+Core-model and instrument findings:
+
+1. **The observer was hijacked by the observed.** Two traces were structurally different
+   between identical runs. Both tests `patch("os.path.join")`. The collector named
+   symbols through `pathlib`, which calls `os.path.join` dynamically, so
+   `load_openai_mappings` was named after the test's temp file
+   (`py:/.private.var/…/pytest-78/…/test_mappings.load_openai_mappings`), differently per
+   run, and the per-code scope cache froze the wrong name. **Principle:** an in-process
+   collector must not read patchable globals on its capture path. Scoping is now pure
+   string work on prefixes computed at construction; `inspect` and `os.path` are gone
+   from the capture path. Pinned by a test that patches `os.path.join`. This is a
+   language-neutral hazard for every in-runtime collector (JVMTI agents share the JVM
+   with Mockito; V8 hooks share the isolate with jest), and an argument the OS plane
+   has for itself: a ptrace/eBPF observer shares no state with the target.
+2. **Fan-out.** Composing every seed against every fragment produced 11,524 composed
+   edges from 3,324 observed (`get_manager()` alone: 5,168 joins). Fragments were
+   grouped by *behavior shape* (symbols, kinds, outcomes, claims, paths; not values):
+   `conditional_int` had 261 fragments and 1 shape, `_render` 213 → 50, `normalize_text`
+   97 → 19. Shape merging brings composition to **406 composed edges**; merged
+   fragments are kept as `Evidence.alternates`, so provenance is complete. A shape is
+   a behavior path, which is what the "genome" idea was about.
+3. **Vacuous VALUE.** 21 `list_voices()` seams were graded `SYMBOL` with "no argument
+   shapes on one side". With no arguments on either side, argument compatibility holds
+   vacuously; the seam now grades `VALUE` with the note `no arguments`. It exposes what
+   the lattice already said: for zero-argument calls, entry compatibility is entirely
+   receiver/global state, the `STATE` rung. On this target 1,490 of 2,050 attempts are
+   such vacuous `VALUE` joins on factories like `get_manager()`; they are honest about
+   arguments and silent about state.
+4. **Stand-in arguments compared as types.** `process_and_validate_voices(TTSService)`
+   seams reported `type conflict: TTSService≠stand-in`. The stand-in was a
+   `Mock(spec=TTSService)`; the conflict was the test's, not the seam's. Shapes of
+   stand-in arguments now carry their spec (`stand-in:TTSService`) and compare as that
+   type; a spec-less stand-in is a wildcard and caps the grade at `ARG_SHAPE`.
+5. **Return chains are the next resolution frontier.** 61 stand-ins are calls on the
+   *return value* of a patched factory (`get_tts_service.().list_voices`). The claim
+   names the factory; what it returns is a static fact (`-> TTSService` annotation) that
+   the runtime never observed. That is the `injection-annotation` rule family, and it is
+   the first place static evidence would enter the graph, as `STATIC`, never as observed.
+6. **Determinism on a real target.** After fix 1, 0 of 318 traces differ structurally
+   between runs; 18 differ only in digests of values that are nondeterministic in the
+   target (temp paths, timings, encoded audio). Repeated runs therefore identify
+   *unstable values*, exactly the ones no seam should be graded `VALUE` on. Not acted
+   on yet.
+7. Smaller instrument facts: 1 of 318 tests failed under trace only because its
+   parametrized id exceeded the filename limit (S1 doing its job); two parametrized ids
+   collided after sanitizing and one trace silently overwrote the other. Trace files now
+   carry a digest of the test id.
+
+Numbers for the record (after all fixes): 318 executions, 3,324 in-repo call nodes on
+2 threads, 508 symbols (149 repo, 334 test, 24 external, 1 unknown), 336 stand-in calls
+(181 interposition, 83 fakes, 72 mock objects), 207 fragment targets, 11 gaps (7 are
+construction of `TTSService` itself), 34 joins rejected as unsound (outcome conflict),
+2 executions with no in-repo call.
+
+What this changes in the plan:
+
+- The remaining 58% unresolved splits into three named problems: spec-less injected
+  mocks (125; needs `injection-annotation` or an LLM hypothesis), return chains (61;
+  needs static return types), and 8 claims on objects whose module has no file. Each is
+  now measurable per target, which is what experiment 02 was for.
+- The OS plane gains a concrete argument (finding 1). Its collector and the sandbox stay
+  next.
+- `healthchecks` is the next target: 346 in-repo `patch` targets against a Django
+  codebase will stress `interposition` and identity at scale.

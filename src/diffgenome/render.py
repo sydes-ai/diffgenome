@@ -89,6 +89,8 @@ def render_composition(composition: Composition) -> str:
             tail += f"  rule={ev.rule}"
         if ev.kind is EvidenceKind.COMPOSED and ev.fragment and ev.join:
             tail += f"  join={ev.join.name.lower()}  fragment={ev.fragment.execution}"
+            if ev.alternates:
+                tail += f"  +{len(ev.alternates)} same-shape"
         if ev.probe_derived:
             tail += "  probe-derived"
         return f"{_GLYPH[ev.kind]} {edge.callee}{tail}"

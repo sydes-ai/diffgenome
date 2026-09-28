@@ -72,6 +72,12 @@ gives us *physical boundaries* (the process tried to leave) and native call stru
 is ground truth for "did this code try to reach outside", and it's how the sandbox turns
 external access attempts into evidence instead of letting them through.
 
+**Observer integrity.** An in-process collector shares the runtime with the target, and
+targets patch globals: on Kokoro-FastAPI a test's `patch("os.path.join")` reached into the
+collector's `pathlib` calls and renamed symbols after the test's temp file. Capture paths
+therefore read no patchable globals (no `os.path`, `pathlib`, `inspect` at event time). The
+OS plane does not have this problem, which is one of its arguments.
+
 **Symbol plane.** The program's own call structure. For native code this coincides with the
 OS plane (addresses → ELF/DWARF → functions). For managed runtimes it does not, and that's
 a fact about computation, not a tooling gap: from the CPU's point of view an interpreter's
@@ -182,7 +188,7 @@ silently.
 |---|---|
 | `BoundaryResolution` | `INTERNAL` / `EXTERNAL` / `UNRESOLVED`, target symbol, and the **rule** that decided it |
 | `JoinStrength` | `SYMBOL < ARG_SHAPE < VALUE < STATE`: how a composed seam was matched on *entry*. A returned/raised outcome conflict is unsound at every grade. Result compatibility (did the fragment return what the stand-in returned) is reported on the join attempt, independently of the grade. |
-| `Evidence` | `kind`, `site` (the observed node grounding it), `rule` (derived kinds only), `fragment` + `join` (composed only), `probe_derived` |
+| `Evidence` | `kind`, `site` (the observed node grounding it), `rule` (derived kinds only), `fragment` + `join` + `alternates` (composed only), `probe_derived` |
 | `Edge` | caller → callee + one `Evidence`. A symbol pair may have many edges with different evidence. |
 
 `EvidenceKind`, rendered:
@@ -224,6 +230,7 @@ Ordered rules; the first match decides; the rule name is recorded.
 
 | # | Rule | Condition | Result |
 |---|---|---|---|
+| R0 | `patch-target` (relation, not a rule) | the stand-in was installed by an interposition mechanism (`patch`) whose saved original *is* the claim; R2–R5 then apply to that claim | — |
 | R1 | `no-claim` | stand-in claims nothing (`claimed_target is None`) | `UNRESOLVED` |
 | R2 | `claim-in-tests` | claimed target is defined under a test root (a specced fake) | `UNRESOLVED` |
 | R3 | `claim-outside-repo` | claimed target defined outside the source roots, or in native/runtime code | `EXTERNAL` |
@@ -277,8 +284,11 @@ state of the fragment. The join lattice grades how much of that we checked:
 | `VALUE` | equal content digests at every observed position, outcomes known-compatible | bounded digests at seams (implemented; see experiment 02) |
 | `STATE` | relevant reachable state compatible | targeted state capture around seams: the receiver, the arguments' object graphs to a bounded depth. Never whole-process memory. |
 
-Fragments are never flattened. All fragments for a target are attached as alternatives with
-their own join grade and provenance. Recursion is bounded by `on_path` and a depth limit.
+Fragments are never flattened. Fragments for one target are grouped by **behavior shape**
+(symbols, kinds, outcomes, claims and paths of the subtree, not values); each shape is one
+branch, expanded once, represented by its best-graded member with the others kept as
+`Evidence.alternates`. On Kokoro-FastAPI this took composition from 11,524 to 406 composed
+edges with no provenance lost. Recursion is bounded by `on_path` and a depth limit.
 
 The lattice is not metadata. It is the mechanism that stops composed behavior being shown
 as stronger than the evidence: a `SYMBOL`-only seam renders and counts differently from an

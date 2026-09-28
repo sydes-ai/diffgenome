@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
-import inspect
 import sys
 import threading
 from dataclasses import dataclass, field
@@ -60,7 +59,8 @@ def summarize_value(value: Any) -> str:
     if value is None or isinstance(value, bool | int | float | str | bytes):
         return type(value).__name__
     if isinstance(value, mock.NonCallableMock):
-        return "stand-in"
+        spec = getattr(value, "_spec_class", None)
+        return f"stand-in:{spec.__qualname__}" if spec else "stand-in"
     if isinstance(value, list | tuple | set | frozenset | dict):
         return f"{type(value).__name__}[{len(value)}]"
     return type(value).__qualname__
@@ -133,6 +133,9 @@ class TraceResult:
     symbols: tuple[Symbol, ...]
     nodes: tuple[Node, ...]
     stack_repairs: int = 0  # returns that did not match the shadow-stack top
+    attribution_disagreements: int = (
+        0  # calls where a shadow stack would have chosen another parent
+    )
 
 
 @dataclass
@@ -147,28 +150,53 @@ class Tracer:
     _nodes: list[Node] = field(default_factory=list, repr=False)
     _stacks: dict[int, list[tuple[CodeType | None, int]]] = field(default_factory=dict, repr=False)
     _threads: dict[int, int] = field(default_factory=dict, repr=False)
+    _frame_nodes: dict[int, int] = field(default_factory=dict, repr=False)  # id(frame) -> node
+    _fake_wrappers: dict[int, int] = field(
+        default_factory=dict, repr=False
+    )  # call node -> sub node
     _root_code: CodeType | None = None
     _stack_repairs: int = 0
+    _attribution_disagreements: int = 0
     _pending_mock_calls: dict[int, list[int]] = field(default_factory=dict, repr=False)
     _orig_mock_call: Any = None
+    _patched: dict[int, tuple[Any, str, Any]] = field(default_factory=dict, repr=False)
+    _orig_patch_enter: Any = None
+    _orig_patch_exit: Any = None
 
     # ------------------------------------------------------------------ symbol naming
 
-    def _module_for(self, path: Path) -> tuple[Origin, str] | None:
-        if any(part in _EXCLUDED_PARTS or part.startswith(".") for part in path.parts[1:]):
-            return None
-        for origin, roots in ((Origin.TEST, self.test_roots), (Origin.REPO, self.source_roots)):
-            for root in roots:
-                try:
-                    rel = path.relative_to(root)
-                except ValueError:
-                    continue
-                parts = list(rel.with_suffix("").parts)
-                if parts and parts[-1] == "__init__":
-                    parts.pop()
-                prefix = root.relative_to(self.repo_root).parts if origin is Origin.TEST else ()
-                return origin, ".".join((*prefix, *parts))
+    def __post_init__(self) -> None:
+        # Everything below runs on the capture path and must not touch os.path, pathlib or
+        # inspect: those read patchable globals, and a target that patches os.path.join
+        # renamed our symbols after its temp file (Kokoro-FastAPI, experiment 02).
+        self._repo_prefix = str(self.repo_root).rstrip("/") + "/"
+        self._root_prefixes = [(Origin.TEST, str(r).rstrip("/") + "/") for r in self.test_roots] + [
+            (Origin.REPO, str(r).rstrip("/") + "/") for r in self.source_roots
+        ]
+
+    def _module_for(self, filename: str) -> tuple[Origin, str] | None:
+        for origin, prefix in self._root_prefixes:
+            if not filename.startswith(prefix):
+                continue
+            rel = filename[len(prefix) :]
+            parts = rel.split("/")
+            if any(part in _EXCLUDED_PARTS or part.startswith(".") for part in parts):
+                return None
+            if parts[-1].endswith(".py"):
+                parts[-1] = parts[-1][:-3]
+            if parts and parts[-1] == "__init__":
+                parts.pop()
+            if origin is Origin.TEST:
+                parts = prefix[len(self._repo_prefix) :].rstrip("/").split("/") + parts
+            return origin, ".".join(p for p in parts if p)
         return None
+
+    def _relative(self, filename: str) -> str:
+        return (
+            filename[len(self._repo_prefix) :]
+            if filename.startswith(self._repo_prefix)
+            else filename
+        )
 
     def scope_for(self, code: CodeType) -> _Scope | None:
         if code in self._scopes:
@@ -176,15 +204,19 @@ class Tracer:
         scope = None
         filename = code.co_filename
         if not filename.startswith("<"):
-            named = self._module_for(Path(filename))
+            named = self._module_for(filename)
             if named:
                 origin, module = named
+                qualname = code.co_qualname
+                if qualname.rsplit(".", 1)[-1].startswith("<"):
+                    # Anonymous code (<lambda>, <genexpr>, <listcomp>...) has no name of its
+                    # own: two lambdas in one function share a qualname. Its identity is
+                    # its definition site. Found as an IdentityMismatch on Kokoro-FastAPI.
+                    qualname = f"{qualname}@{code.co_firstlineno}"
                 scope = _Scope(
                     origin,
-                    f"py:{module}.{code.co_qualname}",
-                    SourceLocation(
-                        str(Path(filename).relative_to(self.repo_root)), code.co_firstlineno
-                    ),
+                    f"py:{module}.{qualname}",
+                    SourceLocation(self._relative(filename), code.co_firstlineno),
                 )
         self._scopes[code] = scope
         return scope
@@ -196,31 +228,28 @@ class Tracer:
     def symbol_for_object(self, obj: Any) -> Symbol:
         """Identity of a class/function reached by *object*, not by frame, with the origin
         and location the collector can observe for it. Uses the same file-based naming as
-        frames when the object has a code object or an in-scope source file; otherwise a
-        module-based name, which is a second identity scheme (see exp 01 findings)."""
+        frames when the object has a code object or an in-scope module file; otherwise a
+        module-based name, which is a second identity scheme (see exp 01 findings).
+        Reads only attributes, never os.path/inspect (see __post_init__)."""
         code = getattr(obj, "__code__", None)
         if isinstance(code, CodeType) and (scope := self.scope_for(code)):
             return Symbol(scope.symbol, scope.origin, scope.location)
-        try:
-            file = inspect.getsourcefile(obj)
-        except TypeError:
-            file = None
         qualname = getattr(obj, "__qualname__", type(obj).__qualname__)
-        if file:
-            named = self._module_for(Path(file))
-            if named:
-                line = getattr(code, "co_firstlineno", None) if isinstance(code, CodeType) else None
-                loc = SourceLocation(str(Path(file).relative_to(self.repo_root)), line or 0)
-                return Symbol(f"py:{named[1]}.{qualname}", named[0], loc)
-        # C-implemented members (method/getset descriptors) carry no __module__ of their
-        # own; the defining class does. Falling back to type(obj).__module__ named
-        # sqlite3.Connection.execute as "builtins": a wrong identity, caught in exp 01.
         owner = getattr(obj, "__objclass__", None)
-        module = getattr(obj, "__module__", None) or (owner.__module__ if owner else None)
-        if module is None:
+        module_name = getattr(obj, "__module__", None) or (owner.__module__ if owner else None)
+        module = sys.modules.get(module_name) if module_name else None
+        file = getattr(module, "__file__", None)
+        if isinstance(file, str):
+            named = self._module_for(file)
+            if named:
+                line = code.co_firstlineno if isinstance(code, CodeType) else 0
+                loc = SourceLocation(self._relative(file), line)
+                return Symbol(f"py:{named[1]}.{qualname}", named[0], loc)
+        if module_name is None:
             return Symbol(f"py:{type(obj).__module__}.{qualname}", Origin.UNKNOWN, None)
-        # A real object in this process whose file is absent or out of scope: external.
-        return Symbol(f"py:{module}.{qualname}", Origin.EXTERNAL, None)
+        # A real object in this process whose module is absent or out of scope: external.
+        # C-implemented members carry no __module__; their defining class does (exp 01).
+        return Symbol(f"py:{module_name}.{qualname}", Origin.EXTERNAL, None)
 
     def _intern(self, symbol: SymbolId, origin: Origin, location: SourceLocation | None) -> None:
         if symbol not in self._symbols:
@@ -232,7 +261,9 @@ class Tracer:
 
     # ------------------------------------------------------------------ stand-ins
 
-    def _describe_mock(self, m: Any) -> tuple[SymbolId | None, str, tuple[str, ...]]:
+    def _describe_mock(
+        self, m: Any
+    ) -> tuple[SubstitutionMechanism, SymbolId | None, str, tuple[str, ...]]:
         path: list[str] = []
         root = m
         while True:
@@ -244,24 +275,32 @@ class Tracer:
                 break
             root = parent
         path.reverse()
+        patched = self._patched.get(id(root))
+        if patched is not None:
+            # Installed by unittest.mock.patch: the patcher saved the original, which is
+            # exactly what the stand-in replaces. path[0] is the patched attribute.
+            _, _, original = patched
+            claim = None
+            if original is not mock.DEFAULT:
+                original = getattr(original, "__func__", getattr(original, "fget", original))
+                claim = self._intern_symbol(self.symbol_for_object(original))
+            return SubstitutionMechanism.INTERPOSITION, claim, "patch-target", tuple(path)
         spec = getattr(root, "_spec_class", None)
         if spec is None:
-            return None, "none", tuple(path)
+            return SubstitutionMechanism.MOCK_OBJECT, None, "none", tuple(path)
         member: Any = None
         if path and path[0] != "()":
-            member = inspect.getattr_static(spec, path[0], None)
+            member = _static_attr(spec, path[0])
             member = getattr(member, "__func__", getattr(member, "fget", member))
         target = self._intern_symbol(self.symbol_for_object(member if member is not None else spec))
-        return target, "spec", tuple(path)
+        return SubstitutionMechanism.MOCK_OBJECT, target, "spec", tuple(path)
 
     def _record_substitution(
-        self, thread: int, mechanism: SubstitutionMechanism, callable_: Any, args: ArgShapes
+        self, parent: int, mechanism: SubstitutionMechanism, callable_: Any, args: ArgShapes
     ) -> int:
-        stack = self._stacks[thread]
-        parent = stack[-1][1] if stack else 0
         if isinstance(callable_, mock.NonCallableMock):
             substitute = f"py:{type(callable_).__module__}.{type(callable_).__qualname__}"
-            claimed, relation, path = self._describe_mock(callable_)
+            mechanism, claimed, relation, path = self._describe_mock(callable_)
         else:
             substitute = self._intern_symbol(self.symbol_for_object(callable_))
             claimed, relation, path = None, "none", ()
@@ -279,7 +318,7 @@ class Tracer:
         self._nodes.append(node)
         return node.id
 
-    # ------------------------------------------------------------------ callbacks
+    # ------------------------------------------------------------------ attribution
 
     def _thread(self) -> int:
         ident = threading.get_ident()
@@ -288,25 +327,51 @@ class Tracer:
             self._stacks[ident] = []
         return ident
 
+    def _ancestor_node(self, frame: Any) -> int:
+        """Node of the nearest in-scope frame on the real call stack above `frame`, or the
+        root. Correct under generators and coroutines, where a shadow stack is not: a
+        suspended frame is not an ancestor of what runs while it is suspended."""
+        f = frame.f_back
+        while f is not None:
+            node = self._frame_nodes.get(id(f))
+            if node is not None:
+                return node
+            f = f.f_back
+        return 0
+
+    def _shadow_parent(self, ident: int) -> int:
+        stack = self._stacks[ident]
+        return stack[-1][1] if stack else 0
+
+    # ------------------------------------------------------------------ callbacks
+
     def _on_start(self, code: CodeType, _offset: int) -> Any:
         scope = self.scope_for(code)
         if scope is None:
             return _DISABLE
         ident = self._thread()
+        frame = sys._getframe(1)
         stack = self._stacks[ident]
-        if not stack and code is self._root_code and self._threads[ident] == 0:
+        if (
+            code is self._root_code
+            and self._threads[ident] == 0
+            and 0 not in self._frame_nodes.values()
+        ):
+            self._frame_nodes[id(frame)] = 0
             stack.append((code, 0))
             return None
-        frame = sys._getframe(1)
         names = code.co_varnames[: code.co_argcount + code.co_kwonlyargcount][:_MAX_ARGS]
         args: ArgShapes = tuple(
             (n, summarize_value(frame.f_locals[n]), digest_value(frame.f_locals[n]))
             for n in names
             if n not in ("self", "cls") and n in frame.f_locals
         )
-        parent = stack[-1][1] if stack else 0
+        parent = self._ancestor_node(frame)
+        if parent != self._shadow_parent(ident):
+            self._attribution_disagreements += 1
         parent_symbol = getattr(self._nodes[parent], "symbol", None)
         parent_origin = self._symbols[parent_symbol].origin if parent_symbol else Origin.UNKNOWN
+        sub_id = None
         if scope.origin is Origin.TEST and parent_origin is Origin.REPO:
             # Production code called into test-defined code: a fake/stub that executes.
             mechanism = (
@@ -314,8 +379,7 @@ class Tracer:
                 if "." in code.co_qualname
                 else SubstitutionMechanism.STUB
             )
-            sub_id = self._record_substitution(ident, mechanism, _CodeHolder(code), args)
-            stack.append((None, sub_id))
+            sub_id = self._record_substitution(parent, mechanism, _CodeHolder(code), args)
             parent = sub_id
         self._intern(scope.symbol, scope.origin, scope.location)
         node = CallNode(
@@ -327,6 +391,9 @@ class Tracer:
             thread=self._threads[ident],
         )
         self._nodes.append(node)
+        self._frame_nodes[id(frame)] = node.id
+        if sub_id is not None:
+            self._fake_wrappers[node.id] = sub_id
         stack.append((code, node.id))
         return None
 
@@ -335,7 +402,15 @@ class Tracer:
         assert not isinstance(node, OsEventNode)
         self._nodes[node_id] = dataclasses.replace(node, outcome=outcome, result=result)
 
-    def _pop(self, code: CodeType, outcome: str, result: str = "") -> None:
+    def _finish(self, code: CodeType, outcome: str, result: str = "") -> None:
+        frame = sys._getframe(2)
+        node_id = self._frame_nodes.pop(id(frame), None)
+        if node_id:
+            self._set_outcome(node_id, outcome, result)
+            wrapper = self._fake_wrappers.pop(node_id, None)
+            if wrapper is not None:
+                self._set_outcome(wrapper, outcome, result)
+        # Shadow stack, kept only to measure how often it would have misattributed.
         stack = self._stacks.get(threading.get_ident())
         if not stack:
             return
@@ -343,33 +418,27 @@ class Tracer:
             self._stack_repairs += 1
             while stack and stack[-1][0] is not code:
                 stack.pop()
-            if not stack:
-                return
-        _, node_id = stack.pop()
-        if node_id != 0:
-            self._set_outcome(node_id, outcome, result)
-        if stack and stack[-1][0] is None:  # the substitution wrapper of a fake ends too
-            self._set_outcome(stack.pop()[1], outcome, result)
+        if stack:
+            stack.pop()
 
     # PY_RETURN/PY_UNWIND cannot be disabled per location (CPython raises), so
     # out-of-scope returns are simply ignored; PY_START's DISABLE keeps the cost down.
     def _on_return(self, code: CodeType, _offset: int, value: object) -> Any:
         if self.scope_for(code) is not None:
-            self._pop(code, "returned", digest_value(value))
+            self._finish(code, "returned", digest_value(value))
         return None
 
     def _on_unwind(self, code: CodeType, _offset: int, exc: BaseException) -> Any:
         if self.scope_for(code) is not None:
-            self._pop(code, "raised:" + self._intern_symbol(self.symbol_for_object(type(exc))))
+            self._finish(code, "raised:" + self._intern_symbol(self.symbol_for_object(type(exc))))
         return None
 
     def _mock_call(self, m: Any, /, *args: Any, **kwargs: Any) -> Any:
-        """Wraps unittest.mock's call path while tracing, so a stand-in call's outcome is
-        observed rather than inferred. The CALL event has already recorded the node."""
+        """Wraps unittest.mock's call path while tracing, so a stand-in call's arguments and
+        outcome are observed rather than inferred. The CALL event already recorded the node."""
         pending = self._pending_mock_calls.get(threading.get_ident())
         node_id = pending.pop() if pending else None
         if node_id is not None:
-            # The CALL event only exposes the first argument; here all of them are visible.
             shapes: ArgShapes = tuple(
                 [
                     (f"arg{i}", summarize_value(a), digest_value(a))
@@ -403,11 +472,40 @@ class Tracer:
                 () if arg0 is _MISSING else (("arg0", summarize_value(arg0), digest_value(arg0)),)
             )
             ident = self._thread()
+            frame = sys._getframe(1)
+            parent = self._frame_nodes.get(id(frame), self._ancestor_node(frame))
             node_id = self._record_substitution(
-                ident, SubstitutionMechanism.MOCK_OBJECT, callable_, args
+                parent, SubstitutionMechanism.MOCK_OBJECT, callable_, args
             )
             self._pending_mock_calls.setdefault(ident, []).append(node_id)
         return None
+
+    # ------------------------------------------------------------------ patch registry
+
+    def install_patch_hook(self) -> None:
+        """Record what `unittest.mock.patch` installs, for the whole session: fixtures may
+        enter patches before a test's call phase begins. A runtime-adapter detail."""
+        if self._orig_patch_enter is not None:
+            return
+        patch_cls: Any = mock._patch
+        tracer = self
+        self._orig_patch_enter, self._orig_patch_exit = patch_cls.__enter__, patch_cls.__exit__
+
+        def enter(patcher: Any) -> Any:
+            new = tracer._orig_patch_enter(patcher)
+            original = getattr(patcher, "temp_original", mock.DEFAULT)
+            tracer._patched[id(new)] = (patcher.target, patcher.attribute, original)
+            return new
+
+        def exit_(patcher: Any, *exc_info: Any) -> Any:
+            try:
+                current = getattr(patcher.target, patcher.attribute, None)
+                tracer._patched.pop(id(current), None)
+            except Exception:
+                pass
+            return tracer._orig_patch_exit(patcher, *exc_info)
+
+        patch_cls.__enter__, patch_cls.__exit__ = enter, exit_
 
     # ------------------------------------------------------------------ lifecycle
 
@@ -417,7 +515,10 @@ class Tracer:
         self._symbols.clear()
         self._stacks.clear()
         self._threads.clear()
+        self._frame_nodes.clear()
+        self._fake_wrappers.clear()
         self._stack_repairs = 0
+        self._attribution_disagreements = 0
         self._pending_mock_calls.clear()
         self._root_code = root_code
         origin = Origin.TEST
@@ -459,7 +560,17 @@ class Tracer:
             symbols=tuple(self._symbols[k] for k in sorted(self._symbols)),
             nodes=tuple(self._nodes),
             stack_repairs=self._stack_repairs,
+            attribution_disagreements=self._attribution_disagreements,
         )
+
+
+def _static_attr(cls: Any, name: str) -> Any:
+    """Attribute lookup through the MRO without invoking descriptors or inspect."""
+    for klass in getattr(cls, "__mro__", (cls,)):
+        d = getattr(klass, "__dict__", {})
+        if name in d:
+            return d[name]
+    return None
 
 
 class _CodeHolder:

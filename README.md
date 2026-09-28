@@ -96,7 +96,8 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | Event protocol and evidence model (two planes, join lattice, provenance invariants) | done: `src/diffgenome/model.py` |
 | Controlled fixture repository | done: `fixtures/exp01_shop/` |
 | Experiment 01: observability floor per plane + first composition | designed: `docs/experiment-01.md` |
-| CPython symbol-plane collector, resolver, composer (SYMBOL/ARG_SHAPE/VALUE joins, outcome and result checks), renderers | done; see the findings logs in `docs/experiment-01.md` and `docs/experiment-02.md` |
+| CPython symbol-plane collector (frame-ancestry attribution, patch interposition claims, patch-proof scoping), resolver, composer (SYMBOL/ARG_SHAPE/VALUE joins, outcome and result checks, shape merging), renderers | done; findings logs in `docs/experiment-01.md` and `docs/experiment-02.md` |
+| First real target (Kokoro-FastAPI, 318 tests): 42% of stand-ins resolved, 406 composed edges, 11 gaps | measured; see experiment 02 |
 | Linux OS-plane collector and sandbox | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |

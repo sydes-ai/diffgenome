@@ -133,6 +133,43 @@ def _shape_type(shape: str) -> str:
     return shape.split("[", 1)[0]
 
 
+def _types_compatible(a: str, b: str) -> bool:
+    """A stand-in argument compares as the type it stands in for; a spec-less stand-in
+    is a wildcard (unknown type is not a conflict). Kokoro-FastAPI produced
+    ``TTSService≠stand-in`` conflicts that were artefacts of the test, not the seam."""
+    ta, tb = _shape_type(a), _shape_type(b)
+    if ta == tb:
+        return True
+    for x, y in ((ta, tb), (tb, ta)):
+        if x == "stand-in":
+            return True
+        if x.startswith("stand-in:") and x[len("stand-in:") :] == y:
+            return True
+    return False
+
+
+def fragment_shape(corpus: Corpus, ref: NodeRef) -> tuple[object, ...]:
+    """Structural signature of a fragment subtree: symbols, kinds, outcomes, claims and
+    paths, but not argument values. Fragments with one shape are one behavior path and
+    are expanded once; their provenance is kept together (Evidence.alternates)."""
+    ex = corpus.executions[ref.execution]
+
+    def walk(node_id: int) -> tuple[object, ...]:
+        parts: list[object] = []
+        for k in corpus.children[ex.id].get(node_id, []):
+            if isinstance(k, CallNode):
+                parts.append(("c", k.symbol, k.outcome.split(":")[0], walk(k.id)))
+            elif isinstance(k, SubstitutionNode):
+                parts.append(("s", k.mechanism.value, k.claimed_target, k.path, walk(k.id)))
+            else:
+                parts.append(("o", k.kind.value, k.target))
+        return tuple(parts)
+
+    root = ex.nodes[ref.node]
+    assert isinstance(root, CallNode)
+    return (root.symbol, root.outcome.split(":")[0], walk(ref.node))
+
+
 def outcomes_compatible(site: SubstitutionNode, fragment: CallNode) -> bool | None:
     """None when either outcome is unknown. Returned-vs-raised is a conflict: the seed kept
     running on the assumption of the outcome the stand-in produced, and the fragment's
@@ -153,12 +190,22 @@ def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength
     if compatible is False:
         return None, f"outcome conflict: stand-in {site.outcome}, fragment {fragment.outcome}"
     notes = [] if compatible else ["outcome unknown on one side"]
+    if not site.args and not fragment.args:
+        # No arguments on either side: argument compatibility holds vacuously. Entry
+        # compatibility then rests entirely on receiver state, which is the STATE rung.
+        if compatible is None:
+            return JoinStrength.ARG_SHAPE, "; ".join([*notes, "no arguments"])
+        return JoinStrength.VALUE, "no arguments"
     if not site.args or not fragment.args:
-        return JoinStrength.SYMBOL, "; ".join([*notes, "no argument shapes on one side"])
+        return JoinStrength.SYMBOL, "; ".join([*notes, "arity differs: arguments on one side only"])
     pairs = list(zip(site.args, fragment.args, strict=False))
-    conflicts = [f"{a}≠{b}" for (_, a, _), (_, b, _) in pairs if _shape_type(a) != _shape_type(b)]
+    conflicts = [f"{a}≠{b}" for (_, a, _), (_, b, _) in pairs if not _types_compatible(a, b)]
     if conflicts:
         return JoinStrength.SYMBOL, "; ".join([*notes, "type conflict: " + ", ".join(conflicts)])
+    wild = [n for (n, a, _), (_, b, _) in pairs if _shape_type(a) != _shape_type(b)]
+    if wild:
+        notes.append("stand-in argument, type unverified: " + ", ".join(wild))
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)
     missing = [n for (_, _, da), (n, _, db) in pairs if not da or not db]
     if missing:
         notes.append("value unavailable: " + ", ".join(missing))
@@ -234,6 +281,9 @@ def compose(
             assert target is not None
             frags = corpus.fragments.get(target, [])
             accepted_any = False
+            groups: dict[
+                tuple[object, ...], list[tuple[NodeRef, JoinStrength, str, bool | None]]
+            ] = {}
             for ref in frags:
                 frag_ex = corpus.executions[ref.execution]
                 frag_node = frag_ex.nodes[ref.node]
@@ -246,11 +296,20 @@ def compose(
                 if same_result is False:
                     note = "; ".join(filter(None, [note, "result differs: seed continued on it"]))
                 attempts.append(JoinAttempt(site, ref, target, grade, ok, note, same_result))
-                if not ok or grade is None:
-                    continue
+                if ok and grade is not None:
+                    groups.setdefault(fragment_shape(corpus, ref), []).append(
+                        (ref, grade, note, same_result)
+                    )
+            for members in groups.values():
+                # One branch per distinct behavior path; the best-graded member represents
+                # it and the others are kept as alternates, so no provenance is lost.
+                members.sort(key=lambda m: (-m[1].value, m[0].execution, m[0].node))
+                ref, grade, _, _ = members[0]
                 accepted_any = True
-                ev = Evidence(EvidenceKind.COMPOSED, site, rule=res.rule, fragment=ref,
-                              join=grade, probe_derived=probe(ex.id, ref.execution))  # fmt: skip
+                ev = Evidence(EvidenceKind.COMPOSED, site, rule=res.rule, fragment=ref, join=grade,
+                              probe_derived=probe(ex.id, ref.execution),
+                              alternates=tuple(m[0] for m in members[1:]))  # fmt: skip
+                frag_ex = corpus.executions[ref.execution]
                 if target in on_path:
                     gaps.append(Gap(site, target, "cycle"))
                     out.append(Branch(Edge(caller, target, ev), executed))
@@ -258,7 +317,7 @@ def compose(
                     gaps.append(Gap(site, target, "depth"))
                     out.append(Branch(Edge(caller, target, ev), executed))
                 else:
-                    kids = expand(frag_ex, frag_node.id, target, on_path | {target}, depth + 1)
+                    kids = expand(frag_ex, ref.node, target, on_path | {target}, depth + 1)
                     out.append(Branch(Edge(caller, target, ev), executed + kids))
             if not accepted_any:
                 gaps.append(

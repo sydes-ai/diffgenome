@@ -3,6 +3,8 @@
 Runs the collector on the fixture, then composes from the controller seed. Assertions are
 structural, about evidence and provenance, not about rendering."""
 
+from pathlib import Path
+
 import pytest
 
 from diffgenome.compose import Branch, Composition, Corpus, build_corpus, compose
@@ -243,3 +245,49 @@ def test_p9_outcome_conflict_is_unsound_and_recursion_is_provenanced(corpus: Cor
     assert not any(
         e.callee == PLACE and e.evidence.kind is EvidenceKind.INTERNAL_GAP for e in c.edges()
     )
+
+
+def test_same_shape_fragments_merge_with_provenance_kept(tmp_path: Path) -> None:
+    """Fragments with one behavior shape expand once; the others ride along as alternates.
+    On Kokoro-FastAPI this took composition from 11,524 to 406 composed edges."""
+    from tests.test_collector import trace
+
+    root = tmp_path
+    (root / "pkg").mkdir()
+    (root / "pkg" / "__init__.py").write_text("")
+    (root / "pkg" / "svc.py").write_text(
+        "class Repo:\n"
+        "    def get(self, k): return k\n"
+        "class Svc:\n"
+        "    def __init__(self, repo): self.repo = repo\n"
+        "    def run(self, k): return self.repo.get(k)\n"
+        "def use(svc): return svc.run('x')\n"
+    )
+    (root / "tests").mkdir()
+    (root / "tests" / "test_svc.py").write_text(
+        "from unittest.mock import create_autospec\n"
+        "from pkg.svc import Repo, Svc, use\n"
+        "def test_seed():\n"
+        "    svc = create_autospec(Svc, instance=True); svc.run.return_value = 'x'\n"
+        "    assert use(svc) == 'x'\n"
+        "def test_frag_a(): assert Svc(Repo()).run('x') == 'x'\n"
+        "def test_frag_b(): assert Svc(Repo()).run('x') == 'x'\n"
+        "def test_frag_c(): assert Svc(Repo()).run('y') == 'y'\n"
+    )
+    (root / "pytest.ini").write_text("[pytest]\npythonpath = .\n")
+    corpus = build_corpus(list(trace(root, root / "out").values()))
+    c = compose(corpus, next(i for i in corpus.executions if "test_seed" in i))
+
+    composed = [e for e in c.edges() if e.evidence.kind is EvidenceKind.COMPOSED]
+    assert len(composed) == 1  # three same-shape fragments, one branch
+    ev = composed[0].evidence
+    assert ev.join is JoinStrength.VALUE and ev.fragment is not None
+    assert "test_frag_a" in ev.fragment.execution or "test_frag_b" in ev.fragment.execution
+    cited = {ev.fragment.execution} | {a.execution for a in ev.alternates}
+    assert {x.split("::")[1].split("@")[0] for x in cited} == {
+        "test_frag_a",
+        "test_frag_b",
+        "test_frag_c",
+    }
+    grades = {a.fragment.execution.split("::")[1].split("@")[0]: a.grade for a in c.attempts}
+    assert grades["test_frag_c"] is JoinStrength.ARG_SHAPE  # 'y' ≠ 'x': kept, ranked below

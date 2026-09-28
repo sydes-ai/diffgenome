@@ -82,4 +82,5 @@ def execution_from_json(text: str) -> Execution:
             for s in d["symbols"]
         ),
         nodes=tuple(_node_from_dict(n) for n in d["nodes"]),
+        diagnostics=tuple((k, v) for k, v in d.get("diagnostics", [])),
     )
