@@ -138,19 +138,42 @@ def _shape_type(shape: str) -> str:
     return shape.split("[", 1)[0]
 
 
-def _types_compatible(a: str, b: str) -> bool:
-    """A stand-in argument compares as the type it stands in for; a spec-less stand-in
-    is a wildcard (unknown type is not a conflict). Kokoro-FastAPI produced
-    ``TTSService≠stand-in`` conflicts that were artefacts of the test, not the seam."""
+_STRUCTURAL = (
+    "NoneType", "null", "undefined", "nil", "int", "float", "str", "bool", "bytes", "number",
+    "string", "boolean", "bigint", "list", "tuple", "dict", "set", "frozenset", "array", "object",
+    "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32",
+    "float64", "[]", "map[",
+)  # fmt: skip
+
+
+def _is_structural(shape: str) -> bool:
+    """Primitive, None/nil or container shapes: their kind is the whole story. Anything else
+    is an object whose relationship to another object type (interface, subclass, duck
+    typing) the collector cannot see."""
+    t = _shape_type(shape)
+    for k in _STRUCTURAL:
+        if t == k or t.startswith(k + "[") or (k.endswith("[") and t.startswith(k)):
+            return True
+    return t.startswith("[]")
+
+
+def _types_compatible(a: str, b: str) -> str | None:
+    """None when compatible; "conflict" for a decisive structural mismatch (None vs dict is a
+    different branch); "object" when two object types differ but may be related (a
+    *gin.Context where a context.Context is declared), which is unverified, not wrong.
+    A stand-in argument compares as the type it stands in for; a spec-less stand-in is a
+    wildcard."""
     ta, tb = _shape_type(a), _shape_type(b)
     if ta == tb:
-        return True
+        return None
     for x, y in ((ta, tb), (tb, ta)):
         if x == "stand-in":
-            return True
+            return None
         if x.startswith("stand-in:") and x[len("stand-in:") :] == y:
-            return True
-    return False
+            return None
+    if _is_structural(ta) or _is_structural(tb):
+        return "conflict"
+    return "object"
 
 
 def fragment_shape(corpus: Corpus, ref: NodeRef) -> tuple[object, ...]:
@@ -186,7 +209,7 @@ def outcomes_compatible(site: SubstitutionNode, fragment: CallNode) -> bool | No
 
 
 def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength | None, str]:
-    """Grade a seam, or return ``None`` when it is known unsound (outcome conflict).
+    """Grade a seam, or return ``None`` when it is known unsound (outcome or type conflict).
 
     ARG_SHAPE compares argument *types* by position. Sizes differ → still ARG_SHAPE, with
     a note: sizes are value-level and would need the VALUE join, which no collector
@@ -204,10 +227,17 @@ def grade_seam(site: SubstitutionNode, fragment: CallNode) -> tuple[JoinStrength
     if not site.args or not fragment.args:
         return JoinStrength.SYMBOL, "; ".join([*notes, "arity differs: arguments on one side only"])
     pairs = list(zip(site.args, fragment.args, strict=False))
-    conflicts = [f"{a}≠{b}" for (_, a, _), (_, b, _) in pairs if not _types_compatible(a, b)]
+    verdicts = [(n, a, b, _types_compatible(a, b)) for (n, a, _), (_, b, _) in pairs]
+    conflicts = [f"{a}≠{b}" for _, a, b, v in verdicts if v == "conflict"]
     if conflicts:
-        return JoinStrength.SYMBOL, "; ".join([*notes, "type conflict: " + ", ".join(conflicts)])
-    wild = [n for (n, a, _), (_, b, _) in pairs if _shape_type(a) != _shape_type(b)]
+        # A decisive argument-kind conflict is evidence against the seam, not a weak match:
+        # the fragment was entered with different kinds of values (Kokoro: None vs dict).
+        return None, "; ".join([*notes, "type conflict: " + ", ".join(conflicts)])
+    unverified = [f"{n}: {a} vs {b}" for n, a, b, v in verdicts if v == "object"]
+    if unverified:
+        notes.append("object types differ, relationship unverified: " + ", ".join(unverified))
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)
+    wild = [n for n, a, b, _ in verdicts if _shape_type(a) != _shape_type(b)]
     if wild:
         notes.append("stand-in argument, type unverified: " + ", ".join(wild))
         return JoinStrength.ARG_SHAPE, "; ".join(notes)

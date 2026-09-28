@@ -1,0 +1,160 @@
+{
+ "seeds": [
+  "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError",
+  "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError.constructor",
+  "js:src/api/services/PetService.PetService.create"
+ ],
+ "behavioral_edges": [
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError.constructor",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/api/models/Pet.Pet.toString",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "composed",
+   "boundary": null,
+   "best_join": "ARG_SHAPE",
+   "composed_shapes_by_grade": {
+    "ARG_SHAPE": 2
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "claim-member"
+   ],
+   "tests": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age"
+   ],
+   "probes": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array"
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "stand-in:js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "kind": "unresolved",
+   "boundary": "unresolved",
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "no-claim"
+   ],
+   "tests": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "stand-in:js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "kind": "unresolved",
+   "boundary": "unresolved",
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "no-claim"
+   ],
+   "tests": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.info",
+   "callee": "js:src/lib/logger/Logger.Logger.log",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [],
+   "probes": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array"
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.log",
+   "callee": "js:src/lib/logger/Logger.Logger.formatScope",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [],
+   "probes": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array"
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.log",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved",
+   "boundary": "unresolved",
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "no-claim"
+   ],
+   "tests": [],
+   "probes": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array"
+   ]
+  }
+ ],
+ "metrics": {
+  "observed_edges": 9,
+  "composed_edges": 1,
+  "strong_joins": 0,
+  "weak_joins": 1,
+  "internal_gaps": 0,
+  "unresolved_boundaries": 3,
+  "external_boundaries": 0,
+  "os_boundaries": 0,
+  "unsound_attempts": 0,
+  "probe_derived_edges": 4,
+  "symbols": 14,
+  "tests": 3,
+  "reconstructed": 9,
+  "denominator_provisional": 13,
+  "reconstruction_ratio_provisional": 0.692
+ }
+}

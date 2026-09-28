@@ -95,6 +95,13 @@ class NodeSymbolIndex:
         ]  # fmt: skip
         return max(classes, key=lambda c: c.start) if classes else None
 
+    def is_test(self, symbol: SymbolId) -> bool:
+        d = self.find(symbol)
+        if d is None:
+            return False
+        path = self.repo_root / d.path
+        return any(path.is_relative_to(r) for r in self.test_roots)
+
     def return_type_of(self, symbol: SymbolId) -> SymbolId | None:
         return None  # not extracted for this runtime yet
 

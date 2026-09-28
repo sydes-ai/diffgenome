@@ -15,6 +15,14 @@ probe-derived edges: claimed 5, true 5, precision 1.000
 
 alternate fragments carried on claimed edges: 0
 
+### path-level: app.main.create_order
+ground-truth sequences 1, claimed 2, matched 1, extra 1 (of which outcome-only mismatches 0), missed 0
+  extra:  create_order!
+
+### path-level: app.main.read_inventory
+ground-truth sequences 2, claimed 1, matched 1, extra 0 (of which outcome-only mismatches 0), missed 1
+  missed: read_inventory! → get_stock! → get_stock
+
 ## Join lattice: seam-level precision
 | join grade | seams | consistent | matching | outcome ok |
 |---|---|---|---|---|

@@ -17,6 +17,14 @@ missing continuations (ground truth not claimed):
 
 alternate fragments carried on claimed edges: 0
 
+### path-level: shop.controller.OrderController.place_order
+ground-truth sequences 2, claimed 3, matched 0, extra 3 (of which outcome-only mismatches 1), missed 2
+  extra:  place_order → place → _validate
+  extra:  place_order → place → _validate → quote
+  extra:  place_order → place → _validate → quote → price_for → price_for
+  missed: place_order! → place! → _validate!
+  missed: place_order → place → _validate → reserve → quote → price_for → price_for
+
 ## Join lattice: seam-level precision
 | join grade | seams | consistent | matching | outcome ok |
 |---|---|---|---|---|

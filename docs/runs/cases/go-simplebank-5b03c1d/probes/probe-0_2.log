@@ -1,0 +1,6 @@
+FAIL	github.com/techschool/simplebank/api [build failed]
+FAIL
+
+--- stderr ---
+# github.com/techschool/simplebank/api [github.com/techschool/simplebank/api.test]
+api/diffgenome_probe_0_2_test.go:90:9: cannot use &emptyRows{} (value of type *emptyRows) as pgx.Rows value in return statement: *emptyRows does not implement pgx.Rows (missing method CommandTag)

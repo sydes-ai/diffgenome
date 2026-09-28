@@ -13,11 +13,24 @@ def inspect_main(argv: list[str]) -> int:
     ap.add_argument("--up", type=int, default=3)
     ap.add_argument("--down", type=int, default=4)
     ap.add_argument("--json", action="store_true", help="print the neighborhood as JSON")
+    ap.add_argument(
+        "--ambiguity", action="store_true", help="print the ambiguity/rejected-join report"
+    )
+    ap.add_argument(
+        "--behavior",
+        action="store_true",
+        help="print the behavioral projection instead of the evidence slice",
+    )
     args = ap.parse_args(argv)
     from diffgenome.graph import BehavioralGraph
     from diffgenome.report import render_map_slice
 
     graph = BehavioralGraph.from_json(json.loads(args.graph.read_text()))
+    if args.ambiguity:
+        from diffgenome.ambiguity import render_ambiguity
+
+        print(render_ambiguity(graph))
+        return 0
     if not args.symbol:
         print(f"{len(graph.symbols)} symbols, {len(graph.edges)} edges, {len(graph.gaps)} gaps")
         return 0
@@ -53,6 +66,10 @@ def inspect_main(argv: list[str]) -> int:
                 indent=1,
             )
         )
+    elif args.behavior:
+        from diffgenome.projection import render_behavior_map
+
+        print(render_behavior_map(graph, seeds, up=args.up, down=args.down))
     else:
         print(render_map_slice(graph, seeds, up=args.up, down=args.down))
     return 0

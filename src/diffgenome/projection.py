@@ -126,7 +126,11 @@ def _tests_reaching(graph: BehavioralGraph, symbol: SymbolId) -> set[str]:
 
 
 def render_behavior_map(
-    graph: BehavioralGraph, seeds: list[SymbolId], up: int = 3, down: int = 4
+    graph: BehavioralGraph,
+    seeds: list[SymbolId],
+    up: int = 3,
+    down: int = 4,
+    declarations: set[SymbolId] | None = None,
 ) -> str:
     edges = project(graph)
     out_by: dict[SymbolId, list[BehaviorEdge]] = defaultdict(list)
@@ -193,6 +197,10 @@ def render_behavior_map(
                 up_tree(be.caller, cont, depth + 1, path | {be.caller})
 
     for seed in seeds:
+        if declarations and seed in declarations:
+            lines.append(f"# {_short(seed)}   [changed declaration: no executable body of its own]")
+            lines.append("")
+            continue
         outs = graph.outcomes_by_symbol.get(seed, Counter())
         outcome_text = dict(outs) or "never executed"
         reached = entry_evidence(seed)

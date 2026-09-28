@@ -291,3 +291,30 @@ def test_same_shape_fragments_merge_with_provenance_kept(tmp_path: Path) -> None
     }
     grades = {a.fragment.execution.split("::")[1].split("@")[0]: a.grade for a in c.attempts}
     assert grades["test_frag_c"] is JoinStrength.ARG_SHAPE  # 'y' ≠ 'x': kept, ranked below
+
+
+def test_type_conflicts_are_decisive_only_for_structural_kinds() -> None:
+    """None vs dict is a different branch (unsound); *gin.Context vs context.backgroundCtx
+    may both satisfy a declared interface (unverified, capped at ARG_SHAPE); a stand-in
+    argument is a wildcard."""
+    from diffgenome.compose import grade_seam
+    from diffgenome.model import SubstitutionMechanism, SubstitutionNode
+
+    def sub(*args: tuple[str, str, str]) -> SubstitutionNode:
+        return SubstitutionNode(
+            1, 0, 0, SubstitutionMechanism.FAKE, "x", None, "none", (), args, "returned", ""
+        )
+
+    def frag(*args: tuple[str, str, str]) -> CallNode:
+        return CallNode(2, 0, "py:t", 0, args, 0, "returned", "")
+
+    grade, note = grade_seam(sub(("a", "NoneType", "n")), frag(("a", "dict[2]", "d")))
+    assert grade is None and "type conflict" in note
+    grade, note = grade_seam(
+        sub(("ctx", "*gin.Context", "")), frag(("ctx", "context.backgroundCtx", ""))
+    )
+    assert grade is JoinStrength.ARG_SHAPE and "unverified" in note
+    grade, note = grade_seam(sub(("a", "stand-in", "")), frag(("a", "Repo", "")))
+    assert grade is JoinStrength.ARG_SHAPE
+    grade, _ = grade_seam(sub(("id", "int64", "h1")), frag(("id", "int64", "h1")))
+    assert grade is JoinStrength.VALUE

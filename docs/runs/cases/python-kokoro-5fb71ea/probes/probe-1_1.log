@@ -1,0 +1,44 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.7, pytest-8.3.5, pluggy-1.6.0
+rootdir: /private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/case-py/workspaces/ws-1790610783626/repo
+configfile: pytest.ini
+plugins: anyio-4.12.1, cov-6.0.0, asyncio-0.25.3, typeguard-4.5.1
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 1 item
+
+api/tests/test_diffgenome_probe_1_1.py F                                 [100%]
+
+=================================== FAILURES ===================================
+_________________ test_list_voices_executes_real_voice_manager _________________
+api/tests/test_diffgenome_probe_1_1.py:27: in test_list_voices_executes_real_voice_manager
+    service = await TTSService.create()
+api/src/services/tts_service.py:50: in create
+    service.model_manager = await get_model_manager()
+E   TypeError: object object can't be used in 'await' expression
+=============================== warnings summary ===============================
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/spacy/cli/_util.py:23
+  /Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/spacy/cli/_util.py:23: DeprecationWarning: Importing 'parser.split_arg_string' is deprecated, it will only be available in 'shell_completion' in Click 9.0.
+    from click.parser import split_arg_string
+
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/joblib/_multiprocessing_helpers.py:44
+  /Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/joblib/_multiprocessing_helpers.py:44: UserWarning: [Errno 1] Operation not permitted.  joblib will operate in serial mode
+    warnings.warn("%s.  joblib will operate in serial mode" % (e,))
+
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+../../../../../../../../../../Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+  /Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.10/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED api/tests/test_diffgenome_probe_1_1.py::test_list_voices_executes_real_voice_manager
+======================== 1 failed, 7 warnings in 0.05s =========================
+
+--- stderr ---
+/Users/ksnaik/sample_repos/Kokoro-FastAPI/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

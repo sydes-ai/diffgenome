@@ -37,11 +37,17 @@ class Definition:
 
 class GoSymbolIndex:
     def __init__(
-        self, repo_root: Path, source_roots: list[Path], test_roots: list[Path], index_file: Path
+        self,
+        repo_root: Path,
+        source_roots: list[Path],
+        test_roots: list[Path],
+        index_file: Path,
+        mock_roots: list[Path] | None = None,
     ) -> None:
         self.repo_root = repo_root.resolve()
         self.source_roots = [p.resolve() for p in source_roots]
         self.test_roots = [p.resolve() for p in test_roots]
+        self.mock_roots = [p.resolve() for p in (mock_roots or [])]
         doc = json.loads(index_file.read_text())
         self._defs = [
             Definition(d["symbol"], d["path"], d["start"], d["end"], d["kind"])
@@ -87,6 +93,16 @@ class GoSymbolIndex:
         if len(parts) < 3:
             return None
         return self.find("go:" + ".".join(parts[:-1]))
+
+    def is_test(self, symbol: SymbolId) -> bool:
+        # Go tests live beside the code: test-ness is the _test.go suffix or a mock package.
+        d = self.find(symbol)
+        if d is None:
+            return False
+        if d.path.endswith("_test.go"):
+            return True
+        path = self.repo_root / d.path
+        return any(path.is_relative_to(r) for r in self.mock_roots)
 
     def return_type_of(self, symbol: SymbolId) -> SymbolId | None:
         return None  # not extracted for this runtime yet
@@ -170,6 +186,7 @@ class GoTestRuntime:
             [self.repo / self.source_root],
             [self.repo / self.test_root, *mock_roots],
             index_file,
+            mock_roots,
         )
 
     def trace(
@@ -192,6 +209,16 @@ class GoTestRuntime:
         }
         argv = [str(self.go), "test", "-count=1", "-p", "1"]
         if only:
+            # A probe file added after preparation must be instrumented too (Begin/End
+            # come from instrumentation); already-instrumented files are skipped.
+            tool = ws.root / "dg-instrument"
+            subprocess.run(
+                [
+                    str(tool), "-root", str(ws.repo), "-module", self.module,
+                    "-src", os.path.dirname(only[0]) or ".", "-tests", ",".join(self.mock_dirs),
+                ],
+                capture_output=True, text=True, check=True,
+            )  # fmt: skip
             # a probe file lives in the package dir; run that package, only the probe tests
             pkg = "./" + os.path.dirname(only[0]) + "/"
             argv += ["-run", "DiffgenomeProbe", pkg]
@@ -215,7 +242,11 @@ class GoTestRuntime:
             "package directly; test functions MUST be named TestDiffgenomeProbe... so the "
             f"harness can select them. Module path: {self.module}. No network and no database "
             "are available; substitute the Store with the generated gomock "
-            "(`mockdb.NewMockStore(ctrl)`) as the existing tests do."
+            "(`mockdb.NewMockStore(ctrl)`) as the existing tests do. Only modules already in "
+            "go.mod can be imported (GOPROXY=off): the standard library, this module, testify, "
+            "gomock, pgx/v5 and gin; do not add new dependencies. Sqlc `Queries` take a `DBTX` "
+            "interface (pgx), so a hand-written fake DBTX returning a fake `pgx.Row` can drive "
+            "real query code without a database."
         )
 
     def _package_name(self) -> str:

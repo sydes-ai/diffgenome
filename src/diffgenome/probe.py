@@ -343,6 +343,7 @@ def verify(
     improved = (
         after.internal_gaps < before.internal_gaps
         or after.strong_joins > before.strong_joins
+        or after.composed > before.composed  # a new continuation, even a weak one, is evidence
         or after.observed > before.observed
     )
     if not improved:

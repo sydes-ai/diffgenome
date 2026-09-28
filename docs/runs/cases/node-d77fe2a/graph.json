@@ -1,0 +1,3263 @@
+{
+ "format": "diffgenome-graph/1",
+ "symbols": [
+  {
+   "id": "js:HttpError",
+   "origin": "external",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/errors/InvalidPetAgeError.ts",
+    "line": 4
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/middlewares/ErrorHandlerMiddleware.ts",
+    "line": 12
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.error",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/middlewares/ErrorHandlerMiddleware.ts",
+    "line": 16
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/models/Pet.Pet.toString",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/models/Pet.ts",
+    "line": 30
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/models/User.User.toString",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/models/User.ts",
+    "line": 57
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/api/services/PetService.PetService.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/services/PetService.ts",
+    "line": 16
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/services/PetService.PetService.create",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/services/PetService.ts",
+    "line": 41
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "outcomes": {
+    "returned": 1,
+    "raised": 1
+   }
+  },
+  {
+   "id": "js:src/api/services/UserService.UserService.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/services/UserService.ts",
+    "line": 14
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:src/api/services/UserService.UserService.create",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/services/UserService.ts",
+    "line": 30
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/api/services/UserService.UserService.find",
+   "origin": "repo",
+   "location": {
+    "path": "src/api/services/UserService.ts",
+    "line": 20
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/auth/AuthService.AuthService.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/auth/AuthService.ts",
+    "line": 12
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 3
+   }
+  },
+  {
+   "id": "js:src/auth/AuthService.AuthService.parseBasicAuthFromRequest",
+   "origin": "repo",
+   "location": {
+    "path": "src/auth/AuthService.ts",
+    "line": 17
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 3
+   }
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/lib/logger/Logger.ts",
+    "line": 33
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 10
+   }
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.error",
+   "origin": "repo",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.formatScope",
+   "origin": "repo",
+   "location": {
+    "path": "src/lib/logger/Logger.ts",
+    "line": 59
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.info",
+   "origin": "repo",
+   "location": {
+    "path": "src/lib/logger/Logger.ts",
+    "line": 41
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.log",
+   "origin": "repo",
+   "location": {
+    "path": "src/lib/logger/Logger.ts",
+    "line": 53
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/lib/logger/Logger.Logger.parsePathToScope",
+   "origin": "repo",
+   "location": {
+    "path": "src/lib/logger/Logger.ts",
+    "line": 19
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 10
+   }
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/auth/AuthService.test.ts",
+    "line": 14
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 3
+   }
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@21",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/auth/AuthService.test.ts",
+    "line": 21
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@33",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/auth/AuthService.test.ts",
+    "line": 33
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@42",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/auth/AuthService.test.ts",
+    "line": 42
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/lib/EventDispatcherMock.ts",
+    "line": 5
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:test/unit/lib/LogMock.LogMock.error",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/lib/LogMock.ts",
+    "line": 22
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:test/unit/lib/LogMock.LogMock.info",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/lib/LogMock.ts",
+    "line": 14
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 8
+   }
+  },
+  {
+   "id": "js:test/unit/lib/RepositoryMock.RepositoryMock.find",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/lib/RepositoryMock.ts",
+    "line": 11
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/lib/RepositoryMock.ts",
+    "line": 21
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@13",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts",
+    "line": 13
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@20",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts",
+    "line": 20
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@29",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts",
+    "line": 29
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/services/PetService.test.<anon>@9.<anon>@11",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/services/PetService.test.ts",
+    "line": 11
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/services/PetService.test.ts",
+    "line": 24
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/services/UserService.test.<anon>@8.<anon>@10",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/services/UserService.test.ts",
+    "line": 10
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/services/UserService.test.<anon>@8.<anon>@26",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/services/UserService.test.ts",
+    "line": 26
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/services/UserService.test.ts::UserService Find should return a list of users",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@16",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/validations/UserValidations.test.ts",
+    "line": 16
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a last name@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@25",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/validations/UserValidations.test.ts",
+    "line": 25
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a email@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@34",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/validations/UserValidations.test.ts",
+    "line": 34
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User validation should succeed with all required fields@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@7",
+   "origin": "test",
+   "location": {
+    "path": "test/unit/validations/UserValidations.test.ts",
+    "line": 7
+   },
+   "kind": "callable",
+   "executed_by": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a first name@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a email",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a first name",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a last name",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:test/unit/validations/UserValidations.test.ts::UserValidations User validation should succeed with all required fields",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  }
+ ],
+ "edges": [
+  {
+   "caller": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.error",
+   "callee": "js:src/lib/logger/Logger.Logger.error",
+   "kind": "internal_gap",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "internal_gap",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 7
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-member",
+     "probe_derived": false
+    },
+    {
+     "kind": "internal_gap",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 7
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-member",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 11
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/api/models/Pet.Pet.toString",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 7
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 2
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 8
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "stand-in:js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 13
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/PetService.PetService.create",
+   "callee": "stand-in:js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 10
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.create",
+   "callee": "js:src/api/models/User.User.toString",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.create",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.create",
+   "callee": "stand-in:js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 13
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.create",
+   "callee": "stand-in:js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 10
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.find",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 6
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/api/services/UserService.UserService.find",
+   "callee": "stand-in:js:test/unit/lib/RepositoryMock.RepositoryMock.find",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:src/auth/AuthService.AuthService.parseBasicAuthFromRequest",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 4
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 10
+     },
+     "fragment": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.constructor",
+   "callee": "js:src/lib/logger/Logger.Logger.parsePathToScope",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.info",
+   "callee": "js:src/lib/logger/Logger.Logger.log",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.log",
+   "callee": "js:src/lib/logger/Logger.Logger.formatScope",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:src/lib/logger/Logger.Logger.log",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "callee": "js:src/auth/AuthService.AuthService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@21",
+   "callee": "js:src/auth/AuthService.AuthService.parseBasicAuthFromRequest",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@33",
+   "callee": "js:src/auth/AuthService.AuthService.parseBasicAuthFromRequest",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@42",
+   "callee": "js:src/auth/AuthService.AuthService.parseBasicAuthFromRequest",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@21",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@42",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@14",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header",
+   "callee": "js:test/unit/auth/AuthService.test.<anon>@9.<anon>@20.<anon>@33",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array",
+   "callee": "js:src/lib/logger/Logger.Logger.info",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "callee": "js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 14
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 14
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/EventDispatcherMock.EventDispatcherMock.dispatch",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 15
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 15
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/LogMock.LogMock.error",
+   "callee": "js:test/unit/lib/LogMock.LogMock.error",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/LogMock.LogMock.error",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/LogMock.LogMock.info",
+   "callee": "js:test/unit/lib/LogMock.LogMock.info",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 11
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 7
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/LogMock.LogMock.info",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+      "node": 12
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 10
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/RepositoryMock.RepositoryMock.find",
+   "callee": "js:test/unit/lib/RepositoryMock.RepositoryMock.find",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 10
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/RepositoryMock.RepositoryMock.find",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 11
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "callee": "js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 11
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 11
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/lib/RepositoryMock.RepositoryMock.save",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 12
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    },
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 12
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@13",
+   "callee": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@13",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@20",
+   "callee": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.error",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@29",
+   "callee": "js:src/api/middlewares/ErrorHandlerMiddleware.ErrorHandlerMiddleware.error",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production",
+   "callee": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@13",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production",
+   "callee": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@20",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development",
+   "callee": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@13",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development",
+   "callee": "js:test/unit/middlewares/ErrorHandlerMiddleware.test.<anon>@7.<anon>@29",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@11",
+   "callee": "js:src/api/services/PetService.PetService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@11",
+   "callee": "js:src/api/services/PetService.PetService.create",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@11",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "callee": "js:src/api/errors/InvalidPetAgeError.InvalidPetAgeError.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "callee": "js:src/api/services/PetService.PetService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "callee": "js:src/api/services/PetService.PetService.create",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers",
+   "callee": "js:test/unit/services/PetService.test.<anon>@9.<anon>@11",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age",
+   "callee": "js:test/unit/services/PetService.test.<anon>@9.<anon>@24",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@10",
+   "callee": "js:src/api/services/UserService.UserService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@10",
+   "callee": "js:src/api/services/UserService.UserService.find",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@10",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@26",
+   "callee": "js:src/api/services/UserService.UserService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@26",
+   "callee": "js:src/api/services/UserService.UserService.create",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.<anon>@8.<anon>@26",
+   "callee": "js:src/lib/logger/Logger.Logger.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers",
+   "callee": "js:test/unit/services/UserService.test.<anon>@8.<anon>@26",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/services/UserService.test.ts::UserService Find should return a list of users",
+   "callee": "js:test/unit/services/UserService.test.<anon>@8.<anon>@10",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a email",
+   "callee": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@25",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a email@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a email@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a first name",
+   "callee": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@7",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a first name@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a first name@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/validations/UserValidations.test.ts::UserValidations User should always have a last name",
+   "callee": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@16",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a last name@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/validations/UserValidations.test.ts::UserValidations User should always have a last name@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:test/unit/validations/UserValidations.test.ts::UserValidations User validation should succeed with all required fields",
+   "callee": "js:test/unit/validations/UserValidations.test.<anon>@5.<anon>@34",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "test/unit/validations/UserValidations.test.ts::UserValidations User validation should succeed with all required fields@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "test/unit/validations/UserValidations.test.ts::UserValidations User validation should succeed with all required fields@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  }
+ ],
+ "gaps": [
+  {
+   "site": {
+    "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should not print stack out in production@unknown",
+    "node": 7
+   },
+   "target": "js:src/lib/logger/Logger.Logger.error",
+   "kind": "no-fragment"
+  },
+  {
+   "site": {
+    "execution": "test/unit/middlewares/ErrorHandlerMiddleware.test.ts::ErrorHandlerMiddleware Should print stack out in development@unknown",
+    "node": 7
+   },
+   "target": "js:src/lib/logger/Logger.Logger.error",
+   "kind": "no-fragment"
+  }
+ ],
+ "join_attempts": [
+  {
+   "site": {
+    "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return the credentials of the basic authorization header@unknown",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is no basic authorization header@unknown",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/auth/AuthService.test.ts::AuthService parseTokenFromRequest Should return undefined if there is a invalid basic authorization header@unknown",
+    "node": 10
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/services/PetService.test.ts::PetService Create should dispatch subscribers@unknown",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/services/PetService.test.ts::PetService Create should reject a non-positive age@unknown",
+    "node": 8
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/services/UserService.test.ts::UserService Create should dispatch subscribers@unknown",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "test/unit/services/UserService.test.ts::UserService Find should return a list of users@unknown",
+    "node": 6
+   },
+   "fragment": {
+    "execution": "test/unit/diffgenome_probe_0_1.test.ts::Logger.info delegates to winston with formatted scope and args array@unknown",
+    "node": 3
+   },
+   "target": "js:src/lib/logger/Logger.Logger.info",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: message, args",
+   "result_compatible": null
+  }
+ ]
+}

@@ -192,6 +192,9 @@ func instrumentFile(absRoot, module, path, origin string, definers map[string]ma
 	if err != nil {
 		return false, nil, err
 	}
+	if bytes.Contains(src, []byte("internal/diffgenome/dg\"")) {
+		return false, nil, nil // already instrumented (re-runs after adding a probe file)
+	}
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, src, parser.ParseComments)
 	if err != nil {

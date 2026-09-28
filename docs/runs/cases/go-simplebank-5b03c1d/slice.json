@@ -1,0 +1,295 @@
+{
+ "seeds": [
+  "go:api.Server.createTransfer",
+  "go:api.Server.checkSufficientBalance"
+ ],
+ "behavioral_edges": [
+  {
+   "caller": "go:api.<anon>@8",
+   "callee": "go:util.IsSupportedCurrency",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestCreateAccountAPI/InternalError",
+    "TestCreateAccountAPI/InvalidCurrency",
+    "TestCreateAccountAPI/OK",
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.checkSufficientBalance",
+   "callee": "go:api.errorResponse",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/InsufficientBalance"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.createTransfer",
+   "callee": "go:api.<anon>@8",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.createTransfer",
+   "callee": "go:api.Server.checkSufficientBalance",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/TransferTxError"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.createTransfer",
+   "callee": "go:api.Server.validAccount",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.createTransfer",
+   "callee": "go:api.errorResponse",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.createTransfer",
+   "callee": "go:db/sqlc.SQLStore.TransferTx",
+   "kind": "composed",
+   "boundary": null,
+   "best_join": "ARG_SHAPE",
+   "composed_shapes_by_grade": {
+    "ARG_SHAPE": 1
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "claim-member"
+   ],
+   "tests": [
+    "TestTransferAPI/OK",
+    "TestTransferAPI/TransferTxError"
+   ],
+   "probes": [
+    "TestDiffgenomeProbe_TransferTx_ExecutesReal"
+   ]
+  },
+  {
+   "caller": "go:api.Server.validAccount",
+   "callee": "go:api.errorResponse",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:api.Server.validAccount",
+   "callee": "go:db/sqlc.Queries.GetAccount",
+   "kind": "composed",
+   "boundary": null,
+   "best_join": "ARG_SHAPE",
+   "composed_shapes_by_grade": {
+    "ARG_SHAPE": 11
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "claim-member"
+   ],
+   "tests": [
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": [
+    "TestDiffgenomeProbeQueriesGetAccountExecutes"
+   ]
+  },
+  {
+   "caller": "go:api.authMiddleware.<anon>@21",
+   "callee": "go:api.Server.createTransfer",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InsufficientBalance",
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser"
+   ],
+   "probes": []
+  },
+  {
+   "caller": "go:db/sqlc.Queries.GetAccount",
+   "callee": "stand-in:go:api.fakeDB.QueryRow",
+   "kind": "unresolved",
+   "boundary": "unresolved",
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "no-claim"
+   ],
+   "tests": [],
+   "probes": [
+    "TestDiffgenomeProbeQueriesGetAccountExecutes"
+   ]
+  },
+  {
+   "caller": "go:db/sqlc.Queries.GetAccount",
+   "callee": "stand-in:go:api.fakeRow.Scan",
+   "kind": "unresolved",
+   "boundary": "unresolved",
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "no-claim"
+   ],
+   "tests": [],
+   "probes": [
+    "TestDiffgenomeProbeQueriesGetAccountExecutes"
+   ]
+  },
+  {
+   "caller": "go:db/sqlc.SQLStore.TransferTx",
+   "callee": "go:db/sqlc.SQLStore.execTx",
+   "kind": "observed",
+   "boundary": null,
+   "best_join": null,
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [],
+   "tests": [],
+   "probes": [
+    "TestDiffgenomeProbe_TransferTx_ExecutesReal"
+   ]
+  }
+ ],
+ "metrics": {
+  "observed_edges": 46,
+  "composed_edges": 2,
+  "strong_joins": 0,
+  "weak_joins": 2,
+  "internal_gaps": 2,
+  "unresolved_boundaries": 2,
+  "external_boundaries": 0,
+  "os_boundaries": 0,
+  "unsound_attempts": 4,
+  "probe_derived_edges": 5,
+  "symbols": 49,
+  "tests": 43,
+  "reconstructed": 46,
+  "denominator_provisional": 52,
+  "reconstruction_ratio_provisional": 0.885
+ }
+}

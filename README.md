@@ -102,7 +102,8 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | Materialized behavioral graph (`graph.json`, `map.md`, `inspect` command) | done |
 | **Second runtime**: Node/TypeScript collector behind the runtime seam; core model unchanged | done; see `docs/experiment-04.md` |
 | **Ground truth**: edge precision/recall and seam-level join grading against hidden whole executions | done; see `docs/experiment-05.md` |
-| Linux OS-plane collector, larger targets, STATE joins | next |
+| **Third runtime (Go)**, behavioral projection (`map.md`), ambiguity report, path-level ground truth, three real-diff case studies | done; see `docs/experiment-06.md` and `docs/runs/cases/` |
+| STATE joins, goroutine/coroutine spawn causality, Linux OS-plane collector, larger targets | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
 
@@ -113,8 +114,9 @@ uv run python -m diffgenome mvp --repo <target> --python .venv/bin/python --test
   --diff <base..head | commit> --writer openai --out out/run
 ```
 
-`--runtime node --source-root src --test-root test/unit` drives a Node/TypeScript target the
-same way. It traces the target's unit tests under confinement, builds the repo-level behavioral map,
+`--runtime node --source-root src --test-root test/unit` drives a Node/TypeScript target and
+`--runtime go --test-root api --tests ./api/ --mock-dir db/mock` a Go module the same way;
+`--rev <git rev>` analyzes a revision without touching the checkout. It traces the target's unit tests under confinement, builds the repo-level behavioral map,
 maps the diff to changed symbols, extracts their behavioral neighborhood, picks the most
 valuable gaps and weak joins near the change, asks the model for one isolated unit probe
 per deficit, executes each probe in a disposable sandboxed workspace (no network, no writes
@@ -122,8 +124,10 @@ outside it, no inherited environment), accepts it only on evidence from its own 
 reports before vs after with provenance on every edge. The OpenAI key is read from
 `OPENAI_API_KEY`, `~/.config/diffgenome/openai_api_key`, or a Keychain item
 `diffgenome-openai`; it never reaches the sandbox. `--writer recorded:<dir>` replays saved
-probes deterministically. The run leaves `graph.json` (the whole graph with provenance),
-`map.md` (the slice around the change) and `report.md`; `python -m diffgenome inspect
+probes deterministically. The run leaves `graph.json` (the canonical evidence graph with
+provenance), `map.md` (the behavioral projection around the change: production behavior,
+tests and probes as evidence), `map-evidence.md`, `slice.json`, `metrics.json`,
+`ambiguity.md` and `report.md`; `python -m diffgenome inspect
 --graph graph.json --symbol <id>` queries the graph, `python -m diffgenome evaluate` grades
 a reconstruction against hidden whole executions.
 
@@ -142,12 +146,16 @@ a reconstruction against hidden whole executions.
   language-neutrality accounting.
 - [docs/experiment-05.md](docs/experiment-05.md): reconstruction accuracy against ground truth
   and the join-lattice test.
+- [docs/experiment-06.md](docs/experiment-06.md): three real changes across Python, Node and Go,
+  the behavioral projection, ambiguity analysis, path-level ground truth, and the
+  language-neutrality accounting after three runtimes.
 
 ## Layout
 
 ```
 src/diffgenome/      the package: language-agnostic core, runtime adapters under collect/
 tools/node-collector the Node/TypeScript collector (instrumenter, runtime, Jest hook)
+tools/go-collector   the Go collector (AST instrumenter, dg runtime package)
 tests/               diffgenome's own tests
 fixtures/            small stand-alone *target* repositories that experiments analyze
 docs/                architecture and experiment write-ups

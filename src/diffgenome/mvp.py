@@ -17,6 +17,7 @@ import sys
 import time
 from pathlib import Path
 
+from diffgenome.ambiguity import render_ambiguity
 from diffgenome.change import ChangeSet, changes_from_diff, changes_from_symbols, git_diff
 from diffgenome.compose import build_corpus
 from diffgenome.graph import build_graph
@@ -185,7 +186,11 @@ def main(argv: list[str] | None = None) -> int:
         (out / "graph.json").write_text(json.dumps(final_graph.to_json(), indent=1) + "\n")
         evidence_slice = render_map_slice(final_graph, seeds, up=args.up, down=args.down)
         (out / "map-evidence.md").write_text(evidence_slice)
-        behavior_map = render_behavior_map(final_graph, seeds, up=args.up, down=args.down)
+        declared = {s for s in seeds if (d := index.find(s)) is not None and d.kind == "class"}
+        behavior_map = render_behavior_map(
+            final_graph, seeds, up=args.up, down=args.down, declarations=declared
+        )
+        (out / "ambiguity.md").write_text(render_ambiguity(final_graph))
         (out / "map.md").write_text(behavior_map)
         (out / "slice.json").write_text(
             json.dumps(slice_json(final_graph, seeds, args.up, args.down), indent=1) + "\n"
@@ -211,10 +216,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _under_test_root(symbol: str, index: SymbolIndex) -> bool:
-    """True if the symbol's definition lives under a test root (uses the index, so the
-    naming scheme of each runtime is respected)."""
-    d = index.find(symbol)
-    if d is None:
-        return False
-    path = index.repo_root / d.path
-    return any(path.is_relative_to(r) for r in index.test_roots)
+    """True if the symbol is test code, as the runtime's index defines test code."""
+    return index.is_test(symbol)

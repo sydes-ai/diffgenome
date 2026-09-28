@@ -290,7 +290,9 @@ branch, expanded once, represented by its best-graded member with the others kep
 `Evidence.alternates`. On Kokoro-FastAPI this took composition from 11,524 to 406 composed
 edges with no provenance lost. Recursion is bounded by `on_path` and a depth limit.
 
-The lattice is not metadata. It is the mechanism that stops composed behavior being shown
+A seam with a known conflict (returned vs raised, or an argument-type conflict) is unsound
+and never composed, at any threshold; it is recorded as a rejected join. The lattice is not
+metadata. It is the mechanism that stops composed behavior being shown
 as stronger than the evidence: a `SYMBOL`-only seam renders and counts differently from an
 `ARG_SHAPE` seam, and the north star only counts `ARG_SHAPE` and above. Weak and failed
 joins (seam found, no fragment compatible at the required grade) are recorded as
@@ -397,7 +399,9 @@ repo + diff ─► existing tests traced (confined) ─► Corpus ─► Behavio
 | `sandbox.py` | workspace, scrubbed env, limits, OS confinement | platform (macOS Seatbelt today; Linux runner later) |
 | `report.py`, `mvp.py` | deterministic text/JSON report; one command | nothing |
 | `runtime.py` | `RuntimeAdapter` / `SymbolIndex` seam: prepare a workspace, run stimuli, place probes, state conventions | nothing |
-| `collect/py_runtime.py`, `collect/node_jest.py`, `tools/node-collector/` | the two runtime implementations | Python; Node |
+| `collect/py_runtime.py`, `collect/node_jest.py`, `collect/go_test.py`, `tools/node-collector/`, `tools/go-collector/` | the three runtime implementations | Python; Node; Go |
+| `projection.py`, `ambiguity.py` | behavioral projection of the evidence graph; ambiguous and rejected compositions | nothing |
+| `static_types.py` | `factory().member` claims through declared return types (rule `static-return-type`) | nothing above `SymbolIndex.return_type_of` |
 | `evaluate.py` | edge precision/recall and seam-level join grading against hidden whole executions | nothing |
 
 AI proposes; execution establishes facts. A probe is accepted only on evidence from its

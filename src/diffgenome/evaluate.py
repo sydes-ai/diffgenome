@@ -370,10 +370,13 @@ def composed_paths(graph: BehavioralGraph, entry: SymbolId, depth: int = 8) -> s
         def expand(branches: list[Branch], d: int) -> list[list[str]]:
             # siblings concatenate; alternatives for one caller→callee pair multiply
             seqs: list[list[str]] = [[]]
-            groups: dict[tuple[str, str], list[Branch]] = defaultdict(list)
-            order: list[tuple[str, str]] = []
-            for b in branches:
-                key = (b.edge.caller, b.edge.callee)
+            groups: dict[tuple[str, str, int], list[Branch]] = defaultdict(list)
+            order: list[tuple[str, str, int]] = []
+            for i, b in enumerate(branches):
+                # composed alternatives for one seam share a site; observed siblings are
+                # distinct calls even when they have the same callee
+                ev = b.edge.evidence
+                key = (b.edge.caller, b.edge.callee, ev.site.node if ev.kind is EK.COMPOSED else -i)
                 if key not in groups:
                     order.append(key)
                 groups[key].append(b)

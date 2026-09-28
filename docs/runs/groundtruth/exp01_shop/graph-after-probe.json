@@ -5,6 +5,7 @@
    "id": "py:builtins.ValueError",
    "origin": "external",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -15,6 +16,7 @@
     "path": "shop/controller.py",
     "line": 7
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
@@ -30,6 +32,7 @@
     "path": "shop/controller.py",
     "line": 10
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
@@ -45,6 +48,7 @@
     "path": "shop/inventory_service.py",
     "line": 8
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
    ],
@@ -59,6 +63,7 @@
     "path": "shop/inventory_service.py",
     "line": 11
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
    ],
@@ -73,6 +78,7 @@
     "path": "shop/order_service.py",
     "line": 20
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
@@ -89,6 +95,7 @@
     "path": "shop/order_service.py",
     "line": 24
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
@@ -106,6 +113,7 @@
     "path": "shop/order_service.py",
     "line": 14
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
@@ -123,6 +131,7 @@
     "path": "shop/price_repository.py",
     "line": 5
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
@@ -138,6 +147,7 @@
     "path": "shop/price_repository.py",
     "line": 8
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
    ],
@@ -152,6 +162,7 @@
     "path": "shop/pricing_service.py",
     "line": 5
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
@@ -167,6 +178,7 @@
     "path": "shop/pricing_service.py",
     "line": 8
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
     "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
@@ -179,6 +191,7 @@
    "id": "py:sqlite3.Connection.execute",
    "origin": "external",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -189,6 +202,7 @@
     "path": "tests/test_controller.py",
     "line": 9
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -199,6 +213,7 @@
     "path": "tests/test_controller.py",
     "line": 22
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -209,6 +224,7 @@
     "path": "tests/test_diffgenome_probe_0_1.py",
     "line": 6
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -219,6 +235,7 @@
     "path": "tests/test_order_service.py",
     "line": 21
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -229,6 +246,7 @@
     "path": "tests/test_order_service.py",
     "line": 9
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -239,6 +257,7 @@
     "path": "tests/test_pricing_service.py",
     "line": 15
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -249,6 +268,7 @@
     "path": "tests/test_pricing_service.py",
     "line": 8
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -256,6 +276,7 @@
    "id": "py:urllib.request.urlopen",
    "origin": "external",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   }

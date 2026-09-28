@@ -8,6 +8,7 @@
     "path": "app/main.py",
     "line": 24
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
    ],
@@ -23,6 +24,7 @@
     "path": "app/main.py",
     "line": 14
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown"
    ],
@@ -37,6 +39,7 @@
     "path": "app/repository.py",
     "line": 12
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown"
    ],
@@ -51,6 +54,7 @@
     "path": "app/repository.py",
     "line": 16
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown"
    ],
@@ -65,6 +69,7 @@
     "path": "app/service.py",
     "line": 16
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown"
    ],
@@ -79,6 +84,7 @@
     "path": "app/service.py",
     "line": 9
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown"
    ],
@@ -90,6 +96,7 @@
    "id": "py:builtins.dict",
    "origin": "unknown",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -97,6 +104,7 @@
    "id": "py:fastapi.exceptions.HTTPException",
    "origin": "external",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -104,6 +112,7 @@
    "id": "py:pydantic.main.BaseModel.__init__",
    "origin": "external",
    "location": null,
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -114,6 +123,7 @@
     "path": "tests/test_diffgenome_probe_0_1.py",
     "line": 11
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -124,6 +134,7 @@
     "path": "tests/test_diffgenome_probe_0_1.py",
     "line": 25
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
    ],
@@ -138,6 +149,7 @@
     "path": "tests/test_diffgenome_probe_0_1.py",
     "line": 26
    },
+   "kind": "callable",
    "executed_by": [
     "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
    ],
@@ -152,6 +164,7 @@
     "path": "tests/test_diffgenome_probe_1_1.py",
     "line": 7
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -162,6 +175,7 @@
     "path": "tests/test_diffgenome_probe_2_1.py",
     "line": 6
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -172,6 +186,7 @@
     "path": "tests/test_diffgenome_probe_3_1.py",
     "line": 6
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -182,6 +197,7 @@
     "path": "tests/test_diffgenome_probe_4_1.py",
     "line": 7
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   },
@@ -192,6 +208,7 @@
     "path": "tests/test_diffgenome_probe_5_1.py",
     "line": 6
    },
+   "kind": "callable",
    "executed_by": [],
    "outcomes": {}
   }

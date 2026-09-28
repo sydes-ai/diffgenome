@@ -46,6 +46,52 @@
  "outcome_conflicts": [],
  "alternate_fragments_total": 0,
  "notes": [],
+ "paths": [
+  {
+   "entry": "py:shop.controller.OrderController.place_order",
+   "truth": 2,
+   "claimed": 3,
+   "matched": 0,
+   "extra": [
+    [
+     "py:shop.controller.OrderController.place_order:returned",
+     "py:shop.order_service.OrderService.place:returned",
+     "py:shop.order_service._validate:returned"
+    ],
+    [
+     "py:shop.controller.OrderController.place_order:returned",
+     "py:shop.order_service.OrderService.place:returned",
+     "py:shop.order_service._validate:returned",
+     "py:shop.pricing_service.PricingService.quote:returned"
+    ],
+    [
+     "py:shop.controller.OrderController.place_order:returned",
+     "py:shop.order_service.OrderService.place:returned",
+     "py:shop.order_service._validate:returned",
+     "py:shop.pricing_service.PricingService.quote:returned",
+     "py:shop.price_repository.PriceRepository.price_for:returned",
+     "py:shop.price_repository.PriceRepository.price_for:returned"
+    ]
+   ],
+   "missed": [
+    [
+     "py:shop.controller.OrderController.place_order:raised",
+     "py:shop.order_service.OrderService.place:raised",
+     "py:shop.order_service._validate:raised"
+    ],
+    [
+     "py:shop.controller.OrderController.place_order:returned",
+     "py:shop.order_service.OrderService.place:returned",
+     "py:shop.order_service._validate:returned",
+     "py:shop.inventory_service.InventoryService.reserve:returned",
+     "py:shop.pricing_service.PricingService.quote:returned",
+     "py:shop.price_repository.PriceRepository.price_for:returned",
+     "py:shop.price_repository.PriceRepository.price_for:returned"
+    ]
+   ],
+   "outcome_mismatches": 1
+  }
+ ],
  "seam_grades": [
   {
    "grade": "ARG_SHAPE",

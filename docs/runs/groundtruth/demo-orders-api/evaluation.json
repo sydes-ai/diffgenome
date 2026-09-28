@@ -36,6 +36,36 @@
  "outcome_conflicts": [],
  "alternate_fragments_total": 0,
  "notes": [],
+ "paths": [
+  {
+   "entry": "py:app.main.create_order",
+   "truth": 1,
+   "claimed": 2,
+   "matched": 1,
+   "extra": [
+    [
+     "py:app.main.create_order:raised"
+    ]
+   ],
+   "missed": [],
+   "outcome_mismatches": 0
+  },
+  {
+   "entry": "py:app.main.read_inventory",
+   "truth": 2,
+   "claimed": 1,
+   "matched": 1,
+   "extra": [],
+   "missed": [
+    [
+     "py:app.main.read_inventory:raised",
+     "py:app.service.get_stock:raised",
+     "py:app.repository.get_stock:returned"
+    ]
+   ],
+   "outcome_mismatches": 0
+  }
+ ],
  "seam_grades": [
   {
    "grade": "ARG_SHAPE",

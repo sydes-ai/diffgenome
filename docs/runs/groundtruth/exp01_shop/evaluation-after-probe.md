@@ -16,6 +16,12 @@ probe-derived edges: claimed 1, true 1, precision 1.000
 
 alternate fragments carried on claimed edges: 0
 
+### path-level: shop.controller.OrderController.place_order
+ground-truth sequences 2, claimed 3, matched 1, extra 2 (of which outcome-only mismatches 1), missed 1
+  extra:  place_order → place → _validate
+  extra:  place_order → place → _validate → reserve → quote
+  missed: place_order! → place! → _validate!
+
 ## Join lattice: seam-level precision
 | join grade | seams | consistent | matching | outcome ok |
 |---|---|---|---|---|
