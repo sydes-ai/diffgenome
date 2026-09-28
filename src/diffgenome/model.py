@@ -26,10 +26,20 @@ from dataclasses import dataclass
 from enum import Enum
 
 SymbolId = str
-"""Canonical symbol identity: ``<language>:<qualified name>``,
+"""Symbol identity: ``<language>:<qualified name>``,
 e.g. ``py:shop.pricing_service.PricingService.quote`` or ``go:db.Store.TransferTx``.
-Stable across runs of the same revision; this is the key that lets fragments from
-different executions be joined, so both sides of a seam must produce it identically."""
+This is the key that lets fragments from different executions be joined, so both sides of
+a seam must produce it identically.
+
+**Provisional.** Sufficient for experiment 01; not assumed sufficient long term. Known
+identity problems: source path vs module, defining type vs receiver type, overloads and
+signatures, interfaces vs implementations, closures, generated functions, generics,
+monorepos, dynamic runtimes. Whenever two components disagree about an identity, raise
+``IdentityMismatch``: compositions must never be lost silently."""
+
+
+class IdentityMismatch(Exception):
+    """Two components produced incompatible identities for what should be one symbol."""
 
 
 class Origin(Enum):
@@ -105,24 +115,34 @@ class CallNode:
     symbol: SymbolId
     collector: int  # index into Execution.collectors
     args: str | None = None  # bounded summary of argument shapes/values, for seam matching
+    thread: int = 0  # 0 is the stimulus thread; others numbered in order of first appearance
 
 
 @dataclass(frozen=True)
 class SubstitutionNode:
-    """Control left the observed symbol space into a stand-in. Always a leaf: what the
-    stand-in did is not the system under analysis."""
+    """Control left the production symbol space into a stand-in.
+
+    Three separate facts are kept apart: what actually executed (``substitute``), what
+    production component it stands in for (``claimed_target``), and how the two are related
+    (``relation``). A stand-in is **not necessarily a leaf**: a framework mock usually is,
+    but a hand-written fake, an in-memory repository, a DI test implementation or a proxy
+    executes code of its own, and that code appears as children of this node."""
 
     id: int
     parent: int  # the real symbol-plane call that invoked the stand-in
     collector: int
     mechanism: SubstitutionMechanism
+    substitute: SymbolId | None
+    """What actually executed: the fake's class, the stub function, the mock's runtime type.
+    None when the substitute has no meaningful symbol of its own."""
     claimed_target: SymbolId | None
     """What the stand-in *says* it replaces, read off the artefact itself (a spec class, a
     patch target string, a generated-mock interface). None when it says nothing. This is
     a fact about the artefact, not a resolution: interpretation happens downstream."""
-    identified_by: str
-    """How ``claimed_target`` was obtained, e.g. "spec", "patch-target", "generated-mock",
-    "none". Lets the resolver weight it and lets a reader audit it."""
+    relation: str
+    """The observable relationship between substitute and claimed target, e.g. "spec",
+    "patch-target", "implements", "generated-from", "none". Lets the resolver weight the
+    claim and lets a reader audit it."""
     path: tuple[str, ...] = ()
     """Member path invoked on the stand-in, e.g. ``("execute", "()", "fetchone")`` where
     ``"()"`` marks a call's return value."""
@@ -166,6 +186,7 @@ class Execution:
     outcome: str  # "passed" | "failed" | ...; only passing executions are composition sources
     revision: str | None  # VCS revision the trace was taken at, if known
     collectors: tuple[Collector, ...]
+    symbols: tuple[Symbol, ...]  # every SymbolId referenced by nodes, with origin and location
     nodes: tuple[Node, ...]
 
 

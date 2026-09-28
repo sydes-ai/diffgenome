@@ -97,7 +97,9 @@ to have the number, per target, in the write-up. If C2 turns out cheap and compl
 changes which collector we build for other runtimes.
 
 C2 is optional if it costs more than a day: note it as unmeasured rather than skip
-silently.
+silently. More generally Part 1 is bounded: its job is to establish the floor and choose
+the capture architecture, not to benchmark tracing tools. Composition and gap discovery
+are the research questions; tooling detours stop as soon as the prediction is answered.
 
 ## Part 2: composition (Q2)
 
@@ -162,7 +164,7 @@ Each becomes an assertion in `tests/test_exp01.py` or a table in the write-up.
 | S8 | **No laundering.** No edge has `OBSERVED` unless caller and callee are real calls in the same execution with a `COMPLETE` collector. Every edge below a seam cites the fragment's execution. `probe_derived` is `False` everywhere (no probes exist yet). |
 | S9 | **Boundaries terminate.** External, unresolved and OS leaves have no children. Nothing is resolved by name. |
 | S10 | **Gap reported.** `InventoryService.reserve` is `INTERNAL_GAP` and listed as a probe candidate. |
-| S11 | **Physical boundary evidence.** With `InventoryService` run un-substituted inside the sandbox (a direct-call stimulus, not a test), C1 records `OS_BOUNDARY connect … ENETUNREACH` attributed to `InventoryService.reserve`, and nothing leaves the sandbox. |
+| S11 | **Physical boundary evidence.** A synthetic canary under diffgenome's control (not target code) attempts a `connect` inside the sandbox as a direct-call stimulus. C1 records `OS_BOUNDARY connect … ENETUNREACH` attributed to the canary's symbol, and nothing leaves the sandbox. Target code is never un-substituted to produce this. |
 | S12 | **Determinism.** Two runs give identical `Execution` JSON modulo timestamps and identical rendering. |
 
 ## Failure criteria: what would change the plan
@@ -197,3 +199,63 @@ Each becomes an assertion in `tests/test_exp01.py` or a table in the write-up.
 Generated probes, interposition (`patch`) resolution, claim-less inference, async and
 generators, persistence beyond per-execution JSON, static analysis, LLMs, any runtime
 other than CPython.
+
+## Findings log
+
+Running record. Each entry names the prediction it tested, the outcome, and what changed
+because of it. Entries are dated; nothing is edited after the fact, only appended.
+
+### 2026-09-28: C4 collector on both targets
+
+Instrument: `diffgenome.collect.py_monitoring` (`sys.monitoring`, complete fidelity) via
+the pytest adapter. Both targets read-only, output to a scratch directory, byte-code
+writing and pytest's cache disabled. Pinned in `tests/test_collector.py`.
+
+| Prediction | Outcome | Evidence |
+|---|---|---|
+| **P1** fixture: complete ordered in-repo tree; stand-in calls attributed to the in-repo caller | **holds** | `place_order → place → _validate`, both stand-ins parented on `OrderService.place`; `price_for`'s two stand-ins parented on `price_for`. No test or runtime frame in any tree. (S4) |
+| **P2** fixture: claim-derived identity of `quote` equals frame-derived identity | **holds, but not as an independent check** | Both routes reduce to the same function (`symbol_for_code`) whenever the claimed object carries a code object. So equality is a *design consequence*, not an empirical result. The empirical content moved: identity is unified iff a code object exists. Where it doesn't (C members, classes, patch strings, decorators without `wraps`), a second naming scheme applies, and on its first use it produced a wrong identity: `sqlite3.Connection.execute` was named `py:builtins.Connection.execute`. Fixed via `__objclass__`; pinned by a test. **This is the identity-drift risk appearing on run one, on the external side.** |
+| **P3** demo-orders-api: in-repo attribution survives Starlette/anyio; the test → endpoint chain is structurally broken by the portal thread | **holds, both halves** | `app.main.create_order → app.service.create_order → {get_stock → repository.get_stock, repository.save_order}` fully attributed, on thread `t1`. The endpoint hangs directly off the stimulus root; nothing links it to the test function, because every frame in between is out of scope and on another thread. (S3: attribution part passes; the thread hop is *recorded*, as `thread=1`, but not *bridged*.) |
+| **P4** determinism | **holds** on both targets | `diff -r` of two runs: identical. (S12) |
+
+Unpredicted findings:
+
+1. **Scope is not "under the source root".** The target keeps `.venv` inside its repo, so
+   `site-packages` was classified `REPO` and the first trace was 750 KB of pytest
+   internals. Rule added: hidden directories and `site-packages`/`node_modules`/
+   `dist-packages` are never repository code. This is risk 10 ("what counts as the
+   repository") on the first real target; the rule is a patch, not an answer.
+2. **A behavior with zero in-repo footprint.** `test_non_positive_quantity_is_rejected`
+   produced an empty tree: the 422 is decided entirely by pydantic/FastAPI before any
+   in-repo function runs. Real behavior of the system, no in-repo symbol-plane evidence
+   at all. Consequence for the north star: "in-repo behavioral structure" must decide how
+   framework-owned behavior counts in the denominator, or such tests will look like they
+   observed nothing.
+3. **Success and failure paths are indistinguishable at the call-tree level.**
+   `test_unknown_sku_returns_404` and `test_inventory_lookup_returns_stock` produce the
+   same tree shape (`read_inventory → get_stock → repository.get_stock`); one raised
+   `UnknownSkuError` inside `get_stock`, the other returned. The protocol records calls,
+   not how they ended. A call tree is therefore not a behavioral signature. Candidate
+   change (language-neutral): an outcome on `CallNode` (returned / raised `<symbol>`), or
+   a separate `EXCEPTION` event. Deferred until the composer needs it, but it bounds what
+   "behavioral diffing" can mean over the current protocol.
+4. **Instrument fact:** CPython refuses `DISABLE` from `PY_RETURN`/`PY_UNWIND` callbacks
+   (only `PY_START`, `CALL` and a few others are locally disableable). Out-of-scope
+   returns are ignored instead; cost is bounded by `PY_START` being disabled.
+5. **A fake is observed as a substitution with children** (synthetic test, not a target):
+   `Service.run ⊗ FAKE FakeRepo.save → _helper`. The mechanism for guardrail item 2 works
+   on the symbol plane using only origins (`REPO` caller → `TEST` callee); no mock library
+   involvement.
+
+What this changes in the plan:
+
+- S3 is split. *Attribution* across a framework passes. *Bridging* a thread hop from
+  stimulus to endpoint is a separate question: the link exists only through out-of-scope
+  frames, so either the collector records the spawning relationship between threads
+  (universal: thread creation is an OS-plane event) or the stimulus → endpoint edge is
+  itself a kind of composition. Decision deferred to the composer; recorded here.
+- Part 1's C1 (syscalls) now has a concrete question to answer on `demo-orders-api`: does
+  `TestClient` produce any OS events at all, and does the OS plane see the thread creation
+  that the symbol plane can only number?
+- Finding 3 goes on the protocol change list; finding 2 goes into the north-star
+  denominator discussion in architecture §1.

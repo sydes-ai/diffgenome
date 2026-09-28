@@ -29,11 +29,13 @@ Target: reconstructed / denominator ≥ 0.85, with every remaining edge explicit
 ```
 
 The denominator is the hard part of this definition. "Locally realizable" excludes edges
-that only exist with production state or a real external system. Until experiment 04 gives
-us ground truth on a repo that *can* run end to end, we report the ratio against the static
-call graph of R and state that the static graph over-approximates the denominator in
-dynamic languages. That makes the number a lower bound, which is the honest direction to
-err in.
+that only exist with production state or a real external system. Until experiment 05 gives
+us ground truth on a repo that *can* run end to end, any number we report is a
+**provisional reconstruction ratio** against whatever static call graph we used for R. It
+is not a bound in either direction: a static analyzer for a dynamic language both misses
+edges (reflection, dynamic dispatch, generated code) and invents edges (imprecise
+resolution), and we don't claim over-approximation unless the analyzer used guarantees
+it.
 
 ## 2. Invariants
 
@@ -139,7 +141,15 @@ protocol, not the capture.
 - **Renderer / graph**: a text tree for the experiments. Persistent storage is *later*.
 
 Only the collectors know about a runtime. A Go or Node collector plugs in to the left of
-`Execution` and reuses everything to its right.
+`Execution` and reuses everything to its right. The layering, stated once:
+
+| Layer | Specific to |
+|---|---|
+| capture | platform and runtime |
+| event/evidence protocol | nothing |
+| reconstruction / composition | nothing |
+| exploration / probe generation | nothing, above a thin runtime adapter that writes and runs a probe |
+| behavioral diffing | nothing |
 
 ## 5. Data model
 
@@ -153,12 +163,18 @@ Defined in [`src/diffgenome/model.py`](../src/diffgenome/model.py).
 | `Collector` | `name`, `plane`, `fidelity`. Every node cites one. |
 | `Execution` | one stimulus on one process: `stimulus` kind + ref, outcome, revision, collectors, nodes |
 | `CallNode` | logical call on the symbol plane; `parent` forms the tree; bounded `args` summary for seam matching |
-| `SubstitutionNode` | control left the observed symbol space into a stand-in. Records the `mechanism` (mock object / fake / DI binding / interposition / stub), what the stand-in `claimed_target`s and `identified_by` what means, and the member `path` invoked. Always a leaf. |
+| `SubstitutionNode` | control left the production symbol space into a stand-in. Keeps three facts apart: `substitute` (what actually executed), `claimed_target` (what production component it stands in for) and `relation` (how the two are related), plus the `mechanism` (mock object / fake / DI binding / interposition / stub) and the member `path` invoked. **Not necessarily a leaf**: a fake or in-memory repository executes code, and that code appears as its children. |
 | `OsEventNode` | kernel-visible event (`CONNECT`, `OPEN`, `EXEC`, `SPAWN`, ...) with target and outcome, attributed to the innermost symbol-plane call when possible |
 
 A stand-in's `claimed_target` is a **fact about the artefact** (an autospec's class, a
 `patch("pkg.mod.Name")` string, a gomock's interface). Whether that claim is trusted, and
 what it maps to, is the resolver's job. Collectors never classify.
+
+`SymbolId` is **provisional**. `<lang>:<qualified name>` is enough for experiment 01 and is
+expected to break on source path vs module, defining type vs receiver, overloads,
+interfaces vs implementations, closures, generated functions, generics and monorepos. The
+rule is that identity disagreements raise `IdentityMismatch`; a composition is never lost
+silently.
 
 ### Interpretation: always with provenance
 
@@ -224,6 +240,9 @@ corroboration).
 
 In-repo adapters that wrap external SDKs are **internal**. Their own tests substitute the
 SDK, which is where the external boundary really is; if they have no tests, that's a gap.
+A true external boundary is never crossed on purpose: we don't un-substitute Stripe, Kafka,
+a database or an HTTP service to see what happens, even though the sandbox would block it.
+Exploration stops there semantically.
 
 ## 7. Composition: the core research problem
 
@@ -260,8 +279,12 @@ state of the fragment. The join lattice grades how much of that we checked:
 
 Fragments are never flattened. All fragments for a target are attached as alternatives with
 their own join grade and provenance. Recursion is bounded by `on_path` and a depth limit.
-Failed compositions (seam found, no compatible fragment at the required join) are recorded
-too: they are what probe generation should target first.
+
+The lattice is not metadata. It is the mechanism that stops composed behavior being shown
+as stronger than the evidence: a `SYMBOL`-only seam renders and counts differently from an
+`ARG_SHAPE` seam, and the north star only counts `ARG_SHAPE` and above. Weak and failed
+joins (seam found, no fragment compatible at the required grade) are recorded as
+first-class results: they are the queue that targeted probe generation works from.
 
 ## 8. Sandbox
 
@@ -281,6 +304,11 @@ a disposable Linux container with:
 
 This isn't a later hardening step. The OS-plane collector *is* the egress guard's
 observation half, so the sandbox and the collector are built together.
+
+The sandbox is a safety net and an observation mechanism, **not an exploration strategy**.
+Its block-and-observe behavior is tested with a synthetic canary that we control. An
+unexpected egress attempt from target code is a *finding* (an un-substituted external
+dependency), never something we provoke.
 
 ## 9. Deterministic vs AI
 
