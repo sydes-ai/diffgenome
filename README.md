@@ -1,115 +1,128 @@
 # diffgenome
 
-> Research prototype. Nothing here is production-ready, and the central question is still open.
+> Research prototype. The central question is open, and the project is trying to
+> falsify its own approach before scaling it.
 
-**Hypothesis.** We can reconstruct system-level behavioral paths *compositionally* from
-isolated unit-test executions. We do this by resolving and traversing the mock boundaries
-between in-repo components, with no need for the full application, a staging environment,
-databases, queues, or downstream services.
+**diffgenome is a language-neutral runtime behavioral reconstruction system.** Its input
+is an executing process plus a stimulus. Its output is a normalized execution graph that
+can be composed across isolated runs, where every edge keeps the record of *why* we
+believe it exists.
 
 ## The problem
 
-Most real repositories can't be run end-to-end on a laptop. They need databases, internal
-services, Kafka, cloud credentials and staging config. Most of them *do* have unit tests,
-and unit tests run anywhere.
+Most real repositories can't be run end to end on a laptop. They need databases, internal
+services, queues, cloud credentials and staging config. Yet every program, in every
+language, eventually becomes the same thing: a process, in memory, executing instructions,
+making calls, crossing into the kernel. That process can be observed. What it needs is a
+*stimulus*, and most repositories already have one: unit tests.
 
-Each unit test sees a small slice of the system. Tracing stops at the first mock:
-
-```
-test_controller                       test_pricing_service
-  Controller                            PricingService
-    → OrderService                        → PriceRepository
-      → MockPricingService    (stop)        → Mock(sqlite3.Connection)   (stop)
-```
-
-`MockPricingService` isn't the edge of the system. `PricingService` lives in the same
-repository, and another test executes it for real. diffgenome resolves that mock to its
-real in-repo target, finds executions of the target, and joins the fragments:
+Each unit test exercises a small slice of the system and substitutes the rest. Observing
+one test gives one **execution fragment**. The system-level behavior is the composition
+of many fragments, joined where one fragment's boundary is another fragment's entry point:
 
 ```
-Controller
-  → OrderService
-  ⇢ PricingService
-  → PriceRepository
-  → [external: sqlite3.Connection]
+fragment A (test_controller)           fragment B (test_pricing_service)
+  OrderController.place_order             PricingService.quote
+    → OrderService.place                    → PriceRepository.price_for
+      → [stand-in for PricingService]          → [external: sqlite3]
 ```
 
 ```
-→   observed directly within one unit-test execution
-⇢   joined across unit-test executions (stitched)
+OrderController.place_order
+  → OrderService.place
+  ⇢ PricingService.quote                  seam: composed, join=symbol
+    → PriceRepository.price_for
+    → [external: sqlite3]
 ```
 
-**A stitched path is never presented as if it had been observed end-to-end.** The call
-*into* the mock was observed. What `PricingService` does next was observed in a
-*different* execution, possibly with different inputs. The ⇢ marks that seam, and every
-edge keeps a record of which executions support it.
+```
+→   observed directly within one execution
+⇢   composed across executions, graded by how strongly the seam matched
+```
 
-## Internal vs external mocks
+A composed path is never presented as if one end-to-end execution happened. The call
+*into* the stand-in was observed. What the real target does next was observed in a
+*different* execution. The ⇢ marks that seam, and the edge records both executions.
 
-| Mock stands in for | Examples | diffgenome treats it as |
+## Two planes of observation
+
+| Plane | What it sees | Universality |
 |---|---|---|
-| **Internal**: code whose real implementation is in this repo | `create_autospec(PricingService)` | a **continuation point**: find executions of the real target, stitch, recurse |
-| **External**: something outside the repo | Stripe, Kafka, S3, `sqlite3`, HTTP APIs | a **terminal boundary**: record it and stop, never contact it |
-| **Unresolved**: not enough evidence to tell | `MagicMock()` with no spec | a **terminal, reported gap**: never guessed |
+| **OS plane** | syscalls, sockets, files, processes, native symbols | universal: any language, any process |
+| **Symbol plane** | the program's logical functions and calls | per runtime, unavoidably: to a CPU an interpreter's program is *data*, not code |
 
-An internal target that no test executes is a **coverage gap**. A later experiment will
-fill gaps with *generated unit probes*: disposable tests that run one component with its
-dependencies still mocked. Probes stay unit tests. They never become integration tests and
-never reach real external services.
+The OS plane gives **physical boundaries** (the process tried to leave) with no language
+knowledge at all. The symbol plane gives the call structure and needs the runtime's help
+(hooks, exported metadata, probes). Both feed one event protocol, and every node records
+which plane and which fidelity (complete trace or sample) it came from.
 
-## Principles
+Stand-ins are one kind of boundary among many. A mock object, a hand-written fake, a DI
+binding, a monkey-patched attribute and a stubbed function pointer are all "control left
+the observed symbol space". The core model has no notion of a mock, a test framework or a
+language.
 
-1. Observed evidence is ground truth.
-2. Stitched evidence stays distinguishable from observed execution.
-3. External boundaries end local exploration.
-4. Internal mocks are continuation points, not endpoints.
-5. Generated tests are isolated unit probes, not integration tests.
-6. Staging or full-system execution is never required.
-7. An LLM is never responsible for facts that runtime instrumentation can determine.
-8. AI can later help with ambiguous mock resolution, probe generation, exploration
-   priority and explanation. It does not do basic tracing.
-9. Everything above the tracer is language-agnostic and replaceable.
-10. The first goal is to prove the hypothesis, not to build a platform.
+## Stimulus is not observation
 
-## Why "genome"
+Existing tests, generated isolated probes and direct calls are all ways to *cause*
+execution. None of them is how execution is observed. Generated probes are unit probes:
+they run real in-repo code with substitutions kept at genuine external boundaries, inside
+a sandbox with no network egress, and any attempt to leave becomes boundary evidence.
 
-Each execution becomes a normalized sequence of semantic events (symbols and calls), not
-raw memory. Across many tests these sequences form a reusable behavioral graph of the
-codebase. Later they may be interned into compact ID sequences, but they always map back
-to source symbols. Possible uses later on: change-impact analysis, test selection,
-behavioral diffing between commits, novel-path detection, and coverage-gap discovery.
-None of those are in scope yet.
+## Invariants
+
+```
+NO full environment dependency
+NO language-specific core
+NO hidden evidence upgrades
+NO external side effects
+NO modifying target repos
+NO claiming reconstructed = observed
+```
+
+Implementation strategy may change substantially as evidence comes in. These don't.
+
+## North star
+
+For a change-centred region of a repository: how much of the relevant in-repo behavioral
+graph can be turned from *unknown / statically possible* into *observed / strongly
+composable* using only isolated local execution? Target: 85–90% on realistically testable
+code, with the remaining 10–15% explicitly marked rather than guessed. The definition and
+its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-non-goals).
 
 ## Status
 
 | | |
 |---|---|
-| Core data model (observation vs interpretation, provenance invariants) | done: `src/diffgenome/model.py` |
-| Experiment 01 fixture repository | done: `fixtures/exp01_shop/` |
-| Python tracer (pytest plugin on `sys.monitoring`) | next |
-| Mock resolver, stitcher, text renderer | next |
-| Generated unit probes | later experiment |
-| Static-analysis evidence | later |
+| Event protocol and evidence model (two planes, join lattice, provenance invariants) | done: `src/diffgenome/model.py` |
+| Controlled fixture repository | done: `fixtures/exp01_shop/` |
+| Experiment 01: observability floor per plane + first composition | designed: `docs/experiment-01.md` |
+| Collectors (Python symbol plane; Linux OS plane), resolver, composer, renderer | next |
+| Sandbox | built alongside the OS-plane collector |
+| Generated probes, second runtime, ground-truth comparison, Go | later experiments |
 
 ## Documents
 
-- [docs/architecture.md](docs/architecture.md): data model, tracer design, mock
-  resolution, stitching, what is deterministic and what may need an LLM, and risks.
-- [docs/experiment-01.md](docs/experiment-01.md): the first validation experiment with its
+- [docs/architecture.md](docs/architecture.md): goal and north star, invariants, the two
+  planes and the capture ladder, protocol, boundary resolution, composition and the join
+  lattice, sandbox, deterministic vs AI, risks, experiment sequence.
+- [docs/experiment-01.md](docs/experiment-01.md): the first validation experiment and its
   success and failure criteria.
 
 ## Layout
 
 ```
-src/diffgenome/      the package (language-agnostic core + Python collector)
+src/diffgenome/      the package (language-agnostic core; collectors under it later)
 tests/               diffgenome's own tests
 fixtures/            small stand-alone *target* repositories that experiments analyze
 docs/                architecture and experiment write-ups
 ```
 
+Larger targets live outside the repo under `~/sample_repos` and are only ever mounted
+read-only.
+
 ## Development
 
-Requires Python ≥ 3.12, because the tracer uses `sys.monitoring` (PEP 669).
+Requires Python ≥ 3.12. OS-plane work requires Linux (a VM or container on macOS).
 
 ```bash
 uv sync

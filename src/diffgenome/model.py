@@ -1,15 +1,22 @@
-"""Core, language-agnostic data model.
+"""Core, language-agnostic data model: the diffgenome event protocol and evidence types.
 
 Two layers, deliberately kept apart:
 
-1. **Observation** (`TestExecution`, `CallNode`, `MockTarget`): raw facts emitted by a
-   language-specific tracer. A tracer records *what happened* and never interprets it.
-   Any collector (Python today; Java/Go/Rust later) must be able to emit exactly this.
+1. **Observation** (`Execution` and its nodes): raw facts emitted by a capture adapter.
+   Adapters differ completely per runtime (sys.monitoring, JVMTI, uprobes, eBPF, perf,
+   V8 hooks...) but all emit exactly this. An adapter records *what happened* and never
+   interprets it. Two capture **planes** feed it:
 
-2. **Interpretation** (`MockResolution`, `Evidence`, `Edge`): conclusions drawn from
+   - the *OS plane* (syscalls, sockets, files, processes): universal, gives physical
+     boundaries and native call structure;
+   - the *symbol plane* (logical calls inside the runtime): per-runtime, gives the
+     program's own call structure.
+
+2. **Interpretation** (`BoundaryResolution`, `Evidence`, `Edge`): conclusions drawn from
    observations. Every conclusion carries the rule and the observation(s) it came from,
-   so provenance is never lost and a stitched edge can never pass as an observed one.
+   so provenance is never lost and a composed edge can never pass as an observed one.
 
+Nothing in this module may mention a language, a test framework or a mocking library.
 See docs/architecture.md for the reasoning behind each type.
 """
 
@@ -20,14 +27,15 @@ from enum import Enum
 
 SymbolId = str
 """Canonical symbol identity: ``<language>:<qualified name>``,
-e.g. ``py:shop.pricing_service.PricingService.quote``. Stable across runs of the
-same revision; this is the key that lets fragments from different tests be joined."""
+e.g. ``py:shop.pricing_service.PricingService.quote`` or ``go:db.Store.TransferTx``.
+Stable across runs of the same revision; this is the key that lets fragments from
+different executions be joined, so both sides of a seam must produce it identically."""
 
 
 class Origin(Enum):
     REPO = "repo"  # defined in the repository's source roots
-    TEST = "test"  # defined in the repository's test code (test functions, fakes, helpers)
-    EXTERNAL = "external"  # stdlib, third-party, or otherwise outside the repository
+    TEST = "test"  # defined in the repository's test code (tests, fakes, helpers)
+    EXTERNAL = "external"  # stdlib, runtime, third-party, or otherwise outside the repository
     UNKNOWN = "unknown"
 
 
@@ -47,108 +55,204 @@ class Symbol:
 # --------------------------------------------------------------------------- observation
 
 
-class ExecutionKind(Enum):
+class Plane(Enum):
+    OS = "os"  # kernel-visible: syscalls, sockets, files, processes, native symbols
+    SYMBOL = "symbol"  # runtime-visible: the program's logical functions and calls
+
+
+class Fidelity(Enum):
+    COMPLETE = "complete"  # every event of this kind was recorded, in order
+    SAMPLED = "sampled"  # periodic snapshots; presence is evidence, order and count are not
+
+
+class Stimulus(Enum):
+    """How execution was caused. It is only ever a way to *cause* execution, never how
+    execution is *observed*."""
+
     EXISTING_TEST = "existing_test"
-    GENERATED_PROBE = "generated_probe"  # experiment 2+; recorded so probes never masquerade
+    GENERATED_PROBE = "generated_probe"  # disposable isolated unit probe (later experiment)
+    DIRECT_CALL = "direct_call"  # harness invoked an entrypoint directly
 
 
 @dataclass(frozen=True)
-class MockTarget:
-    """What the tracer can say, factually, about a mock object at a call site."""
+class Collector:
+    """The capture adapter that produced a set of nodes, and what its output means."""
 
-    spec: str | None
-    """Qualified name of the object the root mock was specced from (``spec=``/autospec/
-    patch original), or None for a spec-less mock. A fact read off the mock, not a guess."""
-    path: tuple[str, ...]
-    """Attribute path from the root mock, e.g. ``("execute", "()", "fetchone")``
-    where ``"()"`` marks a call's return value."""
-    member: str | None
-    """Qualified name of the definition ``path`` names on ``spec``, looked up statically
-    through the MRO at trace time (so an inherited method resolves to the base class that
-    defines it). None if ``path`` crosses a return value or names no definition."""
-    member_file: str | None
-    """Source file of ``member`` (or of ``spec`` when ``member`` is None); None for C code."""
+    name: str  # e.g. "py-sys-monitoring", "linux-ptrace-syscalls", "perf-sample"
+    plane: Plane
+    fidelity: Fidelity
+
+
+class SubstitutionMechanism(Enum):
+    """How the real implementation was kept out of the execution. Language-neutral: a mock
+    object, a hand-written fake, a DI binding, a monkey-patched module attribute, an
+    LD_PRELOAD interposer and a stubbed function pointer are all the same thing here."""
+
+    MOCK_OBJECT = "mock_object"  # framework-generated stand-in (unittest.mock, gomock, jest.fn)
+    FAKE = "fake"  # hand-written in-test implementation
+    DI_BINDING = "di_binding"  # injector configured with a test implementation
+    INTERPOSITION = "interposition"  # attribute/symbol replaced (patch, monkeypatch, LD_PRELOAD)
+    STUB = "stub"  # function pointer/callback replaced
+    UNKNOWN = "unknown"
 
 
 @dataclass(frozen=True)
 class CallNode:
-    """One call observed in one execution. Nodes form a tree via ``parent``."""
+    """One logical call observed on the symbol plane. Nodes form a tree via ``parent``."""
 
     id: int  # unique within its execution
-    parent: int | None  # None only for the execution's root (the test function)
-    symbol: SymbolId  # real callee; for mock calls, a synthetic ``mock:<spec or ?>.<path>`` id
-    mock: MockTarget | None = None  # set iff the callee was a mock; mock calls are leaves
-    args: str | None = None  # bounded summary of argument shapes, for later contract checks
+    parent: int | None  # None only for the execution's root (the stimulus itself)
+    symbol: SymbolId
+    collector: int  # index into Execution.collectors
+    args: str | None = None  # bounded summary of argument shapes/values, for seam matching
 
 
 @dataclass(frozen=True)
-class TestExecution:
-    test_id: str  # e.g. pytest node id
-    kind: ExecutionKind
-    outcome: str  # "passed" | "failed" | ...; only passing executions are stitch sources
+class SubstitutionNode:
+    """Control left the observed symbol space into a stand-in. Always a leaf: what the
+    stand-in did is not the system under analysis."""
+
+    id: int
+    parent: int  # the real symbol-plane call that invoked the stand-in
+    collector: int
+    mechanism: SubstitutionMechanism
+    claimed_target: SymbolId | None
+    """What the stand-in *says* it replaces, read off the artefact itself (a spec class, a
+    patch target string, a generated-mock interface). None when it says nothing. This is
+    a fact about the artefact, not a resolution: interpretation happens downstream."""
+    identified_by: str
+    """How ``claimed_target`` was obtained, e.g. "spec", "patch-target", "generated-mock",
+    "none". Lets the resolver weight it and lets a reader audit it."""
+    path: tuple[str, ...] = ()
+    """Member path invoked on the stand-in, e.g. ``("execute", "()", "fetchone")`` where
+    ``"()"`` marks a call's return value."""
+    args: str | None = None
+
+
+class OsEventKind(Enum):
+    CONNECT = "connect"  # outbound socket connection attempt
+    LISTEN = "listen"
+    DNS = "dns"
+    OPEN = "open"  # file open (path recorded; may be a local config file, see docs)
+    EXEC = "exec"  # process image replaced
+    SPAWN = "spawn"  # child process created
+    OTHER = "other"
+
+
+@dataclass(frozen=True)
+class OsEventNode:
+    """A kernel-visible event, attributed to the innermost symbol-plane call active at the
+    time when attribution is possible, otherwise to the execution root."""
+
+    id: int
+    parent: int
+    collector: int
+    kind: OsEventKind
+    target: str  # endpoint, path, or command as the kernel saw it
+    outcome: str  # "ok", or the errno/reason it failed, e.g. "ENETUNREACH" inside the sandbox
+    native_symbol: str | None = None  # calling native symbol when the OS plane could resolve it
+
+
+Node = CallNode | SubstitutionNode | OsEventNode
+
+
+@dataclass(frozen=True)
+class Execution:
+    """One stimulus applied to one process, and everything observed about it."""
+
+    id: str  # stable, e.g. "<stimulus_ref>@<revision>"
+    stimulus: Stimulus
+    stimulus_ref: str  # test id, probe path, or entrypoint symbol
+    outcome: str  # "passed" | "failed" | ...; only passing executions are composition sources
     revision: str | None  # VCS revision the trace was taken at, if known
-    nodes: tuple[CallNode, ...]
+    collectors: tuple[Collector, ...]
+    nodes: tuple[Node, ...]
 
 
 # ------------------------------------------------------------------------ interpretation
 
 
-class MockClass(Enum):
+class BoundaryClass(Enum):
     INTERNAL = "internal"  # stands in for code in this repository: a continuation point
     EXTERNAL = "external"  # stands in for something outside the repository: terminal
     UNRESOLVED = "unresolved"  # not enough evidence to decide: terminal, reported, never guessed
 
 
 @dataclass(frozen=True)
-class MockResolution:
-    classification: MockClass
-    target: SymbolId | None  # the real symbol the mock represents, when known
-    rule: str  # which deterministic rule decided this, e.g. "spec-class", "no-spec"
+class BoundaryResolution:
+    classification: BoundaryClass
+    target: SymbolId | None  # the real symbol the stand-in represents, when known
+    rule: str  # which deterministic rule decided this
+
+
+class JoinStrength(Enum):
+    """How a composed seam was matched. Each level implies the ones before it."""
+
+    SYMBOL = 1  # same SymbolId on both sides
+    ARG_SHAPE = 2  # and argument arity/types compatible
+    VALUE = 3  # and argument values at the seam compatible
+    STATE = 4  # and relevant reachable state at the seam compatible
 
 
 class EvidenceKind(Enum):
-    OBSERVED = "observed"  # caller really called callee within a single execution
-    STITCHED = "stitched"  # call hit an internal mock; callee's continuation is another execution
-    INTERNAL_GAP = "internal_gap"  # call hit an internal mock; no execution of the real target yet
-    EXTERNAL_BOUNDARY = "external_boundary"  # call hit an external mock; exploration stops
-    UNRESOLVED_MOCK = "unresolved_mock"  # call hit a mock we could not classify
-    # Reserved, not produced yet: STATIC ("statically possible"), from static analysis.
+    OBSERVED = "observed"  # complete trace: caller called callee, same execution
+    OBSERVED_SAMPLED = "observed_sampled"  # sampled: callee seen under caller; order/count unknown
+    COMPOSED = "composed"  # call hit an internal stand-in; continuation is another execution
+    STATIC = "static"  # statically possible, never executed (reserved; not produced yet)
+    INTERNAL_GAP = "internal_gap"  # internal stand-in, no execution of the real target yet
+    EXTERNAL_BOUNDARY = "external_boundary"  # semantic boundary: stand-in for outside code
+    OS_BOUNDARY = "os_boundary"  # physical boundary: the process tried to leave via the kernel
+    UNRESOLVED_BOUNDARY = "unresolved_boundary"  # stand-in we could not classify
 
 
-_MOCK_DERIVED = {
-    EvidenceKind.STITCHED,
+_RULE_REQUIRED = {
+    EvidenceKind.COMPOSED,
+    EvidenceKind.STATIC,
     EvidenceKind.INTERNAL_GAP,
     EvidenceKind.EXTERNAL_BOUNDARY,
-    EvidenceKind.UNRESOLVED_MOCK,
+    EvidenceKind.UNRESOLVED_BOUNDARY,
 }
+_RULE_FORBIDDEN = {EvidenceKind.OBSERVED, EvidenceKind.OBSERVED_SAMPLED, EvidenceKind.OS_BOUNDARY}
 
 
 @dataclass(frozen=True)
 class NodeRef:
-    test_id: str
+    execution: str
     node: int
 
 
 @dataclass(frozen=True)
 class Evidence:
-    """Why we believe an edge exists. Invariants are enforced at construction."""
+    """Why we believe an edge exists. Invariants are enforced at construction so that
+    evidence can never be silently upgraded."""
 
     kind: EvidenceKind
     site: NodeRef
-    """The observed call node that grounds this evidence. For mock-derived kinds this is
-    the mock call itself: the *call* was observed even when the continuation was not."""
-    rule: str | None = None  # mock-resolution rule; required for every mock-derived kind
+    """The observed node that grounds this evidence. For boundary and composed kinds this is
+    the substitution or OS event itself: the *call into it* was observed even when the
+    continuation was not."""
+    rule: str | None = None
+    """Resolution or analysis rule. Required for anything derived (composed, static,
+    boundaries); forbidden for direct observations, which have no rule to cite."""
     fragment: NodeRef | None = None
-    """STITCHED only: the root of the continuation, i.e. a real call to the target symbol
-    in some (usually different) execution."""
+    """COMPOSED only: the root of the borrowed continuation, a real call to the target in
+    some (usually different) execution."""
+    join: JoinStrength | None = None
+    """COMPOSED only: how strongly the seam was matched."""
+    probe_derived: bool = False
+    """True if any execution this evidence cites was a generated probe rather than an
+    existing test. Set by whoever builds the evidence and knows the executions."""
 
     def __post_init__(self) -> None:
-        if self.kind in _MOCK_DERIVED and self.rule is None:
-            raise ValueError(f"{self.kind.value} evidence must name its resolution rule")
-        if self.kind is EvidenceKind.OBSERVED and self.rule is not None:
-            raise ValueError("observed evidence is not derived from a mock resolution")
-        if (self.kind is EvidenceKind.STITCHED) != (self.fragment is not None):
-            raise ValueError("a fragment is required for, and only for, stitched evidence")
+        if self.kind in _RULE_REQUIRED and self.rule is None:
+            raise ValueError(f"{self.kind.value} evidence must name its rule")
+        if self.kind in _RULE_FORBIDDEN and self.rule is not None:
+            raise ValueError(f"{self.kind.value} evidence is a direct observation and has no rule")
+        composed = self.kind is EvidenceKind.COMPOSED
+        if composed != (self.fragment is not None):
+            raise ValueError("a fragment is required for, and only for, composed evidence")
+        if composed != (self.join is not None):
+            raise ValueError("a join strength is required for, and only for, composed evidence")
 
 
 @dataclass(frozen=True)
