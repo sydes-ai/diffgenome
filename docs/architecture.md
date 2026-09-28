@@ -396,9 +396,18 @@ repo + diff ─► existing tests traced (confined) ─► Corpus ─► Behavio
 | `llm.py` | `ProbeWriter` seam; OpenAI and recorded writers | provider, behind one method |
 | `sandbox.py` | workspace, scrubbed env, limits, OS confinement | platform (macOS Seatbelt today; Linux runner later) |
 | `report.py`, `mvp.py` | deterministic text/JSON report; one command | nothing |
+| `runtime.py` | `RuntimeAdapter` / `SymbolIndex` seam: prepare a workspace, run stimuli, place probes, state conventions | nothing |
+| `collect/py_runtime.py`, `collect/node_jest.py`, `tools/node-collector/` | the two runtime implementations | Python; Node |
+| `evaluate.py` | edge precision/recall and seam-level join grading against hidden whole executions | nothing |
 
 AI proposes; execution establishes facts. A probe is accepted only on evidence from its
 own trace, and everything it contributes is marked `probe_derived`.
+
+The graph is materialized as `graph.json` (format `diffgenome-graph/1`): every symbol
+with origin, location, executing tests and outcomes; every edge with kind, join histogram,
+rules, executions, probe flag and its full evidence (site, fragment, alternates); gaps; and
+every join attempt including rejected and unsound ones. It loads back without the corpus
+for queries (`inspect`) and grading (`evaluate`).
 
 ## 13. Deliberately not built
 

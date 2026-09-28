@@ -1,0 +1,177 @@
+{
+ "id": "tests/test_orders.py::test_valid_order_creation_returns_201@unknown",
+ "stimulus": "existing_test",
+ "stimulus_ref": "tests/test_orders.py::test_valid_order_creation_returns_201",
+ "outcome": "passed",
+ "revision": null,
+ "collectors": [
+  {
+   "name": "py-sys-monitoring",
+   "plane": "symbol",
+   "fidelity": "complete"
+  },
+  {
+   "name": "py-egress-guard",
+   "plane": "os",
+   "fidelity": "complete"
+  }
+ ],
+ "symbols": [
+  {
+   "id": "py:app.main.create_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/main.py",
+    "line": 24
+   }
+  },
+  {
+   "id": "py:app.repository.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/repository.py",
+    "line": 12
+   }
+  },
+  {
+   "id": "py:app.repository.save_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/repository.py",
+    "line": 16
+   }
+  },
+  {
+   "id": "py:app.service.create_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 16
+   }
+  },
+  {
+   "id": "py:app.service.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 9
+   }
+  },
+  {
+   "id": "py:tests.test_orders.test_valid_order_creation_returns_201",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_orders.py",
+    "line": 33
+   }
+  }
+ ],
+ "nodes": [
+  {
+   "type": "call",
+   "id": 0,
+   "parent": null,
+   "symbol": "py:tests.test_orders.test_valid_order_creation_returns_201",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "unknown",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 1,
+   "parent": 0,
+   "symbol": "py:app.main.create_order",
+   "collector": 0,
+   "args": [
+    [
+     "order",
+     "OrderCreate",
+     ""
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 2,
+   "parent": 1,
+   "symbol": "py:app.service.create_order",
+   "collector": 0,
+   "args": [
+    [
+     "order",
+     "OrderCreate",
+     ""
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 3,
+   "parent": 2,
+   "symbol": "py:app.service.get_stock",
+   "collector": 0,
+   "args": [
+    [
+     "sku",
+     "str",
+     "2bdcbec328e87691"
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": "3e1948798e02e919"
+  },
+  {
+   "type": "call",
+   "id": 4,
+   "parent": 3,
+   "symbol": "py:app.repository.get_stock",
+   "collector": 0,
+   "args": [
+    [
+     "sku",
+     "str",
+     "2bdcbec328e87691"
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": "3e1948798e02e919"
+  },
+  {
+   "type": "call",
+   "id": 5,
+   "parent": 2,
+   "symbol": "py:app.repository.save_order",
+   "collector": 0,
+   "args": [
+    [
+     "order",
+     "OrderCreate",
+     ""
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": ""
+  }
+ ],
+ "diagnostics": [
+  [
+   "stack_repairs",
+   "0"
+  ],
+  [
+   "attribution_disagreements",
+   "0"
+  ]
+ ]
+}

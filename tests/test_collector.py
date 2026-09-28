@@ -268,3 +268,29 @@ def test_observer_is_not_hijacked_by_target_patches(tmp_path: Path) -> None:
     assert sub.mechanism is SubstitutionMechanism.INTERPOSITION
     assert sub.claimed_target == "py:posixpath.join"
     assert {s.id: s.origin for s in ex.symbols}["py:posixpath.join"] is Origin.EXTERNAL
+
+
+def test_function_autospec_standins_are_visible(tmp_path: Path) -> None:
+    """patch(target, autospec=True) on a function installs a function wrapper, not a mock
+    object; the seam must still be recorded with the patch claim (found in experiment 05)."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "svc.py").write_text(
+        "def lookup(key): return key.upper()\ndef run(key): return lookup(key) + '!'\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_auto.py").write_text(
+        "from unittest.mock import patch\n"
+        "from pkg import svc\n"
+        "def test_run():\n"
+        "    with patch('pkg.svc.lookup', autospec=True) as lookup:\n"
+        "        lookup.return_value = 'X'\n"
+        "        assert svc.run('a') == 'X!'\n"
+    )
+    (tmp_path / "pytest.ini").write_text("[pytest]\npythonpath = .\n")
+    ex = trace(tmp_path, tmp_path / "out")["test_run"]
+    [sub] = substitutions(ex)
+    assert sub.mechanism is SubstitutionMechanism.INTERPOSITION
+    assert sub.claimed_target == "py:pkg.svc.lookup" and sub.relation == "patch-target"
+    assert sub.outcome == "returned" and sub.args[0][:2] == ("arg0", "str")
+    assert sub.parent == calls(ex)["py:pkg.svc.run"][0].id

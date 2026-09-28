@@ -1,0 +1,140 @@
+{
+ "id": "tests/test_orders.py::test_unknown_sku_returns_404@unknown",
+ "stimulus": "existing_test",
+ "stimulus_ref": "tests/test_orders.py::test_unknown_sku_returns_404",
+ "outcome": "passed",
+ "revision": null,
+ "collectors": [
+  {
+   "name": "py-sys-monitoring",
+   "plane": "symbol",
+   "fidelity": "complete"
+  },
+  {
+   "name": "py-egress-guard",
+   "plane": "os",
+   "fidelity": "complete"
+  }
+ ],
+ "symbols": [
+  {
+   "id": "py:app.main.read_inventory",
+   "origin": "repo",
+   "location": {
+    "path": "app/main.py",
+    "line": 14
+   }
+  },
+  {
+   "id": "py:app.repository.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/repository.py",
+    "line": 12
+   }
+  },
+  {
+   "id": "py:app.service.UnknownSkuError",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 0
+   }
+  },
+  {
+   "id": "py:app.service.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 9
+   }
+  },
+  {
+   "id": "py:fastapi.exceptions.HTTPException",
+   "origin": "external",
+   "location": null
+  },
+  {
+   "id": "py:tests.test_orders.test_unknown_sku_returns_404",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_orders.py",
+    "line": 27
+   }
+  }
+ ],
+ "nodes": [
+  {
+   "type": "call",
+   "id": 0,
+   "parent": null,
+   "symbol": "py:tests.test_orders.test_unknown_sku_returns_404",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "unknown",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 1,
+   "parent": 0,
+   "symbol": "py:app.main.read_inventory",
+   "collector": 0,
+   "args": [
+    [
+     "sku",
+     "str",
+     "5c43155905972e08"
+    ]
+   ],
+   "thread": 1,
+   "outcome": "raised:py:fastapi.exceptions.HTTPException",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 2,
+   "parent": 1,
+   "symbol": "py:app.service.get_stock",
+   "collector": 0,
+   "args": [
+    [
+     "sku",
+     "str",
+     "5c43155905972e08"
+    ]
+   ],
+   "thread": 1,
+   "outcome": "raised:py:app.service.UnknownSkuError",
+   "result": ""
+  },
+  {
+   "type": "call",
+   "id": 3,
+   "parent": 2,
+   "symbol": "py:app.repository.get_stock",
+   "collector": 0,
+   "args": [
+    [
+     "sku",
+     "str",
+     "5c43155905972e08"
+    ]
+   ],
+   "thread": 1,
+   "outcome": "returned",
+   "result": "99bf08d8dc95c6ae"
+  }
+ ],
+ "diagnostics": [
+  [
+   "stack_repairs",
+   "0"
+  ],
+  [
+   "attribution_disagreements",
+   "0"
+  ]
+ ]
+}

@@ -65,8 +65,21 @@ def evaluate_main(argv: list[str]) -> int:
     ap.add_argument("--entry", action="append", required=True, help="entry symbol (exact id)")
     ap.add_argument("--depth", type=int, default=6)
     ap.add_argument("--json", type=Path, default=None, help="also write the evaluation as JSON")
+    ap.add_argument(
+        "--traces",
+        action="append",
+        default=[],
+        type=Path,
+        help="directories of the executions the graph was built from (for seam grading)",
+    )
     args = ap.parse_args(argv)
-    from diffgenome.evaluate import evaluate, ground_truth_from, render_evaluation
+    from diffgenome.evaluate import (
+        evaluate,
+        ground_truth_from,
+        render_evaluation,
+        render_seams,
+        seam_precision,
+    )
     from diffgenome.graph import BehavioralGraph
     from diffgenome.model import Origin
     from diffgenome.serialize import execution_from_json
@@ -82,8 +95,32 @@ def evaluate_main(argv: list[str]) -> int:
     gt = ground_truth_from(truth_runs, args.entry, origins)
     ev = evaluate(graph, gt, args.entry, depth=args.depth)
     print(render_evaluation(ev))
+    doc = ev.as_dict()
+    if args.traces:
+        from diffgenome.model import CallNode
+
+        per_exec: dict[str, set[tuple[str, str]]] = {}
+        for d in args.traces:
+            for f in sorted(d.glob("*.json")):
+                ex = execution_from_json(f.read_text())
+                by_id = {n.id: n for n in ex.nodes}
+                edges = set()
+                for n in ex.nodes:
+                    if isinstance(n, CallNode) and n.parent is not None:
+                        p = by_id[n.parent]
+                        if (
+                            isinstance(p, CallNode)
+                            and origins.get(p.symbol) is Origin.REPO
+                            and origins.get(n.symbol) is Origin.REPO
+                        ):
+                            edges.add((p.symbol, n.symbol))
+                per_exec[ex.id] = edges
+        grades = seam_precision(graph, per_exec, gt)
+        print("## Join lattice: seam-level precision")
+        print(render_seams(grades))
+        doc["seam_grades"] = [g.__dict__ for g in grades]
     if args.json:
-        args.json.write_text(json.dumps(ev.as_dict(), indent=1) + "\n")
+        args.json.write_text(json.dumps(doc, indent=1) + "\n")
     return 0
 
 

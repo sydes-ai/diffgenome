@@ -1,0 +1,65 @@
+{
+ "entries": [
+  "py:shop.controller.OrderController.place_order"
+ ],
+ "ground_truth_edges": 5,
+ "claimed_edges": 4,
+ "true_positive": 4,
+ "false_positive": 0,
+ "false_negative": 1,
+ "precision": 1.0,
+ "recall": 0.8,
+ "by_evidence_kind": {
+  "observed": {
+   "claimed": 3,
+   "true": 3
+  },
+  "composed": {
+   "claimed": 1,
+   "true": 1
+  }
+ },
+ "by_join_strength": {
+  "VALUE": {
+   "claimed": 1,
+   "true": 1
+  }
+ },
+ "probe_derived": {},
+ "false_composed_continuations": [],
+ "missing_continuations": [
+  [
+   "py:shop.order_service.OrderService.place",
+   "py:shop.inventory_service.InventoryService.reserve"
+  ]
+ ],
+ "missing_explained": {
+  "gap": [
+   [
+    "py:shop.order_service.OrderService.place",
+    "py:shop.inventory_service.InventoryService.reserve"
+   ]
+  ],
+  "unresolved": [],
+  "absent": []
+ },
+ "outcome_conflicts": [],
+ "alternate_fragments_total": 0,
+ "notes": [],
+ "seam_grades": [
+  {
+   "grade": "ARG_SHAPE",
+   "seams": 2,
+   "consistent": 2,
+   "matching": 0,
+   "outcome_ok": 2
+  },
+  {
+   "grade": "VALUE",
+   "seams": 2,
+   "consistent": 2,
+   "matching": 1,
+   "outcome_ok": 2
+  }
+ ]
+}

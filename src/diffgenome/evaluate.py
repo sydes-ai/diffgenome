@@ -194,6 +194,85 @@ def _row(label: str, v: dict[str, int]) -> str:
     return f"| {label} | {c} | {t} | {t / c:.3f} |" if c else f"| {label} | 0 | 0 | - |"
 
 
+@dataclass
+class SeamGrade:
+    grade: str
+    seams: int
+    consistent: int  # continuation claims no edge the whole execution did not take
+    matching: int  # continuation is exactly the whole execution's continuation
+    outcome_ok: int
+
+
+def seam_precision(
+    graph: BehavioralGraph, corpus_graph_edges: dict[str, set[Edge]], gt: GroundTruth
+) -> list[SeamGrade]:
+    """Join-lattice test at the seam level. For every accepted join whose target is on a
+    ground-truth path: the borrowed fragment's first-level continuation (target → callees
+    inside the fragment execution) is compared with the ground truth's continuation from
+    that target. `corpus_graph_edges` maps execution id -> in-repo (caller, callee) edges
+    observed in that execution."""
+    per: dict[str, list[tuple[bool, bool, bool]]] = defaultdict(list)
+    gt_out: dict[SymbolId, set[SymbolId]] = defaultdict(set)
+    for a, b in gt.edges:
+        gt_out[a].add(b)
+    gt_targets = {b for _, b in gt.edges} | {a for a, _ in gt.edges}
+    for att in graph.attempts:
+        if not att.accepted or att.grade is None or att.target not in gt_targets:
+            continue
+        frag_edges = {
+            e for e in corpus_graph_edges.get(att.fragment.execution, set()) if e[0] == att.target
+        }
+        claimed_next = {b for _, b in frag_edges}
+        # Continuations the fragment reaches through its own seams count too: composed
+        # edges out of the target whose evidence site lies in this fragment's execution.
+        for ge in graph.out.get(att.target, []):
+            if ge.kind is EvidenceKind.COMPOSED and any(
+                ev.site.execution == att.fragment.execution for ev in ge.evidence
+            ):
+                claimed_next.add(ge.callee)
+        truth_next = gt_out.get(att.target, set())
+        consistent = claimed_next <= truth_next
+        matching = claimed_next == truth_next
+        frag_outcome = graph.outcomes_by_symbol.get(att.target, Counter())
+        truth_outcomes = (
+            set().union(
+                *(
+                    gt.outcomes.get((a, att.target), set())
+                    for a in gt_out
+                    if att.target in gt_out[a]
+                )
+            )
+            if any(att.target in v for v in gt_out.values())
+            else set()
+        )
+        outcome_ok = (not truth_outcomes) or bool(set(frag_outcome) & truth_outcomes)
+        per[att.grade.name].append((consistent, matching, outcome_ok))
+    out = []
+    for grade in ("SYMBOL", "ARG_SHAPE", "VALUE", "STATE"):
+        rows = per.get(grade, [])
+        if rows:
+            out.append(
+                SeamGrade(
+                    grade,
+                    len(rows),
+                    sum(r[0] for r in rows),
+                    sum(r[1] for r in rows),
+                    sum(r[2] for r in rows),
+                )
+            )
+    return out
+
+
+def render_seams(grades: list[SeamGrade]) -> str:
+    lines = ["| join grade | seams | consistent | matching | outcome ok |", "|---|---|---|---|---|"]
+    for g in grades:
+        lines.append(
+            f"| {g.grade} | {g.seams} | {g.consistent} ({g.consistent / g.seams:.2f}) "
+            f"| {g.matching} ({g.matching / g.seams:.2f}) | {g.outcome_ok} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def render_evaluation(ev: Evaluation) -> str:
     lines = [
         "# Ground-truth evaluation",

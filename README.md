@@ -99,7 +99,10 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | CPython symbol-plane collector (frame-ancestry attribution, patch interposition claims, patch-proof scoping), resolver, composer (SYMBOL/ARG_SHAPE/VALUE joins, outcome and result checks, shape merging), renderers | done; findings logs in `docs/experiment-01.md` and `docs/experiment-02.md` |
 | First real target (Kokoro-FastAPI, 318 tests): 42% of stand-ins resolved, 406 composed edges, 11 gaps | measured; see experiment 02 |
 | **MVP**: one command from repo + diff to a confined, AI-probed, before/after behavioral impact report | done; see `docs/experiment-03.md` and `docs/runs/kokoro-8307b0e/` |
-| Linux OS-plane collector, second runtime, ground-truth comparison | next |
+| Materialized behavioral graph (`graph.json`, `map.md`, `inspect` command) | done |
+| **Second runtime**: Node/TypeScript collector behind the runtime seam; core model unchanged | done; see `docs/experiment-04.md` |
+| **Ground truth**: edge precision/recall and seam-level join grading against hidden whole executions | done; see `docs/experiment-05.md` |
+| Linux OS-plane collector, larger targets, STATE joins | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
 
@@ -110,7 +113,8 @@ uv run python -m diffgenome mvp --repo <target> --python .venv/bin/python --test
   --diff <base..head | commit> --writer openai --out out/run
 ```
 
-It traces the target's unit tests under confinement, builds the repo-level behavioral map,
+`--runtime node --source-root src --test-root test/unit` drives a Node/TypeScript target the
+same way. It traces the target's unit tests under confinement, builds the repo-level behavioral map,
 maps the diff to changed symbols, extracts their behavioral neighborhood, picks the most
 valuable gaps and weak joins near the change, asks the model for one isolated unit probe
 per deficit, executes each probe in a disposable sandboxed workspace (no network, no writes
@@ -118,7 +122,10 @@ outside it, no inherited environment), accepts it only on evidence from its own 
 reports before vs after with provenance on every edge. The OpenAI key is read from
 `OPENAI_API_KEY`, `~/.config/diffgenome/openai_api_key`, or a Keychain item
 `diffgenome-openai`; it never reaches the sandbox. `--writer recorded:<dir>` replays saved
-probes deterministically.
+probes deterministically. The run leaves `graph.json` (the whole graph with provenance),
+`map.md` (the slice around the change) and `report.md`; `python -m diffgenome inspect
+--graph graph.json --symbol <id>` queries the graph, `python -m diffgenome evaluate` grades
+a reconstruction against hidden whole executions.
 
 ## Documents
 
@@ -131,11 +138,16 @@ probes deterministically.
   finding, the first real target (Kokoro-FastAPI).
 - [docs/experiment-03.md](docs/experiment-03.md): the MVP on a real change, before/after, and
   what generated probes did and did not recover.
+- [docs/experiment-04.md](docs/experiment-04.md): the Node/TypeScript runtime and the
+  language-neutrality accounting.
+- [docs/experiment-05.md](docs/experiment-05.md): reconstruction accuracy against ground truth
+  and the join-lattice test.
 
 ## Layout
 
 ```
-src/diffgenome/      the package (language-agnostic core; collectors under it later)
+src/diffgenome/      the package: language-agnostic core, runtime adapters under collect/
+tools/node-collector the Node/TypeScript collector (instrumenter, runtime, Jest hook)
 tests/               diffgenome's own tests
 fixtures/            small stand-alone *target* repositories that experiments analyze
 docs/                architecture and experiment write-ups

@@ -534,6 +534,15 @@ class Tracer:
     def _on_call(self, code: CodeType, _offset: int, callable_: object, arg0: object) -> Any:
         if self.scope_for(code) is None:
             return _DISABLE
+        # create_autospec(function) returns a plain function wrapper whose `.mock` is the
+        # mock; without this it was invisible to the tracer (found by ground truth, exp 05).
+        if not isinstance(callable_, mock.NonCallableMock) and isinstance(
+            getattr(callable_, "mock", None), mock.NonCallableMock
+        ):
+            inner = callable_.mock  # type: ignore[attr-defined]
+            if id(callable_) in self._patched and id(inner) not in self._patched:
+                self._patched[id(inner)] = self._patched[id(callable_)]
+            callable_ = inner
         if isinstance(callable_, mock.NonCallableMock):
             args: ArgShapes = (
                 () if arg0 is _MISSING else (("arg0", summarize_value(arg0), digest_value(arg0)),)

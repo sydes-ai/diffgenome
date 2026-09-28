@@ -1,0 +1,48 @@
+{
+ "entries": [
+  "py:app.main.create_order",
+  "py:app.main.read_inventory"
+ ],
+ "ground_truth_edges": 5,
+ "claimed_edges": 5,
+ "true_positive": 5,
+ "false_positive": 0,
+ "false_negative": 0,
+ "precision": 1.0,
+ "recall": 1.0,
+ "by_evidence_kind": {
+  "composed": {
+   "claimed": 5,
+   "true": 5
+  }
+ },
+ "by_join_strength": {
+  "ARG_SHAPE": {
+   "claimed": 5,
+   "true": 5
+  }
+ },
+ "probe_derived": {
+  "claimed": 5,
+  "true": 5
+ },
+ "false_composed_continuations": [],
+ "missing_continuations": [],
+ "missing_explained": {
+  "gap": [],
+  "unresolved": [],
+  "absent": []
+ },
+ "outcome_conflicts": [],
+ "alternate_fragments_total": 0,
+ "notes": [],
+ "seam_grades": [
+  {
+   "grade": "ARG_SHAPE",
+   "seams": 5,
+   "consistent": 5,
+   "matching": 5,
+   "outcome_ok": 5
+  }
+ ]
+}

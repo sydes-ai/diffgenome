@@ -1,0 +1,52 @@
+{
+ "id": "tests/test_orders.py::test_non_positive_quantity_is_rejected@unknown",
+ "stimulus": "existing_test",
+ "stimulus_ref": "tests/test_orders.py::test_non_positive_quantity_is_rejected",
+ "outcome": "passed",
+ "revision": null,
+ "collectors": [
+  {
+   "name": "py-sys-monitoring",
+   "plane": "symbol",
+   "fidelity": "complete"
+  },
+  {
+   "name": "py-egress-guard",
+   "plane": "os",
+   "fidelity": "complete"
+  }
+ ],
+ "symbols": [
+  {
+   "id": "py:tests.test_orders.test_non_positive_quantity_is_rejected",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_orders.py",
+    "line": 46
+   }
+  }
+ ],
+ "nodes": [
+  {
+   "type": "call",
+   "id": 0,
+   "parent": null,
+   "symbol": "py:tests.test_orders.test_non_positive_quantity_is_rejected",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "unknown",
+   "result": ""
+  }
+ ],
+ "diagnostics": [
+  [
+   "stack_repairs",
+   "0"
+  ],
+  [
+   "attribution_disagreements",
+   "0"
+  ]
+ ]
+}

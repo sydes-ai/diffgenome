@@ -1,0 +1,777 @@
+{
+ "format": "diffgenome-graph/1",
+ "symbols": [
+  {
+   "id": "py:app.main.create_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/main.py",
+    "line": 24
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "outcomes": {
+    "returned": 1,
+    "raised": 1
+   }
+  },
+  {
+   "id": "py:app.main.read_inventory",
+   "origin": "repo",
+   "location": {
+    "path": "app/main.py",
+    "line": 14
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:app.repository.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/repository.py",
+    "line": 12
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:app.repository.save_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/repository.py",
+    "line": 16
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:app.service.create_order",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 16
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:app.service.get_stock",
+   "origin": "repo",
+   "location": {
+    "path": "app/service.py",
+    "line": 9
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:builtins.dict",
+   "origin": "unknown",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:fastapi.exceptions.HTTPException",
+   "origin": "external",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:pydantic.main.BaseModel.__init__",
+   "origin": "external",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_0_1.py",
+    "line": 11
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku.<locals>.DummyUnknownSkuError",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_0_1.py",
+    "line": 25
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku.<locals>.DummyUnknownSkuError.__init__",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_0_1.py",
+    "line": 26
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_1_1.test_create_order_invokes_inventory_and_persists",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_1_1.py",
+    "line": 7
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_2_1.test_get_stock_calls_repository_and_returns_value",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_2_1.py",
+    "line": 6
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_3_1.test_get_stock_reads_from_inventory",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_3_1.py",
+    "line": 6
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_4_1.test_probe_save_order_spies_on_order_ctor_and_appends",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_4_1.py",
+    "line": 7
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_5_1.test_read_inventory_calls_get_stock_and_returns_item",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_5_1.py",
+    "line": 6
+   },
+   "executed_by": [],
+   "outcomes": {}
+  }
+ ],
+ "edges": [
+  {
+   "caller": "py:app.main.create_order",
+   "callee": "py:app.service.create_order",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+    "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 2
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+      "node": 1
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.main.create_order",
+   "callee": "py:app.service.create_order",
+   "kind": "internal_gap",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "internal_gap",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.main.read_inventory",
+   "callee": "py:app.service.get_stock",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+    "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown",
+      "node": 2
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+      "node": 1
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.repository.get_stock",
+   "callee": "py:builtins.dict",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-unknown-origin"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-unknown-origin",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.repository.save_order",
+   "callee": "py:pydantic.main.BaseModel.__init__",
+   "kind": "external_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-outside-repo"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.service.create_order",
+   "callee": "py:app.repository.save_order",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+      "node": 3
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown",
+      "node": 1
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.service.create_order",
+   "callee": "py:app.service.get_stock",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+      "node": 2
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+      "node": 1
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:app.service.get_stock",
+   "callee": "py:app.repository.get_stock",
+   "kind": "composed",
+   "best_join": "ARG_SHAPE",
+   "joins": {
+    "ARG_SHAPE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+    "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+      "node": 2
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown",
+      "node": 1
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku",
+   "callee": "py:app.main.create_order",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku",
+   "callee": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku.<locals>.DummyUnknownSkuError",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku",
+   "callee": "py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku.<locals>.DummyUnknownSkuError.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_1_1.test_create_order_invokes_inventory_and_persists",
+   "callee": "py:app.service.create_order",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_2_1.test_get_stock_calls_repository_and_returns_value",
+   "callee": "py:app.service.get_stock",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_3_1.test_get_stock_reads_from_inventory",
+   "callee": "py:app.repository.get_stock",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_4_1.test_probe_save_order_spies_on_order_ctor_and_appends",
+   "callee": "py:app.repository.save_order",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_5_1.test_read_inventory_calls_get_stock_and_returns_item",
+   "callee": "py:app.main.read_inventory",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  }
+ ],
+ "gaps": [
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+    "node": 6
+   },
+   "target": "py:app.service.create_order",
+   "kind": "no-compatible-fragment"
+  }
+ ],
+ "join_attempts": [
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+    "node": 2
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "node": 1
+   },
+   "target": "py:app.service.create_order",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "value unavailable: order",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "node": 2
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+    "node": 1
+   },
+   "target": "py:app.service.get_stock",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: sku; result differs: seed continued on it",
+   "result_compatible": false
+  },
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+    "node": 2
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_3_1.py::test_get_stock_reads_from_inventory@unknown",
+    "node": 1
+   },
+   "target": "py:app.repository.get_stock",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: sku",
+   "result_compatible": true
+  },
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "node": 3
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_4_1.py::test_probe_save_order_spies_on_order_ctor_and_appends@unknown",
+    "node": 1
+   },
+   "target": "py:app.repository.save_order",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "value unavailable: order",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_0_1.py::test_probe_create_order_executes_and_handles_unknown_sku@unknown",
+    "node": 6
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_1_1.py::test_create_order_invokes_inventory_and_persists@unknown",
+    "node": 1
+   },
+   "target": "py:app.service.create_order",
+   "grade": null,
+   "accepted": false,
+   "note": "outcome conflict: stand-in raised:py:tests.test_diffgenome_probe_0_1.test_probe_create_order_executes_and_handles_unknown_sku.<locals>.DummyUnknownSkuError, fragment returned",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "tests/test_diffgenome_probe_5_1.py::test_read_inventory_calls_get_stock_and_returns_item@unknown",
+    "node": 2
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_2_1.py::test_get_stock_calls_repository_and_returns_value@unknown",
+    "node": 1
+   },
+   "target": "py:app.service.get_stock",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: sku",
+   "result_compatible": true
+  }
+ ]
+}

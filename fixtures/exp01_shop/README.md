@@ -31,3 +31,7 @@ Run its own suite (must pass before tracing means anything):
 ```bash
 cd fixtures/exp01_shop && python -m pytest -q
 ```
+
+`groundtruth/` holds whole-stack executions used only as ground truth in experiment 05.
+It is outside `testpaths` on purpose: those runs must never enter the corpus the composer
+reconstructs from. Run them explicitly: `python -m pytest -q groundtruth`.

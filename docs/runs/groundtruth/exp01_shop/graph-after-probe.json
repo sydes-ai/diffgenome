@@ -1,0 +1,1244 @@
+{
+ "format": "diffgenome-graph/1",
+ "symbols": [
+  {
+   "id": "py:builtins.ValueError",
+   "origin": "external",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:shop.controller.OrderController.__init__",
+   "origin": "repo",
+   "location": {
+    "path": "shop/controller.py",
+    "line": 7
+   },
+   "executed_by": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:shop.controller.OrderController.place_order",
+   "origin": "repo",
+   "location": {
+    "path": "shop/controller.py",
+    "line": 10
+   },
+   "executed_by": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:shop.inventory_service.InventoryService.__init__",
+   "origin": "repo",
+   "location": {
+    "path": "shop/inventory_service.py",
+    "line": 8
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:shop.inventory_service.InventoryService.reserve",
+   "origin": "repo",
+   "location": {
+    "path": "shop/inventory_service.py",
+    "line": 11
+   },
+   "executed_by": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "py:shop.order_service.OrderService.__init__",
+   "origin": "repo",
+   "location": {
+    "path": "shop/order_service.py",
+    "line": 20
+   },
+   "executed_by": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 3
+   }
+  },
+  {
+   "id": "py:shop.order_service.OrderService.place",
+   "origin": "repo",
+   "location": {
+    "path": "shop/order_service.py",
+    "line": 24
+   },
+   "executed_by": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2,
+    "raised": 1
+   }
+  },
+  {
+   "id": "py:shop.order_service._validate",
+   "origin": "repo",
+   "location": {
+    "path": "shop/order_service.py",
+    "line": 14
+   },
+   "executed_by": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2,
+    "raised": 1
+   }
+  },
+  {
+   "id": "py:shop.price_repository.PriceRepository.__init__",
+   "origin": "repo",
+   "location": {
+    "path": "shop/price_repository.py",
+    "line": 5
+   },
+   "executed_by": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:shop.price_repository.PriceRepository.price_for",
+   "origin": "repo",
+   "location": {
+    "path": "shop/price_repository.py",
+    "line": 8
+   },
+   "executed_by": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:shop.pricing_service.PricingService.__init__",
+   "origin": "repo",
+   "location": {
+    "path": "shop/pricing_service.py",
+    "line": 5
+   },
+   "executed_by": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:shop.pricing_service.PricingService.quote",
+   "origin": "repo",
+   "location": {
+    "path": "shop/pricing_service.py",
+    "line": 8
+   },
+   "executed_by": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:sqlite3.Connection.execute",
+   "origin": "external",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_controller.test_place_order_returns_quoted_total",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_controller.py",
+    "line": 9
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_controller.test_place_order_with_order_service_stand_in",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_controller.py",
+    "line": 22
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_diffgenome_probe_0_1.test_reserve_posts_a_reservation_and_accepts_201",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_diffgenome_probe_0_1.py",
+    "line": 6
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_order_service.test_duplicate_skus_rejected",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_order_service.py",
+    "line": 21
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_order_service.test_place_with_unspecced_mocks",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_order_service.py",
+    "line": 9
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_pricing_service.test_quote_empty_cart_is_free",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_pricing_service.py",
+    "line": 15
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:tests.test_pricing_service.test_quote_sums_repository_prices",
+   "origin": "test",
+   "location": {
+    "path": "tests/test_pricing_service.py",
+    "line": 8
+   },
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "py:urllib.request.urlopen",
+   "origin": "external",
+   "location": null,
+   "executed_by": [],
+   "outcomes": {}
+  }
+ ],
+ "edges": [
+  {
+   "caller": "py:shop.controller.OrderController.place_order",
+   "callee": "py:shop.order_service.OrderService.place",
+   "kind": "composed",
+   "best_join": "VALUE",
+   "joins": {
+    "ARG_SHAPE": 1,
+    "VALUE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 4
+     },
+     "alternates": [],
+     "join": "VALUE",
+     "rule": "claim-member",
+     "probe_derived": false
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.controller.OrderController.place_order",
+   "callee": "py:shop.order_service.OrderService.place",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.inventory_service.InventoryService.reserve",
+   "callee": "py:urllib.request.urlopen",
+   "kind": "external_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-outside-repo"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.inventory_service.InventoryService.reserve",
+   "callee": "stand-in:py:unittest.mock.MagicMock.__exit__",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.order_service.OrderService.place",
+   "callee": "py:shop.inventory_service.InventoryService.reserve",
+   "kind": "composed",
+   "best_join": "VALUE",
+   "joins": {
+    "VALUE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 6
+     },
+     "fragment": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+      "node": 2
+     },
+     "alternates": [],
+     "join": "VALUE",
+     "rule": "claim-member",
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.order_service.OrderService.place",
+   "callee": "py:shop.order_service._validate",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.order_service.OrderService.place",
+   "callee": "py:shop.pricing_service.PricingService.quote",
+   "kind": "composed",
+   "best_join": "VALUE",
+   "joins": {
+    "ARG_SHAPE": 1,
+    "VALUE": 1
+   },
+   "rules": [
+    "claim-member"
+   ],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "ARG_SHAPE",
+     "rule": "claim-member",
+     "probe_derived": false
+    },
+    {
+     "kind": "composed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 7
+     },
+     "fragment": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "alternates": [],
+     "join": "VALUE",
+     "rule": "claim-member",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.order_service.OrderService.place",
+   "callee": "stand-in:py:unittest.mock.MagicMock.quote",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.order_service.OrderService.place",
+   "callee": "stand-in:py:unittest.mock.MagicMock.reserve",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.price_repository.PriceRepository.price_for",
+   "callee": "py:sqlite3.Connection.execute",
+   "kind": "external_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-outside-repo"
+   ],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": false
+    },
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 8
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.price_repository.PriceRepository.price_for",
+   "callee": "py:sqlite3.Connection.execute.().fetchone",
+   "kind": "external_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-outside-repo"
+   ],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 6
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": false
+    },
+    {
+     "kind": "external_boundary",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 9
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": "claim-outside-repo",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:shop.pricing_service.PricingService.quote",
+   "callee": "py:shop.price_repository.PriceRepository.price_for",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 7
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_controller.test_place_order_returns_quoted_total",
+   "callee": "py:shop.controller.OrderController.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_controller.test_place_order_returns_quoted_total",
+   "callee": "py:shop.controller.OrderController.place_order",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_controller.test_place_order_returns_quoted_total",
+   "callee": "py:shop.order_service.OrderService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_controller.test_place_order_with_order_service_stand_in",
+   "callee": "py:shop.controller.OrderController.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_controller.test_place_order_with_order_service_stand_in",
+   "callee": "py:shop.controller.OrderController.place_order",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_0_1.test_reserve_posts_a_reservation_and_accepts_201",
+   "callee": "py:shop.inventory_service.InventoryService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_diffgenome_probe_0_1.test_reserve_posts_a_reservation_and_accepts_201",
+   "callee": "py:shop.inventory_service.InventoryService.reserve",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown"
+   ],
+   "probe_derived": true,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": true
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_order_service.test_duplicate_skus_rejected",
+   "callee": "py:shop.order_service.OrderService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_order_service.test_duplicate_skus_rejected",
+   "callee": "py:shop.order_service.OrderService.place",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_order_service.test_place_with_unspecced_mocks",
+   "callee": "py:shop.order_service.OrderService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_order_service.test_place_with_unspecced_mocks",
+   "callee": "py:shop.order_service.OrderService.place",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_empty_cart_is_free",
+   "callee": "py:shop.price_repository.PriceRepository.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_empty_cart_is_free",
+   "callee": "py:shop.pricing_service.PricingService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_empty_cart_is_free",
+   "callee": "py:shop.pricing_service.PricingService.quote",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_sums_repository_prices",
+   "callee": "py:shop.price_repository.PriceRepository.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_sums_repository_prices",
+   "callee": "py:shop.pricing_service.PricingService.__init__",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_pricing_service.test_quote_sums_repository_prices",
+   "callee": "py:shop.pricing_service.PricingService.quote",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  }
+ ],
+ "gaps": [],
+ "join_attempts": [
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 6
+   },
+   "fragment": {
+    "execution": "tests/test_diffgenome_probe_0_1.py::test_reserve_posts_a_reservation_and_accepts_201@unknown",
+    "node": 2
+   },
+   "target": "py:shop.inventory_service.InventoryService.reserve",
+   "grade": "VALUE",
+   "accepted": true,
+   "note": "",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "tests/test_pricing_service.py::test_quote_empty_cart_is_free@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 3
+   },
+   "target": "py:shop.pricing_service.PricingService.quote",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: skus; result differs: seed continued on it",
+   "result_compatible": false
+  },
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 7
+   },
+   "fragment": {
+    "execution": "tests/test_pricing_service.py::test_quote_sums_repository_prices@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 3
+   },
+   "target": "py:shop.pricing_service.PricingService.quote",
+   "grade": "VALUE",
+   "accepted": true,
+   "note": "",
+   "result_compatible": true
+  },
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 3
+   },
+   "fragment": {
+    "execution": "tests/test_controller.py::test_place_order_returns_quoted_total@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 4
+   },
+   "target": "py:shop.order_service.OrderService.place",
+   "grade": "VALUE",
+   "accepted": true,
+   "note": "result differs: seed continued on it",
+   "result_compatible": false
+  },
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 3
+   },
+   "fragment": {
+    "execution": "tests/test_order_service.py::test_duplicate_skus_rejected@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 2
+   },
+   "target": "py:shop.order_service.OrderService.place",
+   "grade": null,
+   "accepted": false,
+   "note": "outcome conflict: stand-in returned, fragment raised:py:builtins.ValueError",
+   "result_compatible": null
+  },
+  {
+   "site": {
+    "execution": "tests/test_controller.py::test_place_order_with_order_service_stand_in@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 3
+   },
+   "fragment": {
+    "execution": "tests/test_order_service.py::test_place_with_unspecced_mocks@cc35ba355d7f792d4c82a07d2afb01fd58608d60",
+    "node": 2
+   },
+   "target": "py:shop.order_service.OrderService.place",
+   "grade": "ARG_SHAPE",
+   "accepted": true,
+   "note": "values differ: customer_id, skus; result differs: seed continued on it",
+   "result_compatible": false
+  }
+ ]
+}
