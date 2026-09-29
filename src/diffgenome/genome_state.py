@@ -18,6 +18,7 @@ Adds to `diffgenome.genome`:
 from __future__ import annotations
 
 import hashlib
+import itertools
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -38,6 +39,7 @@ from diffgenome.genome import (
     eval_predicate,
 )
 from diffgenome.model import CallNode, Execution
+from diffgenome.structure import Skeleton, build_skeleton, placement_problems, resolve
 
 RANK = {REJECTED: -1, HYPOTHESIS: 0, SUPPORTED: 1, VERIFIED: 2, STATIC: 2, OBSERVED: 3}
 
@@ -653,6 +655,140 @@ def agreement_from_facts(
     return out
 
 
+def genome_vocabulary(g: Genome) -> list[str]:
+    """Every entity a genome names: procedures, decisions, transitions and called entities."""
+    names = {p.entity for p in g.procedures} | {d.entity for d in g.decisions}
+    names |= {t.entity for t in g.transitions}
+    step_lists = [p.steps for p in g.procedures] + [
+        [*b.steps, *(f"call:{c}" for c in b.calls)]
+        for d in g.decisions
+        for b in (d.true_branch, d.false_branch)
+    ]
+    for steps in step_lists:
+        names |= {st[5:] for st in steps if st.startswith("call:")}
+    return sorted(n for n in names if n)
+
+
+def _reached(
+    steps: list[str], decisions: dict[str, Decision], vocab: list[str]
+) -> tuple[list[str], list[tuple[str, str]]]:
+    """Calls and decision sites reached in a procedure's own body (its steps and its
+    decisions' branches), without entering other entities' procedures."""
+    calls: list[str] = []
+    dsites: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    stack = [list(steps)]
+    while stack:
+        for st in stack.pop():
+            kind, _, ref = st.partition(":")
+            if kind == "call":
+                calls.append(resolve(vocab, ref))
+            elif kind == "D" and ref in decisions and ref not in seen:
+                seen.add(ref)
+                d = decisions[ref]
+                if d.site:
+                    dsites.append((d.id, d.site))
+                for br in (d.true_branch, d.false_branch):
+                    stack.append(br.steps or [f"call:{c}" for c in br.calls])
+    return calls, dsites
+
+
+def procedure_structure_claims(g: Genome, sk: Skeleton) -> list[dict[str, Any]]:
+    """What each procedure claims about execution structure, judged against the observed
+    skeleton (diffgenome.structure). Absence of observation never rejects: a call or
+    decision on a path the tests never took is simply not established. Rejection needs
+    positive evidence.
+    - contains:  `call:B` reached in A's own steps (and its decisions' branches) claims B
+                 runs during A. Rejected if the nesting is inverted: every observed A ran
+                 during B. Verified if every observed B ran during A, in >= 2 executions;
+                 supported if some did; otherwise not established.
+    - evaluates: a decision reached in A's steps claims its site is evaluated during A.
+                 Rejected if the site is evaluated in another function's own call and every
+                 observed A ran during that function (the decider encloses A: its decisions
+                 cannot be evaluated inside A). Verified if every evaluation was during A
+                 (>= 2); supported if some; otherwise not established.
+    - order:     consecutive steps x, y of A claim x before y. Verified when x precedes y in
+                 every observed occurrence of A holding both (>= 2 executions), or inside
+                 one repetition of a repeated region (>= 2 repetitions); rejected when the
+                 opposite was observed; else supported. Counts are never claimed.
+    Recursion (a function running during itself) is outside these rules."""
+    vocab = sorted(set(genome_vocabulary(g)) | set(sk.seen))
+    decisions = {d.id: d for d in g.decisions}
+    claims: list[dict[str, Any]] = []
+
+    def claim(p: Any, kind: str, what: str, status: str, why: str) -> None:
+        claims.append(
+            {"procedure": p.id, "entity": p.entity, "kind": kind, "claim": what,
+             "status": status, "why": why}
+        )  # fmt: skip
+
+    for p in g.procedures:
+        a = resolve(vocab, p.entity)
+        calls, dsites = _reached(p.steps, decisions, vocab)
+        for b in dict.fromkeys(calls):
+            n = sk.seen.get(b, 0)
+            inside = sk.inside_occ.get(b, {}).get(a, 0)
+            what = f"{b} during {a}"
+            if n == 0:
+                claim(p, "contains", what, "unobserved", f"{b} never observed")
+            elif b != a and sk.always_during(a, b):
+                claim(p, "contains", what, REJECTED,
+                      f"inverted: every observed {a} ran during {b}")  # fmt: skip
+            elif inside == 0:
+                claim(p, "contains", what, "not established",
+                      f"{b} observed {n} time(s), never during {a}")  # fmt: skip
+            elif inside == n and sk.ancestry.get(b, {}).get(a, 0) >= 2:
+                claim(p, "contains", what, VERIFIED, f"all {n} observed")
+            else:
+                claim(p, "contains", what, SUPPORTED, f"{inside} of {n} observed")
+        for did, site in dsites:
+            during = sk.site_during.get(site)
+            what = f"{did} ({site}) evaluated during {a}"
+            if not during:
+                claim(p, "evaluates", what, "unobserved", "site never evaluated")
+                continue
+            total = max(during.values())
+            owners = [o for o in sk.site_owner.get(site, {}) if o != a]
+            if a not in during and owners and all(sk.always_during(a, o) for o in owners):
+                claim(p, "evaluates", what, REJECTED,
+                      f"inverted: evaluated in {', '.join(owners)}, and every observed "
+                      f"{a} ran during it")  # fmt: skip
+            elif a not in during:
+                claim(p, "evaluates", what, "not established",
+                      f"evaluated {total} time(s), never during {a}")  # fmt: skip
+            elif during[a] == total and total >= 2:
+                claim(p, "evaluates", what, VERIFIED, f"all {total} evaluations")
+            else:
+                claim(p, "evaluates", what, SUPPORTED, f"{during[a]} of {total} evaluations")
+        fams: list[str] = []
+        for st in p.steps:
+            kind, _, ref = st.partition(":")
+            if kind == "call":
+                fams.append(resolve(vocab, ref))
+            elif kind == "D" and ref in decisions and decisions[ref].site:
+                fams.append(f"site:{decisions[ref].site}")
+        for x, y in itertools.pairwise(fams):
+            if x == y:
+                continue
+            what = f"{x} before {y} in {a}"
+            regions = [r for r in sk.regions.get(a, []) if r["head"] is not None]
+            if sk.strictly_before(a, x, y):
+                n_ex = sk.before[a][(x, y)][1]
+                claim(p, "order", what, VERIFIED if n_ex >= 2 else SUPPORTED,
+                      f"all of x before all of y in {n_ex} execution(s)")  # fmt: skip
+            elif sk.strictly_before(a, y, x):
+                claim(p, "order", what, REJECTED, "observed the other way round")
+            elif any((x, y) in r["within"] for r in regions):
+                n = max(r["within"].get((x, y), 0) for r in regions)
+                claim(p, "order", what, VERIFIED if n >= 2 else SUPPORTED,
+                      f"inside one repetition, {n} repetition(s)")  # fmt: skip
+            elif any((y, x) in r["within"] for r in regions):
+                claim(p, "order", what, REJECTED, "inside one repetition, observed reversed")
+            else:
+                claim(p, "order", what, SUPPORTED, "not established by observation")
+    return claims
+
+
 # evidence kinds that report what executed: a failure is an observed contradiction
 _OBSERVED_KINDS = ("execution", "branch", "delta", "boundary", "outcome")
 
@@ -898,6 +1034,14 @@ def establish_state(
             )
         elif agreeing:
             p.status_reason += f"; outcome {p.outcome['is']} observed in {agreeing} call(s)"
+    # execution structure: where a procedure places calls and decisions, and their order,
+    # judged against the skeleton of the observed executions
+    sk = build_skeleton([ob.execution for ob in sub.obs.by_test.values()], genome_vocabulary(g))
+    for c in procedure_structure_claims(g, sk):
+        p = next(q for q in g.procedures if q.id == c["procedure"])
+        if c["status"] == REJECTED and p.status != REJECTED:
+            p.status = REJECTED
+            p.status_reason = f"structure contradicted: {c['claim']}: {c['why']}"
     return g
 
 
@@ -938,6 +1082,9 @@ class SeqPrediction:
     )  # ("call", e) | ("branch", site, v) | ("set", var, val)
     state: dict[str, Any] = field(default_factory=dict)
     indeterminate: str | None = None
+    # the predicted occurrence tree: {"entity", "parent": index | None,
+    # "events": [("call", entity) | ("branch", "site:<id>")]} (see diffgenome.structure)
+    occurrences: list[dict[str, Any]] = field(default_factory=list)
 
 
 def predict_sequence(
@@ -960,7 +1107,13 @@ def predict_sequence(
                 return k
         return None
 
-    def run_steps(steps: list[str], env: dict[str, Any], depth: int) -> bool:
+    def new_occurrence(entity: str, parent: int | None) -> int:
+        pred.occurrences.append({"entity": entity, "parent": parent, "events": []})
+        if parent is not None:
+            pred.occurrences[parent]["events"].append(("call", entity))
+        return len(pred.occurrences) - 1
+
+    def run_steps(steps: list[str], env: dict[str, Any], depth: int, occ: int) -> bool:
         """Returns True if the enclosing entity stops."""
         for st in steps:
             if pred.indeterminate:
@@ -969,8 +1122,9 @@ def predict_sequence(
             if kind == "call":
                 pred.events.append(("call", ref))
                 key = entity_key(ref)
+                child = new_occurrence(key or ref, occ)
                 if key is not None:
-                    run_entity(key, env, depth + 1)
+                    run_entity(key, env, depth + 1, child)
             elif kind == "T":
                 t = transitions.get(ref)
                 if t is None or not usable(t):
@@ -1001,20 +1155,21 @@ def predict_sequence(
                     return True
                 if d.site:
                     pred.events.append(("branch", d.site, v))
+                    pred.occurrences[occ]["events"].append(("branch", f"site:{d.site}"))
                 b = d.true_branch if v else d.false_branch
                 if b.outcome and b.outcome.get("is"):
                     pred.events.append(
                         ("outcome", b.outcome.get("entity") or d.entity, b.outcome["is"])
                     )
                 inner = b.steps or [f"call:{c}" for c in b.calls]
-                if run_steps(inner, env, depth) or b.stops:
+                if run_steps(inner, env, depth, occ) or b.stops:
                     return True
             else:
                 pred.indeterminate = f"unknown step {st!r}"
                 return True
         return False
 
-    def run_entity(key: str, env: dict[str, Any], depth: int) -> None:
+    def run_entity(key: str, env: dict[str, Any], depth: int, occ: int) -> None:
         if depth > max_depth:
             pred.indeterminate = f"depth limit at {key}"
             return
@@ -1022,7 +1177,7 @@ def predict_sequence(
         if not usable(p):
             pred.indeterminate = f"procedure {p.id} ({key}) is {p.status}"
             return
-        stopped = run_steps(p.steps, env, depth)
+        stopped = run_steps(p.steps, env, depth, occ)
         if not stopped and not pred.indeterminate and p.outcome and p.outcome.get("is"):
             pred.events.append(("outcome", p.outcome.get("entity") or p.entity, p.outcome["is"]))
 
@@ -1032,6 +1187,7 @@ def predict_sequence(
         e = call["entity"]
         pred.events.append(("call", e))
         key = entity_key(e)
+        top = new_occurrence(key or e, None)
         if key is None:
             # an entity the genome says nothing about is a call with no modeled behavior;
             # one the genome has decisions for but no procedure cannot be predicted
@@ -1042,7 +1198,7 @@ def predict_sequence(
                 pred.indeterminate = f"no procedure for {e}, which has decisions"
                 break
             continue
-        run_entity(key, env, 0)
+        run_entity(key, env, 0, top)
         if pred.indeterminate:
             break
     return pred
@@ -1186,6 +1342,7 @@ def compare_sequence(
     ob: ExecObs,
     sites: set[str],
     required_sites: set[str] | None = None,
+    skeleton: Skeleton | None = None,
 ) -> dict[str, Any]:
     """Predicted branch events vs the observed branch vector over the genome's sites (exact,
     in order), and the predicted final state vs the last observed exit state of each bound
@@ -1225,13 +1382,24 @@ def compare_sequence(
         unmatched_pred = [c for c in claims if not any(exit_matches(c, o) for o in seen)]
         if unmatched_obs or unmatched_pred:
             outcome_diff[ent] = {"predicted": sorted(set(claims)), "observed": sorted(set(seen))}
-    indeterminate = pred.indeterminate or (
-        f"no decision covers observed site(s) {', '.join(uncovered)}" if uncovered else None
+    # observed execution structure: a prediction that places a call or a decision where it
+    # was never observed (hoisted out of a modeled caller, or evaluated in the wrong call)
+    # predicts a structure the evidence does not have: indeterminate, never a guess
+    placement: list[str] = []
+    if skeleton is not None:
+        vocab = sorted(skeleton.seen)
+        tree = [{**o, "entity": resolve(vocab, o["entity"])} for o in pred.occurrences]
+        placement = placement_problems(tree, skeleton)
+    indeterminate = (
+        pred.indeterminate
+        or (f"no decision covers observed site(s) {', '.join(uncovered)}" if uncovered else None)
+        or (f"placement: {'; '.join(placement[:3])}" if placement else None)
     )
     return {
         "execution": ob.execution.stimulus_ref,
         "indeterminate": indeterminate,
         "uncovered_sites": uncovered,
+        "placement_problems": placement,
         "predicted_branches": predicted_vec,
         "observed_branches": observed_vec,
         "branches_exact": indeterminate is None and predicted_vec == observed_vec,

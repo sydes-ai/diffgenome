@@ -8,7 +8,7 @@ Two substrates, same proposal and same frozen checker (genome_state at 5f45eb2):
              DeferredFieldImporter file. Closure variables of a nested function resolve as
              `global:` (the front end has no closure scope) — a stated caveat.
 
-usage: establish_exp10.py <head-run> <base-run> <case-dir> <head-tree> [<proposals.json>] [<out-prefix>] [frozen|repaired]
+usage: establish_exp10.py <head-run> <base-run> <case-dir> <head-tree> [<proposals.json>] [<out-prefix>] [frozen|repaired|structure]
 """
 
 from __future__ import annotations
@@ -30,11 +30,14 @@ from diffgenome.genome_state import (
     compare_sequence,
     establish_state,
     exit_matches,
+    genome_vocabulary,
     predict_sequence,
+    procedure_structure_claims,
     regimes,
 )
 from diffgenome.model import CallNode
 from diffgenome.serialize import execution_from_json
+from diffgenome.structure import build_skeleton
 
 MODEL = "claude-opus-5-5"
 LOWERED = {
@@ -112,6 +115,7 @@ def run(
     mech_fns: list[dict[str, Any]],
     tree: Path,
     required_symbols: list[str] | None = None,
+    structure: bool = False,
 ) -> dict[str, Any]:
     holdout = json.loads((case / "holdout.json").read_text())
     scenarios = proposals.get("scenarios") or {}
@@ -161,13 +165,17 @@ def run(
     # scored on every observed site of the changed functions (genome_state.change_sites),
     # not only on the sites the genome chose; None keeps Experiment 09's rule
     required = change_sites(mech, obs_all, required_symbols) if required_symbols else None
+    # observed execution structure from the SHOWN executions only (withheld traces never
+    # inform it), relative to the genome's own vocabulary
+    sk = build_skeleton(shown, genome_vocabulary(g)) if structure else None
+    claims = procedure_structure_claims(g, sk) if sk is not None else []
     per_test = []
     for test, sc in sorted(scenarios.items()):
         ob = obs_all.get(test)
         if ob is None:
             continue
         pred = predict_sequence(g, sc)
-        r = compare_sequence(g, pred, ob, sites, required)
+        r = compare_sequence(g, pred, ob, sites, required, sk)
         chosen = compare_sequence(g, pred, ob, sites)
         # the same prediction with every proposal usable: what the model's semantics alone
         # would have predicted, independent of what the checker could establish
@@ -213,6 +221,7 @@ def run(
         "sites_not_in_mechanics": sorted(s for s in sites if s not in mech.sites),
         "required_sites": sorted(required or []),
         "required_sites_uncovered": sorted((required or set()) - sites),
+        "structure_claims": claims,
     }
 
 
@@ -223,6 +232,11 @@ def summarize(res: dict[str, Any], g: Any) -> dict[str, Any]:
         "exact_all": f"{sum(r['match'] for r in pt)}/{len(pt)}",
         "exact_withheld": f"{sum(r['match'] for r in held)}/{len(held)}",
         "exact_on_genome_chosen_sites": f"{sum(r['match_on_genome_sites'] for r in pt)}/{len(pt)}",
+        "structure_claims": {
+            st: sum(1 for c in res.get("structure_claims", []) if c["status"] == st)
+            for st in ("verified", "supported", "rejected", "not established", "unobserved")
+        },
+        "placement_indeterminate": sum(1 for r in pt if r.get("placement_problems")),
         "required_sites_uncovered": res["required_sites_uncovered"],
         "indeterminate": sum(1 for r in pt if r["indeterminate"]),
         "confidently_wrong": sum(1 for r in pt if not r["indeterminate"] and not r["match"]),
@@ -263,14 +277,14 @@ def main() -> int:
     frozen = json.loads((head_run / "mechanics.json").read_text())["functions"]
     report: dict[str, Any] = {}
     required: list[str] | None = None
-    if mode == "repaired":
-        substrates = [("repaired", frozen)]
+    if mode in ("repaired", "structure"):
+        substrates = [(mode, frozen)]
         artifact = json.loads((head_run / "diffgenome-change.json").read_text())
         required = list(artifact["change"]["symbols"])
     else:
         substrates = [("frozen", frozen), ("coverage", coverage_mechanics(frozen, tree))]
     for tag, fns in substrates:
-        res = run(head_run, base_run, case, proposals, fns, tree, required)
+        res = run(head_run, base_run, case, proposals, fns, tree, required, mode == "structure")
         g = res.pop("genome")
         res["summary"] = summarize(res, g)
         report[tag] = res

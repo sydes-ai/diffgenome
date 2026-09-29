@@ -1,0 +1,979 @@
+{
+ "structure": {
+  "statuses": {
+   "variables": {
+    "supported": 12
+   },
+   "decisions": {
+    "supported": 6,
+    "verified": 1
+   },
+   "transitions": {
+    "verified": 2
+   },
+   "procedures": {
+    "supported": 3
+   },
+   "rules": {
+    "supported": 4
+   },
+   "regimes": {
+    "supported": 2
+   }
+  },
+  "per_test": [
+   {
+    "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_can_import_database_with_formula_dependencies",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "No by-name reference to a link_row field; r_non_link_reference_unchanged keeps every dependency set identical to base."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 29
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+    "withheld": true,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "Duplication imports all three tables through the same _import_table_fields, so field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) at head exactly as in the snapshot case, and at base the consumer is not ordered after the deferred array primary ChildId."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 36
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_explicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "The consumer already names (ChildId, LinkedChildren) explicitly; the only by-name link reference (ChildId's field('Detail')) targets a plain text primary, so no ordering hazard in either revision."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 34
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "r_link_reference_implies_primary makes the head dependency set equal to the explicit form, removing r_order_hazard."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 36
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "withheld": true,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "AConsumer's (ToB, None) and BId's (ToC, None) are rewritten at head to (BId, ToB) and (CLabel, ToC), chaining C -> B -> A in dependency levels, whereas at base AConsumer and the array primary BId share a level and AConsumer recalculates against a NULL primary."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 33
+   }
+  ],
+  "regime_classes": [
+   [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   [
+    "test_duplicate_application_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep"
+   ]
+  ],
+  "sites_in_mechanics": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1",
+   "br:f960d9f63045"
+  ],
+  "sites_not_in_mechanics": [],
+  "required_sites": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1",
+   "br:f960d9f63045"
+  ],
+  "required_sites_uncovered": [],
+  "structure_claims": [
+   {
+    "procedure": "p_expand",
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "kind": "evaluates",
+    "claim": "d_expand_passthrough (br:be7d3ee9e3b1) evaluated during DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "status": "verified",
+    "why": "all 26 evaluations"
+   },
+   {
+    "procedure": "p_link_implied",
+    "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+    "kind": "evaluates",
+    "claim": "d_link_table_outside (br:a0d4e306fb5a) evaluated during LinkRowFieldType.get_import_dependency_when_referenced",
+    "status": "verified",
+    "why": "all 3 evaluations"
+   },
+   {
+    "procedure": "p_link_implied",
+    "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+    "kind": "evaluates",
+    "claim": "d_link_primary_missing (br:f960d9f63045) evaluated during LinkRowFieldType.get_import_dependency_when_referenced",
+    "status": "verified",
+    "why": "all 3 evaluations"
+   },
+   {
+    "procedure": "p_link_implied",
+    "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+    "kind": "order",
+    "claim": "site:br:a0d4e306fb5a before site:br:f960d9f63045 in LinkRowFieldType.get_import_dependency_when_referenced",
+    "status": "verified",
+    "why": "all of x before all of y in 2 execution(s)"
+   },
+   {
+    "procedure": "p_import_field",
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "kind": "evaluates",
+    "claim": "d_first_field_of_table (br:3f16965dcd1f) evaluated during DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "status": "verified",
+    "why": "all 26 evaluations"
+   }
+  ],
+  "summary": {
+   "exact_all": "0/5",
+   "exact_withheld": "0/2",
+   "exact_on_genome_chosen_sites": "0/5",
+   "structure_claims": {
+    "verified": 5,
+    "supported": 0,
+    "rejected": 0,
+    "not established": 0,
+    "unobserved": 0
+   },
+   "placement_indeterminate": 0,
+   "required_sites_uncovered": [],
+   "indeterminate": 5,
+   "confidently_wrong": 0,
+   "unchecked_semantics_exact": "0/5",
+   "phenotype_claims_exact": "5/5",
+   "decisions_verified": "1/7",
+   "transitions_verified": "2/2",
+   "rejected": [],
+   "hypothesis": [],
+   "sites_not_in_mechanics": []
+  }
+ }
+}

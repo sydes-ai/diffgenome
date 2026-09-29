@@ -356,6 +356,120 @@ This is the second observed consequence of that gap on the same case. It is stil
 
 Both need design sections 5.2 to 5.4, which still have a single supporting case.
 
+## Step 2b: observed execution structure instead of an iteration primitive
+
+The question: are Step 2a's five confidently wrong predictions evidence for a first-class
+iteration primitive? Or did they come from letting the model rebuild call nesting and
+chronology the runtime had already observed?
+
+The design is in `docs/design-occurrence-structure.md`. In short:
+- occurrences and a skeleton are derived deterministically from the shown executions;
+- predictions that place work where it was never observed become indeterminate;
+- procedures' structure claims are checked, and rejected only on positive evidence;
+- nothing about loops, collections, relations or order is added.
+
+**The skeleton on Case A** comes from the shown head executions only. It recovers the procedure
+exactly:
+- inside `_import_table_fields`: the primary-field scan, then a repeated region of per-field
+  work, then the deferred run, then the refresh pass;
+- the repeated region's head is the expansion, and inside one repetition the order is:
+  expansion, then the defer decision, then add-deferred or import-now;
+- the link-row hook runs only inside the expansion, after its empty-dependencies check.
+
+**Results:**
+
+| | v2, before (Step 2a) | v2 proposal + structure checks | **v3 fresh proposal + structure** |
+|---|---|---|---|
+| held-out exact | 0 / 2 | 0 / 2 | 0 / 2 |
+| all scenarios exact | 0 / 5 | 0 / 5 | 0 / 5 |
+| **confidently wrong** | **5 / 5** | **0 / 5** | **0 / 5** |
+| indeterminate | 0 / 5 | 5 / 5 (expansion hoisted out of its observed caller; the expansion procedure rejected) | 5 / 5 ("no procedure for `_import_table_fields`, which has decisions") |
+| verified decisions | 3 / 7 | 3 / 7 | 1 / 7 |
+| verified transitions | 3 / 5 | 3 / 5 | 2 / 2, both boundary-bound, including the link-row implication |
+| structure claims: verified / rejected / not established | — | 8 / 1 / 2 | **5 / 0 / 0** |
+| phenotype claims (entry exits, base and head) | 5 / 5 | 5 / 5 | 5 / 5 |
+
+- **The v2 rejection** is *inverted placement*. v2's expansion procedure evaluates the defer
+  decision, whose site is evaluated in `_import_table_fields`, the function every observed
+  expansion runs during.
+- **The v3 proposer** was told that structure is a constraint. It placed nothing
+  incorrectly. It declined to give `_import_table_fields` a procedure, because each option
+  would violate a constraint (fixed counts, per-field variable names, or hoisting), and it said
+  so.
+
+**Controls (v3, structure mode):**
+
+| control | result |
+|---|---|
+| c1 inverted guard | the link-row transition is no longer verified (replayed along the observed path, the inverted guard never reaches it); 0 wrong |
+| **c2 pre-change semantics** | **REJECTED**: "implied_dependency observed True, predicted False"; 0 wrong |
+| c3 missing decision | its site is uncovered; the transition is not verified; 0 wrong |
+| c4 fabricated site | hypothesis; 0 wrong |
+
+**Hoisting control:** the v2 proposal itself. Under the structure checks its expansion
+procedure is rejected and its predictions become indeterminate. Nothing is wrong any more.
+
+**Regression:**
+- Experiment 09 (Kokoro, main genome and 4 controls): 0 differences in any status or per-test
+  result, still 13/13 and 4/4. With the placement check on, still 13/13. Kokoro's structure
+  claims: 26 verified, 0 rejected.
+- Experiment 08: identical.
+- Experiment 10 v2, re-established with the new checker: c2 still rejected at both
+  boundaries, boundary transitions and outcomes unchanged. The only difference is v2's
+  expansion procedure, now rejected for inverted placement. So v2's five wrong predictions
+  became indeterminate. No previously correct prediction changed. The Step 2a files in
+  `genome-baserow-6069-v2/` are kept as recorded; the re-established v2 is in
+  `genome-baserow-6069-v2/structure.*`.
+- Tests: 88 pass. The new ones are in `tests/test_structure.py`.
+
+**Which outcome this is: Outcome B.** Structure fixes nesting and removes every confident
+error. It does not let the genome carry per-item facts. The proof comes from the shown traces:
+inside **one** occurrence of `_import_table_fields`, the expansion occurs 8 or 9 times, with
+different facts per occurrence:
+
+```
+formula dependencies:  8 expansions   T F T T T F T F                  (T = empty dependency set)
+explicit:              9 expansions   T T F F+hook T T T T T           (+hook = link-row hook ran)
+implicit:              9 expansions   T T F+hook F+hook T T T T T
+```
+
+The count and the pattern come from the test's field list, not from program state. The genome
+can change facts inside one call only through transitions, which are deterministic in state.
+Scenario facts enter only at top-level calls. So there are exactly three options:
+- hard-code the per-test pattern into transitions, which is not generative;
+- hoist the per-field calls, which is now a placement error, indeterminate;
+- supply the facts per occurrence inside the enclosing call.
+
+**The minimal missing concept is therefore per-occurrence fact binding for a repeated region.**
+- A procedure marks where the observed repeated region goes. The skeleton already supplies its
+  placement and its order inside one repetition.
+- The scenario supplies, for each repetition, that occurrence's facts, read by the model from
+  the test's setup.
+- There is no loop variable, no collection, no derived order, and no count claimed by the
+  genome.
+
+It is a restricted relative of the `for_each` in design 5.4: its source is scenario-supplied
+occurrences, not a relation, and it has no `respecting` order. It is not built in this pass.
+
+**The answers:**
+- **Did Baserow require a first-class iteration primitive for correct procedural prediction?**
+  No. The five confident errors were a structural fault: the model was inventing nesting the
+  runtime had observed. Deterministic occurrence structure removes all of them, and the
+  genome's structure claims now verify.
+- **Is structure sufficient for *correct* prediction?** No, only for *safe* prediction.
+  Predicting the per-field region needs per-occurrence fact binding, above. That is narrower
+  than iteration.
+- **What remains impossible without relation and order semantics:**
+  - which deferred field is imported before which;
+  - that the consumer lands on the same level as the linked table's formula primary at base,
+    and after it at head;
+  - the two-link chain;
+  - the base `DataError` as a *derived* consequence rather than the model's claim.
+
+  Per-occurrence binding would let the genome predict the per-field decisions and
+  deferral. It would not let it predict the order the importer runs them in, or the failure
+  that order causes.
+
 ## Artifacts
 
 `docs/runs/genome-baserow-6069/`:
