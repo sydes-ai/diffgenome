@@ -104,6 +104,7 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | **Ground truth**: edge precision/recall and seam-level join grading against hidden whole executions | done; see `docs/experiment-05.md` |
 | **Third runtime (Go)**, behavioral projection (`map.md`), ambiguity report, path-level ground truth, three real-diff case studies | done; see `docs/experiment-06.md` and `docs/runs/cases/` |
 | **STATE rung** (bounded, value-free state facts on all three runtimes), exit categories (`returned-error`/`panic`), adversarial ground truth VALUE-only vs STATE, join matrix and path precision/recall with explanations, state-condition probe objective | done; see `docs/experiment-07.md` and `docs/runs/exp07-state/` |
+| **Integration surface**: `diffgenome change` / `diffgenome.api`, the `diffgenome-change/1` artifact, consumed by Sydes `verify-change --behavioral-map diffgenome` | done; see `docs/integration-artifact.md` and `docs/integration-sydes.md` |
 | Goroutine/coroutine spawn causality, Linux OS-plane collector, larger targets, state-condition probes against a live writer | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
@@ -153,6 +154,10 @@ whole run.
 - [docs/experiment-06.md](docs/experiment-06.md): three real changes across Python, Node and Go,
   the behavioral projection, ambiguity analysis, path-level ground truth, and the
   language-neutrality accounting after three runtimes.
+- [docs/integration-artifact.md](docs/integration-artifact.md): the `diffgenome-change/1`
+  contract, the only surface an integrator reads.
+- [docs/integration-sydes.md](docs/integration-sydes.md): Sydes consuming DiffGenome on a real
+  change, before and after, with the merge policy and the integration-boundary decision.
 - [docs/experiment-07.md](docs/experiment-07.md): the STATE rung and the exit model, an
   adversarial ground truth where VALUE must fail, VALUE-only vs STATE on the same corpus,
   the Kokoro and Go replays, and the privacy accounting for state.

@@ -200,12 +200,25 @@ def evaluate_main(argv: list[str]) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    argv = sys.argv[1:]
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] == "inspect":
-        sys.exit(inspect_main(argv[1:]))
+        return inspect_main(argv[1:])
     if argv and argv[0] == "evaluate":
-        sys.exit(evaluate_main(argv[1:]))
+        return evaluate_main(argv[1:])
+    if argv and argv[0] == "change":
+        # The integrator's entry point: same pipeline as `mvp`, existing tests only by
+        # default (no LLM call), and the diffgenome-change/1 artifact as the product.
+        rest = argv[1:]
+        if "--writer" not in rest:
+            rest = ["--writer", "none", *rest]
+        if "--probes" not in rest:
+            rest = ["--probes", "0", *rest]
+        return mvp.main(rest)
     if argv and argv[0] == "mvp":
         argv = argv[1:]
-    sys.exit(mvp.main(argv))
+    return mvp.main(argv)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

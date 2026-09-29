@@ -19,6 +19,8 @@ from pathlib import Path
 
 from diffgenome.ambiguity import render_ambiguity
 from diffgenome.change import ChangeSet, changes_from_diff, changes_from_symbols, git_diff
+from diffgenome.change_artifact import build_change_artifact
+from diffgenome.change_artifact import dumps as dump_artifact
 from diffgenome.compose import build_corpus
 from diffgenome.graph import build_graph
 from diffgenome.llm import OpenAIProbeWriter, ProbeWriter, RecordedProbeWriter
@@ -211,6 +213,41 @@ def main(argv: list[str] | None = None) -> int:
         )
         (out / "report.md").write_text(text)
         (out / "report.json").write_text(report_json(change, nb_before, attempts, nb_after, notes))
+        # 13. the integration artifact: bounded, change-centred, no internal objects
+        artifact = build_change_artifact(
+            final_graph,
+            seeds,
+            up=args.up,
+            down=args.down,
+            change_spec=change.description,
+            runtime=runtime.name,
+            repo=str(repo),
+            revision=args.rev,
+            budget={
+                "writer": args.writer,
+                "probes_requested": args.probes if writer is not None else 0,
+                "attempts_per_probe": args.attempts,
+                "llm_calls": sum(1 for a in attempts if a.draft is not None)
+                if args.writer == "openai"
+                else 0,
+                "existing_traces_reused": bool(args.traces),
+            },
+            probes=[
+                {
+                    "tag": f"{i}",
+                    "objective": a.objective.kind,
+                    "target": a.objective.target,
+                    "attempt": a.attempt,
+                    "verdict": a.verdict,
+                    "reasons": list(a.reasons)[:3],
+                }
+                for i, a in enumerate(attempts)
+            ],
+            notes=notes,
+            graph_before=graph if graph_after else None,
+        )
+        (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
+        (out / "behavioral-map.md").write_text(behavior_map)
         print(text)
         _log(f"report: {out / 'report.md'}  graph: {out / 'graph.json'}  map: {out / 'map.md'}")
     finally:

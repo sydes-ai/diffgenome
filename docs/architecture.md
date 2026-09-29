@@ -440,6 +440,20 @@ rules, executions, probe flag and its full evidence (site, fragment, alternates)
 every join attempt including rejected and unsound ones. It loads back without the corpus
 for queries (`inspect`) and grading (`evaluate`).
 
+## 12a. Integration surface (built)
+
+Consumers such as Sydes read exactly one thing: the `diffgenome-change/1` artifact
+(`docs/integration-artifact.md`), produced by `diffgenome change …` (a console script; same
+pipeline as `mvp`, existing tests only unless a probe budget is given) or by
+`diffgenome.api.analyze_change(...)`. The artifact is a bounded, deterministic, change-centred
+projection: nodes with stable ids and locations, one edge per production caller→callee with
+its evidence class / join grade / STATE status / exit verdict / provenance, boundaries,
+contributing executions, ambiguous seams with rejection reasons, a probe summary and the
+case-metrics facts. No collector, corpus, graph or composer object crosses the line; the
+runtime adapter's options are forwarded opaquely by the integrator. The integration itself
+(merge policy, rendering, fallback) lives on the consumer's side: see
+`docs/integration-sydes.md`.
+
 ## 13. Deliberately not built
 
 Persistent graph store, genome interning, commit-to-commit diffing, test selection, static
