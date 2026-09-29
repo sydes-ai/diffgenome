@@ -8,10 +8,12 @@ never flattened into paths: alternatives for one seam are sibling branches.
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 from diffgenome.model import (
+    ArgShapes,
     BoundaryClass,
     CallNode,
     Edge,
@@ -249,6 +251,32 @@ def state_compatibility(site: SubstitutionNode, fragment: CallNode) -> tuple[str
     return "match", f"state matched on {len(common)} fact(s): " + ", ".join(common[:6])
 
 
+_PLACEHOLDER = re.compile(r"^(arg|_)\d+$|^\*")
+
+
+def align_arguments(
+    site: ArgShapes, fragment: ArgShapes
+) -> tuple[list[tuple[tuple[str, str, str], tuple[str, str, str]]], list[str]]:
+    """Pair the seam's arguments with the fragment's. By name when both sides recorded
+    real parameter names (a keyword call at the seam and the signature order in the
+    fragment differ in order and in which defaults appear); by position otherwise
+    (placeholder names such as ``arg0``). Returns the pairs and the names present on
+    one side only (for positional pairing: the surplus positions)."""
+    named = all(not _PLACEHOLDER.match(n) for n, _, _ in site) and all(
+        not _PLACEHOLDER.match(n) for n, _, _ in fragment
+    )
+    if named:
+        by_name = {n: a for a in fragment for n in [a[0]]}
+        pairs = [(a, by_name[a[0]]) for a in site if a[0] in by_name]
+        site_names = {a[0] for a in site}
+        one_sided = sorted(({a[0] for a in site} - set(by_name)) | (set(by_name) - site_names))
+        if pairs:
+            return pairs, one_sided
+    pairs = list(zip(site, fragment, strict=False))
+    longer = site if len(site) > len(fragment) else fragment
+    return pairs, [a[0] for a in longer[len(pairs) :]]
+
+
 def grade_seam(
     site: SubstitutionNode, fragment: CallNode, use_state: bool = True
 ) -> tuple[JoinStrength | None, str]:
@@ -276,7 +304,7 @@ def grade_seam(
         return JoinStrength.VALUE, "no arguments; " + snote
     if not site.args or not fragment.args:
         return JoinStrength.SYMBOL, "; ".join([*notes, "arity differs: arguments on one side only"])
-    pairs = list(zip(site.args, fragment.args, strict=False))
+    pairs, one_sided = align_arguments(site.args, fragment.args)
     verdicts = [(n, a, b, _types_compatible(a, b)) for (n, a, _), (_, b, _) in pairs]
     conflicts = [f"{a}≠{b}" for _, a, b, v in verdicts if v == "conflict"]
     if conflicts:
@@ -290,6 +318,11 @@ def grade_seam(
     wild = [n for n, a, b, _ in verdicts if _shape_type(a) != _shape_type(b)]
     if wild:
         notes.append("stand-in argument, type unverified: " + ", ".join(wild))
+        return JoinStrength.ARG_SHAPE, "; ".join(notes)
+    if one_sided:
+        # A parameter passed on one side only: the other side used its default, or a
+        # different call shape. Equality of that parameter is not observed, so no VALUE.
+        notes.append("argument on one side only: " + ", ".join(one_sided))
         return JoinStrength.ARG_SHAPE, "; ".join(notes)
     missing = [n for (_, _, da), (n, _, db) in pairs if not da or not db]
     if missing:

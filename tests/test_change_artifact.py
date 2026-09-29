@@ -57,6 +57,12 @@ def test_shape_and_provenance(artifact: dict[str, Any], tmp_path: Path) -> None:
     assert artifact["ambiguous_seams"][0]["rejected_candidates"] == 3
     assert artifact["facts"]["joins"]["STATE"] == 1
     assert all(e["stimulus"] == "existing_test" for e in artifact["executions"])
+    files = {e["id"]: e["file"] for e in artifact["executions"]}
+    assert {e["outcome"] for e in artifact["executions"]} == {"passed"}
+    assert (
+        files["tests/test_pipeline.py::test_execute_wraps_processor_result"]
+        == "tests/test_pipeline.py"
+    )
     # round trip through the file API
     path = tmp_path / "diffgenome-change.json"
     path.write_text(dumps(artifact))

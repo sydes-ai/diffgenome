@@ -419,6 +419,25 @@ def verify(
     return "accepted", [], after, learned, new_corpus
 
 
+def apply_budget_policy(
+    objectives: list[ProbeObjective],
+    max_objectives: int,
+    max_distance: int | None,
+    skipped: list[str] | None = None,
+) -> list[ProbeObjective]:
+    """Keep objectives within `max_distance` hops of a changed symbol, in priority order,
+    up to `max_objectives`. What the policy excludes is reported, never silently dropped."""
+    if max_distance is not None:
+        far = [o for o in objectives if o.distance > max_distance]
+        objectives = [o for o in objectives if o.distance <= max_distance]
+        if skipped is not None:
+            skipped.extend(
+                f"{o.target}: {o.kind} at distance {o.distance} > budget policy {max_distance}"
+                for o in far
+            )
+    return objectives[:max_objectives]
+
+
 def run_probe_loop(
     graph: BehavioralGraph,
     neighborhood: Neighborhood,
@@ -431,13 +450,23 @@ def run_probe_loop(
     up: int,
     down: int,
     skipped: list[str] | None = None,
+    max_distance: int | None = None,
 ) -> tuple[list[ProbeAttempt], Corpus]:
+    """`max_distance` is the integrated-mode budget policy: only objectives within that
+    many hops of a changed symbol are attempted (0: changed symbols nothing executes;
+    1: their direct callers and callees). Farther ones are listed in `skipped`, not
+    silently dropped."""
     out_dir.mkdir(parents=True, exist_ok=True)
     assert graph.corpus is not None
     corpus = graph.corpus
     seeds = list(neighborhood.seeds)
     attempts: list[ProbeAttempt] = []
-    objectives = select_objectives(neighborhood, graph, max_objectives, index, skipped)
+    objectives = apply_budget_policy(
+        select_objectives(neighborhood, graph, max_objectives * 4, index, skipped),
+        max_objectives,
+        max_distance,
+        skipped,
+    )
     for i, o in enumerate(objectives):
         failures: list[str] = []
         current_graph = build_graph(corpus)

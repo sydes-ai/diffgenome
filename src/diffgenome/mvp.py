@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import shlex
 import sys
 import time
@@ -29,9 +30,17 @@ from diffgenome.probe import ProbeAttempt, ProbeRunner, run_probe_loop
 from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.runtime import RuntimeAdapter, SymbolIndex
-from diffgenome.sandbox import Workspace
+from diffgenome.sandbox import Workspace, host_supports_confinement
 from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
+
+
+def _write_status(out: Path, status: str, reason: str) -> None:
+    """When no diffgenome-change.json can be produced, say why in a file an integrator in
+    another job can read (diffgenome-status/1), instead of leaving only a missing file."""
+    (out / "diffgenome-status.json").write_text(
+        json.dumps({"format": "diffgenome-status/1", "status": status, "reason": reason}) + "\n"
+    )
 
 
 def _log(msg: str) -> None:
@@ -94,11 +103,27 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--no-state", action="store_true", help="ignore state facts at seams (VALUE-only baseline)"
     )
+    ap.add_argument(
+        "--probe-max-distance",
+        type=int,
+        default=None,
+        help="only probe gaps within this many hops of a changed symbol (integrated mode: 1)",
+    )
     args = ap.parse_args(argv)
 
     repo = args.repo.resolve()
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
+    if not host_supports_confinement():
+        # Invariant: target code never runs unconfined. Say so in one line an integrator
+        # can show verbatim, instead of failing later with a traceback.
+        reason = (
+            f"refusing to run: no supported OS sandbox on this host ({platform.system()}); "
+            "target tests are never executed unconfined"
+        )
+        _log(reason)
+        _write_status(out, "refused", reason)
+        return 3
     pytest_args = [a for chunk in args.pytest_arg for a in shlex.split(chunk)]
     runtime = make_runtime(args, repo, pytest_args)
     notes: list[str] = []
@@ -122,6 +147,9 @@ def main(argv: list[str] | None = None) -> int:
             _log(f"existing tests: {tail} -> {len(executions)} executions")
         if not executions and not args.traces:
             _log("no executions captured; see existing-tests.log")
+            _write_status(
+                out, "failed", "no test executions captured (test command failed or found no tests)"
+            )
             return 2
         if not executions:
             notes.append("cold start: no existing executions; every changed symbol is uncovered")
@@ -176,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
             skipped: list[str] = []
             attempts, corpus_after = run_probe_loop(
                 graph, nb_before, index, writer, runner, out, args.probes, args.attempts,
-                args.up, args.down, skipped,
+                args.up, args.down, skipped, max_distance=args.probe_max_distance,
             )  # fmt: skip
             notes.extend(f"not probeable: {s}" for s in skipped)
             accepted = sum(a.verdict == "accepted" for a in attempts)
@@ -231,6 +259,7 @@ def main(argv: list[str] | None = None) -> int:
                 if args.writer == "openai"
                 else 0,
                 "existing_traces_reused": bool(args.traces),
+                "probe_max_distance": args.probe_max_distance,
             },
             probes=[
                 {

@@ -18,7 +18,15 @@ from typing import Any
 
 from diffgenome import __version__
 from diffgenome.graph import BehavioralGraph, GraphEdge
-from diffgenome.model import EvidenceKind, JoinStrength, Origin, Stimulus, SymbolId
+from diffgenome.model import (
+    CallNode,
+    EvidenceKind,
+    Execution,
+    JoinStrength,
+    Origin,
+    Stimulus,
+    SymbolId,
+)
 from diffgenome.projection import case_metrics, project, render_behavior_map
 
 FORMAT = "diffgenome-change/1"
@@ -40,6 +48,19 @@ def _name(symbol: SymbolId) -> str:
 
 def _execution_label(execution_id: str) -> str:
     return execution_id.split("@")[0]
+
+
+def _test_file(ex: Execution) -> str | None:
+    """The test source file of an execution: the location of the first test-origin call
+    the collector attributed a location to (the stimulus root itself may carry none, as a
+    Go subtest's does)."""
+    symbols = {sym.id: sym for sym in ex.symbols}
+    for node in ex.nodes:
+        if isinstance(node, CallNode):
+            sym = symbols.get(node.symbol)
+            if sym is not None and sym.origin is Origin.TEST and sym.location is not None:
+                return sym.location.path
+    return None
 
 
 def _state_status(graph: BehavioralGraph, edge: GraphEdge) -> str:
@@ -184,11 +205,18 @@ def build_change_artifact(
     executions = []
     for x in sorted(exec_ids):
         stim = "generated_probe"
+        test_file: str | None = None
+        outcome: str | None = None
         if graph.corpus is not None and x in graph.corpus.executions:
-            stim = graph.corpus.executions[x].stimulus.value
+            ex = graph.corpus.executions[x]
+            stim = ex.stimulus.value
+            test_file = _test_file(ex)
+            outcome = ex.outcome
         elif "diffgenome_probe" not in x:
             stim = Stimulus.EXISTING_TEST.value
-        executions.append({"id": _execution_label(x), "stimulus": stim})
+        executions.append(
+            {"id": _execution_label(x), "stimulus": stim, "file": test_file, "outcome": outcome}
+        )
 
     # ---- ambiguous seams and rejected candidates on neighborhood seams
     sites = {ev.site for _, e in nb.edges.values() for ev in e.evidence}

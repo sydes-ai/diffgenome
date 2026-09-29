@@ -1,0 +1,1291 @@
+{
+ "format": "diffgenome-change/1",
+ "generated_by": "diffgenome 0.0.1",
+ "generated_at": "2026-09-29T04:17:55+00:00",
+ "repository": {
+  "root": "/private/tmp/claude-501/-Users-ksnaik-StudioProjects-diffgenome/aefb02de-a379-42cc-819b-9d59916c2d04/scratchpad/ko",
+  "runtime": "python/pytest",
+  "revision": "checkout"
+ },
+ "change": {
+  "spec": "git diff 5152e8b6e29bd8f1ddd68c62a1a2471b5b34fd44..9c7819c6806c6c0d2b1bdbcb72e08ac91d961b22",
+  "symbols": [
+   "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "py:api.src.services.text_processing.text_processor.split_by_voice"
+  ],
+  "symbols_never_executed": []
+ },
+ "neighborhood": {
+  "up": 5,
+  "down": 4,
+  "symbols": 15
+ },
+ "budget": {
+  "writer": "none",
+  "probes_requested": 0,
+  "attempts_per_probe": 1,
+  "llm_calls": 0,
+  "existing_traces_reused": false,
+  "probe_max_distance": 1
+ },
+ "nodes": [
+  {
+   "id": "py:api.src.routers.development.create_captioned_speech",
+   "name": "api.src.routers.development.create_captioned_speech",
+   "file": "api/src/routers/development.py",
+   "line": 216,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 6
+  },
+  {
+   "id": "py:api.src.routers.development.create_dialogue",
+   "name": "api.src.routers.development.create_dialogue",
+   "file": "api/src/routers/development.py",
+   "line": 180,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 6
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible._alias_target",
+   "name": "api.src.routers.openai_compatible._alias_target",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 97,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 46
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.alias_rate",
+   "name": "api.src.routers.openai_compatible.alias_rate",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 127,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 31
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.create_speech",
+   "name": "api.src.routers.openai_compatible.create_speech",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 299,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 30
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "name": "api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 203,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": true,
+   "executed_by": 35
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags.<locals>.<lambda>@237",
+   "name": "api.src.routers.openai_compatible.process_and_validate_voice_tags.<locals>.<lambda>@237",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 237,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 12
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.process_and_validate_voices",
+   "name": "api.src.routers.openai_compatible.process_and_validate_voices",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 133,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 41
+  },
+  {
+   "id": "py:api.src.routers.openai_compatible.resolve_voice_alias",
+   "name": "api.src.routers.openai_compatible.resolve_voice_alias",
+   "file": "api/src/routers/openai_compatible.py",
+   "line": 119,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 42
+  },
+  {
+   "id": "py:api.src.services.text_processing.text_processor.split_by_voice",
+   "name": "api.src.services.text_processing.text_processor.split_by_voice",
+   "file": "api/src/services/text_processing/text_processor.py",
+   "line": 113,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": true,
+   "executed_by": 23
+  },
+  {
+   "id": "py:api.src.services.tts_service.TTSService._split_multi_voice",
+   "name": "api.src.services.tts_service.TTSService._split_multi_voice",
+   "file": "api/src/services/tts_service.py",
+   "line": 265,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 11
+  },
+  {
+   "id": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "name": "api.src.services.tts_service.TTSService.generate_audio",
+   "file": "api/src/services/tts_service.py",
+   "line": 500,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 2
+  },
+  {
+   "id": "py:api.src.services.tts_service.TTSService.generate_audio_stream",
+   "name": "api.src.services.tts_service.TTSService.generate_audio_stream",
+   "file": "api/src/services/tts_service.py",
+   "line": 319,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 7
+  },
+  {
+   "id": "py:api.src.services.tts_service.TTSService.list_voices",
+   "name": "api.src.services.tts_service.TTSService.list_voices",
+   "file": "api/src/services/tts_service.py",
+   "line": 545,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 1
+  },
+  {
+   "id": "py:api.src.structures.schemas.clamp_rate",
+   "name": "api.src.structures.schemas.clamp_rate",
+   "file": "api/src/structures/schemas.py",
+   "line": 64,
+   "kind": "callable",
+   "origin": "repo",
+   "changed": false,
+   "executed_by": 24
+  }
+ ],
+ "edges": [
+  {
+   "caller": "py:api.src.routers.development.create_captioned_speech",
+   "callee": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_captioned_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_captioned_streaming_over_pause_budget_is_400"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.development.create_dialogue",
+   "callee": "py:api.src.routers.openai_compatible.create_speech",
+   "evidence": "observed",
+   "distance": 2,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_rejects_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.alias_rate",
+   "callee": "py:api.src.routers.openai_compatible._alias_target",
+   "evidence": "observed",
+   "distance": 2,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_on_voice_param_multiplies_speed_when_tags_off",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_on_voice_param_opens_a_baserate_tag_when_tags_on",
+    "api/tests/test_openai_endpoints.py::test_captioned_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_captioned_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_server_error",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+    "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "callee": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_server_error",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+    "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "callee": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "evidence": "composed",
+   "distance": 4,
+   "join": "ARG_SHAPE",
+   "also_composed_at": null,
+   "state": "not_consulted",
+   "exit": "same",
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_tts_service.py::test_generate_audio_joins_encoded_chunks"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {
+    "ARG_SHAPE": 10
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "static-return-type"
+   ]
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "callee": "py:api.src.routers.openai_compatible.alias_rate",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "callee": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags.<locals>.<lambda>@237",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "callee": "py:api.src.routers.openai_compatible.process_and_validate_voices",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_rejects_unknown",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_pointing_at_an_unknown_voice_still_fails",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voice_tags",
+   "callee": "py:api.src.services.tts_service.TTSService.list_voices",
+   "evidence": "composed",
+   "distance": 1,
+   "join": "VALUE",
+   "also_composed_at": null,
+   "state": "unavailable",
+   "exit": "same",
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_rejects_unknown",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_pointing_at_an_unknown_voice_still_fails",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags",
+    "api/tests/test_tts_service.py::test_list_voices"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {
+    "VALUE": 16
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "claim-member",
+    "static-return-type"
+   ]
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voices",
+   "callee": "py:api.src.routers.openai_compatible.resolve_voice_alias",
+   "evidence": "observed",
+   "distance": 2,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_combine_voices",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_list_input",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_weighted",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_rejects_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_malformed_voice_weights_are_rejected_up_front",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_invalid_voice",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_rejects_unknown",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_server_error",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_openai_endpoints.py::test_streaming_error",
+    "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+    "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_applies_to_the_voice_parameter",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_pointing_at_an_unknown_voice_still_fails",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags",
+    "api/tests/test_openai_endpoints.py::test_weighted_combinations_pass_validation"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.process_and_validate_voices",
+   "callee": "py:api.src.services.tts_service.TTSService.list_voices",
+   "evidence": "composed",
+   "distance": 2,
+   "join": "VALUE",
+   "also_composed_at": null,
+   "state": "unavailable",
+   "exit": "same",
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_combine_voices",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_list_input",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_weighted",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_rejects_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_malformed_voice_weights_are_rejected_up_front",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_invalid_voice",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_server_error",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_openai_endpoints.py::test_streaming_error",
+    "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+    "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_applies_to_the_voice_parameter",
+    "api/tests/test_openai_endpoints.py::test_weighted_combinations_pass_validation",
+    "api/tests/test_tts_service.py::test_list_voices"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {
+    "VALUE": 41
+   },
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": [
+    "claim-member",
+    "static-return-type"
+   ]
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.resolve_voice_alias",
+   "callee": "py:api.src.routers.openai_compatible._alias_target",
+   "evidence": "observed",
+   "distance": 3,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_an_exactly_spelled_alias_wins_over_a_folded_one",
+    "api/tests/test_openai_endpoints.py::test_combine_voices",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_list_input",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_combine_voices_weighted",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_rejects_unknown_voice",
+    "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_malformed_voice_weights_are_rejected_up_front",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_invalid_voice",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+    "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+    "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+    "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+    "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_rejects_unknown",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_openai_endpoints.py::test_server_error",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+    "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+    "api/tests/test_openai_endpoints.py::test_streaming_error",
+    "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+    "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header",
+    "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+    "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_applies_to_the_voice_parameter",
+    "api/tests/test_openai_endpoints.py::test_voice_alias_pointing_at_an_unknown_voice_still_fails",
+    "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags",
+    "api/tests/test_openai_endpoints.py::test_weighted_combinations_pass_validation"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.services.text_processing.text_processor.split_by_voice",
+   "callee": "py:api.src.structures.schemas.clamp_rate",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+    "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+    "api/tests/test_text_processor.py::test_baserate_persists_across_voice_change",
+    "api/tests/test_text_processor.py::test_split_baserate_product_clamps_to_speed_bounds",
+    "api/tests/test_text_processor.py::test_split_by_rate_clamps_to_speed_bounds",
+    "api/tests/test_text_processor.py::test_split_by_rate_segments",
+    "api/tests/test_text_processor.py::test_split_by_voice_accepts_combined_voices",
+    "api/tests/test_text_processor.py::test_split_by_voice_keeps_pause_tags",
+    "api/tests/test_text_processor.py::test_split_by_voice_leading_text_uses_default",
+    "api/tests/test_text_processor.py::test_split_by_voice_merges_repeated_voice",
+    "api/tests/test_text_processor.py::test_split_by_voice_multiple_speakers",
+    "api/tests/test_text_processor.py::test_split_rate_scales_baserate",
+    "api/tests/test_text_processor.py::test_split_voice_tag_resets_rate",
+    "api/tests/test_tts_service.py::test_rate_tags_multiply_request_speed",
+    "api/tests/test_tts_service.py::test_split_multi_voice_explicit_lang_code_wins",
+    "api/tests/test_tts_service.py::test_split_multi_voice_lang_code_per_speaker",
+    "api/tests/test_tts_service.py::test_split_multi_voice_resolves_each_speaker_once",
+    "api/tests/test_tts_service.py::test_timestamps_carry_speaker_when_tags_allowed",
+    "api/tests/test_tts_service.py::test_timings_carry_speaker_when_tags_allowed"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.services.tts_service.TTSService._split_multi_voice",
+   "callee": "py:api.src.services.text_processing.text_processor.split_by_voice",
+   "evidence": "observed",
+   "distance": 1,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+    "api/tests/test_tts_service.py::test_rate_tags_multiply_request_speed",
+    "api/tests/test_tts_service.py::test_split_multi_voice_explicit_lang_code_wins",
+    "api/tests/test_tts_service.py::test_split_multi_voice_lang_code_per_speaker",
+    "api/tests/test_tts_service.py::test_split_multi_voice_resolves_each_speaker_once",
+    "api/tests/test_tts_service.py::test_timestamps_carry_speaker_when_tags_allowed",
+    "api/tests/test_tts_service.py::test_timings_carry_speaker_when_tags_allowed"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "callee": "py:api.src.services.tts_service.TTSService.generate_audio_stream",
+   "evidence": "observed",
+   "distance": 3,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  },
+  {
+   "caller": "py:api.src.services.tts_service.TTSService.generate_audio_stream",
+   "callee": "py:api.src.services.tts_service.TTSService._split_multi_voice",
+   "evidence": "observed",
+   "distance": 2,
+   "join": null,
+   "also_composed_at": null,
+   "state": "n/a",
+   "exit": null,
+   "probe_derived": false,
+   "executions": [
+    "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+    "api/tests/test_tts_service.py::test_rate_tags_multiply_request_speed",
+    "api/tests/test_tts_service.py::test_timestamps_carry_speaker_when_tags_allowed",
+    "api/tests/test_tts_service.py::test_timestamps_omit_speaker_by_default",
+    "api/tests/test_tts_service.py::test_timings_carry_speaker_when_tags_allowed",
+    "api/tests/test_tts_service.py::test_timings_collect_chunks_and_pauses"
+   ],
+   "probes": [],
+   "composed_shapes_by_grade": {},
+   "same_shape_alternates": 0,
+   "ambiguous": false,
+   "rules": []
+  }
+ ],
+ "boundaries": [
+  {
+   "caller": "py:api.src.services.tts_service.TTSService.list_voices",
+   "target": "py:api.src.inference.voice_manager.VoiceManager.list_voices",
+   "target_name": "api.src.inference.voice_manager.VoiceManager.list_voices",
+   "kind": "gap",
+   "rules": [
+    "static-return-type"
+   ],
+   "distance": 2,
+   "executions": [
+    "api/tests/test_tts_service.py::test_list_voices"
+   ]
+  }
+ ],
+ "executions": [
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_alias_names_are_matched_regardless_of_case",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_alias_rate_expands_to_a_baserate_tag",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_alias_rate_on_voice_param_multiplies_speed_when_tags_off",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_alias_rate_on_voice_param_opens_a_baserate_tag_when_tags_on",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_an_exactly_spelled_alias_wins_over_a_folded_one",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_captioned_endpoint_translates_ssml_input",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_captioned_streaming_over_pause_budget_is_400",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_combine_voices",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_combine_voices_list_input",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_combine_voices_unknown_voice",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_combine_voices_weighted",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_dialogue_endpoint",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_accepts_elevenlabs_field_names",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_opts_into_voice_tags",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_rejects_unknown_voice",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_dialogue_endpoint_resolves_voice_aliases",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_malformed_voice_weights_are_rejected_up_front",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_empty_text",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_endpoint",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_invalid_voice",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_pcm_streaming",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_streaming",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_speech_streaming_over_pause_budget_is_400",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_voice_mapping",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_openai_voice_mapping_streaming",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_plain_text_is_untouched_when_ssml_is_off",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_maps_openai_names",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_process_and_validate_voice_tags_rejects_unknown",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_rate_tag_scales_the_alias_base_rate",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_server_error",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_accepts_voice_aliases",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_ignores_voice_tags_by_default",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_an_alias_to_nowhere",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_rejects_unknown_inline_voice",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_translates_ssml_input",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_with_inline_voice_tags",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_speech_endpoint_without_opt_in_ignores_kill_switch",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_streaming_error",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_streaming_with_timing_sidecar",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_streaming_without_timing_has_no_header",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_tag_validation_scans_the_voice_dir_once",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_unaliased_names_are_left_to_normal_validation",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_voice_alias_applies_to_the_voice_parameter",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_voice_alias_pointing_at_an_unknown_voice_still_fails",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_voice_aliases_stand_in_for_a_mix_in_tags",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_openai_endpoints.py::test_weighted_combinations_pass_validation",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_openai_endpoints.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_baserate_persists_across_voice_change",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_baserate_product_clamps_to_speed_bounds",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_rate_clamps_to_speed_bounds",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_rate_segments",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_voice_accepts_combined_voices",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_voice_keeps_pause_tags",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_voice_leading_text_uses_default",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_voice_merges_repeated_voice",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_by_voice_multiple_speakers",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_rate_scales_baserate",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_text_processor.py::test_split_voice_tag_resets_rate",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_text_processor.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_generate_audio_joins_encoded_chunks",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_list_voices",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_rate_tags_multiply_request_speed",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_split_multi_voice_explicit_lang_code_wins",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_split_multi_voice_lang_code_per_speaker",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_split_multi_voice_resolves_each_speaker_once",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_timestamps_carry_speaker_when_tags_allowed",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_timestamps_omit_speaker_by_default",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_timings_carry_speaker_when_tags_allowed",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  },
+  {
+   "id": "api/tests/test_tts_service.py::test_timings_collect_chunks_and_pauses",
+   "stimulus": "existing_test",
+   "file": "api/tests/test_tts_service.py",
+   "outcome": "passed"
+  }
+ ],
+ "ambiguous_seams": [
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "accepted_candidates": 1,
+   "rejected_candidates": 10,
+   "rejection_reasons": {
+    "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError": 10
+   }
+  }
+ ],
+ "rejected_candidates": [
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  },
+  {
+   "caller": "py:api.src.routers.openai_compatible.create_speech",
+   "target": "py:api.src.services.tts_service.TTSService.generate_audio",
+   "candidate": "api/tests/test_tts_service.py::test_generate_audio_with_nothing_speakable_raises",
+   "reason": "exit conflict: stand-in returned, fragment raised:py:builtins.ValueError"
+  }
+ ],
+ "probes": [],
+ "facts": {
+  "observed_edges": 13,
+  "composed_edges": 3,
+  "joins": {
+   "SYMBOL": 0,
+   "ARG_SHAPE": 1,
+   "VALUE": 2,
+   "STATE": 0
+  },
+  "rejected_joins": 10,
+  "ambiguous_joins": 0,
+  "internal_gaps": 1,
+  "declarations_no_in_repo_body": 0,
+  "unresolved_boundaries": 0,
+  "external_boundaries": 0,
+  "existing_tests_contributing": 68,
+  "probe_derived_edges": 0,
+  "structural_coverage_ratio_NOT_correctness": 0.979
+ },
+ "invariants": [
+  "observed edges were seen in one execution; composed edges are reconstructed across a stand-in seam and are never presented as observed",
+  "join grades are evidence classes, not a probability: SYMBOL < ARG_SHAPE < VALUE < STATE",
+  "structural_coverage_ratio_NOT_correctness counts symbol pairs with evidence; it says nothing about whether the behavior is right",
+  "boundaries are where DiffGenome's knowledge stops: external stays substituted, unresolved was not attributed, gap has no executing fragment"
+ ],
+ "notes": [
+  "60 factory().member stand-ins resolved through declared return types (rule static-return-type)"
+ ]
+}

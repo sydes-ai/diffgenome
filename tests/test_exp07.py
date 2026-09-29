@@ -288,3 +288,59 @@ def test_d3_state_condition_objective(corpus: Corpus) -> None:
 
 def test_fixture_is_read_only() -> None:
     assert not list(Path(FIXTURE).rglob("*.diffgenome*"))
+
+
+def test_d4_budget_policy_keeps_only_gaps_next_to_the_change() -> None:
+    from diffgenome.model import NodeRef
+    from diffgenome.probe import ProbeObjective, apply_budget_policy
+
+    def obj(target: str, d: int) -> ProbeObjective:
+        return ProbeObjective(
+            "internal_gap", target, "c", NodeRef("e", 0), d, (), "returned", None, 1
+        )
+
+    objectives = [obj("near", 1), obj("far", 2), obj("near2", 1), obj("dark", 0)]
+    skipped: list[str] = []
+    kept = apply_budget_policy(objectives, 2, 1, skipped)
+    assert [o.target for o in kept] == ["near", "near2"]
+    assert skipped == ["far: internal_gap at distance 2 > budget policy 1"]
+    assert [o.target for o in apply_budget_policy(objectives, 10, None)] == [
+        "near",
+        "far",
+        "near2",
+        "dark",
+    ]
+
+
+def test_b2_keyword_seam_aligns_by_name_not_position() -> None:
+    """Kokoro: the route calls generate_audio(text=..., voice=..., writer=..., speed=...,
+    volume_multiplier=..., normalization_options=..., lang_code=None,
+    allow_voice_tags=True) by keyword; the fragment records the signature order,
+    including return_timestamps. Positional pairing produced a spurious type conflict."""
+    from diffgenome.compose import align_arguments
+
+    seam = SubstitutionNode(
+        id=1, parent=0, collector=0, mechanism=SubstitutionMechanism.INTERPOSITION,
+        substitute="s", claimed_target="py:t", relation="claim-member", path=("t",),
+        args=(("text", "str", "a"), ("voice", "str", "b"), ("speed", "float", "c"),
+              ("normalization_options", "NormalizationOptions", "d"),
+              ("lang_code", "NoneType", "e")),
+        outcome="returned",
+    )  # fmt: skip
+    frag = CallNode(
+        id=1, parent=0, symbol="py:t", collector=0,
+        args=(("text", "str", "a"), ("voice", "str", "b"), ("speed", "float", "c"),
+              ("return_timestamps", "bool", "f"),
+              ("normalization_options", "NormalizationOptions", "d")),
+        outcome="returned",
+    )  # fmt: skip
+    pairs, one_sided = align_arguments(seam.args, frag.args)
+    assert [a[0] for a, _ in pairs] == ["text", "voice", "speed", "normalization_options"]
+    assert one_sided == ["lang_code", "return_timestamps"]
+    grade, note = grade_seam(seam, frag)
+    assert grade is JoinStrength.ARG_SHAPE and "argument on one side only" in note
+    # positional placeholders still pair by position; surplus positions are one-sided
+    pairs, one_sided = align_arguments(
+        (("arg0", "str", "x"),), (("item", "str", "x"), ("n", "int", "1"))
+    )
+    assert len(pairs) == 1 and one_sided == ["n"]

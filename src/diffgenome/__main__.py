@@ -214,6 +214,13 @@ def main(argv: list[str] | None = None) -> int:
             rest = ["--writer", "none", *rest]
         if "--probes" not in rest:
             rest = ["--probes", "0", *rest]
+        if "--up" not in rest:
+            # integrators ask "what reaches the change": follow callers far enough to meet
+            # an entry point even when the change sits deep below it
+            rest = ["--up", "5", *rest]
+        if "--probe-max-distance" not in rest:
+            # a probe is only worth its cost when the gap sits next to the change
+            rest = ["--probe-max-distance", "1", *rest]
         return mvp.main(rest)
     if argv and argv[0] == "mvp":
         argv = argv[1:]

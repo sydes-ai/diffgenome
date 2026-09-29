@@ -77,3 +77,43 @@ renderer read `supporting_tests`/`behavioral` (its "regression test: Not found" 
 contradicted by the section above it); let AI recovery's trigger consult behavioral evidence
 (it re-spent 47 model calls on a question DiffGenome had answered); a probe-budget policy
 keyed to gaps at distance ≤ 1 from the change.
+
+## Second pass: making the integration trustworthy (2026-09-29)
+
+Follow-ups from the first pass, all in place and tested:
+
+- **Sydes' AI recovery consults executed evidence.** A gap the behavioral run already
+  answers is not sent to the model. On simplebank that removed AI recovery entirely: 0
+  recovery model calls, down from 33 before and 47 in the first after run. On Kokoro,
+  recovery that had triggered and failed was not needed. The "entry path" rule is strict:
+  a changed symbol counts as reached only when observed or reconstructed calls connect it to
+  a step of Sydes' own flows. Reaching a service method its unit tests call does not count.
+- **The PR comment (sydes-action renderer, local clone, not pushed)** gains
+  `### Behavioral effect`. The regression-test row, a new "Executed in isolation" row, the
+  named-test rows and the before-merging nudge now read the evidence consistently.
+  Observed tests are never shown as "Checks the behavior: Yes".
+- **Composer fix: arguments aligned by name.** Found on Kokoro PY-H-01. A route called
+  `TTSService.generate_audio` by keyword while the fragment recorded the signature order,
+  including a defaulted parameter. Positional pairing produced a spurious type conflict and
+  rejected a real route-to-service continuation. `compose.align_arguments` now pairs by name
+  when both sides carry real parameter names. A parameter present on one side only caps the
+  join at ARG_SHAPE. Experiment 07's Kokoro VALUE-only/STATE figures are unchanged,
+  re-measured on the same corpus: that measurement composed without the static-return-type
+  rule, and the misaligned seam exists only with it.
+- **Artifact additions (still `/1`, additive):** per-execution `file` (a Go subtest id has
+  none of its own) and `outcome`; `budget.probe_max_distance`; and `diffgenome-status.json`
+  (`refused` / `failed` with a reason) whenever no artifact is produced.
+- **`change` defaults for integrators:** `--up 5`, so a deep change meets its entry point;
+  `--probe-max-distance 1`, so probes are spent only on gaps next to the change, with the
+  rest listed in notes.
+- **No sandbox, no run:** on a host without a supported OS sandbox, which today means any
+  Linux runner, `change` exits 3 with one line of reason and a status file. It never runs
+  target tests unconfined. Sydes shows that reason.
+- **CI, checked locally only:** `sydes/docs/integration/ci-local-simulation.sh` reproduces
+  the two-job hand-off, with DiffGenome uploading and Sydes consuming via
+  `--behavioral-artifact`, plus the Linux refusal leg. Both behave as designed. A real
+  GitHub run was not attempted. Docker is not running here, and a Linux runner would only
+  demonstrate the refusal. The blocker for CI is a Linux sandbox for DiffGenome, which is
+  on the deferred list.
+
+Second validation case: Kokoro-FastAPI PY-H-01, in `sydes/docs/integration/diffgenome-kokoro/`.

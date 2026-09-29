@@ -14,12 +14,21 @@ diffgenome change --runtime go --repo <path> --diff <base..head|commit> \
 ```
 
 `change` is the `mvp` pipeline with integrator defaults: existing tests only (`--writer none
---probes 0`, no LLM call) unless a budget is given (`--probes N --writer openai`). It writes
+--probes 0`, no LLM call) unless a budget is given (`--probes N --writer openai`); callers
+followed 5 hops up (`--up 5`) so a deep change meets its entry point; probes only for gaps
+within 1 hop of a changed symbol (`--probe-max-distance 1`), the rest listed in `notes`. It writes
 `<dir>/diffgenome-change.json` and `<dir>/behavioral-map.md` next to the usual outputs. The
 Python surface is `diffgenome.api.analyze_change(...)` / `load_change_artifact(path)`. The
 runtime adapter's options (`--runtime`, `--test-root`, `--tests`, `--mock-dir`, `--python`,
 `--pytest-arg`, `--source-root`) are forwarded by the integrator opaquely; framework and
 runtime knowledge stays inside DiffGenome.
+
+When no artifact can be produced, `change`/`mvp` write `diffgenome-status.json`
+(`{"format": "diffgenome-status/1", "status": "refused" | "failed", "reason": "..."}`) in the
+same directory and exit non-zero: `refused` (exit 3) when the host has no supported OS
+sandbox, since target code is never run unconfined; `failed` (exit 2) when the test
+command produced no executions. A consumer in another CI job shows that reason instead of
+"missing file".
 
 ## Contents
 
@@ -33,7 +42,7 @@ runtime knowledge stays inside DiffGenome.
 | `nodes` | `id` (stable: `<lang>:<qualified name>`), `name`, `file`, `line`, `kind` (callable/declaration), `origin` (repo/test/external/unknown), `changed`, `executed_by` (existing executions that ran the real symbol) |
 | `edges` | one per production caller→callee: `evidence` (`observed` / `composed`), `distance`, `join` (composed only: `SYMBOL`/`ARG_SHAPE`/`VALUE`/`STATE`), `state` (`matched` / `unavailable` / `not_consulted` / `n/a`), `exit` (`same` / `kind` / `unknown`), `probe_derived`, `executions` (tests: for a composed edge, the seed that exposed the seam and the fragment that continued it), `probes`, `composed_shapes_by_grade`, `same_shape_alternates`, `ambiguous`, `rules` (resolver rules that fired) |
 | `boundaries` | where knowledge stops: `kind` = `external` (stays substituted), `unresolved` (stand-in not attributed), `gap` (no execution of the target), `declaration` (no in-repo body), `os`; with rules, distance and executions |
-| `executions` | tests and probes contributing to the neighborhood, with `stimulus` |
+| `executions` | tests and probes contributing to the neighborhood, with `stimulus`, `outcome` (`passed` / `failed` in DiffGenome's isolated run; only passing executions are composition sources) and the test source `file` (location of the first located test-origin call; null when the collector recorded none) |
 | `ambiguous_seams` | seams with several accepted continuations or rejected candidates, with rejection reasons counted |
 | `rejected_candidates` | (bounded) each rejected join on a neighborhood seam: caller, target, candidate test, reason (`exit conflict: …`, `type conflict: …`, `state conflict: …`) |
 | `probes` | objective kind, target, verdict and reasons per attempt |
