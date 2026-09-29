@@ -17,6 +17,7 @@ Adds to `diffgenome.genome`:
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -53,6 +54,92 @@ def _callee_match(claimed: str, callee: str) -> bool:
     """A claimed entity against a call expression (`self._backend.unload`)."""
     last = claimed.rsplit(".", 1)[-1]
     return callee in (claimed, last) or callee.endswith("." + last)
+
+
+# --------------------------------------------------------------------------- boundary facts
+
+
+def _d(canonical: str) -> str:
+    return hashlib.sha256(canonical.encode()).hexdigest()[:16]
+
+
+# Collectors digest values as sha256(canonical)[:16]; the canonical forms of "no value"
+# (Python None, Go nil, JS null/undefined) and of booleans are known, so these facts are
+# decidable from digests alone, without capturing any value.
+NULL_DIGESTS = frozenset({_d("NoneType:None"), _d("nil"), _d("null"), _d("undefined")})
+NULL_SHAPES = frozenset({"NoneType", "nil", "null", "undefined"})
+BOOL_DIGESTS = {
+    _d("bool:True"): True, _d("bool:False"): False,  # Python
+    _d("bool:true"): True, _d("bool:false"): False,  # Go
+    _d("boolean:true"): True, _d("boolean:false"): False,  # JS
+}  # fmt: skip
+
+
+def boundary_fact(node: Any, point: str, kind: str) -> Any:
+    """An identity-level fact at a call boundary, or None when not decidable.
+
+    point: "arg:<name>" | "result". kind:
+      is_set                  the value is not null/none/nil
+      changed_from:arg:<name> the value differs from that argument (digest inequality)
+      size                    the collection's size (argument shapes carry it)
+      bool                    a boolean, decoded from its digest"""
+    if not isinstance(node, CallNode):
+        return None
+    args = {a: (shape, dg) for a, shape, dg in node.args}
+    if point == "result":
+        shape, dg = None, node.result
+    elif point.startswith("arg:") and point[4:] in args:
+        shape, dg = args[point[4:]]
+    else:
+        return None
+    if kind == "is_set":
+        if shape is not None:
+            return shape.split("[", 1)[0] not in NULL_SHAPES
+        return (dg not in NULL_DIGESTS) if dg else None
+    if kind.startswith("changed_from:"):
+        src = kind.split(":", 1)[1]
+        if not src.startswith("arg:") or src[4:] not in args:
+            return None
+        other = args[src[4:]][1]
+        return (dg != other) if dg and other else None
+    if kind == "size":
+        m = re.fullmatch(r"[^\[]*\[(\d+)\]", shape or "")
+        return int(m.group(1)) if m else None
+    if kind == "bool":
+        return BOOL_DIGESTS.get(dg or "")
+    return None
+
+
+def _exit_point(kind: str, point: str) -> bool:
+    """Result facts and change facts describe the call's exit; argument facts its entry."""
+    return point == "result" or kind.startswith("changed_from:")
+
+
+def exit_matches(claim: str, observed: str) -> bool | None:
+    """A claimed exit (`returned`, `returned-error[:kind]`, `raised[:kind]`, `panic[:kind]`,
+    `cancelled`; `completed` = `returned`) against a call's observed outcome (model.Outcome).
+    A kind matches the observed identity exactly or as its dotted suffix. None if unknown."""
+    if not observed or observed == "unknown":
+        return None
+    claim = claim.replace("returned_error", "returned-error")
+    claim = "returned" if claim == "completed" else claim
+    c_cat, _, c_kind = claim.partition(":")
+    o_cat, _, o_kind = observed.partition(":")
+    if c_cat != o_cat:
+        return False
+    if not c_kind:
+        return True
+    o_kind = o_kind.split(":", 1)[1] if o_kind[:3] in ("py:", "go:", "js:") else o_kind
+    return o_kind == c_kind or o_kind.endswith("." + c_kind)
+
+
+def _enclosing_call(ob: ExecObs, node_id: int, entity: str) -> Any:
+    n: Any = ob.execution.nodes[node_id] if node_id < len(ob.execution.nodes) else None
+    while n is not None:
+        if isinstance(n, CallNode) and _name_match(entity, n.symbol):
+            return n
+        n = ob.execution.nodes[n.parent] if n.parent is not None else None
+    return None
 
 
 # --------------------------------------------------------------------------- mechanics
@@ -244,6 +331,36 @@ class StateSubstrate(Substrate):
             )
             ref.why = "" if ref.ok else f"no operand of {ref.site} originates at {ref.origin}"
             return
+        if k == "boundary":
+            ob = self.obs.get(ref.test or "")
+            if ob is None:
+                ref.ok, ref.why = False, f"no execution {ref.test!r}"
+                return
+            ref.ok = any(
+                isinstance(n, CallNode)
+                and _name_match(ref.entity or "", n.symbol)
+                and boundary_fact(n, ref.point or "", ref.binding or "is_set") == ref.value
+                for n in ob.execution.nodes
+            )
+            ref.why = (
+                ""
+                if ref.ok
+                else f"no {ref.entity} call with {ref.point} {ref.binding} = {ref.value!r}"
+            )
+            return
+        if k == "outcome":
+            ob = self.obs.get(ref.test or "")
+            if ob is None:
+                ref.ok, ref.why = False, f"no execution {ref.test!r}"
+                return
+            ref.ok = any(
+                isinstance(n, CallNode)
+                and _name_match(ref.entity or "", n.symbol)
+                and exit_matches(ref.exit or "", n.outcome) is True
+                for n in ob.execution.nodes
+            )
+            ref.why = "" if ref.ok else f"no {ref.entity} call ending {ref.exit}"
+            return
         if k == "store":
             ref.ok = any(
                 any(st["path"] == ref.path for st in f["stores"])
@@ -382,6 +499,14 @@ def _observed_contradictions(d: Decision, site: str, sub: StateSubstrate) -> lis
             if ev.site != site:
                 continue
             b = d.true_branch if ev.outcome else d.false_branch
+            if b.outcome and b.outcome.get("entity") and b.outcome.get("is"):
+                call = _enclosing_call(ob, ev.node, b.outcome["entity"])
+                ok = exit_matches(b.outcome["is"], call.outcome) if call is not None else None
+                if ok is False:
+                    bad.append(
+                        f"{test}: {b.outcome['entity']} ended {call.outcome}, "
+                        f"not {b.outcome['is']}, after {site}={ev.outcome}"
+                    )
             if not b.absent:
                 continue
             after = (
@@ -433,7 +558,7 @@ def _local_agreement(
             if not isinstance(node, CallNode):
                 continue
             facts = {**constants, **{a: b for a, b, _ in node.state if a not in stored_before}}
-            v = eval_predicate(d.predicate, derive(g, _bind(g, facts)))
+            v = eval_predicate(d.predicate, derive(g, _bind(g, facts, node, "entry")))
             if v is None:
                 continue
             name = test.split("/")[-1].split("::")[-1]
@@ -443,11 +568,26 @@ def _local_agreement(
     return agree, disagree
 
 
-def _bind(g: Genome, facts: dict[str, str]) -> dict[str, Any]:
-    """Observed buckets -> genome variable values, through each variable's binding."""
+def _bind(
+    g: Genome, facts: dict[str, str], node: Any = None, phase: str = "entry"
+) -> dict[str, Any]:
+    """Observed buckets -> genome variable values, through each variable's binding. With a
+    call node, variables bound at that entity's boundary (`observed_as.at`) are added:
+    argument facts at "entry", result and change facts at "exit"."""
     out: dict[str, Any] = {}
     for v in g.variables:
         b = v.observed_as or {}
+        at = b.get("at")
+        if isinstance(at, dict):
+            if node is None or not _name_match(str(at.get("entity", "")), node.symbol):
+                continue
+            point, kind = str(at.get("point", "")), str(b.get("kind", "is_set"))
+            if _exit_point(kind, point) != (phase == "exit"):
+                continue
+            val = boundary_fact(node, point, kind)
+            if val is not None:
+                out[v.name] = val
+            continue
         fact = b.get("fact")
         if not fact or fact not in facts:
             continue
@@ -513,6 +653,10 @@ def agreement_from_facts(
     return out
 
 
+# evidence kinds that report what executed: a failure is an observed contradiction
+_OBSERVED_KINDS = ("execution", "branch", "delta", "boundary", "outcome")
+
+
 def establish_state(
     g: Genome,
     sub: StateSubstrate,
@@ -533,12 +677,10 @@ def establish_state(
         failed = [r for r in it.evidence if not r.ok]
         if not it.evidence:
             it.status, it.status_reason = HYPOTHESIS, "no evidence cited"
-        elif [r for r in failed if r.kind in ("execution", "branch", "delta") and not r.unanchored]:
+        elif [r for r in failed if r.kind in _OBSERVED_KINDS and not r.unanchored]:
             it.status = REJECTED
             it.status_reason = "contradicted: " + "; ".join(
-                r.why
-                for r in failed
-                if r.kind in ("execution", "branch", "delta") and not r.unanchored
+                r.why for r in failed if r.kind in _OBSERVED_KINDS and not r.unanchored
             )
         elif failed:
             it.status = HYPOTHESIS
@@ -676,24 +818,38 @@ def establish_state(
                             seen_globals.setdefault(a, set()).add(b)
             constant = {a: next(iter(bs)) for a, bs in seen_globals.items() if len(bs) == 1}
             for n in ob.execution.nodes:
-                if not (
-                    isinstance(n, CallNode) and _name_match(t.entity, n.symbol) and n.state_after
-                ):
+                if not (isinstance(n, CallNode) and _name_match(t.entity, n.symbol)):
                     continue
-                before = _bind(g, {**constant, **{a: b for a, b, _ in n.state}})
-                after = _bind(g, {a: b for a, b, _ in n.state_after})
+                before = _bind(g, {**constant, **{a: b for a, b, _ in n.state}}, n, "entry")
+                after = _bind(g, {a: b for a, b, _ in n.state_after}, n, "exit")
+                if not after:
+                    continue
+                replayed: dict[str, Any] | None = None
                 if t.id in placed:
                     run = predict_sequence(
                         g, {"state": dict(before), "calls": [{"entity": t.entity}]}, "hypothesis"
                     )
                     if not any(e[0] == "set" and e[3] == t.id for e in run.events):
-                        continue  # the genome says this call does not reach the transition
+                        if run.indeterminate is None:
+                            continue  # the genome says this call does not reach it
+                        # the genome cannot decide the path from the entry state alone
+                        # (decisions over unbound inputs): follow the path that executed
+                        events, _, problem = replay_observed(g, t.entity, ob, n.id, dict(before))
+                        sets = [e for e in events if e[0] == "set" and e[3] == t.id]
+                        if problem is not None or not sets:
+                            continue
+                        replayed = {e[1]: e[2] for e in sets}
                 elif eval_predicate(t.when, before) is not True:
                     continue
                 for var, expr in t.sets.items():
                     if var not in after:
                         continue
-                    pred = eval_expr(expr, before)
+                    if replayed is not None:
+                        if var not in replayed:
+                            continue
+                        pred = replayed[var]
+                    else:
+                        pred = eval_expr(expr, before)
                     if pred is None and expr.strip() not in ("none", "None", "null"):
                         continue
                     if _abstract_equal(kinds.get(var, "is_set"), pred, after[var]):
@@ -714,6 +870,34 @@ def establish_state(
             )
         elif not consistent:
             t.status_reason += "; not verified: no observed call of the entity with a bound delta"
+    # procedure outcomes: where an observed call completes the procedure's path (replayed
+    # along what executed, without a stopping branch), the named entity's exit must match
+    for p in g.procedures:
+        if not p.outcome or not p.outcome.get("is") or p.status == REJECTED:
+            continue
+        target = p.outcome.get("entity") or p.entity
+        agreeing, disagreeing = 0, []
+        for test, ob in sub.obs.by_test.items():
+            for n in ob.execution.nodes:
+                if not (isinstance(n, CallNode) and _name_match(p.entity, n.symbol)):
+                    continue
+                env = _bind(g, {a: b for a, b, _ in n.state}, n, "entry")
+                _, stopped, problem = replay_observed(g, p.entity, ob, n.id, env)
+                if stopped or problem is not None:
+                    continue
+                call = _enclosing_call(ob, n.id, target)
+                ok = exit_matches(p.outcome["is"], call.outcome) if call is not None else None
+                if ok is True:
+                    agreeing += 1
+                elif ok is False:
+                    disagreeing.append(f"{test.split('::')[-1]}: {target} ended {call.outcome}")
+        if disagreeing:
+            p.status = REJECTED
+            p.status_reason = f"observed exit contradicts outcome {p.outcome['is']}: " + "; ".join(
+                disagreeing[:3]
+            )
+        elif agreeing:
+            p.status_reason += f"; outcome {p.outcome['is']} observed in {agreeing} call(s)"
     return g
 
 
@@ -818,6 +1002,10 @@ def predict_sequence(
                 if d.site:
                     pred.events.append(("branch", d.site, v))
                 b = d.true_branch if v else d.false_branch
+                if b.outcome and b.outcome.get("is"):
+                    pred.events.append(
+                        ("outcome", b.outcome.get("entity") or d.entity, b.outcome["is"])
+                    )
                 inner = b.steps or [f"call:{c}" for c in b.calls]
                 if run_steps(inner, env, depth) or b.stops:
                     return True
@@ -834,7 +1022,9 @@ def predict_sequence(
         if not usable(p):
             pred.indeterminate = f"procedure {p.id} ({key}) is {p.status}"
             return
-        run_steps(p.steps, env, depth)
+        stopped = run_steps(p.steps, env, depth)
+        if not stopped and not pred.indeterminate and p.outcome and p.outcome.get("is"):
+            pred.events.append(("outcome", p.outcome.get("entity") or p.entity, p.outcome["is"]))
 
     env = pred.state
     for call in scenario.get("calls") or []:
@@ -856,6 +1046,122 @@ def predict_sequence(
         if pred.indeterminate:
             break
     return pred
+
+
+def replay_observed(
+    g: Genome, entity: str, ob: ExecObs, node_id: int, env: dict[str, Any], depth: int = 0
+) -> tuple[list[tuple[Any, ...]], bool, str | None]:
+    """Run an entity's procedure for ONE observed call, guided by what executed.
+
+    Each decision takes the outcomes observed at its site in that call (in order). A
+    decision whose predicate is atomic (`v` or `!v`) binds v accordingly. A `call:X` step
+    descends into the next observed call of X beneath this one. Transitions apply when their
+    `when` holds in the resulting environment. Nothing is guessed: a missing observation or
+    an undecidable `when` ends the replay with a problem.
+
+    Returns (events, stopped, problem). Events: ("branch", site, v), ("set", var, value,
+    transition id, node), ("outcome", entity, exit, node)."""
+    procedures = {p.entity: p for p in g.procedures}
+    decisions = {d.id: d for d in g.decisions}
+    transitions = {t.id: t for t in g.transitions}
+
+    def key_of(e: str) -> str | None:
+        return next(
+            (k for k in procedures if k == e or k.endswith("." + e) or e.endswith("." + k)), None
+        )
+
+    key = key_of(entity)
+    if key is None:
+        return [], False, f"no procedure for {entity}"
+    nodes = ob.execution.nodes
+    kids = ob.children_of(node_id)
+    pending: dict[str, list[bool]] = {}
+    for b in ob.branches:
+        if b.node == node_id:
+            pending.setdefault(b.site, []).append(b.outcome)
+
+    def subtree(n: int) -> list[int]:
+        out: list[int] = []
+        stack = list(reversed(kids.get(n, [])))
+        while stack:
+            k = stack.pop()
+            out.append(k)
+            stack.extend(reversed(kids.get(k, [])))
+        return out
+
+    below = sorted(subtree(node_id))
+    cursor = -1
+    events: list[tuple[Any, ...]] = []
+
+    def run(steps: list[str]) -> tuple[bool, str | None]:
+        nonlocal cursor
+        for st in steps:
+            kind, _, ref = st.partition(":")
+            if kind == "call":
+                nxt = next(
+                    (
+                        k
+                        for k in below
+                        if k > cursor
+                        and isinstance(nodes[k], CallNode)
+                        and _name_match(ref, _symbol(nodes[k]))
+                    ),
+                    None,
+                )
+                if nxt is None:
+                    return False, f"{ref} was not observed under this call"
+                inner = subtree(nxt)
+                cursor = max([nxt, *inner])
+                if key_of(ref) is not None and depth < 12:
+                    ev, _, prob = replay_observed(g, ref, ob, nxt, env, depth + 1)
+                    events.extend(ev)
+                    if prob is not None:
+                        return False, prob
+            elif kind == "D":
+                d = decisions.get(ref)
+                if d is None or not d.site:
+                    return False, f"decision {ref} is missing or has no site"
+                queue = pending.get(d.site) or []
+                if not queue:
+                    return False, f"{ref}: no observed evaluation of {d.site} in this call"
+                v = queue.pop(0)
+                events.append(("branch", d.site, v))
+                m = re.fullmatch(r"\s*(!?)\s*([\w.]+)\s*", d.predicate)
+                if m and m.group(2) not in ("true", "false"):
+                    env[m.group(2)] = (not v) if m.group(1) else v
+                b = d.true_branch if v else d.false_branch
+                if b.outcome and b.outcome.get("is"):
+                    events.append(
+                        ("outcome", b.outcome.get("entity") or d.entity, b.outcome["is"], node_id)
+                    )
+                stopped, prob = run(b.steps or [f"call:{c}" for c in b.calls])
+                if prob is not None:
+                    return stopped, prob
+                if stopped or b.stops:
+                    return True, None
+            elif kind == "T":
+                t = transitions.get(ref)
+                if t is None:
+                    return False, f"transition {ref} is missing"
+                w = eval_predicate(t.when, derive(g, env))
+                if w is None:
+                    return False, f"{ref}: `{t.when}` is undecidable on the observed path"
+                if w:
+                    for var, expr in t.sets.items():
+                        val = eval_expr(expr, env)
+                        if val is None and expr.strip() not in ("none", "None", "null"):
+                            return False, f"{ref}: cannot evaluate {var} := {expr}"
+                        env[var] = val
+                        events.append(("set", var, val, ref, node_id))
+            else:
+                return False, f"unknown step {st!r}"
+        return False, None
+
+    p = procedures[key]
+    stopped, problem = run(p.steps)
+    if not stopped and problem is None and p.outcome and p.outcome.get("is"):
+        events.append(("outcome", p.outcome.get("entity") or p.entity, p.outcome["is"], node_id))
+    return events, stopped, problem
 
 
 def change_sites(mech: Mechanics, obs: Observations, symbols: list[str]) -> set[str]:
@@ -902,6 +1208,23 @@ def compare_sequence(
         for k, v in observed_state.items()
         if k in pred.state and not _abstract_equal(kinds.get(k, "is_set"), pred.state[k], v)
     }
+    # predicted exits, per entity, against the exits of that entity's observed calls: every
+    # observed call must match a predicted exit and every predicted exit an observed call
+    predicted_exits: dict[str, list[str]] = {}
+    for e in pred.events:
+        if e[0] == "outcome":
+            predicted_exits.setdefault(e[1], []).append(e[2])
+    outcome_diff: dict[str, Any] = {}
+    for ent, claims in predicted_exits.items():
+        seen = [
+            n.outcome
+            for n in ob.execution.nodes
+            if isinstance(n, CallNode) and _name_match(ent, n.symbol)
+        ]
+        unmatched_obs = [o for o in seen if not any(exit_matches(c, o) for c in claims)]
+        unmatched_pred = [c for c in claims if not any(exit_matches(c, o) for o in seen)]
+        if unmatched_obs or unmatched_pred:
+            outcome_diff[ent] = {"predicted": sorted(set(claims)), "observed": sorted(set(seen))}
     indeterminate = pred.indeterminate or (
         f"no decision covers observed site(s) {', '.join(uncovered)}" if uncovered else None
     )
@@ -914,5 +1237,9 @@ def compare_sequence(
         "branches_exact": indeterminate is None and predicted_vec == observed_vec,
         "state_checked": sorted(k for k in observed_state if k in pred.state),
         "state_diff": state_diff,
-        "match": indeterminate is None and predicted_vec == observed_vec and not state_diff,
+        "outcome_diff": outcome_diff,
+        "match": indeterminate is None
+        and predicted_vec == observed_vec
+        and not state_diff
+        and not outcome_diff,
     }

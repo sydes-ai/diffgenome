@@ -2,53 +2,77 @@
  "repaired": {
   "statuses": {
    "variables": {
-    "supported": 11
+    "supported": 10
    },
    "decisions": {
-    "supported": 7
+    "supported": 4,
+    "verified": 3
    },
    "transitions": {
+    "verified": 1,
+    "rejected": 2,
     "supported": 2
    },
    "procedures": {
-    "supported": 4
+    "supported": 6
    },
    "rules": {
-    "supported": 4
+    "supported": 5
    },
    "regimes": {
-    "supported": 2
+    "supported": 3
    }
   },
   "per_test": [
    {
     "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
-    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
-    "uncovered_sites": [
-     "br:09962e1ae1b2",
-     "br:34ec71ee29c9",
-     "br:3f16965dcd1f"
+    "indeterminate": "transition t_expand_map is rejected",
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ]
     ],
-    "predicted_branches": [],
     "observed_branches": [
      [
-      "br:be7d3ee9e3b1",
+      "br:34ec71ee29c9",
       true
      ],
      [
-      "br:47a63ce03fc8",
-      false
-     ],
-     [
-      "br:49c2edb05730",
-      false
-     ],
-     [
-      "br:be7d3ee9e3b1",
-      false
-     ],
-     [
-      "br:47a63ce03fc8",
+      "br:34ec71ee29c9",
       true
      ],
      [
@@ -60,24 +84,8 @@
       false
      ],
      [
-      "br:be7d3ee9e3b1",
+      "br:3f16965dcd1f",
       true
-     ],
-     [
-      "br:47a63ce03fc8",
-      false
-     ],
-     [
-      "br:be7d3ee9e3b1",
-      true
-     ],
-     [
-      "br:47a63ce03fc8",
-      false
-     ],
-     [
-      "br:49c2edb05730",
-      false
      ],
      [
       "br:be7d3ee9e3b1",
@@ -96,11 +104,51 @@
       false
      ],
      [
-      "br:df188b1f6d10",
+      "br:3f16965dcd1f",
       false
      ],
      [
-      "br:b0d9d883d08b",
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -109,6 +157,30 @@
      ],
      [
       "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
       true
      ]
     ],
@@ -121,11 +193,11 @@
     "withheld": false,
     "match_on_genome_sites": false,
     "unchecked_semantics_match": false,
-    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "unchecked_indeterminate": "transition t_expand_map is rejected",
     "phenotype_claim": {
-     "base": "passed",
-     "head": "passed",
-     "why": "No formula references a link_row field by name, so r_link_reference_expands never fires (the one consulted referenced type is non-link and returns None) and the dependency sets are identical at base and head."
+     "base": "returned",
+     "head": "returned",
+     "why": "No same-table reference names a link_row field, so expansion is the identity and deferral and ordering are unchanged."
     },
     "phenotype_observed": {
      "head_test": "passed",
@@ -138,19 +210,76 @@
      ]
     },
     "phenotype_exact": true,
-    "n_observed_at_sites": 20
+    "n_observed_at_sites": 29
    },
    {
     "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
-    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
-    "uncovered_sites": [
-     "br:09962e1ae1b2",
-     "br:34ec71ee29c9",
-     "br:3f16965dcd1f"
+    "indeterminate": "transition t_expand_map is rejected",
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ]
     ],
-    "predicted_branches": [],
     "observed_branches": [
      [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -159,6 +288,10 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -167,27 +300,7 @@
       false
      ],
      [
-      "br:49c2edb05730",
-      false
-     ],
-     [
-      "br:be7d3ee9e3b1",
-      false
-     ],
-     [
-      "br:a0d4e306fb5a",
-      false
-     ],
-     [
-      "br:f960d9f63045",
-      false
-     ],
-     [
-      "br:47a63ce03fc8",
-      true
-     ],
-     [
-      "br:49c2edb05730",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -208,10 +321,42 @@
      ],
      [
       "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -223,11 +368,7 @@
       false
      ],
      [
-      "br:be7d3ee9e3b1",
-      true
-     ],
-     [
-      "br:47a63ce03fc8",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -239,12 +380,36 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
       false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
      ]
     ],
     "branches_exact": false,
@@ -256,11 +421,11 @@
     "withheld": true,
     "match_on_genome_sites": false,
     "unchecked_semantics_match": false,
-    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "unchecked_indeterminate": "transition t_expand_map is rejected",
     "phenotype_claim": {
-     "base": "failed",
-     "head": "passed",
-     "why": "Duplication re-imports the same serialized schema through _import_table_fields (the linked tables are in the import, so link_table_in_import holds), hence the same implicit-link ordering bug at base and the same r_link_reference_expands fix at head."
+     "base": "raised:django.db.utils.DataError",
+     "head": "raised:django.db.utils.DataError",
+     "why": "Duplication imports all three tables through the same _import_table_fields, so field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) at head and ordered after the deferred ChildId, while at base it shared ChildId's level and failed as in the snapshot case."
     },
     "phenotype_observed": {
      "head_test": "passed",
@@ -272,20 +437,77 @@
       "raised:py:django.db.utils.DataError"
      ]
     },
-    "phenotype_exact": true,
-    "n_observed_at_sites": 24
+    "phenotype_exact": false,
+    "n_observed_at_sites": 36
    },
    {
     "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
-    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
-    "uncovered_sites": [
-     "br:09962e1ae1b2",
-     "br:34ec71ee29c9",
-     "br:3f16965dcd1f"
+    "indeterminate": "transition t_expand_map is rejected",
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ]
     ],
-    "predicted_branches": [],
     "observed_branches": [
      [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -294,6 +516,10 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -302,7 +528,7 @@
       false
      ],
      [
-      "br:49c2edb05730",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -312,10 +538,6 @@
      [
       "br:47a63ce03fc8",
       true
-     ],
-     [
-      "br:49c2edb05730",
-      false
      ],
      [
       "br:be7d3ee9e3b1",
@@ -342,11 +564,19 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -358,11 +588,7 @@
       false
      ],
      [
-      "br:be7d3ee9e3b1",
-      true
-     ],
-     [
-      "br:47a63ce03fc8",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -372,6 +598,38 @@
      [
       "br:47a63ce03fc8",
       false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
      ]
     ],
     "branches_exact": false,
@@ -383,11 +641,11 @@
     "withheld": false,
     "match_on_genome_sites": false,
     "unchecked_semantics_match": false,
-    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "unchecked_indeterminate": "transition t_expand_map is rejected",
     "phenotype_claim": {
-     "base": "passed",
-     "head": "passed",
-     "why": "The consumer's lookup('LinkedChildren','ChildId') already yields (ChildId, LinkedChildren), so it is levelled after the child primary at base and head (r_ordering_phenotype condition false); head only additionally expands the child primary's field('Detail') reference."
+     "base": "returned",
+     "head": "returned",
+     "why": "The consumer's lookups already carry via=LinkedChildren so it depends on ChildId in the linked table at both revisions; the change only rewrites ChildId's own field('Detail') to (Label, Detail), which does not alter the outcome."
     },
     "phenotype_observed": {
      "head_test": "passed",
@@ -400,19 +658,76 @@
      ]
     },
     "phenotype_exact": true,
-    "n_observed_at_sites": 22
+    "n_observed_at_sites": 34
    },
    {
     "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
-    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
-    "uncovered_sites": [
-     "br:09962e1ae1b2",
-     "br:34ec71ee29c9",
-     "br:3f16965dcd1f"
+    "indeterminate": "transition t_expand_map is rejected",
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ]
     ],
-    "predicted_branches": [],
     "observed_branches": [
      [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -421,6 +736,10 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -429,27 +748,7 @@
       false
      ],
      [
-      "br:49c2edb05730",
-      false
-     ],
-     [
-      "br:be7d3ee9e3b1",
-      false
-     ],
-     [
-      "br:a0d4e306fb5a",
-      false
-     ],
-     [
-      "br:f960d9f63045",
-      false
-     ],
-     [
-      "br:47a63ce03fc8",
-      true
-     ],
-     [
-      "br:49c2edb05730",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -470,10 +769,42 @@
      ],
      [
       "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -485,11 +816,7 @@
       false
      ],
      [
-      "br:be7d3ee9e3b1",
-      true
-     ],
-     [
-      "br:47a63ce03fc8",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -501,12 +828,36 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
       false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
      ]
     ],
     "branches_exact": false,
@@ -518,11 +869,11 @@
     "withheld": false,
     "match_on_genome_sites": false,
     "unchecked_semantics_match": false,
-    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "unchecked_indeterminate": "transition t_expand_map is rejected",
     "phenotype_claim": {
-     "base": "failed",
-     "head": "passed",
-     "why": "field('LinkedChildren') gives only (LinkedChildren, None), a level-0 field, so at base the consumer shares a level with the ChildId formula and recalculates against a NULL column (DataError); at head r_link_reference_expands turns it into (ChildId, LinkedChildren) and orders it after ChildId."
+     "base": "raised:django.db.utils.DataError",
+     "head": "raised:django.db.utils.DataError",
+     "why": "field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) so ActiveChildren is ordered after the deferred array primary ChildId; at base it was a same-table ref and recalculated first, raising DataError."
     },
     "phenotype_observed": {
      "head_test": "passed",
@@ -534,20 +885,77 @@
       "raised:py:django.db.utils.DataError"
      ]
     },
-    "phenotype_exact": true,
-    "n_observed_at_sites": 24
+    "phenotype_exact": false,
+    "n_observed_at_sites": 36
    },
    {
     "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
-    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
-    "uncovered_sites": [
-     "br:09962e1ae1b2",
-     "br:34ec71ee29c9",
-     "br:3f16965dcd1f"
+    "indeterminate": "transition t_expand_map is rejected",
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ]
     ],
-    "predicted_branches": [],
     "observed_branches": [
      [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -556,6 +964,10 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -564,27 +976,7 @@
       false
      ],
      [
-      "br:49c2edb05730",
-      false
-     ],
-     [
-      "br:be7d3ee9e3b1",
-      false
-     ],
-     [
-      "br:a0d4e306fb5a",
-      false
-     ],
-     [
-      "br:f960d9f63045",
-      false
-     ],
-     [
-      "br:47a63ce03fc8",
-      true
-     ],
-     [
-      "br:49c2edb05730",
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -605,10 +997,42 @@
      ],
      [
       "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
       true
      ],
      [
       "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
       false
      ],
      [
@@ -620,6 +1044,10 @@
       false
      ],
      [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
       "br:be7d3ee9e3b1",
       true
      ],
@@ -628,12 +1056,24 @@
       false
      ],
      [
-      "br:be7d3ee9e3b1",
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
       true
      ],
      [
-      "br:47a63ce03fc8",
-      false
+      "br:09962e1ae1b2",
+      true
      ]
     ],
     "branches_exact": false,
@@ -645,11 +1085,11 @@
     "withheld": true,
     "match_on_genome_sites": false,
     "unchecked_semantics_match": false,
-    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields, which has decisions",
+    "unchecked_indeterminate": "transition t_expand_map is rejected",
     "phenotype_claim": {
-     "base": "failed",
-     "head": "passed",
-     "why": "Both AConsumer=field('ToB') and BId=field('ToC') are by-name link references; at base both depend only on level-0 link fields and share a level, so AConsumer can recalculate before BId is populated; at head each is expanded (AConsumer->(BId,ToB), BId->(CLabel,ToC)) and the chain is levelled C < BId < AConsumer."
+     "base": "raised:django.db.utils.DataError",
+     "head": "raised:django.db.utils.DataError",
+     "why": "At head both field('ToB') and B's primary field('ToC') are rewritten to (linked primary, link) so the chain CLabel -> BId -> AConsumer is ordered across levels; at base both stay same-table refs on one level and AConsumer recalculates before BId is populated, raising DataError in after_rows_imported."
     },
     "phenotype_observed": {
      "head_test": "passed",
@@ -661,8 +1101,8 @@
       "raised:py:django.db.utils.DataError"
      ]
     },
-    "phenotype_exact": true,
-    "n_observed_at_sites": 22
+    "phenotype_exact": false,
+    "n_observed_at_sites": 33
    }
   ],
   "regime_classes": [
@@ -681,12 +1121,12 @@
    ]
   ],
   "sites_in_mechanics": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
    "br:47a63ce03fc8",
-   "br:49c2edb05730",
    "br:a0d4e306fb5a",
-   "br:b0d9d883d08b",
    "br:be7d3ee9e3b1",
-   "br:df188b1f6d10",
    "br:f960d9f63045"
   ],
   "sites_not_in_mechanics": [],
@@ -699,27 +1139,22 @@
    "br:be7d3ee9e3b1",
    "br:f960d9f63045"
   ],
-  "required_sites_uncovered": [
-   "br:09962e1ae1b2",
-   "br:34ec71ee29c9",
-   "br:3f16965dcd1f"
-  ],
+  "required_sites_uncovered": [],
   "summary": {
    "exact_all": "0/5",
    "exact_withheld": "0/2",
    "exact_on_genome_chosen_sites": "0/5",
-   "required_sites_uncovered": [
-    "br:09962e1ae1b2",
-    "br:34ec71ee29c9",
-    "br:3f16965dcd1f"
-   ],
+   "required_sites_uncovered": [],
    "indeterminate": 5,
    "confidently_wrong": 0,
    "unchecked_semantics_exact": "0/5",
-   "phenotype_claims_exact": "5/5",
-   "decisions_verified": "0/7",
-   "transitions_verified": "0/2",
-   "rejected": [],
+   "phenotype_claims_exact": "2/5",
+   "decisions_verified": "3/7",
+   "transitions_verified": "1/5",
+   "rejected": [
+    "t_expand_map",
+    "t_link_found"
+   ],
    "hypothesis": [],
    "sites_not_in_mechanics": []
   }

@@ -190,6 +190,9 @@ class EvidenceRef:
     #   kind="dataflow": site, origin            (static: an operand of site originates there)
     #   kind="delta":    entity, fact, before, after, test (observed bucket change)
     #   kind="store":    entity, path            (static: entity writes that field)
+    #   kind="boundary": entity, point, binding, value, test
+    #                    (a call of entity in that test had that boundary fact, 5.1)
+    #   kind="outcome":  entity, exit, test      (a call of entity in that test ended so)
     site: str | None = None
     outcome: bool | None = None
     origin: str | None = None
@@ -198,6 +201,10 @@ class EvidenceRef:
     before: str | None = None
     after: str | None = None
     path: str | None = None
+    point: str | None = None  # "arg:<name>" | "result"
+    binding: str | None = None  # is_set | changed_from:arg:<name> | size | bool
+    value: Any = None
+    exit: str | None = None  # returned | returned-error[:k] | raised[:k] | panic[:k] | cancelled
     # filled by the checker
     ok: bool | None = None
     why: str = ""
@@ -262,6 +269,10 @@ class Branch:
     #     caller's continuation only when this branch exits the deciding function;
     #   "run": everything after, including deferred callbacks and later iterations
     absent_scope: str = "episode"
+    # the exit this branch leads to: {"entity": <function>, "is": <exit>}; the entity may be
+    # the deciding function or one enclosing it (an effect that surfaces later in the same
+    # episode). Exits are the collector's categories (model.Outcome), never test results.
+    outcome: dict[str, str] | None = None
 
 
 @dataclass
@@ -302,6 +313,8 @@ class Procedure(Item):
 
     entity: str = ""
     steps: list[str] = field(default_factory=list)
+    # the entity's exit when its steps complete without a stopping branch
+    outcome: dict[str, str] | None = None
 
 
 @dataclass
@@ -364,6 +377,7 @@ def _branch(d: dict[str, Any] | None, when: bool) -> Branch:
         effect=str(d.get("effect") or ""),
         steps=list(d.get("steps") or []),
         absent_scope=str(d.get("absent_scope") or "episode"),
+        outcome=dict(d["outcome"]) if isinstance(d.get("outcome"), dict) else None,
     )
 
 

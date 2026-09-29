@@ -1,0 +1,1602 @@
+{
+ "repaired": {
+  "statuses": {
+   "variables": {
+    "supported": 10
+   },
+   "decisions": {
+    "supported": 4,
+    "verified": 3
+   },
+   "transitions": {
+    "verified": 3,
+    "supported": 2
+   },
+   "procedures": {
+    "supported": 6
+   },
+   "rules": {
+    "supported": 5
+   },
+   "regimes": {
+    "supported": 3
+   }
+  },
+  "per_test": [
+   {
+    "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_can_import_database_with_formula_dependencies",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "No same-table reference names a link_row field, so expansion is the identity and deferral and ordering are unchanged."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 29
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+    "withheld": true,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "Duplication imports all three tables through the same _import_table_fields, so field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) at head and ordered after the deferred ChildId, while at base it shared ChildId's level and failed as in the snapshot case."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 36
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_explicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "The consumer's lookups already carry via=LinkedChildren so it depends on ChildId in the linked table at both revisions; the change only rewrites ChildId's own field('Detail') to (Label, Detail), which does not alter the outcome."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 34
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) so ActiveChildren is ordered after the deferred array primary ChildId; at base it was a same-table ref and recalculated first, raising DataError."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 36
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:f960d9f63045",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "withheld": true,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "At head both field('ToB') and B's primary field('ToC') are rewritten to (linked primary, link) so the chain CLabel -> BId -> AConsumer is ordered across levels; at base both stay same-table refs on one level and AConsumer recalculates before BId is populated, raising DataError in after_rows_imported."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 33
+   }
+  ],
+  "regime_classes": [
+   [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   [
+    "test_duplicate_application_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep"
+   ]
+  ],
+  "sites_in_mechanics": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1",
+   "br:f960d9f63045"
+  ],
+  "sites_not_in_mechanics": [],
+  "required_sites": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1",
+   "br:f960d9f63045"
+  ],
+  "required_sites_uncovered": [],
+  "summary": {
+   "exact_all": "0/5",
+   "exact_withheld": "0/2",
+   "exact_on_genome_chosen_sites": "0/5",
+   "required_sites_uncovered": [],
+   "indeterminate": 0,
+   "confidently_wrong": 5,
+   "unchecked_semantics_exact": "0/5",
+   "phenotype_claims_exact": "5/5",
+   "decisions_verified": "3/7",
+   "transitions_verified": "3/5",
+   "rejected": [],
+   "hypothesis": [],
+   "sites_not_in_mechanics": []
+  }
+ }
+}

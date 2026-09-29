@@ -1,6 +1,7 @@
 # Design (Step 2): the smallest extension of the Behavioral Genome that survives Case A
 
-Status: **design only**. No code was changed for this document. It is written against commit
+Status: **design**. Sections 5.1 (boundary bindings) and 5.5 (Outcome) were later built. Results are in `docs/experiment-10-stress-baserow.md`, under "Step 2a". Sections 5.2 to 5.4 remain unbuilt, as recommended.
+No code was changed for this document. It is written against commit
 8c1cbf2, which includes the Step 1 repairs.
 
 Evidence used:

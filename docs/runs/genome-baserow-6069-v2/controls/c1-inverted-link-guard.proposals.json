@@ -1,0 +1,1772 @@
+{
+ "variables": [
+  {
+   "id": "v_field_is_primary",
+   "name": "field_is_primary",
+   "origin": "input",
+   "description": "The serialized field being scanned in the first pass is its table's primary field; primaries populate primary_table_fields_map (table id -> primary field id).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 456,
+     "text": "if serialized_field[\"primary\"]:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:34ec71ee29c9",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_field_needs_refresh",
+   "name": "field_needs_refresh",
+   "origin": "setting",
+   "description": "The imported field's type declares needs_refresh_after_import_serialized (formula-like types); such instances are refreshed from the db after after_import_serialized.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 589,
+     "text": "if field_type.needs_refresh_after_import_serialized:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:09962e1ae1b2",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_raw_deps_set",
+   "name": "raw_deps_set",
+   "origin": "derived",
+   "description": "The field type declared import-time dependencies (get_field_depdendencies_before_import_serialized returned a non-None set).",
+   "observed_as": {
+    "at": {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "arg:field_deps"
+    },
+    "kind": "is_set"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "dataflow",
+     "site": "br:be7d3ee9e3b1",
+     "origin": "param:field_deps"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "arg:field_deps",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "arg:field_deps",
+     "binding": "is_set",
+     "value": false,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "v_expanded_deps_set",
+   "name": "expanded_deps_set",
+   "origin": "derived",
+   "description": "The dependency set after implied-dependency expansion is non-empty; this is what decides deferral.",
+   "observed_as": {
+    "at": {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result"
+    },
+    "kind": "is_set"
+   },
+   "definition": "raw_deps_set",
+   "evidence": [
+    {
+     "kind": "dataflow",
+     "site": "br:47a63ce03fc8",
+     "origin": "call:_expand_implied_import_dependencies"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_can_import_database_with_formula_dependencies"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "is_set",
+     "value": false,
+     "test": "test_can_import_database_with_formula_dependencies"
+    }
+   ]
+  },
+  {
+   "id": "v_refs_link_in_import",
+   "name": "refs_link_in_import",
+   "origin": "input",
+   "description": "The field's dependency set contains a same-table reference by name, (name, None), to a link_row field (e.g. formula field('LinkField')). Whether the linked table is itself imported is separate (link_table_outside_import / linked_primary_unserialized).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 502,
+     "text": "referenced = fields_by_name.get(name) if via is None else None"
+    },
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 508,
+     "text": "expanded.add(implied or (name, via))"
+    }
+   ]
+  },
+  {
+   "id": "v_deps_rewritten",
+   "name": "deps_rewritten",
+   "origin": "derived",
+   "description": "Expansion replaced at least one same-table reference (link, None) by the implied dependency (linked table primary name, link name).",
+   "observed_as": {
+    "at": {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result"
+    },
+    "kind": "changed_from:arg:field_deps"
+   },
+   "definition": "refs_link_in_import && !link_table_outside_import && !linked_primary_unserialized",
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": true,
+     "test": "test_snapshot_with_explicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": false,
+     "test": "test_can_import_database_with_formula_dependencies"
+    }
+   ]
+  },
+  {
+   "id": "v_link_table_outside_import",
+   "name": "link_table_outside_import",
+   "origin": "state",
+   "description": "The referenced link_row field has no link_row_table_id, or its linked table is not among the imported tables (e.g. duplicating a single table/field whose target already exists).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3710,
+     "text": "if related_table_id is None or related_table_id not in primary_table_fields_map:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:a0d4e306fb5a",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_linked_primary_unserialized",
+   "name": "linked_primary_unserialized",
+   "origin": "state",
+   "description": "The linked table's primary field id is not in the serialized fields map of this import.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3714,
+     "text": "if primary_field_id not in serialized_fields_map:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:f960d9f63045",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_implied_dep_found",
+   "name": "implied_dep_found",
+   "origin": "derived",
+   "description": "LinkRowFieldType.get_import_dependency_when_referenced returned an implied dependency (linked primary name, link name) rather than None.",
+   "observed_as": {
+    "at": {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "point": "result"
+    },
+    "kind": "is_set"
+   },
+   "definition": "!link_table_outside_import && !linked_primary_unserialized",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3717,
+     "text": "return (serialized_fields_map[primary_field_id][\"name\"], reference_name)"
+    },
+    {
+     "kind": "boundary",
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_snapshot_with_explicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "v_table_seen",
+   "name": "table_seen",
+   "origin": "state",
+   "description": "The field's table already has an entry in the closure table_fields_by_name, i.e. some field of this table was already imported (immediately or deferred).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 480,
+     "text": "if table_instance not in table_fields_by_name:"
+    },
+    {
+     "kind": "dataflow",
+     "site": "br:3f16965dcd1f",
+     "origin": "closure:table_fields_by_name"
+    },
+    {
+     "kind": "branch",
+     "site": "br:3f16965dcd1f",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:3f16965dcd1f",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  }
+ ],
+ "decisions": [
+  {
+   "id": "d_primary_scan",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:34ec71ee29c9",
+   "inputs": [
+    "field_is_primary"
+   ],
+   "predicate": "field_is_primary",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "primary_table_fields_map[table id] = primary field id"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "field only recorded in database_fields_map"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 456,
+     "text": "if serialized_field[\"primary\"]:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:34ec71ee29c9",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:34ec71ee29c9",
+     "test": "test_can_import_database_with_formula_dependencies",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "d_expand_empty",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "site": "br:be7d3ee9e3b1",
+   "inputs": [
+    "raw_deps_set"
+   ],
+   "predicate": "!raw_deps_set",
+   "order": 2,
+   "true_branch": {
+    "steps": [
+     "T:t_expand_passthrough",
+     "D:d_defer"
+    ],
+    "calls": [],
+    "absent": [
+     "LinkRowFieldType.get_import_dependency_when_referenced"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "is": "returned"
+    },
+    "effect": "no dependencies: returned unchanged (None); caller then imports the field immediately"
+   },
+   "false_branch": {
+    "steps": [
+     "T:t_expand_map",
+     "D:d_defer"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "each (name, via) maps to exactly one element: the referenced field type's implied dependency for same-table refs if any, else itself; referenced link_row fields are asked via get_import_dependency_when_referenced"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 497,
+     "text": "if not field_deps:"
+    },
+    {
+     "kind": "dataflow",
+     "site": "br:be7d3ee9e3b1",
+     "origin": "param:field_deps"
+    },
+    {
+     "kind": "branch",
+     "site": "br:be7d3ee9e3b1",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:be7d3ee9e3b1",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_defer",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:47a63ce03fc8",
+   "inputs": [
+    "expanded_deps_set"
+   ],
+   "predicate": "expanded_deps_set",
+   "order": 3,
+   "true_branch": {
+    "steps": [
+     "call:DeferredFieldImporter.add_deferred_field_import"
+    ],
+    "calls": [
+     "DeferredFieldImporter.add_deferred_field_import"
+    ],
+    "absent": [
+     "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized"
+    ],
+    "stops": false,
+    "outcome": null,
+    "effect": "field import deferred with its (expanded) dependency set; imported later by run_deferred_field_imports in dependency-level order"
+   },
+   "false_branch": {
+    "steps": [
+     "call:DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized"
+    ],
+    "calls": [
+     "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized"
+    ],
+    "absent": [
+     "DeferredFieldImporter.add_deferred_field_import"
+    ],
+    "stops": false,
+    "outcome": null,
+    "effect": "field imported immediately and appended to fields_without_dependencies"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 532,
+     "text": "if field_deps:"
+    },
+    {
+     "kind": "control",
+     "site": "br:47a63ce03fc8",
+     "outcome": true,
+     "callee": "deferred_field_importer.add_deferred_field_import"
+    },
+    {
+     "kind": "control",
+     "site": "br:47a63ce03fc8",
+     "outcome": false,
+     "callee": "_import_field_serialized"
+    },
+    {
+     "kind": "branch",
+     "site": "br:47a63ce03fc8",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:47a63ce03fc8",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_table_bucket",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+   "site": "br:3f16965dcd1f",
+   "inputs": [
+    "table_seen"
+   ],
+   "predicate": "!table_seen",
+   "order": 4,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "creates the per-table name->field bucket in table_fields_by_name"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "reuses the existing bucket"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 480,
+     "text": "if table_instance not in table_fields_by_name:"
+    },
+    {
+     "kind": "branch",
+     "site": "br:3f16965dcd1f",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:3f16965dcd1f",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_link_table_missing",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "site": "br:a0d4e306fb5a",
+   "inputs": [
+    "link_table_outside_import"
+   ],
+   "predicate": "!link_table_outside_import",
+   "order": 5,
+   "true_branch": {
+    "steps": [
+     "T:t_link_none"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "is": "returned"
+    },
+    "effect": "returns None: linked table pre-exists the import, nothing to order; reference kept as (link, None)"
+   },
+   "false_branch": {
+    "steps": [
+     "D:d_link_primary_missing"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "linked table is part of the import"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3710,
+     "text": "if related_table_id is None or related_table_id not in primary_table_fields_map:"
+    },
+    {
+     "kind": "dataflow",
+     "site": "br:a0d4e306fb5a",
+     "origin": "param:primary_table_fields_map"
+    },
+    {
+     "kind": "branch",
+     "site": "br:a0d4e306fb5a",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:a0d4e306fb5a",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_link_primary_missing",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "site": "br:f960d9f63045",
+   "inputs": [
+    "linked_primary_unserialized"
+   ],
+   "predicate": "linked_primary_unserialized",
+   "order": 6,
+   "true_branch": {
+    "steps": [
+     "T:t_link_none"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "is": "returned"
+    },
+    "effect": "returns None"
+   },
+   "false_branch": {
+    "steps": [
+     "T:t_link_found"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "returns (linked table primary field name, link field name): the reference now depends on the linked primary, reached via the link"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3714,
+     "text": "if primary_field_id not in serialized_fields_map:"
+    },
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3717,
+     "text": "return (serialized_fields_map[primary_field_id][\"name\"], reference_name)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:f960d9f63045",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:f960d9f63045",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_refresh",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:09962e1ae1b2",
+   "inputs": [
+    "field_needs_refresh"
+   ],
+   "predicate": "field_needs_refresh",
+   "order": 7,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "field_instance.refresh_from_db()"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "no refresh"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 589,
+     "text": "if field_type.needs_refresh_after_import_serialized:"
+    },
+    {
+     "kind": "control",
+     "site": "br:09962e1ae1b2",
+     "outcome": true,
+     "callee": "field_instance.refresh_from_db"
+    },
+    {
+     "kind": "branch",
+     "site": "br:09962e1ae1b2",
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:09962e1ae1b2",
+     "test": "test_can_import_database_with_formula_dependencies",
+     "outcome": true
+    }
+   ]
+  }
+ ],
+ "transitions": [
+  {
+   "id": "t_expand_passthrough",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "when": "!raw_deps_set",
+   "sets": {
+    "expanded_deps_set": "raw_deps_set",
+    "deps_rewritten": "false"
+   },
+   "state_before": "field declared no dependencies",
+   "action": "return field_deps unchanged",
+   "state_after": "result is None, identical to the argument",
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "is_set",
+     "value": false,
+     "test": "test_snapshot_with_explicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "t_expand_map",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "when": "raw_deps_set",
+   "sets": {
+    "expanded_deps_set": "raw_deps_set",
+    "deps_rewritten": "refs_link_in_import"
+   },
+   "state_before": "non-empty dependency set",
+   "action": "map each (name, via) to implied-or-self into a new set",
+   "state_after": "non-empty set; differs from the input exactly when a same-table reference to an in-import link_row was rewritten",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 508,
+     "text": "expanded.add(implied or (name, via))"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": false,
+     "test": "test_can_import_database_with_formula_dependencies"
+    }
+   ]
+  },
+  {
+   "id": "t_link_none",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "when": "true",
+   "sets": {
+    "implied_dep_found": "false"
+   },
+   "state_before": "link target not resolvable inside the import",
+   "action": "return None",
+   "state_after": "no implied dependency",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3711,
+     "text": "return None"
+    }
+   ]
+  },
+  {
+   "id": "t_link_found",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "when": "true",
+   "sets": {
+    "implied_dep_found": "true"
+   },
+   "state_before": "linked table and its primary are in the import",
+   "action": "return (primary name, reference_name)",
+   "state_after": "implied dependency returned",
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "t_table_seen",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+   "when": "true",
+   "sets": {
+    "table_seen": "true"
+   },
+   "state_before": "field about to be registered",
+   "action": "table_fields_by_name[table][name] = field_instance",
+   "state_after": "table has a bucket",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 482,
+     "text": "table_fields_by_name[table_instance][field_instance.name] = field_instance"
+    }
+   ]
+  }
+ ],
+ "procedures": [
+  {
+   "id": "p_import_table_fields",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "steps": [
+    "D:d_primary_scan",
+    "D:d_primary_scan",
+    "D:d_primary_scan",
+    "D:d_refresh",
+    "D:d_refresh"
+   ],
+   "outcome": {
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "DatabaseApplicationType.import_tables_serialized",
+     "exit": "returned",
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "p_expand",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "steps": [
+    "D:d_expand_empty"
+   ],
+   "outcome": {
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 509,
+     "text": "return expanded"
+    }
+   ]
+  },
+  {
+   "id": "p_import_field",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+   "steps": [
+    "D:d_table_bucket",
+    "T:t_table_seen"
+   ],
+   "outcome": {
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 487,
+     "text": "return field_instance"
+    }
+   ]
+  },
+  {
+   "id": "p_link_implied",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "steps": [
+    "D:d_link_table_missing"
+   ],
+   "outcome": {
+    "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3706,
+     "text": "related_table_id = serialized_field.get(\"link_row_table_id\", None)"
+    }
+   ]
+  },
+  {
+   "id": "p_add_deferred",
+   "entity": "DeferredFieldImporter.add_deferred_field_import",
+   "steps": [],
+   "outcome": {
+    "entity": "DeferredFieldImporter.add_deferred_field_import",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 47,
+     "text": "self.deferred_field_imports[unique_field_name] = (table, field_dependencies)"
+    }
+   ]
+  },
+  {
+   "id": "p_run_deferred",
+   "entity": "DeferredFieldImporter.run_deferred_field_imports",
+   "steps": [
+    "call:DeferredFieldImporter.get_all_fields_dependencies"
+   ],
+   "outcome": {
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 120,
+     "text": "for level in dependency_levels[1:]:"
+    }
+   ]
+  }
+ ],
+ "rules": [
+  {
+   "id": "r_implied_link_dependency",
+   "name": "Referencing a link_row by name depends on the linked table's primary",
+   "inputs": [
+    "refs_link_in_import",
+    "link_table_outside_import",
+    "linked_primary_unserialized"
+   ],
+   "relevant_state": [
+    "primary_table_fields_map",
+    "database_fields_map"
+   ],
+   "condition": "refs_link_in_import && !link_table_outside_import && !linked_primary_unserialized",
+   "consequences": [
+    "LinkRowFieldType.get_import_dependency_when_referenced returns (linked primary name, link name)",
+    "the expanded dependency set differs from the declared one (deps_rewritten)",
+    "DeferredFieldImporter resolves the dependency through the link (via_field_name is not None) into the linked table instead of the referencing table"
+   ],
+   "decision": "d_link_table_missing",
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "branch",
+     "site": "br:cbfe8c1c2b07",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    },
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 74,
+     "text": "dep_table_id = link_row_field.link_row_table_id"
+    }
+   ]
+  },
+  {
+   "id": "r_expansion_preserves_deferral",
+   "name": "Expansion never changes whether a field is deferred",
+   "inputs": [
+    "raw_deps_set"
+   ],
+   "relevant_state": [],
+   "condition": "true",
+   "consequences": [
+    "expanded_deps_set == raw_deps_set (each dependency maps to exactly one)",
+    "d_defer takes the same branch at head as the base `field_deps` branch did",
+    "only the content of deferred dependency sets changes"
+   ],
+   "decision": "d_expand_empty",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:47a63ce03fc8",
+     "test": "test_can_import_database_with_formula_dependencies",
+     "outcome": true
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_can_import_database_with_formula_dependencies"
+    }
+   ]
+  },
+  {
+   "id": "r_defer_iff_deps",
+   "name": "Fields with dependencies are deferred, others imported at once",
+   "inputs": [
+    "expanded_deps_set"
+   ],
+   "relevant_state": [],
+   "condition": "expanded_deps_set",
+   "consequences": [
+    "add_deferred_field_import called",
+    "_import_field_serialized for that field happens later inside run_deferred_field_imports"
+   ],
+   "decision": "d_defer",
+   "evidence": [
+    {
+     "kind": "control",
+     "site": "br:47a63ce03fc8",
+     "outcome": true,
+     "callee": "deferred_field_importer.add_deferred_field_import"
+    }
+   ]
+  },
+  {
+   "id": "r_first_field_creates_bucket",
+   "name": "The first imported field of a table creates its bucket",
+   "inputs": [
+    "table_seen"
+   ],
+   "relevant_state": [
+    "table_fields_by_name"
+   ],
+   "condition": "!table_seen",
+   "consequences": [
+    "br:3f16965dcd1f true once per table (the first non-deferred field in serialized order); false for all later fields and all deferred imports"
+   ],
+   "decision": "d_table_bucket",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:3f16965dcd1f",
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "r_ordering_phenotype",
+   "name": "Producer array primary must be imported before its consumer",
+   "inputs": [
+    "deps_rewritten"
+   ],
+   "relevant_state": [
+    "deferred dependency levels"
+   ],
+   "condition": "deps_rewritten",
+   "consequences": [
+    "a consumer formula field('Link') lands at a dependency level after the linked table's (possibly deferred) primary, transitively through chains",
+    "after_import_serialized / after_rows_imported recalculate the producer before the consumer: import_tables_serialized returns",
+    "at base the dependency stayed (Link, None) in the consumer's own table, so consumer and deferred producer shared a level; the consumer recalculated against the producer's still-empty array column and FormulaFieldType.after_rows_imported raised django.db.utils.DataError"
+   ],
+   "decision": null,
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "DatabaseApplicationType.import_tables_serialized",
+     "exit": "returned",
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "outcome",
+     "entity": "DatabaseApplicationType.import_serialized",
+     "exit": "returned",
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    },
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 83,
+     "text": "dep_table_id = table.id"
+    }
+   ]
+  }
+ ],
+ "regimes": [
+  {
+   "id": "g_implicit_link_ref",
+   "name": "Formula references a link_row by name whose linked table (with array-formula primary) is in the import",
+   "facts": {
+    "refs_link_in_import": true,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false,
+    "deps_rewritten": true
+   },
+   "members": [
+    "test_snapshot_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "test_duplicate_application_with_implicit_array_primary_dependency"
+   ],
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "point": "result",
+     "binding": "is_set",
+     "value": true,
+     "test": "test_snapshot_with_implicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "g_explicit_lookup",
+   "name": "Consumer uses lookup(link, primary) explicitly; only the producer's own field('Link') gets rewritten",
+   "facts": {
+    "refs_link_in_import": true,
+    "deps_rewritten": true
+   },
+   "members": [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": false,
+     "test": "test_snapshot_with_explicit_array_primary_dependency"
+    },
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": true,
+     "test": "test_snapshot_with_explicit_array_primary_dependency"
+    }
+   ]
+  },
+  {
+   "id": "g_no_link_ref",
+   "name": "No same-table reference to a link_row; expansion is identity",
+   "facts": {
+    "refs_link_in_import": false,
+    "deps_rewritten": false
+   },
+   "members": [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   "evidence": [
+    {
+     "kind": "boundary",
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "point": "result",
+     "binding": "changed_from:arg:field_deps",
+     "value": false,
+     "test": "test_can_import_database_with_formula_dependencies"
+    }
+   ]
+  }
+ ],
+ "scenarios": {
+  "test_snapshot_with_implicit_array_primary_dependency_two_links_deep": {
+   "state": {
+    "field_is_primary": true,
+    "field_needs_refresh": true,
+    "table_seen": false,
+    "raw_deps_set": false,
+    "refs_link_in_import": false,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false
+   },
+   "calls": [
+    {
+     "entity": "DatabaseApplicationType._import_table_fields",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DeferredFieldImporter.run_deferred_field_imports",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    }
+   ],
+   "phenotype": {
+    "base": "raised:django.db.utils.DataError",
+    "head": "returned",
+    "why": "At head both field('ToB') and B's primary field('ToC') are rewritten to (linked primary, link) so the chain CLabel -> BId -> AConsumer is ordered across levels; at base both stay same-table refs on one level and AConsumer recalculates before BId is populated, raising DataError in after_rows_imported."
+   }
+  },
+  "test_duplicate_application_with_implicit_array_primary_dependency": {
+   "state": {
+    "field_is_primary": true,
+    "field_needs_refresh": true,
+    "table_seen": false,
+    "raw_deps_set": false,
+    "refs_link_in_import": false,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false
+   },
+   "calls": [
+    {
+     "entity": "DatabaseApplicationType._import_table_fields",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DeferredFieldImporter.run_deferred_field_imports",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    }
+   ],
+   "phenotype": {
+    "base": "raised:django.db.utils.DataError",
+    "head": "returned",
+    "why": "Duplication imports all three tables through the same _import_table_fields, so field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) at head and ordered after the deferred ChildId, while at base it shared ChildId's level and failed as in the snapshot case."
+   }
+  },
+  "test_snapshot_with_implicit_array_primary_dependency": {
+   "state": {
+    "field_is_primary": true,
+    "field_needs_refresh": true,
+    "table_seen": false,
+    "raw_deps_set": false,
+    "refs_link_in_import": false,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false
+   },
+   "calls": [
+    {
+     "entity": "DatabaseApplicationType._import_table_fields",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DeferredFieldImporter.run_deferred_field_imports",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    }
+   ],
+   "phenotype": {
+    "base": "raised:django.db.utils.DataError",
+    "head": "returned",
+    "why": "field('LinkedChildren') is rewritten to (ChildId, LinkedChildren) so ActiveChildren is ordered after the deferred array primary ChildId; at base it was a same-table ref and recalculated first, raising DataError."
+   }
+  },
+  "test_snapshot_with_explicit_array_primary_dependency": {
+   "state": {
+    "field_is_primary": true,
+    "field_needs_refresh": true,
+    "table_seen": false,
+    "raw_deps_set": false,
+    "refs_link_in_import": false,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false
+   },
+   "calls": [
+    {
+     "entity": "DatabaseApplicationType._import_table_fields",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": true
+     }
+    },
+    {
+     "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+     "facts": {
+      "link_table_outside_import": false,
+      "linked_primary_unserialized": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DeferredFieldImporter.run_deferred_field_imports",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    }
+   ],
+   "phenotype": {
+    "base": "returned",
+    "head": "returned",
+    "why": "The consumer's lookups already carry via=LinkedChildren so it depends on ChildId in the linked table at both revisions; the change only rewrites ChildId's own field('Detail') to (Label, Detail), which does not alter the outcome."
+   }
+  },
+  "test_can_import_database_with_formula_dependencies": {
+   "state": {
+    "field_is_primary": true,
+    "field_needs_refresh": true,
+    "table_seen": false,
+    "raw_deps_set": false,
+    "refs_link_in_import": false,
+    "link_table_outside_import": false,
+    "linked_primary_unserialized": false
+   },
+   "calls": [
+    {
+     "entity": "DatabaseApplicationType._import_table_fields",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": false
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": false,
+      "refs_link_in_import": false,
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+     "facts": {
+      "raw_deps_set": true,
+      "refs_link_in_import": false
+     }
+    },
+    {
+     "entity": "DeferredFieldImporter.run_deferred_field_imports",
+     "facts": {}
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    },
+    {
+     "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+     "facts": {
+      "table_seen": true
+     }
+    }
+   ],
+   "phenotype": {
+    "base": "returned",
+    "head": "returned",
+    "why": "No same-table reference names a link_row field, so expansion is the identity and deferral and ordering are unchanged."
+   }
+  }
+ },
+ "unknowns": [
+  {
+   "what": "Iteration counts of the loop-level sites br:34ec71ee29c9 (one observed true per table primary) and br:09962e1ae1b2 (one observed true per formula-like field).",
+   "why": "No iteration steps and no per-iteration traced call host these sites, so p_import_table_fields hard-codes 3 primary scans and 2 refreshes. This fits the 3-table/2-formula tests (including both withheld ones) but not test_can_import_database_with_formula_dependencies (2 tables, 3 refreshes). The false outcomes of these two sites are never observed (they fall through to the loop header), so only the true evaluations are modelled."
+  },
+  {
+   "what": "Where calls interleave between the expand helper, the LinkRow callee, and the caller's br:47a63ce03fc8.",
+   "why": "Which dependency in a set is a same-table link_row reference is decided per element of a loop with no `if` site (`referenced and ...`). So the LinkRow call can't be gated inside the expand procedure and is listed as a separate entry call after expand. br:47a63ce03fc8 (a caller site) is reached from the expand procedure. Per-site order is right; the global interleaving is only approximate."
+  },
+  {
+   "what": "The before/after ordering phenotype: which deferred field lands at which dependency level, including the transitive two-link chain.",
+   "why": "This is relation-valued: dependency edges between named fields across tables, and levels from group_dependencies_by_level. It is a derived order and cannot be expressed. The phenotype is stated in r_ordering_phenotype and the scenario `why` fields, not generated by decisions."
+  },
+  {
+   "what": "The DataError at base.",
+   "why": "It surfaces in FormulaFieldType.after_rows_imported during row import, outside the traced functions. No head decision owns it, and the fixed format has no base-revision decisions, so no branch claims a raised outcome."
+  },
+  {
+   "what": "Several same-table link references in one dependency set.",
+   "why": "refs_link_in_import is an aggregate boolean. With k such references the helper would call get_import_dependency_when_referenced k times. No observed or withheld case has k>1, but the genome cannot generate a count."
+  },
+  {
+   "what": "Base exit of test_duplicate_application_with_implicit_array_primary_dependency.",
+   "why": "Predicted to be the same DataError as the snapshot case because duplication uses the same import path. Whether duplicate_application's wrapper changes that path at base is not visible in the bundle."
+  }
+ ]
+}

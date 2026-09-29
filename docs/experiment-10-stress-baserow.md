@@ -274,6 +274,88 @@ re-asked. Tests: `tests/test_exp10.py`, a synthetic importer with the same shape
 - **The semantic gap.** c2 remains indistinguishable. That is the Step 2 question, relations
   with a derived order (F9), and it is untouched here.
 
+## Step 2a: Outcome and boundary bindings (built; relations still deferred)
+
+This step builds sections 5.1 and 5.5 of `docs/design-step2-genome-relations.md`. Relations,
+derived order and iteration are **not** built (that design says DO NOT BUILD YET).
+
+| addition | what it does | where |
+|---|---|---|
+| **Boundary bindings** (`observed_as.at`) | A variable binds to an identity-level fact at a call boundary: `is_set`, `changed_from:arg:<name>`, `size`, or `bool`. These are decided from the shapes and digests the collector already records. The canonical "no value" digests of the three collectors are known constants, so no value is ever captured. Argument facts count at call entry, result and change facts at exit. Used in local agreement, transition checks and `boundary` evidence | `genome_state.boundary_fact`, `_bind` |
+| **Observed-path replay** | When the entry state cannot decide a procedure's path, because decisions read unbound inputs, a placed transition is checked along the branches that actually executed in that call. A decision with an atomic predicate binds its variable from the observed outcome. A missing observation or an undecidable `when` ends the replay, and nothing is guessed | `genome_state.replay_observed` |
+| **Outcome** | `Branch.outcome` and `Procedure.outcome` name a function, which may enclose the decider, and an exit from the collector's taxonomy (`returned`, `returned-error`, `raised:<kind>`, `panic`, `cancelled`). They are checked against that function's observed exits: a contradicting branch rejects its decision, and a contradicting procedure is rejected. The predictor emits outcome events, and the comparer matches them per entity. `outcome` evidence is available. Test results are never used | `exit_matches`, `_observed_contradictions`, `establish_state`, `predict_sequence`, `compare_sequence` |
+| failed `boundary` or `outcome` evidence contradicts | these kinds report what executed | `_OBSERVED_KINDS` |
+
+**Regression.**
+- Experiment 09 (Kokoro, the main genome and 4 controls): 0 differences in any status or
+  per-test result.
+- Experiment 08 (simplebank): identical.
+- The v1 Case A proposal on the repaired substrate reproduces its Step 1 result.
+- Tests: 83 pass. The new ones are in `tests/test_outcome_boundary.py`.
+
+**Case A with a fresh proposal on the extended schema** (`docs/runs/genome-baserow-6069-v2/`).
+The bundle is 1,636 lines, digest `58057121dc2b16fd`. It uses the same holdout and the repaired
+substrate, lists the 7 required sites explicitly, shows the observed exits of the import entry
+points, and states that relations and iteration are unavailable. It was given to a fresh Opus
+subagent that read only the bundle.
+- **Proposal:** 10 variables, 4 of them boundary-bound:
+  - the expansion's argument is set;
+  - the expansion's result is set;
+  - the expansion changed its dependency set;
+  - the link-row hook's result is set.
+- **Other elements:** 7 decisions (one per required site), 5 transitions, 6 procedures with
+  outcomes, 5 scenarios with exit phenotypes, 6 unknowns.
+
+| | v1 proposal, Step 1 substrate | **v2 fresh proposal, Outcome + boundary bindings** |
+|---|---|---|
+| verified decisions | 0 / 7 | **3 / 7**: empty dependencies, defer vs import now, first field of a table |
+| verified transitions | 0 / 2 | **3 / 5**: the expansion passes through, the expansion rewrites, *the link-row hook implies a dependency* |
+| rejected / demoted | 0 / 0 | 0 / 0 |
+| required sites uncovered | 3 | 0 |
+| held-out exact | 0 / 2 | 0 / 2 |
+| indeterminate | 5 / 5 | 0 / 5 |
+| **confidently wrong** | 0 | **5 / 5**, all on global order (below) |
+| per-site outcome sequences equal to observed (diagnostic) | 7/7 in 5/5 tests | 7/7 in 4/5 tests, including both held-out tests. The formula-dependency test gets 5/7, failing on the two loop-count sites the proposer flagged itself |
+| phenotype claims (entry exits at base and head) | 5/5 as test labels | **5/5 as exits** (`raised:django.db.utils.DataError` at base for the three implicit tests, `returned` elsewhere), including 2/2 held out. These are model claims, not genome-derived |
+| decisions not verified | — | the two link-row guards are only ever observed false, and the two loop-level sites disagree in one test |
+
+**Controls on the v2 proposal:**
+
+| control | result |
+|---|---|
+| c1 inverted link-row guard | **not verified** (its replayed outcome sequence differs in 2 tests), but not rejected: the guard reads an unbound input |
+| **c2 pre-change semantics** (the hook implies nothing; the expansion never rewrites) | **REJECTED, mechanically.** `t_link_found`: "implied_dep_found observed True, predicted False". `t_expand_map`: "deps_rewritten observed True, predicted False". Every prediction then stops as indeterminate, because a rejected transition is needed. No prose, no Baserow logic in the core, no test result |
+| c3 missing decision | detected: its site is uncovered, and 4 predictions are indeterminate. 1 test with no link-row call is determinate but wrong on global order |
+| c4 fabricated site | hypothesis, its site uncovered, 4 predictions indeterminate |
+
+**The new failure mode is determinate but wrong global order.** Outcome and boundary bindings
+let the predictor finish, so the flattening problem is now exposed as confident error rather
+than indeterminacy. The proposal ran two kinds of work in the wrong place:
+- `_import_table_fields`'s own loops (the primary scan and the refresh pass) run when its
+  procedure starts;
+- the per-field work (expansion, link-row hook, defer or import) runs as later top-level calls.
+
+In the real execution the per-field work happens *inside* `_import_table_fields`, between its
+two loops, and the link-row hook runs inside the expansion. The format has no way to put
+per-item facts inside a procedure. The proposer said so, and was right. A correct flattening
+existed (split pseudo-entities for the phases), so this is partly a proposer choice. The cause
+is the missing iteration primitive (design 5.4).
+
+This is the second observed consequence of that gap on the same case. It is still one case.
+
+**What this settles:**
+- c2, the pre-change semantics, is now mechanically distinguishable. It is rejected at the
+  boundary where the change acts.
+- The real binding and the rule "a link-row reference implies a dependency" are verified.
+- Outcome is expressible and checked.
+
+**What it does not settle:**
+- **Generating the base failure from the relation.** The DataError at base is still only a
+  model claim, because the order of deferred imports is not representable.
+- **Sequence prediction.** It is now confidently wrong, and needs iteration.
+
+Both need design sections 5.2 to 5.4, which still have a single supporting case.
+
 ## Artifacts
 
 `docs/runs/genome-baserow-6069/`:

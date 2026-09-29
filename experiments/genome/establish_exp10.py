@@ -29,9 +29,11 @@ from diffgenome.genome_state import (
     change_sites,
     compare_sequence,
     establish_state,
+    exit_matches,
     predict_sequence,
     regimes,
 )
+from diffgenome.model import CallNode
 from diffgenome.serialize import execution_from_json
 
 MODEL = "claude-opus-5-5"
@@ -78,6 +80,28 @@ def coverage_mechanics(frozen: list[dict[str, Any]], tree: Path) -> list[dict[st
         src = (tree / rel).read_text()
         extra += lower_functions(src, rel, mod) + nested_functions(src, rel, mod)
     return frozen + analyze_all(extra)
+
+
+ENTRY = "DatabaseApplicationType.import_tables_serialized"
+
+
+def entry_exits(ex: Any) -> list[str]:
+    return [n.outcome for n in ex.nodes if isinstance(n, CallNode) and n.symbol.endswith(ENTRY)]
+
+
+def phenotype_exact(ph: dict[str, Any], head_ex: Any, base_ex: Any) -> bool:
+    """v1 claims were test labels (passed/failed), scored against test results as recorded
+    then; v2 claims are exits of the import entry, scored against its observed exits."""
+    if base_ex is None or not ph:
+        return False
+    if ph.get("head") in ("passed", "failed"):
+        return bool(ph.get("head") == head_ex.outcome and ph.get("base") == base_ex.outcome)
+
+    def ok(claim: Any, ex: Any) -> bool:
+        exits = entry_exits(ex)
+        return bool(exits) and all(exit_matches(str(claim), o) is True for o in exits)
+
+    return ok(ph.get("head"), head_ex) and ok(ph.get("base"), base_ex)
 
 
 def run(
@@ -158,12 +182,12 @@ def run(
             unchecked_indeterminate=rh["indeterminate"],
             phenotype_claim=ph,
             phenotype_observed={
-                "head": ob.execution.outcome,
-                "base": base_ex.outcome if base_ex else None,
+                "head_test": ob.execution.outcome,
+                "base_test": base_ex.outcome if base_ex else None,
+                "head_exit": entry_exits(ob.execution),
+                "base_exit": entry_exits(base_ex) if base_ex else None,
             },
-            phenotype_exact=ph.get("head") == ob.execution.outcome
-            and base_ex is not None
-            and ph.get("base") == base_ex.outcome,
+            phenotype_exact=phenotype_exact(ph, ob.execution, base_ex),
             n_observed_at_sites=len(r["observed_branches"]),
         )
         per_test.append(r)
