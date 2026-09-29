@@ -138,7 +138,10 @@ def exit_matches(claim: str, observed: str) -> bool | None:
         return False
     if not c_kind:
         return True
+    # identities may carry the runtime prefix on either side (Experiment 10, Case B: a claim
+    # copied from an observed exit kept its `go:` and never matched the observation)
     o_kind = o_kind.split(":", 1)[1] if o_kind[:3] in ("py:", "go:", "js:") else o_kind
+    c_kind = c_kind.split(":", 1)[1] if c_kind[:3] in ("py:", "go:", "js:") else c_kind
     return o_kind == c_kind or o_kind.endswith("." + c_kind)
 
 

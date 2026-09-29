@@ -159,3 +159,12 @@ def test_a_hoisted_scenario_is_indeterminate_not_wrong() -> None:
     r = compare_sequence(g, predict_sequence(g, sc), ob, {EMPTY}, skeleton=sk)
     assert r["indeterminate"] and r["indeterminate"].startswith("placement")
     assert not r["match"]
+
+
+def test_a_family_never_observed_repeating_is_not_predicted_repeating() -> None:
+    sk = build_skeleton([_ex("t/a"), _ex("t/b")], VOCAB)
+    twice = _tree(("m.importer", None, [("call", "m.finish"), ("call", "m.finish")]))
+    assert any("never observed repeating" in p for p in placement_problems(twice, sk))
+    # a member of a repeated region may repeat: its count follows the supplied occurrences
+    region_member = _tree(("m.importer", None, [("call", "m.expand"), ("call", "m.expand")]))
+    assert not any("never observed repeating" in p for p in placement_problems(region_member, sk))

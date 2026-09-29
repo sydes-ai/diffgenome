@@ -1,0 +1,16 @@
+B-F1 environment: sandboxed go test cannot download github.com/dgrijalva/jwt-go (not in ~/go/pkg/mod); first head run FAIL, 0 executions. Fixed outside the sandbox by go mod download on a git-archive copy of 2e2094e (target repo untouched).
+B-F2 experiment harness: establish_case.py passed the run directory as the source root, so every
+     `source` evidence ref failed ("file missing"); 13 items demoted to hypothesis. Frozen result
+     kept in docs/runs/genome-simplebank-rbac-103/frozen/. Fixed: pass a git-archive tree of the head.
+B-F3 checker (DiffGenome): exit_matches stripped the runtime prefix (go:) from the OBSERVED kind only;
+     a claim "returned-error:go:*status.Error" never matched the identical observed exit. 6 decisions
+     rejected and outcome evidence failed. Fixed generically: normalize both sides; unit test added.
+B-F4 schema ambiguity + proposer: branches list `calls` descriptively ("reached next") while the
+     procedure also calls them; the predictor executes a branch's `calls` when it has no steps, so
+     hasPermission and validateUpdateUserRequest were predicted twice per request. Frozen result
+     (after B-F2/F3): exact 2/7, withheld 1/2, 5 confidently wrong, 5/28 decisions verified.
+B-F5 checker gap: the skeleton observed hasPermission and validateUpdateUserRequest exactly once
+     per call in every shown execution, but a prediction repeating them was not flagged (counts
+     are never checked). Fixed generically: predicting a family inside an occurrence more times
+     than it was ever observed there, when it was never observed repeated (>= 2 executions), is
+     a placement problem (indeterminate). No count is ever claimed or required.

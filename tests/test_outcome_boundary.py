@@ -155,6 +155,9 @@ def test_exit_matching_uses_the_collector_taxonomy() -> None:
     assert exit_matches("returned", "raised:py:ValueError") is False
     assert exit_matches("raised:KeyError", "raised:py:builtins.ValueError") is False
     assert exit_matches("returned", "unknown") is None
+    # a claim that keeps the runtime prefix matches the identical observed exit
+    assert exit_matches("returned-error:go:*status.Error", "returned-error:go:*status.Error")
+    assert exit_matches("raised:py:builtins.ValueError", "raised:py:builtins.ValueError")
 
 
 def test_transition_is_verified_at_the_boundary_along_the_observed_path(tmp_path: Path) -> None:

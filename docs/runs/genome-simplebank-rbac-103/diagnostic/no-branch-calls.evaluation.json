@@ -1,0 +1,1723 @@
+{
+ "summary": {
+  "exact_all": "7/7",
+  "exact_withheld": "2/2",
+  "confidently_wrong": 0,
+  "indeterminate": 0,
+  "decisions_verified": "6/28",
+  "transitions_verified": "0/0",
+  "outcomes_verified": "11/30",
+  "occurrence_facts": {
+   "confirmed": 0,
+   "contradicted": 0,
+   "unobservable": 0
+  },
+  "regions": 0,
+  "structure_claims": {
+   "verified": 51,
+   "supported": 4,
+   "rejected": 0,
+   "not established": 1,
+   "unobserved": 3
+  },
+  "required_sites_observed_uncovered": [],
+  "unknown_dependence": {
+   "decision_operands": 57,
+   "unknown_operands": 2,
+   "call_args": 207,
+   "unknown_call_args": 24
+  },
+  "rejected": [],
+  "hypothesis": [],
+  "phenotype_claims_exact": "7/7"
+ },
+ "per_test": [
+  {
+   "execution": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "BankerCanUpdateUserInfo",
+   "withheld": true,
+   "observed_entry_exits": [
+    "returned"
+   ],
+   "phenotype_claim": "returned",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/ExpiredToken",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     true
+    ],
+    [
+     "br:c7d403dfabc3",
+     true
+    ],
+    [
+     "br:c71158777bce",
+     true
+    ],
+    [
+     "br:0746154f1c47",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     true
+    ],
+    [
+     "br:c7d403dfabc3",
+     true
+    ],
+    [
+     "br:c71158777bce",
+     true
+    ],
+    [
+     "br:0746154f1c47",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "ExpiredToken",
+   "withheld": true,
+   "observed_entry_exits": [
+    "returned-error:go:*status.Error"
+   ],
+   "phenotype_claim": "returned-error:go:*status.Error",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/InvalidEmail",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     true
+    ],
+    [
+     "br:af0e24f4367b",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     true
+    ],
+    [
+     "br:af0e24f4367b",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "InvalidEmail",
+   "withheld": false,
+   "observed_entry_exits": [
+    "returned-error:go:*status.Error"
+   ],
+   "phenotype_claim": "returned-error:go:*status.Error",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/NoAuthorization",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:e3505bc4c4b9",
+     true
+    ],
+    [
+     "br:0746154f1c47",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:e3505bc4c4b9",
+     true
+    ],
+    [
+     "br:0746154f1c47",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "NoAuthorization",
+   "withheld": false,
+   "observed_entry_exits": [
+    "returned-error:go:*status.Error"
+   ],
+   "phenotype_claim": "returned-error:go:*status.Error",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/OK",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "OK",
+   "withheld": false,
+   "observed_entry_exits": [
+    "returned"
+   ],
+   "phenotype_claim": "returned",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "OtherDepositorCannotUpdateThisUserInfo",
+   "withheld": false,
+   "observed_entry_exits": [
+    "returned-error:go:*status.Error"
+   ],
+   "phenotype_claim": "returned-error:go:*status.Error",
+   "phenotype_exact": true
+  },
+  {
+   "execution": "TestUpdateUserAPI/UserNotFound",
+   "indeterminate": null,
+   "uncovered_sites": [],
+   "placement_problems": [],
+   "occurrence_checks": {
+    "confirmed": 0,
+    "contradicted": 0,
+    "unobservable": 0
+   },
+   "predicted_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     true
+    ],
+    [
+     "br:fb1ba40798cf",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:b4114c26b15a",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ],
+    [
+     "br:28f7c30a7189",
+     false
+    ],
+    [
+     "br:c7d403dfabc3",
+     false
+    ],
+    [
+     "br:c71158777bce",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     false
+    ],
+    [
+     "br:92f48828a554",
+     true
+    ],
+    [
+     "br:c1bc39962889",
+     false
+    ],
+    [
+     "br:0746154f1c47",
+     false
+    ],
+    [
+     "br:57793335771a",
+     false
+    ],
+    [
+     "br:444b7eee95f8",
+     false
+    ],
+    [
+     "br:578b58ceb4d3",
+     true
+    ],
+    [
+     "br:864c3600c3d5",
+     false
+    ],
+    [
+     "br:9558e38bf1ec",
+     true
+    ],
+    [
+     "br:f63e639d4185",
+     false
+    ],
+    [
+     "br:af0e24f4367b",
+     false
+    ],
+    [
+     "br:01807a7b80a2",
+     false
+    ],
+    [
+     "br:815be3bfb43a",
+     false
+    ],
+    [
+     "br:17f2bce25a0f",
+     true
+    ],
+    [
+     "br:fb1ba40798cf",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [],
+   "state_diff": {},
+   "outcome_diff": {},
+   "match": true,
+   "test": "UserNotFound",
+   "withheld": false,
+   "observed_entry_exits": [
+    "returned-error:go:*status.Error"
+   ],
+   "phenotype_claim": "returned-error:go:*status.Error",
+   "phenotype_exact": true
+  }
+ ],
+ "structure_claims": [
+  {
+   "procedure": "p_new_payload",
+   "entity": "go:token.NewPayload",
+   "kind": "evaluates",
+   "claim": "d_uuid (br:b4114c26b15a) evaluated during go:token.NewPayload",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_paseto_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "kind": "contains",
+   "claim": "go:token.NewPayload during go:token.PasetoMaker.CreateToken",
+   "status": "verified",
+   "why": "all 4 observed"
+  },
+  {
+   "procedure": "p_paseto_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "kind": "evaluates",
+   "claim": "d_paseto_payload_err (br:0713394c9923) evaluated during go:token.PasetoMaker.CreateToken",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_paseto_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "kind": "order",
+   "claim": "go:token.NewPayload before site:br:0713394c9923 in go:token.PasetoMaker.CreateToken",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "kind": "contains",
+   "claim": "go:token.NewPayload during go:token.JWTMaker.CreateToken",
+   "status": "not established",
+   "why": "go:token.NewPayload observed 4 time(s), never during go:token.JWTMaker.CreateToken"
+  },
+  {
+   "procedure": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "kind": "evaluates",
+   "claim": "d_jwt_payload_err (br:d9f1e0c214f9) evaluated during go:token.JWTMaker.CreateToken",
+   "status": "unobserved",
+   "why": "site never evaluated"
+  },
+  {
+   "procedure": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "kind": "order",
+   "claim": "go:token.NewPayload before site:br:d9f1e0c214f9 in go:token.JWTMaker.CreateToken",
+   "status": "supported",
+   "why": "not established by observation"
+  },
+  {
+   "procedure": "p_payload_valid",
+   "entity": "go:token.Payload.Valid",
+   "kind": "evaluates",
+   "claim": "d_valid_expired (br:28f7c30a7189) evaluated during go:token.Payload.Valid",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "contains",
+   "claim": "go:token.Payload.Valid during go:token.PasetoMaker.VerifyToken",
+   "status": "verified",
+   "why": "all 4 observed"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "evaluates",
+   "claim": "d_decrypt (br:0607e4d952f6) evaluated during go:token.PasetoMaker.VerifyToken",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "evaluates",
+   "claim": "d_verify_expired (br:c7d403dfabc3) evaluated during go:token.PasetoMaker.VerifyToken",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "order",
+   "claim": "site:br:0607e4d952f6 before go:token.Payload.Valid in go:token.PasetoMaker.VerifyToken",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "order",
+   "claim": "go:token.Payload.Valid before site:br:c7d403dfabc3 in go:token.PasetoMaker.VerifyToken",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_has_permission",
+   "entity": "go:gapi.hasPermission",
+   "kind": "evaluates",
+   "claim": "d_hp_matches_banker (br:92f48828a554) evaluated during go:gapi.hasPermission",
+   "status": "verified",
+   "why": "all 8 evaluations"
+  },
+  {
+   "procedure": "p_has_permission",
+   "entity": "go:gapi.hasPermission",
+   "kind": "evaluates",
+   "claim": "d_hp_matches_depositor (br:92f48828a554) evaluated during go:gapi.hasPermission",
+   "status": "verified",
+   "why": "all 8 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "go:token.PasetoMaker.VerifyToken during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "go:gapi.hasPermission during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_no_metadata (br:e3505bc4c4b9) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 5 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_no_auth_header (br:a572eeb6a4c8) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_bad_header_format (br:4393757b65d7) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_not_bearer (br:2e2f712d6301) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_token_rejected (br:c71158777bce) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "evaluates",
+   "claim": "d_role_not_permitted (br:c1bc39962889) evaluated during go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "site:br:e3505bc4c4b9 before site:br:a572eeb6a4c8 in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "site:br:a572eeb6a4c8 before site:br:4393757b65d7 in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "site:br:4393757b65d7 before site:br:2e2f712d6301 in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "site:br:2e2f712d6301 before go:token.PasetoMaker.VerifyToken in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "go:token.PasetoMaker.VerifyToken before site:br:c71158777bce in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "site:br:c71158777bce before go:gapi.hasPermission in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "order",
+   "claim": "go:gapi.hasPermission before site:br:c1bc39962889 in go:gapi.Server.authorizeUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_username (br:57793335771a) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_password_set (br:444b7eee95f8) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_fullname_set (br:578b58ceb4d3) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_email_set (br:9558e38bf1ec) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_email (br:f63e639d4185) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_fullname (br:864c3600c3d5) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "evaluates",
+   "claim": "d_val_password (br:d827424c3b5f) evaluated during go:gapi.validateUpdateUserRequest",
+   "status": "unobserved",
+   "why": "site never evaluated"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "order",
+   "claim": "site:br:57793335771a before site:br:444b7eee95f8 in go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "order",
+   "claim": "site:br:444b7eee95f8 before site:br:578b58ceb4d3 in go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_validate",
+   "entity": "go:gapi.validateUpdateUserRequest",
+   "kind": "order",
+   "claim": "site:br:578b58ceb4d3 before site:br:9558e38bf1ec in go:gapi.validateUpdateUserRequest",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "go:gapi.Server.authorizeUser during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 5 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "go:gapi.validateUpdateUserRequest during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 4 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "go:db/sqlc.Queries.UpdateUser during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 2 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "go:gapi.convertUser during go:gapi.Server.UpdateUser",
+   "status": "supported",
+   "why": "1 of 1 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_unauthenticated (br:0746154f1c47) evaluated during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 5 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_invalid_argument (br:af0e24f4367b) evaluated during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_not_owner (br:01807a7b80a2) evaluated during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 3 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_password_update (br:815be3bfb43a) evaluated during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 2 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_store_failed (br:17f2bce25a0f) evaluated during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 2 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_store_not_found (br:fb1ba40798cf) evaluated during go:gapi.Server.UpdateUser",
+   "status": "supported",
+   "why": "1 of 1 evaluations"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "evaluates",
+   "claim": "d_hash_fails (br:5f17958f3d3f) evaluated during go:gapi.Server.UpdateUser",
+   "status": "unobserved",
+   "why": "site never evaluated"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "go:gapi.Server.authorizeUser before site:br:0746154f1c47 in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 5 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "site:br:0746154f1c47 before go:gapi.validateUpdateUserRequest in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "go:gapi.validateUpdateUserRequest before site:br:af0e24f4367b in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 4 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "site:br:af0e24f4367b before site:br:01807a7b80a2 in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 3 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "site:br:01807a7b80a2 before site:br:815be3bfb43a in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 2 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "site:br:815be3bfb43a before go:db/sqlc.Queries.UpdateUser in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 2 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "go:db/sqlc.Queries.UpdateUser before site:br:17f2bce25a0f in go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all of x before all of y in 2 execution(s)"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "order",
+   "claim": "site:br:17f2bce25a0f before go:gapi.convertUser in go:gapi.Server.UpdateUser",
+   "status": "supported",
+   "why": "all of x before all of y in 1 execution(s)"
+  }
+ ]
+}

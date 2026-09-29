@@ -336,6 +336,14 @@ def _within_problems(e: str, fams: list[str], sk: Skeleton) -> list[str]:
     return out
 
 
+def _executions_with(sk: Skeleton, parent: str, fam: str) -> int:
+    """Executions in which `fam` was observed inside `parent` (children: by ancestry; own
+    decision sites: by the site's owner)."""
+    if fam.startswith("site:"):
+        return sk.executions if parent in sk.site_owner.get(fam[5:], {}) else 0
+    return sk.parents.get(fam, {}).get(parent, 0)
+
+
 def placement_problems(pred_occurrences: list[dict[str, Any]], sk: Skeleton) -> list[str]:
     """Problems of a predicted occurrence tree against the skeleton. Each predicted
     occurrence: {"entity", "parent": index | None, "events": [(kind, family), ...]}.
@@ -354,6 +362,17 @@ def placement_problems(pred_occurrences: list[dict[str, Any]], sk: Skeleton) -> 
             if during is not None and e not in during:
                 problems.append(f"{fam} predicted during {e}, never evaluated there")
         fams = [f for _, f in occ["events"]]
+        # a family never observed repeating inside this entity (once at most in every
+        # occurrence, across >= 2 executions) must not be predicted repeating there; members of
+        # a repeated region are exempt (their count follows the supplied occurrences)
+        in_regions = {m for r in sk.regions.get(e, []) for m in r["members"]}
+        for fam in set(fams) - in_regions:
+            rec = sk.families.get(e, {}).get(fam)
+            if rec and rec[1] == 1 and fams.count(fam) > 1 and _executions_with(sk, e, fam) >= 2:
+                problems.append(
+                    f"{fam} predicted {fams.count(fam)} times inside one {e}, "
+                    "never observed repeating"
+                )
         for i, x in enumerate(fams):
             for y in fams[i + 1 :]:
                 if x != y and sk.strictly_before(e, y, x):
