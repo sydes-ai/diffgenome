@@ -35,6 +35,8 @@ from diffgenome.genome import (
     Genome,
     Item,
     Substrate,
+    Variable,
+    bindings_of,
     derive,
     eval_predicate,
 )
@@ -84,7 +86,72 @@ BOOL_DIGESTS = {
 }  # fmt: skip
 
 
-def boundary_fact(node: Any, point: str, kind: str) -> Any:
+@dataclass(frozen=True)
+class Identity:
+    """An opaque value identity: the collector's digest of a boundary value. It is never
+    decoded; predicates compare identities with == and != only."""
+
+    digest: str
+
+    def __repr__(self) -> str:
+        return f"Identity(#{self.digest[:6]})"
+
+
+_GO_INT_KINDS = frozenset(
+    {"int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64"}
+)
+
+
+def literal_canonical(spec: dict[str, Any]) -> str | None:
+    """The canonical form a runtime collector digests for one allowed source literal, or
+    None. Allowed (design-value-identity.md, 3): bool, null, integers up to 64 bits, printable
+    strings up to 64 characters without quotes or backslashes. Go and Python only."""
+    lang, typ, value = spec.get("lang"), spec.get("type"), spec.get("value")
+    if isinstance(value, str) and (
+        len(value) > 64 or not value.isprintable() or '"' in value or "'" in value or "\\" in value
+    ):
+        return None
+    is_int = isinstance(value, int) and not isinstance(value, bool) and abs(value) < 2**63
+    if lang == "go":
+        if typ == "string" and isinstance(value, str):
+            return f'string:"{value}"'
+        if typ in _GO_INT_KINDS and is_int:
+            return f"{typ}:{value}"
+        if typ == "bool" and isinstance(value, bool):
+            return f"bool:{'true' if value else 'false'}"
+        if typ == "nil":
+            return "nil"
+    if lang == "python":
+        if typ == "str" and isinstance(value, str):
+            return f"str:{value!r}"
+        if typ == "int" and is_int:
+            return f"int:{value!r}"
+        if typ == "bool" and isinstance(value, bool):
+            return f"bool:{value!r}"
+        if typ in ("None", "NoneType"):
+            return "NoneType:None"
+    return None
+
+
+def literal_in_source(spec: dict[str, Any], root: Any) -> bool:
+    """The literal is written on the cited source line (the checker never guesses values)."""
+    src = spec.get("source") or {}
+    try:
+        lines = (root / str(src.get("file", ""))).read_text(encoding="utf-8").splitlines()
+        text = lines[int(src.get("line", 0)) - 1]
+    except (OSError, ValueError, IndexError, TypeError):
+        return False
+    value = spec.get("value")
+    if isinstance(value, str):
+        return f'"{value}"' in text or f"'{value}'" in text
+    if isinstance(value, bool):
+        return re.search(r"\b(true|false|True|False)\b", text) is not None
+    if isinstance(value, int):
+        return re.search(rf"(?<![\w.]){value}(?![\w.])", text) is not None
+    return re.search(r"\b(nil|None|null)\b", text) is not None
+
+
+def boundary_fact(node: Any, point: str, kind: str, literal: dict[str, Any] | None = None) -> Any:
     """An identity-level fact at a call boundary, or None when not decidable.
 
     point: "arg:<name>" | "result". kind:
@@ -116,6 +183,11 @@ def boundary_fact(node: Any, point: str, kind: str) -> Any:
         return int(m.group(1)) if m else None
     if kind == "bool":
         return BOOL_DIGESTS.get(dg or "")
+    if kind == "identity":
+        return Identity(dg) if dg else None
+    if kind == "equals_literal":
+        canon = literal_canonical(literal or {})
+        return (dg == _d(canon)) if canon and dg else None
     return None
 
 
@@ -570,7 +642,7 @@ def _local_agreement(
             if not isinstance(node, CallNode):
                 continue
             facts = {**constants, **{a: b for a, b, _ in node.state if a not in stored_before}}
-            v = eval_predicate(d.predicate, derive(g, _bind(g, facts, node, "entry")))
+            v = eval_predicate(d.predicate, derive(g, _bind(g, facts, node, "entry", ob)))
             if v is None:
                 continue
             name = test.split("/")[-1].split("::")[-1]
@@ -580,38 +652,142 @@ def _local_agreement(
     return agree, disagree
 
 
+def _is_ancestor(ob: ExecObs, anc: int, node: int) -> bool:
+    p = ob.execution.nodes[node].parent
+    while p is not None:
+        if p == anc:
+            return True
+        p = ob.execution.nodes[p].parent
+    return False
+
+
+def scoped_value(ob: ExecObs, b: dict[str, Any], before: int | None = None) -> tuple[Any, str]:
+    """The value of a binding across one execution: the boundary's value in every occurrence
+    of its entity (only those that ran before node `before`, when given: argument points of
+    occurrences started earlier, result points of occurrences finished earlier). Returns
+    (value, "") when all agree, (None, reason) when missing or ambiguous."""
+    at = b.get("at") or {}
+    entity, point = str(at.get("entity", "")), str(at.get("point", ""))
+    kind = str(b.get("kind", "identity"))
+    vals = []
+    for n in ob.execution.nodes:
+        if not (isinstance(n, CallNode) and _name_match(entity, n.symbol)):
+            continue
+        if before is not None:
+            if n.id >= before:
+                continue
+            if _exit_point(kind, point) and _is_ancestor(ob, n.id, before):
+                continue  # still running: its result is not known yet
+        v = boundary_fact(n, point, kind, b.get("literal"))
+        if v is not None:
+            vals.append(v)
+    if not vals:
+        return None, "missing"
+    if any(v != vals[0] for v in vals[1:]):
+        return None, "ambiguous"
+    return vals[0], ""
+
+
 def _bind(
-    g: Genome, facts: dict[str, str], node: Any = None, phase: str = "entry"
+    g: Genome,
+    facts: dict[str, str],
+    node: Any = None,
+    phase: str = "entry",
+    ob: ExecObs | None = None,
 ) -> dict[str, Any]:
-    """Observed buckets -> genome variable values, through each variable's binding. With a
-    call node, variables bound at that entity's boundary (`observed_as.at`) are added:
-    argument facts at "entry", result and change facts at "exit"."""
+    """Observed buckets -> genome variable values, through each variable's binding(s). With
+    a call node, variables bound at that entity's boundary (`observed_as.at`) are added:
+    argument facts at "entry", result and change facts at "exit". With the execution too,
+    bindings of `scope: "execution"` at OTHER entities take the value those boundaries had
+    earlier in the execution, when it is unique (design-value-identity.md, 2)."""
     out: dict[str, Any] = {}
     for v in g.variables:
-        b = v.observed_as or {}
-        at = b.get("at")
-        if isinstance(at, dict):
-            if node is None or not _name_match(str(at.get("entity", "")), node.symbol):
+        for b in bindings_of(v):
+            if v.name in out:
+                break
+            at = b.get("at")
+            if isinstance(at, dict):
+                kind = str(b.get("kind", "is_set"))
+                if kind == "equals_literal" and b.get("_literal_ok") is not True:
+                    continue  # unchecked or not in source: never used
+                point = str(at.get("point", ""))
+                if node is not None and _name_match(str(at.get("entity", "")), node.symbol):
+                    if _exit_point(kind, point) != (phase == "exit"):
+                        continue
+                    val = boundary_fact(node, point, kind, b.get("literal"))
+                elif (
+                    b.get("scope") == "execution"
+                    and ob is not None
+                    and node is not None
+                    and phase == "entry"
+                ):
+                    val, _ = scoped_value(ob, b, before=node.id)
+                else:
+                    continue
+                if val is not None:
+                    out[v.name] = val
                 continue
-            point, kind = str(at.get("point", "")), str(b.get("kind", "is_set"))
-            if _exit_point(kind, point) != (phase == "exit"):
+            fact = b.get("fact")
+            if not fact or fact not in facts:
                 continue
-            val = boundary_fact(node, point, kind)
-            if val is not None:
-                out[v.name] = val
-            continue
-        fact = b.get("fact")
-        if not fact or fact not in facts:
-            continue
-        bucket = facts[fact]
-        kind = b.get("kind", "is_set")
-        if kind == "is_set":
-            out[v.name] = bucket != "none"
-        elif kind == "bool" and bucket.startswith("bool:"):
-            out[v.name] = bucket == "bool:true"
-        elif kind == "sign" and bucket.startswith("num:"):
-            out[v.name] = {"num:zero": 0, "num:pos": 1, "num:neg": -1}[bucket]
+            bucket = facts[fact]
+            kind = b.get("kind", "is_set")
+            if kind == "is_set":
+                out[v.name] = bucket != "none"
+            elif kind == "bool" and bucket.startswith("bool:"):
+                out[v.name] = bucket == "bool:true"
+            elif kind == "sign" and bucket.startswith("num:"):
+                out[v.name] = {"num:zero": 0, "num:pos": 1, "num:neg": -1}[bucket]
     return out
+
+
+def identity_claim(v: Variable, obs: Observations) -> tuple[str, str, int, int]:
+    """Check a variable observed at >= 2 identity boundaries: every observation of it in one
+    execution is the same value. Returns (status or "", reason, agreeing executions, distinct
+    identities). Rejected on any execution where all sides are present and differ; verified
+    when equal in >= 2 executions carrying >= 2 distinct identities (a contrast, so that a
+    constant coincidence cannot verify it); supported when equal but vacuous; "" (unknown)
+    when no execution shows every side."""
+    sides = [b for b in bindings_of(v) if b.get("kind") == "identity"]
+    agree: list[Any] = []
+    bad: list[str] = []
+    for test, ob in obs.by_test.items():
+        vals = [scoped_value(ob, b)[0] for b in sides]
+        if any(x is None for x in vals):
+            continue
+        if all(x == vals[0] for x in vals[1:]):
+            agree.append(vals[0])
+        else:
+            bad.append(test.split("::")[-1])
+    distinct = len(set(agree))
+    if bad:
+        return (
+            REJECTED,
+            f"identity contradicted: sides differ in {', '.join(bad[:3])}",
+            len(agree),
+            distinct,
+        )
+    if len(agree) >= 2 and distinct >= 2:
+        return (
+            VERIFIED,
+            (
+                f"identity verified: equal in {len(agree)} execution(s) carrying {distinct} "
+                "distinct values"
+            ),
+            len(agree),
+            distinct,
+        )
+    if agree:
+        return (
+            SUPPORTED,
+            (
+                f"identity observed in {len(agree)} execution(s) with {distinct} distinct "
+                "value(s): no contrast, not verified"
+            ),
+            len(agree),
+            distinct,
+        )
+    return "", "identity unknown: no execution shows every side", 0, 0
 
 
 def _abstract_equal(kind: str, predicted: Any, observed: Any) -> bool:
@@ -939,6 +1115,35 @@ def establish_state(
                 + ", ".join(sorted({r.kind for r in it.evidence}))
                 + ")"
             )
+    # literal bindings: usable only when the literal is allowed and written on its cited line
+    for v in g.variables:
+        for bd in bindings_of(v):
+            if bd.get("kind") != "equals_literal":
+                continue
+            lit = bd.get("literal") or {}
+            lit_ok = literal_canonical(lit) is not None and literal_in_source(lit, sub.source_root)
+            bd["_literal_ok"] = lit_ok
+            if not lit_ok and v.status != REJECTED:
+                v.status = HYPOTHESIS
+                v.status_reason = (
+                    f"literal {lit.get('value')!r} is not an allowed literal written on "
+                    f"{(lit.get('source') or {}).get('file')}:"
+                    f"{(lit.get('source') or {}).get('line')}"
+                )
+    # identity claims: a variable observed at >= 2 identity boundaries. The proposal names
+    # the correspondence; the equality itself is observed (digests), never assumed.
+    for v in g.variables:
+        if sum(1 for b in bindings_of(v) if bd.get("kind") == "identity") < 2:
+            continue
+        status, why, _, _ = identity_claim(v, sub.obs)
+        if v.status == REJECTED or (
+            v.status == HYPOTHESIS and not v.status_reason.startswith("no evidence cited")
+        ):
+            v.status_reason += f"; {why}"  # its citations failed: identity does not rescue it
+        elif status:
+            v.status, v.status_reason = status, why
+        else:
+            v.status_reason += f"; {why}"
     # decisions: anchored at a site, both outcomes observed, statically consistent,
     # no observed contradiction, and not sharing the site with another decision
     anchors: dict[str, list[str]] = {}
@@ -1000,6 +1205,7 @@ def establish_state(
             )
             continue
         if local_disagree or disagree:
+            d.contradicted = True
             d.status_reason += (
                 "; not verified: predicate disagrees with observed outcomes: "
                 + "; ".join((local_disagree + disagree)[:3])
@@ -1070,7 +1276,10 @@ def establish_state(
     # a procedure places the transition (T:id), it is checked where the genome says it
     # happens: the entity's procedure is run from the call's observed entry state, and the
     # transition is compared only if that run reaches it.
-    kinds = {v.name: (v.observed_as or {}).get("kind", "is_set") for v in g.variables}
+    kinds = {
+        v.name: (bindings_of(v)[0].get("kind", "is_set") if bindings_of(v) else "is_set")
+        for v in g.variables
+    }
     step_lists = [p.steps for p in g.procedures] + [r.steps for r in g.regions]
     placed = {st[2:] for steps in step_lists for st in steps if st.startswith("T:")}
     placed |= {
@@ -1098,7 +1307,7 @@ def establish_state(
             for n in ob.execution.nodes:
                 if not (isinstance(n, CallNode) and _name_match(t.entity, n.symbol)):
                     continue
-                before = _bind(g, {**constant, **{a: b for a, b, _ in n.state}}, n, "entry")
+                before = _bind(g, {**constant, **{a: b for a, b, _ in n.state}}, n, "entry", ob)
                 after = _bind(g, {a: b for a, b, _ in n.state_after}, n, "exit")
                 if not after:
                     continue
@@ -1241,11 +1450,15 @@ def predict_sequence(
     procedures = {p.entity: p for p in g.procedures}
     regions = {r.id: r for r in g.regions}
     # occurrence facts are local to one occurrence; state-bound variables persist
-    state_vars = {v.name for v in g.variables if (v.observed_as or {}).get("fact")}
+    state_vars = {v.name for v in g.variables if any(b.get("fact") for b in bindings_of(v))}
     ctx: list[dict[str, Any]] = []  # the scenario item whose occurrences a region reads
     pred = SeqPrediction(state=dict(scenario.get("state") or {}))
 
     def usable(it: Item) -> bool:
+        # eligibility: a supported item contradicted on a shown execution may not drive a
+        # prediction; diagnostics that ask for hypothesis-level prediction still use it
+        if it.contradicted and it.status != VERIFIED and min_status != HYPOTHESIS:
+            return False
         return RANK.get(it.status, 0) >= RANK[min_status]
 
     def entity_key(e: str) -> str | None:
@@ -1319,7 +1532,16 @@ def predict_sequence(
             elif kind == "D":
                 d = decisions.get(ref)
                 if d is None or not usable(d):
-                    pred.indeterminate = f"decision {ref} is {'missing' if d is None else d.status}"
+                    why = (
+                        "missing"
+                        if d is None
+                        else (
+                            f"{d.status}, contradicted on a shown execution"
+                            if d.contradicted and d.status != VERIFIED
+                            else d.status
+                        )
+                    )
+                    pred.indeterminate = f"decision {ref} is {why}"
                     return True
                 v = eval_predicate(d.predicate, derive(g, env))
                 if v is None:
@@ -1333,7 +1555,7 @@ def predict_sequence(
                     pred.events.append(
                         ("outcome", b.outcome.get("entity") or d.entity, b.outcome["is"])
                     )
-                inner = b.steps or [f"call:{c}" for c in b.calls]
+                inner = b.steps  # `calls` are descriptive (design-value-identity.md, 4)
                 if run_steps(inner, env, depth, occ) or b.stops:
                     return True
             else:
@@ -1463,7 +1685,7 @@ def replay_observed(
                     events.append(
                         ("outcome", b.outcome.get("entity") or d.entity, b.outcome["is"], node_id)
                     )
-                stopped, prob = run(b.steps or [f"call:{c}" for c in b.calls])
+                stopped, prob = run(b.steps)
                 if prob is not None:
                     return stopped, prob
                 if stopped or b.stops:
@@ -1510,18 +1732,26 @@ def _occurrence_values(
     nodes = ob.execution.nodes
     inside = [occs[i] for i in rep["occurrences"]]
     for v in g.variables:
-        b = v.observed_as or {}
-        at = b.get("at")
-        if not isinstance(at, dict):
-            continue
-        target = resolve(vocab, str(at.get("entity", "")))
-        vals = {
-            boundary_fact(nodes[o.id], str(at.get("point", "")), str(b.get("kind", "is_set")))
-            for o in inside
-            if o.entity == target
-        } - {None}
-        if len(vals) == 1:
-            out[v.name] = vals.pop()
+        for b in bindings_of(v):
+            at = b.get("at")
+            if not isinstance(at, dict) or v.name in out:
+                continue
+            if b.get("kind") == "equals_literal" and b.get("_literal_ok") is not True:
+                continue
+            target = resolve(vocab, str(at.get("entity", "")))
+            vals = [
+                boundary_fact(
+                    nodes[o.id],
+                    str(at.get("point", "")),
+                    str(b.get("kind", "is_set")),
+                    b.get("literal"),
+                )
+                for o in inside
+                if o.entity == target
+            ]
+            vals = [x for x in vals if x is not None]
+            if vals and all(x == vals[0] for x in vals[1:]):
+                out[v.name] = vals[0]
     procedures = {p.entity: p for p in g.procedures}
     decisions = {d.id: d for d in g.decisions}
     first: dict[str, bool] = {}
@@ -1546,7 +1776,62 @@ def _occurrence_values(
                 if d.site in first and m and m.group(2) not in ("true", "false"):
                     out.setdefault(m.group(2), (not first[d.site]) if m.group(1) else first[d.site])
                 for br in (d.true_branch, d.false_branch):
-                    stack.append(br.steps or [f"call:{c}" for c in br.calls])
+                    stack.append(br.steps)
+    return out
+
+
+def check_scenario_call_facts(
+    g: Genome, scenario: dict[str, Any], ob: ExecObs
+) -> list[dict[str, Any]]:
+    """Facts a scenario states for one of its calls, for variables bound at that call's own
+    boundary or within the execution (scope "execution"), compared with the aligned observed
+    call (the k-th call of that entity). Identity variables carry labels, never decoded: the
+    label pattern must equal the identity pattern (same label iff same identity)."""
+    out: list[dict[str, Any]] = []
+    pairs: list[tuple[str, Any, Any]] = []
+    counts: dict[str, int] = {}
+    kinds = {
+        v.name: (bindings_of(v)[0].get("kind", "is_set") if bindings_of(v) else "is_set")
+        for v in g.variables
+    }
+    for call in scenario.get("calls") or []:
+        e = call["entity"]
+        k = counts.get(e, 0)
+        counts[e] = k + 1
+        facts = call.get("facts") or {}
+        if not facts:
+            continue
+        nodes = [
+            n for n in ob.execution.nodes if isinstance(n, CallNode) and _name_match(e, n.symbol)
+        ]
+        if k >= len(nodes):
+            continue
+        n = nodes[k]
+        seen = {
+            **_bind(g, {a: b for a, b, _ in n.state}, n, "entry", ob),
+            **_bind(g, {a: b for a, b, _ in n.state_after}, n, "exit", ob),
+        }
+        for var, val in facts.items():
+            if var not in seen:
+                continue
+            if isinstance(seen[var], Identity):
+                pairs.append((var, val, seen[var]))
+                continue
+            same = _abstract_equal(kinds.get(var, "is_set"), val, seen[var])
+            out.append(
+                {"call": e, "fact": var, "supplied": val, "observed": seen[var],
+                 "status": "confirmed" if same else "contradicted"}
+            )  # fmt: skip
+    for i, (va, la, ia) in enumerate(pairs):
+        for vb, lb, ib in pairs[i + 1 :]:
+            consistent = (la == lb) == (ia == ib)
+            out.append(
+                {"fact": f"{va}={la!r} vs {vb}={lb!r}",
+                 "status": "confirmed" if consistent else "contradicted",
+                 "why": "" if consistent else (
+                     "labels equal but identities differ" if la == lb
+                     else "labels differ but identities are equal")}
+            )  # fmt: skip
     return out
 
 
@@ -1718,7 +2003,10 @@ def compare_sequence(
         if isinstance(n, CallNode) and n.state_after:
             last.update({a: b for a, b, _ in n.state_after if a.startswith(("self.", "global."))})
     observed_state = _bind(g, last)
-    kinds = {v.name: (v.observed_as or {}).get("kind", "is_set") for v in g.variables}
+    kinds = {
+        v.name: (bindings_of(v)[0].get("kind", "is_set") if bindings_of(v) else "is_set")
+        for v in g.variables
+    }
     state_diff = {
         k: (pred.state.get(k), v)
         for k, v in observed_state.items()
@@ -1752,8 +2040,10 @@ def compare_sequence(
     # supplied occurrence facts, where the checker can see the execution: a scenario that is
     # wrong about its own input cannot support a prediction
     occ_checks: list[dict[str, Any]] = []
-    if skeleton is not None and scenario is not None and g.regions:
-        occ_checks = check_scenario_occurrences(g, scenario, ob, skeleton)
+    if skeleton is not None and scenario is not None:
+        occ_checks = check_scenario_call_facts(g, scenario, ob)
+        if g.regions:
+            occ_checks += check_scenario_occurrences(g, scenario, ob, skeleton)
     contradicted = [c for c in occ_checks if c["status"] == "contradicted"]
     indeterminate = (
         pred.indeterminate

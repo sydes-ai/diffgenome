@@ -1,0 +1,6649 @@
+{
+ "format": "diffgenome-genome/0",
+ "subject": {
+  "case": "rerun-v5"
+ },
+ "entities": [],
+ "variables": [
+  {
+   "id": "v_rng_ok",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:ecd8b89da8b7",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "rng_ok",
+   "origin": "setting",
+   "description": "uuid.NewRandom succeeds when building a payload (entropy available).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_requested_type",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 35,
+     "text": "func NewPayload(username string, role string, duration time.Duration, tokenType TokenType) (*Payload, error) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "requested_type",
+   "origin": "input",
+   "description": "TokenType passed to CreateToken/NewPayload (1 = access, 2 = refresh).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_duration_negative",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 47,
+     "text": "ExpiredAt: time.Now().Add(duration),",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "duration_negative",
+   "origin": "input",
+   "description": "The duration passed to token creation is negative, so the payload is born expired.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_issued_type",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 43,
+     "text": "Type:      tokenType,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "issued_type",
+   "origin": "state",
+   "description": "The Type stamped into the (most recently built) token payload; payload.Type.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_expected_type",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 40,
+     "text": "payload, err := server.tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 30,
+     "text": "refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "expected_type",
+   "origin": "input",
+   "description": "TokenType the verifier demands (tokenType argument of VerifyToken / Payload.Valid). Fixed to access (1) by authMiddleware and authorizeUser, to refresh (2) by renewAccessToken; chosen by the caller for direct calls.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_token_expired",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestExpiredPasetoToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:bdb0acf90853",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "token_expired",
+   "origin": "state",
+   "description": "The presented token's ExpiredAt is in the past.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_token_authentic",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0607e4d952f6",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestInvalidJWTTokenAlgNone",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:b95a526c7153",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "token_authentic",
+   "origin": "state",
+   "description": "The presented token was sealed/signed by this maker with its key (PASETO decrypts; JWT verifies with HMAC). False for a hand-built alg=none JWT.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_claims_are_payload",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:46e44adad2e4",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "claims_are_payload",
+   "origin": "derived",
+   "description": "Parsed JWT claims are a *Payload (always, since ParseWithClaims is given &Payload{}).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_payload_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c7d403dfabc3",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "payload_valid",
+   "origin": "derived",
+   "description": "Payload.Valid(expected) returned nil: type matches and not expired.",
+   "definition": "issued_type == expected_type && !token_expired",
+   "observed_as": null
+  },
+  {
+   "id": "v_verify_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c71158777bce",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "verify_failed",
+   "origin": "derived",
+   "description": "VerifyToken returned an error (ErrInvalidToken or ErrExpiredToken).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_authorize_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0746154f1c47",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "authorize_failed",
+   "origin": "derived",
+   "description": "gRPC authorizeUser returned an error.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_token_create_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0713394c9923",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "token_create_failed",
+   "origin": "derived",
+   "description": "The last CreateToken returned an error.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_auth_metadata_present",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:e3505bc4c4b9",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "auth_metadata_present",
+   "origin": "input",
+   "description": "gRPC context carries incoming metadata.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_auth_header_present",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:3efaa90434e1",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "auth_header_present",
+   "origin": "input",
+   "description": "An authorization header value is present (HTTP header non-empty / gRPC metadata key has a value).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_header_has_two_fields",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:4ede9085ac0b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "header_has_two_fields",
+   "origin": "input",
+   "description": "The authorization header splits into at least two whitespace fields (scheme and token).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_scheme_is_bearer",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/UnsupportedAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:96c4e761344c",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "scheme_is_bearer",
+   "origin": "input",
+   "description": "The authorization scheme lower-cases to 'bearer'.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_role_permitted",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "boundary",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:gapi.hasPermission",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": "result",
+     "binding": "bool",
+     "value": true,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (boundary)",
+   "contradicted": false,
+   "name": "role_permitted",
+   "origin": "derived",
+   "description": "The verified payload's role is among the RPC's accessible roles (hasPermission result).",
+   "definition": null,
+   "observed_as": {
+    "at": {
+     "entity": "go:gapi.hasPermission",
+     "point": "result"
+    },
+    "kind": "bool"
+   }
+  },
+  {
+   "id": "v_has_violations",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:af0e24f4367b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "has_violations",
+   "origin": "input",
+   "description": "Request field validation produced violations.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_caller_is_banker",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:01807a7b80a2",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "caller_is_banker",
+   "origin": "input",
+   "description": "The authenticated payload's role is banker.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_caller_is_target",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:01807a7b80a2",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "caller_is_target",
+   "origin": "input",
+   "description": "The authenticated username equals the username being updated.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_password_provided",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:815be3bfb43a",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "password_provided",
+   "origin": "input",
+   "description": "UpdateUser request carries a new password.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_hash_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "hash_failed",
+   "origin": "input",
+   "description": "Password hashing failed.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_update_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:17f2bce25a0f",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "update_failed",
+   "origin": "input",
+   "description": "store.UpdateUser returned an error.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_user_not_found",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:fb1ba40798cf",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "user_not_found",
+   "origin": "input",
+   "description": "The store error is db.ErrRecordNotFound for the user.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_request_malformed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "request_malformed",
+   "origin": "input",
+   "description": "HTTP JSON body fails binding/validation.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_user_lookup_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "user_lookup_failed",
+   "origin": "input",
+   "description": "store.GetUser returned an error during login.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_password_wrong",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "password_wrong",
+   "origin": "input",
+   "description": "Login password does not match the stored hash.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_create_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_create_failed",
+   "origin": "input",
+   "description": "store.CreateSession failed during login.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_lookup_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_lookup_failed",
+   "origin": "input",
+   "description": "store.GetSession returned an error during renew.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_not_found",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_not_found",
+   "origin": "input",
+   "description": "The GetSession error is db.ErrRecordNotFound.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_blocked",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_blocked",
+   "origin": "input",
+   "description": "session.IsBlocked.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_user_mismatch",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_user_mismatch",
+   "origin": "input",
+   "description": "session.Username differs from the refresh payload username.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_token_mismatch",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_token_mismatch",
+   "origin": "input",
+   "description": "session.RefreshToken differs from the presented refresh token.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_session_expired",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "session_expired",
+   "origin": "input",
+   "description": "session.ExpiresAt is in the past.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_create_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "create_failed",
+   "origin": "input",
+   "description": "store.CreateUserTx failed.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "v_unique_violation",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "unique_violation",
+   "origin": "input",
+   "description": "The CreateUserTx error is a unique-constraint violation.",
+   "definition": null,
+   "observed_as": null
+  }
+ ],
+ "data_dependencies": [],
+ "decisions": [
+  {
+   "id": "d_np_rng",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:ecd8b89da8b7",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:ecd8b89da8b7 (given); not verified: outcome true never observed at br:ecd8b89da8b7",
+   "contradicted": false,
+   "entity": "go:token.NewPayload",
+   "site": "br:ecd8b89da8b7",
+   "inputs": [
+    "rng_ok"
+   ],
+   "predicate": "!rng_ok",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "no payload; error propagates to CreateToken",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.NewPayload",
+     "is": "returned-error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload built with the requested type",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_pc_err",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0713394c9923",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:0713394c9923 (given); not verified: outcome true never observed at br:0713394c9923",
+   "contradicted": false,
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "site": "br:0713394c9923",
+   "inputs": [
+    "rng_ok"
+   ],
+   "predicate": "!rng_ok",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "no token",
+    "steps": [
+     "T:t_pc_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "is": "returned-error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload encrypted into a token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_jc_err",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:d9f1e0c214f9",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:d9f1e0c214f9 (given); not verified: outcome true never observed at br:d9f1e0c214f9",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.CreateToken",
+   "site": "br:d9f1e0c214f9",
+   "inputs": [
+    "rng_ok"
+   ],
+   "predicate": "!rng_ok",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "no token",
+    "steps": [
+     "T:t_jc_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.CreateToken",
+     "is": "returned-error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload signed HS256",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_valid_type",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 54,
+     "text": "if payload.Type != tokenType {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:8d10f2f9b136",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:8d10f2f9b136",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:token.Payload.Valid",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned-error:go:*errors.errorString",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:8d10f2f9b136 (`payload.Type != tokenType`) observed true in 1 and false in 10 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 11 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:token.Payload.Valid",
+   "site": "br:8d10f2f9b136",
+   "inputs": [
+    "issued_type",
+    "expected_type"
+   ],
+   "predicate": "issued_type != expected_type",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "time.Now().After"
+    ],
+    "stops": true,
+    "effect": "ErrInvalidToken: token of the wrong type; expiry is not examined",
+    "steps": [
+     "T:t_valid_reject"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.Payload.Valid",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "type accepted; go on to expiry",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_valid_expiry",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 57,
+     "text": "if time.Now().After(payload.ExpiredAt) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestExpiredPasetoToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:bdb0acf90853",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:bdb0acf90853",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:bdb0acf90853 (`time.Now().After(payload.ExpiredAt)`) observed true in 3 and false in 7 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 10 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:token.Payload.Valid",
+   "site": "br:bdb0acf90853",
+   "inputs": [
+    "token_expired"
+   ],
+   "predicate": "token_expired",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "ErrExpiredToken",
+    "steps": [
+     "T:t_valid_reject"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.Payload.Valid",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload valid",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_pv_decrypt",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0607e4d952f6",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:0607e4d952f6 (given); not verified: outcome true never observed at br:0607e4d952f6",
+   "contradicted": false,
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "site": "br:0607e4d952f6",
+   "inputs": [
+    "token_authentic"
+   ],
+   "predicate": "!token_authentic",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.Payload.Valid"
+    ],
+    "stops": true,
+    "effect": "ErrInvalidToken",
+    "steps": [
+     "T:t_pv_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload decrypted",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_pv_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c7d403dfabc3",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c7d403dfabc3",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned-error:go:*errors.errorString",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:c7d403dfabc3 (`err != nil`) observed true in 4 and false in 6 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 10 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "site": "br:c7d403dfabc3",
+   "inputs": [
+    "payload_valid"
+   ],
+   "predicate": "!payload_valid",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Valid's error (invalid type or expired) is returned",
+    "steps": [
+     "T:t_pv_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload returned",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_jv_parse",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/jwt_maker.go",
+     "line": 48,
+     "text": "jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestExpiredJWTToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:b95a526c7153",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestInvalidJWTTokenAlgNone",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:b95a526c7153",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:b95a526c7153",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:b95a526c7153 (`err != nil`) observed true in 2 and false in 1 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 3 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:b95a526c7153",
+   "inputs": [
+    "token_authentic",
+    "token_expired"
+   ],
+   "predicate": "!token_authentic || token_expired",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.Payload.Valid"
+    ],
+    "stops": true,
+    "effect": "jwt library rejects (bad signature/alg or exp claim); our Valid (and the type check) never runs",
+    "steps": [
+     "T:t_jv_failed",
+     "D:d_jv_expired"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "claims parsed",
+    "steps": [
+     "T:t_jv_claims"
+    ],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_jv_expired",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestExpiredJWTToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:184d2ca72d5b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestInvalidJWTTokenAlgNone",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:184d2ca72d5b",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:184d2ca72d5b (`errors.Is(err, jwt.ErrTokenExpired)`) observed true in 1 and false in 1 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 2 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:184d2ca72d5b",
+   "inputs": [
+    "token_expired"
+   ],
+   "predicate": "token_expired",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "ErrExpiredToken",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "ErrInvalidToken",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   }
+  },
+  {
+   "id": "d_jv_claims",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:46e44adad2e4",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:46e44adad2e4 (given); not verified: outcome true never observed at br:46e44adad2e4",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:46e44adad2e4",
+   "inputs": [
+    "claims_are_payload"
+   ],
+   "predicate": "!claims_are_payload",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.Payload.Valid"
+    ],
+    "stops": true,
+    "effect": "ErrInvalidToken",
+    "steps": [
+     "T:t_jv_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "go on to Payload.Valid",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_jv_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/jwt_maker.go",
+     "line": 61,
+     "text": "err = payload.Valid(tokenType)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:8a21855c007e",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, source); site: br:8a21855c007e (given); not verified: outcome true never observed at br:8a21855c007e",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:8a21855c007e",
+   "inputs": [
+    "payload_valid"
+   ],
+   "predicate": "!payload_valid",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Valid's error (in practice ErrInvalidToken for a wrong type) returned",
+    "steps": [
+     "T:t_jv_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload returned",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_md",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:e3505bc4c4b9",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:e3505bc4c4b9",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:e3505bc4c4b9 (`!ok`) observed true in 1 and false in 6 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 7 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:e3505bc4c4b9",
+   "inputs": [
+    "auth_metadata_present"
+   ],
+   "predicate": "!auth_metadata_present",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.PasetoMaker.VerifyToken"
+    ],
+    "stops": true,
+    "effect": "missing metadata",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_hdr",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:a572eeb6a4c8",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:a572eeb6a4c8 (given); not verified: outcome true never observed at br:a572eeb6a4c8",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:a572eeb6a4c8",
+   "inputs": [
+    "auth_header_present"
+   ],
+   "predicate": "!auth_header_present",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "missing authorization header",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_fields",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:4393757b65d7",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:4393757b65d7 (given); not verified: outcome true never observed at br:4393757b65d7",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:4393757b65d7",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "predicate": "!header_has_two_fields",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "invalid header format",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_scheme",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:2e2f712d6301",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:2e2f712d6301 (given); not verified: outcome true never observed at br:2e2f712d6301",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:2e2f712d6301",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "predicate": "!scheme_is_bearer",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "unsupported authorization type",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_verify",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c71158777bce",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c71158777bce",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:gapi.Server.authorizeUser",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned-error:go:*errors.errorString",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:c71158777bce (`err != nil`) observed true in 1 and false in 5 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 6 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c71158777bce",
+   "inputs": [
+    "verify_failed"
+   ],
+   "predicate": "verify_failed",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:gapi.hasPermission"
+    ],
+    "stops": true,
+    "effect": "invalid access token (wrong type, expired, or undecryptable)",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_az_role",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:c1bc39962889",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:c1bc39962889 (given); not verified: outcome true never observed at br:c1bc39962889",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c1bc39962889",
+   "inputs": [
+    "role_permitted"
+   ],
+   "predicate": "!role_permitted",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "permission denied",
+    "steps": [
+     "T:t_az_failed"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload returned",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_auth",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:0746154f1c47",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:gapi.Server.UpdateUser",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned-error:go:*status.Error",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:0746154f1c47 (`err != nil`) observed true in 2 and false in 5 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 7 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:0746154f1c47",
+   "inputs": [
+    "authorize_failed"
+   ],
+   "predicate": "authorize_failed",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:gapi.validateUpdateUserRequest",
+     "go:db/sqlc.Queries.UpdateUser"
+    ],
+    "stops": true,
+    "effect": "codes.Unauthenticated",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:af0e24f4367b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:af0e24f4367b (`violations != nil`) observed true in 1 and false in 4 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:af0e24f4367b",
+   "inputs": [
+    "has_violations"
+   ],
+   "predicate": "has_violations",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:db/sqlc.Queries.UpdateUser"
+    ],
+    "stops": true,
+    "effect": "codes.InvalidArgument",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_perm",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:01807a7b80a2",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:01807a7b80a2",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:01807a7b80a2 (`authPayload.Role != util.BankerRole && authPayload.Username != req.GetUsername()`) observed true in 1 and false in 3 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 4 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:01807a7b80a2",
+   "inputs": [
+    "caller_is_banker",
+    "caller_is_target"
+   ],
+   "predicate": "!caller_is_banker && !caller_is_target",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:db/sqlc.Queries.UpdateUser"
+    ],
+    "stops": true,
+    "effect": "codes.PermissionDenied",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_pw",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:815be3bfb43a",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:815be3bfb43a (given); not verified: outcome true never observed at br:815be3bfb43a",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:815be3bfb43a",
+   "inputs": [
+    "password_provided"
+   ],
+   "predicate": "password_provided",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "hash the new password",
+    "steps": [
+     "D:d_uu_hash"
+    ],
+    "absent_scope": "episode",
+    "outcome": null
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "password untouched",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_hash",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:5f17958f3d3f (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:5f17958f3d3f",
+   "inputs": [
+    "hash_failed"
+   ],
+   "predicate": "hash_failed",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "codes.Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_update",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:17f2bce25a0f",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:17f2bce25a0f",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "verified",
+   "status_reason": "site br:17f2bce25a0f (`err != nil`) observed true in 1 and false in 2 execution(s); the predicate agrees with the observed outcome 0 time(s) from observed state and in 3 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:17f2bce25a0f",
+   "inputs": [
+    "update_failed"
+   ],
+   "predicate": "update_failed",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:gapi.convertUser"
+    ],
+    "stops": true,
+    "effect": "store error surfaced",
+    "steps": [
+     "D:d_uu_notfound"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "convert and return the user",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_uu_notfound",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:fb1ba40798cf",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:fb1ba40798cf (given); not verified: outcome false never observed at br:fb1ba40798cf",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:fb1ba40798cf",
+   "inputs": [
+    "user_not_found"
+   ],
+   "predicate": "user_not_found",
+   "order": 7,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "codes.NotFound",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "codes.Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   }
+  },
+  {
+   "id": "d_mw_hdr",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 24,
+     "text": "if len(authorizationHeader) == 0 {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:3efaa90434e1",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:3efaa90434e1",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, source); site: br:3efaa90434e1 (given; observed at runtime, no static facts); not verified: site br:3efaa90434e1 is observed both ways and the predicate agrees 4 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:3efaa90434e1",
+   "inputs": [
+    "auth_header_present"
+   ],
+   "predicate": "!auth_header_present",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.PasetoMaker.VerifyToken"
+    ],
+    "stops": true,
+    "effect": "abort 401: header not provided",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_mw_fields",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 31,
+     "text": "if len(fields) < 2 {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:4ede9085ac0b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, source); site: br:4ede9085ac0b (given; observed at runtime, no static facts); not verified: site br:4ede9085ac0b is observed both ways and the predicate agrees 3 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:4ede9085ac0b",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "predicate": "!header_has_two_fields",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.PasetoMaker.VerifyToken"
+    ],
+    "stops": true,
+    "effect": "abort 401: invalid format",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_mw_scheme",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 38,
+     "text": "if authorizationType != authorizationTypeBearer {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/UnsupportedAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:96c4e761344c",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, source); site: br:96c4e761344c (given; observed at runtime, no static facts); not verified: site br:96c4e761344c is observed both ways and the predicate agrees 2 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:96c4e761344c",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "predicate": "!scheme_is_bearer",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "go:token.PasetoMaker.VerifyToken"
+    ],
+    "stops": true,
+    "effect": "abort 401: unsupported type",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_mw_verify",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 46,
+     "text": "if err != nil {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:052de203d9d4",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    },
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, outcome, source); site: br:052de203d9d4 (given; observed at runtime, no static facts); not verified: outcome false never observed at br:052de203d9d4",
+   "contradicted": false,
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:052de203d9d4",
+   "inputs": [
+    "verify_failed"
+   ],
+   "predicate": "verify_failed",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "abort 401 with the verification error",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload stored in context; ctx.Next()",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_bind",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:51914597d4b2 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:51914597d4b2",
+   "inputs": [
+    "request_malformed"
+   ],
+   "predicate": "request_malformed",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "400",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_verify",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 30,
+     "text": "refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); site: br:b98712eb46d4 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:b98712eb46d4",
+   "inputs": [
+    "verify_failed"
+   ],
+   "predicate": "verify_failed",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401: e.g. an access token presented as a refresh token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_session",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:d2add7aaa3bb (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:d2add7aaa3bb",
+   "inputs": [
+    "session_lookup_failed"
+   ],
+   "predicate": "session_lookup_failed",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "404 or 500",
+    "steps": [
+     "D:d_rn_notfound"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_notfound",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:c91282863028 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:c91282863028",
+   "inputs": [
+    "session_not_found"
+   ],
+   "predicate": "session_not_found",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "404",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   }
+  },
+  {
+   "id": "d_rn_blocked",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:4c153bb03d9c (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:4c153bb03d9c",
+   "inputs": [
+    "session_blocked"
+   ],
+   "predicate": "session_blocked",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401 blocked session",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_user",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:58d817da41f5 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:58d817da41f5",
+   "inputs": [
+    "session_user_mismatch"
+   ],
+   "predicate": "session_user_mismatch",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401 incorrect session user",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_token",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:48d3578e9a44 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:48d3578e9a44",
+   "inputs": [
+    "session_token_mismatch"
+   ],
+   "predicate": "session_token_mismatch",
+   "order": 7,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401 mismatched session token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_expired",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:7b9ae91490eb (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:7b9ae91490eb",
+   "inputs": [
+    "session_expired"
+   ],
+   "predicate": "session_expired",
+   "order": 8,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401 expired session",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_rn_create",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:65b3034c3f05 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "site": "br:65b3034c3f05",
+   "inputs": [
+    "token_create_failed"
+   ],
+   "predicate": "token_create_failed",
+   "order": 9,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.renewAccessToken",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "200 with a new ACCESS-typed token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_bind",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:eb7b1a216152 (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:eb7b1a216152",
+   "inputs": [
+    "request_malformed"
+   ],
+   "predicate": "request_malformed",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "400",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_user",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:84d886a24efe (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:84d886a24efe",
+   "inputs": [
+    "user_lookup_failed"
+   ],
+   "predicate": "user_lookup_failed",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "404 or 500",
+    "steps": [
+     "D:d_hl_notfound"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_notfound",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:e540ee8e596a (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:e540ee8e596a",
+   "inputs": [
+    "user_not_found"
+   ],
+   "predicate": "user_not_found",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "404",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   }
+  },
+  {
+   "id": "d_hl_pw",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:8ac57f80bf1d (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:8ac57f80bf1d",
+   "inputs": [
+    "password_wrong"
+   ],
+   "predicate": "password_wrong",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "401",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/user.go",
+     "line": 115,
+     "text": "token.TokenTypeAccessToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); site: br:b2bb97f7167b (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:b2bb97f7167b",
+   "inputs": [
+    "token_create_failed"
+   ],
+   "predicate": "token_create_failed",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500 access token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_refresh",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/user.go",
+     "line": 126,
+     "text": "token.TokenTypeRefreshToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); site: br:81d23a5f3d1d (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:81d23a5f3d1d",
+   "inputs": [
+    "token_create_failed"
+   ],
+   "predicate": "token_create_failed",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500 refresh token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_hl_session",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:7fe5569cfdac (given)",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "site": "br:7fe5569cfdac",
+   "inputs": [
+    "session_create_failed"
+   ],
+   "predicate": "session_create_failed",
+   "order": 7,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "500",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:api.Server.loginUser",
+     "is": "returned"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "200 with access + refresh tokens",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:76bc8d02ae40 (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:76bc8d02ae40",
+   "inputs": [
+    "has_violations"
+   ],
+   "predicate": "has_violations",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "InvalidArgument",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_user",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:bbafcfbd5eed (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:bbafcfbd5eed",
+   "inputs": [
+    "user_lookup_failed"
+   ],
+   "predicate": "user_lookup_failed",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "NotFound or Internal",
+    "steps": [
+     "D:d_gl_notfound"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_notfound",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:5524c0c4b7f1 (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:5524c0c4b7f1",
+   "inputs": [
+    "user_not_found"
+   ],
+   "predicate": "user_not_found",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "NotFound",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   }
+  },
+  {
+   "id": "d_gl_pw",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:7b2947a85e0c (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:7b2947a85e0c",
+   "inputs": [
+    "password_wrong"
+   ],
+   "predicate": "password_wrong",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "NotFound/Unauthenticated",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_login_user.go",
+     "line": 41,
+     "text": "token.TokenTypeAccessToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); site: br:85b863c14186 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:85b863c14186",
+   "inputs": [
+    "token_create_failed"
+   ],
+   "predicate": "token_create_failed",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "failed to create access token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_refresh",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_login_user.go",
+     "line": 51,
+     "text": "token.TokenTypeRefreshToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); site: br:791afc927393 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:791afc927393",
+   "inputs": [
+    "token_create_failed"
+   ],
+   "predicate": "token_create_failed",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "failed to create refresh token",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_gl_session",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:65d9ca0b3d0c (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "site": "br:65d9ca0b3d0c",
+   "inputs": [
+    "session_create_failed"
+   ],
+   "predicate": "session_create_failed",
+   "order": 7,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.LoginUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_cu_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:bb32884fc4f0 (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.CreateUser",
+   "site": "br:bb32884fc4f0",
+   "inputs": [
+    "has_violations"
+   ],
+   "predicate": "has_violations",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "InvalidArgument",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.CreateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_cu_hash",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:be27f218e30f (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.CreateUser",
+   "site": "br:be27f218e30f",
+   "inputs": [
+    "hash_failed"
+   ],
+   "predicate": "hash_failed",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.CreateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_cu_create",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:086cd7460869 (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.CreateUser",
+   "site": "br:086cd7460869",
+   "inputs": [
+    "create_failed"
+   ],
+   "predicate": "create_failed",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "AlreadyExists or Internal",
+    "steps": [
+     "D:d_cu_unique"
+    ],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.CreateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": null
+   }
+  },
+  {
+   "id": "d_cu_unique",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; site: br:f9551788eb8d (given)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.CreateUser",
+   "site": "br:f9551788eb8d",
+   "inputs": [
+    "unique_violation"
+   ],
+   "predicate": "unique_violation",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "AlreadyExists (message now passed verbatim via status.Error)",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.CreateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "Internal",
+    "steps": [],
+    "absent_scope": "episode",
+    "outcome": {
+     "entity": "go:gapi.Server.CreateUser",
+     "is": "returned-error:go:*status.Error"
+    }
+   }
+  }
+ ],
+ "effects": [],
+ "transitions": [
+  {
+   "id": "t_stamp_payload",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 43,
+     "text": "Type:      tokenType,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "no payload",
+   "action": "build payload with Type = tokenType, ExpiredAt = now + duration",
+   "state_after": "payload carries its type; expired iff duration < 0",
+   "entity": "go:token.NewPayload",
+   "when": "rng_ok",
+   "sets": {
+    "issued_type": "requested_type",
+    "token_expired": "duration_negative"
+   }
+  },
+  {
+   "id": "t_pc_sealed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "payload built",
+   "action": "encrypt with the maker's symmetric key",
+   "state_after": "authentic token",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "when": "true",
+   "sets": {
+    "token_authentic": "true",
+    "token_create_failed": "false"
+   }
+  },
+  {
+   "id": "t_pc_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "NewPayload error",
+   "state_after": "no token",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "when": "true",
+   "sets": {
+    "token_create_failed": "true"
+   }
+  },
+  {
+   "id": "t_jc_sealed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "payload built",
+   "action": "sign HS256 with the maker's secret",
+   "state_after": "authentic token",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "when": "true",
+   "sets": {
+    "token_authentic": "true",
+    "token_create_failed": "false"
+   }
+  },
+  {
+   "id": "t_jc_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "NewPayload error",
+   "state_after": "no token",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "when": "true",
+   "sets": {
+    "token_create_failed": "true"
+   }
+  },
+  {
+   "id": "t_valid_reject",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return ErrInvalidToken / ErrExpiredToken",
+   "state_after": "payload rejected",
+   "entity": "go:token.Payload.Valid",
+   "when": "true",
+   "sets": {
+    "payload_valid": "false"
+   }
+  },
+  {
+   "id": "t_valid_accept",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return nil",
+   "state_after": "payload accepted",
+   "entity": "go:token.Payload.Valid",
+   "when": "true",
+   "sets": {
+    "payload_valid": "true"
+   }
+  },
+  {
+   "id": "t_pv_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return nil, err",
+   "state_after": "verification failed",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "when": "true",
+   "sets": {
+    "verify_failed": "true"
+   }
+  },
+  {
+   "id": "t_pv_ok",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return payload",
+   "state_after": "verified",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "when": "true",
+   "sets": {
+    "verify_failed": "false"
+   }
+  },
+  {
+   "id": "t_jv_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return nil, err",
+   "state_after": "verification failed",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "when": "true",
+   "sets": {
+    "verify_failed": "true"
+   }
+  },
+  {
+   "id": "t_jv_claims",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/jwt_maker.go",
+     "line": 48,
+     "text": "jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "parsed",
+   "action": "claims decoded into the *Payload handed to ParseWithClaims",
+   "state_after": "claims typed",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "when": "true",
+   "sets": {
+    "claims_are_payload": "true"
+   }
+  },
+  {
+   "id": "t_jv_ok",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return payload",
+   "state_after": "verified",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "when": "true",
+   "sets": {
+    "verify_failed": "false"
+   }
+  },
+  {
+   "id": "t_az_expect_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 40,
+     "text": "payload, err := server.tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "VerifyToken(accessToken, TokenTypeAccessToken)",
+   "state_after": "verifier demands an access token",
+   "entity": "go:gapi.Server.authorizeUser",
+   "when": "true",
+   "sets": {
+    "expected_type": "1"
+   }
+  },
+  {
+   "id": "t_az_failed",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return nil, fmt.Errorf(...)",
+   "state_after": "unauthorized",
+   "entity": "go:gapi.Server.authorizeUser",
+   "when": "true",
+   "sets": {
+    "authorize_failed": "true"
+   }
+  },
+  {
+   "id": "t_az_ok",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited; not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "return payload",
+   "state_after": "authorized",
+   "entity": "go:gapi.Server.authorizeUser",
+   "when": "true",
+   "sets": {
+    "authorize_failed": "false"
+   }
+  },
+  {
+   "id": "t_mw_expect_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 45,
+     "text": "payload, err := tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "VerifyToken(accessToken, TokenTypeAccessToken)",
+   "state_after": "verifier demands an access token",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "when": "true",
+   "sets": {
+    "expected_type": "1"
+   }
+  },
+  {
+   "id": "t_rn_expect_refresh",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 30,
+     "text": "refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "VerifyToken(req.RefreshToken, TokenTypeRefreshToken)",
+   "state_after": "verifier demands a refresh token",
+   "entity": "go:api.Server.renewAccessToken",
+   "when": "true",
+   "sets": {
+    "expected_type": "2"
+   }
+  },
+  {
+   "id": "t_rn_request_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 74,
+     "text": "token.TokenTypeAccessToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "CreateToken(..., TokenTypeAccessToken)",
+   "state_after": "new token will be access-typed",
+   "entity": "go:api.Server.renewAccessToken",
+   "when": "true",
+   "sets": {
+    "requested_type": "1"
+   }
+  },
+  {
+   "id": "t_hl_request_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/user.go",
+     "line": 115,
+     "text": "token.TokenTypeAccessToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "CreateToken(..., TokenTypeAccessToken)",
+   "state_after": "",
+   "entity": "go:api.Server.loginUser",
+   "when": "true",
+   "sets": {
+    "requested_type": "1"
+   }
+  },
+  {
+   "id": "t_hl_request_refresh",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/user.go",
+     "line": 126,
+     "text": "token.TokenTypeRefreshToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "CreateToken(..., TokenTypeRefreshToken)",
+   "state_after": "",
+   "entity": "go:api.Server.loginUser",
+   "when": "true",
+   "sets": {
+    "requested_type": "2"
+   }
+  },
+  {
+   "id": "t_gl_request_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_login_user.go",
+     "line": 41,
+     "text": "token.TokenTypeAccessToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "CreateToken(..., TokenTypeAccessToken)",
+   "state_after": "",
+   "entity": "go:gapi.Server.LoginUser",
+   "when": "true",
+   "sets": {
+    "requested_type": "1"
+   }
+  },
+  {
+   "id": "t_gl_request_refresh",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_login_user.go",
+     "line": 51,
+     "text": "token.TokenTypeRefreshToken,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "contradicted": false,
+   "state_before": "",
+   "action": "CreateToken(..., TokenTypeRefreshToken)",
+   "state_after": "",
+   "entity": "go:gapi.Server.LoginUser",
+   "when": "true",
+   "sets": {
+    "requested_type": "2"
+   }
+  }
+ ],
+ "procedures": [
+  {
+   "id": "p_new_payload",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:token.NewPayload",
+   "steps": [
+    "D:d_np_rng",
+    "T:t_stamp_payload"
+   ],
+   "outcome": {
+    "entity": "go:token.NewPayload",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_paseto_create",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "steps": [
+    "call:go:token.NewPayload",
+    "D:d_pc_err",
+    "T:t_pc_sealed"
+   ],
+   "outcome": {
+    "entity": "go:token.PasetoMaker.CreateToken",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_jwt_create",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.CreateToken",
+   "steps": [
+    "call:go:token.NewPayload",
+    "D:d_jc_err",
+    "T:t_jc_sealed"
+   ],
+   "outcome": {
+    "entity": "go:token.JWTMaker.CreateToken",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_valid",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:token.Payload.Valid",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome); outcome returned observed in 7 call(s)",
+   "contradicted": false,
+   "entity": "go:token.Payload.Valid",
+   "steps": [
+    "D:d_valid_type",
+    "D:d_valid_expiry",
+    "T:t_valid_accept"
+   ],
+   "outcome": {
+    "entity": "go:token.Payload.Valid",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_paseto_verify",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome); outcome returned observed in 6 call(s)",
+   "contradicted": false,
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "steps": [
+    "D:d_pv_decrypt",
+    "call:go:token.Payload.Valid",
+    "D:d_pv_valid",
+    "T:t_pv_ok"
+   ],
+   "outcome": {
+    "entity": "go:token.PasetoMaker.VerifyToken",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_jwt_verify",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestJWTMaker",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome); outcome returned observed in 1 call(s)",
+   "contradicted": false,
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "steps": [
+    "D:d_jv_parse",
+    "D:d_jv_claims",
+    "call:go:token.Payload.Valid",
+    "D:d_jv_valid",
+    "T:t_jv_ok"
+   ],
+   "outcome": {
+    "entity": "go:token.JWTMaker.VerifyToken",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_authorize",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:gapi.Server.authorizeUser",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome); outcome returned observed in 5 call(s)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.authorizeUser",
+   "steps": [
+    "D:d_az_md",
+    "D:d_az_hdr",
+    "D:d_az_fields",
+    "D:d_az_scheme",
+    "T:t_az_expect_access",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:d_az_verify",
+    "call:go:gapi.hasPermission",
+    "D:d_az_role",
+    "T:t_az_ok"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.authorizeUser",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_update_user",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OK",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:gapi.Server.UpdateUser",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome)",
+   "contradicted": false,
+   "entity": "go:gapi.Server.UpdateUser",
+   "steps": [
+    "call:go:gapi.Server.authorizeUser",
+    "D:d_uu_auth",
+    "call:go:gapi.validateUpdateUserRequest",
+    "D:d_uu_valid",
+    "D:d_uu_perm",
+    "D:d_uu_pw",
+    "call:go:db/sqlc.Queries.UpdateUser",
+    "D:d_uu_update",
+    "call:go:gapi.convertUser"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.UpdateUser",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_auth_middleware",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": "returned",
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (outcome)",
+   "contradicted": false,
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "steps": [
+    "D:d_mw_hdr",
+    "D:d_mw_fields",
+    "D:d_mw_scheme",
+    "T:t_mw_expect_access",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:d_mw_verify"
+   ],
+   "outcome": {
+    "entity": "go:api.authMiddleware.<anon>@21",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_renew",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:api.Server.renewAccessToken",
+   "steps": [
+    "D:d_rn_bind",
+    "T:t_rn_expect_refresh",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:d_rn_verify",
+    "D:d_rn_session",
+    "D:d_rn_blocked",
+    "D:d_rn_user",
+    "D:d_rn_token",
+    "D:d_rn_expired",
+    "T:t_rn_request_access",
+    "call:go:token.PasetoMaker.CreateToken",
+    "D:d_rn_create"
+   ],
+   "outcome": {
+    "entity": "go:api.Server.renewAccessToken",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_http_login",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:api.Server.loginUser",
+   "steps": [
+    "D:d_hl_bind",
+    "D:d_hl_user",
+    "D:d_hl_pw",
+    "T:t_hl_request_access",
+    "call:go:token.PasetoMaker.CreateToken",
+    "D:d_hl_access",
+    "T:t_hl_request_refresh",
+    "call:go:token.PasetoMaker.CreateToken",
+    "D:d_hl_refresh",
+    "D:d_hl_session"
+   ],
+   "outcome": {
+    "entity": "go:api.Server.loginUser",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_grpc_login",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:gapi.Server.LoginUser",
+   "steps": [
+    "D:d_gl_valid",
+    "D:d_gl_user",
+    "D:d_gl_pw",
+    "T:t_gl_request_access",
+    "call:go:token.PasetoMaker.CreateToken",
+    "D:d_gl_access",
+    "T:t_gl_request_refresh",
+    "call:go:token.PasetoMaker.CreateToken",
+    "D:d_gl_refresh",
+    "D:d_gl_session"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.LoginUser",
+    "is": "returned"
+   }
+  },
+  {
+   "id": "p_create_user",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "entity": "go:gapi.Server.CreateUser",
+   "steps": [
+    "D:d_cu_valid",
+    "D:d_cu_hash",
+    "D:d_cu_create"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.CreateUser",
+    "is": "returned"
+   }
+  }
+ ],
+ "regions": [],
+ "rules": [
+  {
+   "id": "r_type_gate",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:8d10f2f9b136",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "A token is accepted only for the type it was issued as",
+   "inputs": [
+    "issued_type",
+    "expected_type"
+   ],
+   "relevant_state": [
+    "issued_type"
+   ],
+   "condition": "issued_type != expected_type",
+   "consequences": [
+    "Payload.Valid returns ErrInvalidToken before looking at expiry",
+    "PasetoMaker.VerifyToken / JWTMaker.VerifyToken return that error",
+    "every caller treats it exactly like any other verification failure"
+   ],
+   "decision": "d_valid_type"
+  },
+  {
+   "id": "r_type_stamped",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 43,
+     "text": "Type:      tokenType,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "Creation stamps the requested type into the payload",
+   "inputs": [
+    "requested_type"
+   ],
+   "relevant_state": [
+    "issued_type"
+   ],
+   "condition": "rng_ok",
+   "consequences": [
+    "issued_type := requested_type",
+    "login issues one access (1) and one refresh (2) token; renew issues an access token"
+   ],
+   "decision": null
+  },
+  {
+   "id": "r_entry_expectations",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 45,
+     "text": "payload, err := tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "contradicted": false,
+   "name": "Entry points fix the expected type",
+   "inputs": [],
+   "relevant_state": [
+    "expected_type"
+   ],
+   "condition": "true",
+   "consequences": [
+    "HTTP authMiddleware: expected_type := 1 (access)",
+    "gRPC authorizeUser: expected_type := 1 (access)",
+    "HTTP renewAccessToken: expected_type := 2 (refresh)",
+    "direct VerifyToken callers choose it"
+   ],
+   "decision": null
+  },
+  {
+   "id": "r_expiry",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestExpiredJWTToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:184d2ca72d5b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "Expired tokens are rejected (after the type check for PASETO; by the JWT library before the type check for JWT)",
+   "inputs": [
+    "token_expired"
+   ],
+   "relevant_state": [
+    "token_expired"
+   ],
+   "condition": "token_expired",
+   "consequences": [
+    "PASETO: Valid returns ErrExpiredToken only if the type matched",
+    "JWT: ParseWithClaims fails with ErrTokenExpired and VerifyToken returns ErrExpiredToken; Valid is never reached"
+   ],
+   "decision": "d_valid_expiry"
+  },
+  {
+   "id": "r_authenticity",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestInvalidJWTTokenAlgNone",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:184d2ca72d5b",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "Tokens not sealed by this maker are invalid",
+   "inputs": [
+    "token_authentic"
+   ],
+   "relevant_state": [
+    "token_authentic"
+   ],
+   "condition": "!token_authentic",
+   "consequences": [
+    "VerifyToken returns ErrInvalidToken without calling Valid"
+   ],
+   "decision": "d_pv_decrypt"
+  },
+  {
+   "id": "r_verify_to_unauth",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:052de203d9d4",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "Verification failure ends the request as unauthenticated",
+   "inputs": [
+    "verify_failed"
+   ],
+   "relevant_state": [],
+   "condition": "verify_failed",
+   "consequences": [
+    "authMiddleware aborts 401 and returns",
+    "authorizeUser errors so UpdateUser returns codes.Unauthenticated (*status.Error)",
+    "renewAccessToken answers 401"
+   ],
+   "decision": "d_az_verify"
+  },
+  {
+   "id": "r_header_shape",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:4ede9085ac0b",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "Bearer header required before any token work",
+   "inputs": [
+    "auth_metadata_present",
+    "auth_header_present",
+    "header_has_two_fields",
+    "scheme_is_bearer"
+   ],
+   "relevant_state": [],
+   "condition": "!auth_header_present || !header_has_two_fields || !scheme_is_bearer",
+   "consequences": [
+    "reject without calling VerifyToken (HTTP 401 / gRPC Unauthenticated)"
+   ],
+   "decision": "d_mw_hdr"
+  },
+  {
+   "id": "r_update_policy",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:01807a7b80a2",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "UpdateUser: valid fields, and banker or self",
+   "inputs": [
+    "has_violations",
+    "caller_is_banker",
+    "caller_is_target",
+    "update_failed",
+    "user_not_found"
+   ],
+   "relevant_state": [],
+   "condition": "authorized",
+   "consequences": [
+    "violations -> InvalidArgument",
+    "neither banker nor self -> PermissionDenied",
+    "store not found -> NotFound",
+    "else update and return user"
+   ],
+   "decision": "d_uu_perm"
+  }
+ ],
+ "regimes": [
+  {
+   "id": "g_valid_access",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "authentic, unexpired access token presented where access is expected",
+   "facts": {
+    "issued_type": 1,
+    "expected_type": 1,
+    "token_expired": false,
+    "token_authentic": true
+   },
+   "members": [
+    "TestPasetoMaker",
+    "TestJWTMaker",
+    "TestAuthMiddleware/OK",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ]
+  },
+  {
+   "id": "g_type_mismatch",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestPasetoWrongTokenType",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:8d10f2f9b136",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "point": null,
+     "binding": null,
+     "value": null,
+     "exit": null,
+     "ok": true,
+     "why": "",
+     "unanchored": false
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "contradicted": false,
+   "name": "token presented as the other type",
+   "facts": {
+    "issued_type": 1,
+    "expected_type": 2
+   },
+   "members": [
+    "TestPasetoWrongTokenType",
+    "TestJWTWrongTokenType",
+    "TestUpdateUserAPI/WrongTokenType"
+   ]
+  },
+  {
+   "id": "g_expired",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "right type, expired",
+   "facts": {
+    "token_expired": true
+   },
+   "members": [
+    "TestExpiredPasetoToken",
+    "TestExpiredJWTToken",
+    "TestAuthMiddleware/ExpiredToken",
+    "TestUpdateUserAPI/ExpiredToken"
+   ]
+  },
+  {
+   "id": "g_forged",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "token not sealed by the maker",
+   "facts": {
+    "token_authentic": false
+   },
+   "members": [
+    "TestInvalidJWTTokenAlgNone"
+   ]
+  },
+  {
+   "id": "g_bad_header",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [],
+   "status": "hypothesis",
+   "status_reason": "no evidence cited",
+   "contradicted": false,
+   "name": "authorization header missing or malformed",
+   "facts": {},
+   "members": [
+    "TestAuthMiddleware/NoAuthorization",
+    "TestAuthMiddleware/InvalidAuthorizationFormat",
+    "TestAuthMiddleware/UnsupportedAuthorization",
+    "TestUpdateUserAPI/NoAuthorization"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "what": "Equality of token types at call boundaries",
+   "why": "The only boundary facts are is_set/changed_from/size/bool; the tokenType argument digests (#35ddf6 vs #018508) cannot be bound to integer variables, so issued_type and expected_type are carried by transitions and scenario facts and checked only through br:8d10f2f9b136 outcomes."
+  },
+  {
+   "what": "Which token a verification refers to",
+   "why": "issued_type/token_expired/token_authentic describe a single 'current token'. Login creates two tokens (access then refresh) and renew verifies one and creates another; tracking per-token identity (the refresh token later presented to renew) needs relation-valued variables or item identity, which are not available. A scenario that creates two tokens and verifies the first would be mis-predicted."
+  },
+  {
+   "what": "Interface dispatch of token.Maker",
+   "why": "authorizeUser, authMiddleware, renew and login call the Maker interface; procedures name PasetoMaker because servers are observed with PASETO. A JWT-backed server would route to JWTMaker.VerifyToken, whose type check runs after the library's expiry check (ordering differs: expired+wrong-type is ErrExpiredToken for JWT, ErrInvalidToken for PASETO)."
+  },
+  {
+   "what": "hasPermission loop (br:92f48828a554) and validateUpdateUserRequest internals",
+   "why": "Not required; hasPermission is modeled only by its bool result (role_permitted), the loop over accessibleRoles is iteration over a collection."
+  },
+  {
+   "what": "HTTP login/renew, gRPC LoginUser/CreateUser runtime behavior",
+   "why": "No shown test exercises them; their decisions are proposed from source only, and exit kinds for gRPC error paths are assumed to be *status.Error."
+  },
+  {
+   "what": "JWT keyFunc closure (JWTMaker.VerifyToken.<anon>@40)",
+   "why": "Called by the jwt library; folded into token_authentic rather than modeled."
+  }
+ ],
+ "provenance": {}
+}

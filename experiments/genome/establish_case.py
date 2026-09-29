@@ -17,6 +17,7 @@ from diffgenome.genome import (
     SUPPORTED,
     VERIFIED,
     Substrate,
+    bindings_of,
     dumps,
     genome_from_proposals,
     render_markdown,
@@ -192,6 +193,17 @@ def main() -> int:
             if i.status == "hypothesis"
         ],
         "phenotype_claims_exact": f"{sum(r['phenotype_exact'] for r in pt)}/{len(pt)}",
+        "identity_claims": {
+            v.name: v.status
+            for v in g.variables
+            if sum(1 for b in bindings_of(v) if b.get("kind") == "identity") >= 2
+        },
+        "literal_bindings": {
+            v.name: bool(b.get("_literal_ok"))
+            for v in g.variables
+            for b in bindings_of(v)
+            if b.get("kind") == "equals_literal"
+        },
     }
     (case / f"{out_prefix}genome.json").write_text(dumps(g))
     (case / f"{out_prefix}genome.md").write_text(render_markdown(g))

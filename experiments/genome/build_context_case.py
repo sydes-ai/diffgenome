@@ -151,6 +151,59 @@ for them; they will be predicted and compared with what executed.
 """
 
 
+V5_BINDINGS = """                  | {"at": {"entity": "<function>", "point": "arg:<name>" | "result"},
+                     "kind": "is_set" | "changed_from:arg:<name>" | "size" | "bool"}
+                  | {"at": {...}, "kind": "identity", "scope": "call" | "execution"}
+                  | {"at": {...}, "kind": "equals_literal", "scope": "call" | "execution",
+                     "literal": {"lang": "go", "type": "string|int|uint8|...|bool|nil", "value": <v>,
+                                 "source": {"file": "<repo path>", "line": N}}}
+                  | [<several of the above>],"""
+
+V5_IDENTITY = """**Value identity and literals.** A binding of kind `identity` gives the variable an OPAQUE
+value: the digest seen at that boundary, never decoded. With `scope: "execution"`, the value is
+taken from that boundary's occurrences earlier in the same test (it must be unique there, or it
+is unknown); with `scope: "call"` (default) from the call being judged. A variable with a LIST
+of two or more `identity` bindings claims the SAME value appears at all of them in one test:
+the checker verifies that from observed digest equality (equal in at least 2 tests carrying at
+least 2 different values), rejects it if any test shows them different, and never infers flow
+(only equality). Identity variables are compared only with `==` / `!=`. In scenarios, give an
+identity variable a LABEL (any string, e.g. "access"): for shown tests the checker requires
+equal labels exactly where the observed identities are equal. A binding of kind
+`equals_literal` is true when the boundary value equals a literal WRITTEN in the source at the
+cited line (bool, nil, an integer, or a short plain string); the checker confirms the literal on
+that line and compares digests, it never decodes other values. Scenario facts for any bound
+variable (boundary, identity, literal) are checked against the matching call in shown tests."""
+
+V5_POLICY = """**Evidence and prediction eligibility.** Every item must cite checkable evidence; an item
+with none stays a hypothesis and cannot drive a prediction. A supported item that some shown
+test contradicts (e.g. its replayed outcome sequence differs) cannot drive a prediction either.
+A variable with two or more identity bindings is evidenced by its bindings themselves."""
+
+
+def v5_schema(fmt: str) -> str:
+    old_b = """                  | {"at": {"entity": "<function>", "point": "arg:<name>" | "result"},
+                     "kind": "is_set" | "changed_from:arg:<name>" | "size" | "bool"},"""
+    assert old_b in fmt
+    fmt = fmt.replace(old_b, V5_BINDINGS)
+    anchor = "**Outcome.** An exit is one of"
+    assert anchor in fmt
+    fmt = fmt.replace(anchor, V5_IDENTITY + "\n\n" + V5_POLICY + "\n\n" + anchor, 1)
+    old_d = '"D:id" evaluates a decision and runs the taken branch\'s `steps` (or its `calls`); a branch'
+    assert old_d in fmt
+    fmt = fmt.replace(
+        old_d,
+        "\"D:id\" evaluates a decision and runs the taken branch's `steps` ONLY (a branch's\n"
+        "  `calls` are descriptive, what it reaches, and are never executed); a branch",
+    )
+    old_p = "Predicates: booleans/integers, `!name`, comparisons, `&&`, `||`, no parentheses."
+    assert old_p in fmt
+    return fmt.replace(
+        old_p,
+        "Predicates: booleans/integers, `!name`, comparisons (identities: `==` / `!=` only),\n"
+        "  `&&`, `||`, no parentheses.",
+    )
+
+
 def instructions(cfg: dict[str, Any]) -> str:
     v4 = V4.read_text()
     fmt = v4[v4.index("## The genome format") : v4.index("## Required sites")]
@@ -163,6 +216,8 @@ def instructions(cfg: dict[str, Any]) -> str:
         "- `phenotype` is your claim about the entry call's exit; scored separately.",
     )
     fmt = fmt.replace("param:serialized_field", "param:req")
+    if cfg.get("schema") == "v5":
+        fmt = v5_schema(fmt)
     head = HEAD_TMPL.format(
         title=cfg["title"], base8=cfg["base"][:8], head8=cfg["head"][:8], summary=cfg["summary"]
     )
@@ -216,7 +271,9 @@ def event_log(ex: Any, vocab: list[str], preds: dict[str, str]) -> list[str]:
 
 def main() -> int:
     case, run, out = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
-    cfg = CASES[case]
+    cfg = dict(CASES[case])
+    if len(sys.argv) > 4:
+        cfg["schema"] = sys.argv[4]  # "v5": value identity, literals, descriptive calls
     out.mkdir(parents=True, exist_ok=True)
     vocab = [f"go:{v}" if not v.startswith("go:") else v for v in cfg["vocab"]]
     runs = {

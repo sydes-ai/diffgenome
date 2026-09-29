@@ -222,6 +222,10 @@ class Item:
     evidence: list[EvidenceRef] = field(default_factory=list)
     status: str = HYPOTHESIS
     status_reason: str = ""
+    # internal: an observation on a shown execution contradicted this item without
+    # rejecting it (e.g. a replayed outcome sequence differed). It keeps its semantic status
+    # but is not eligible to drive a prediction (design-value-identity.md, 5)
+    contradicted: bool = False
 
 
 @dataclass
@@ -240,7 +244,9 @@ class Variable(Item):
     definition: str | None = None
     # binding to an observed state fact, e.g. {"fact": "self._backend", "kind": "is_set"};
     # kinds: is_set (bucket != none), bool (bool:true/false), sign (num:neg/zero/pos)
-    observed_as: dict[str, str] | None = None
+    # one binding (dict) or several (list): several `identity` bindings claim that every
+    # observation of the variable in one execution is the same value (design-value-identity)
+    observed_as: dict[str, Any] | list[dict[str, Any]] | None = None
 
 
 @dataclass
@@ -261,7 +267,8 @@ class Branch:
     stops: bool = False  # the enclosing entry returns after this branch
     effect: str = ""  # human description
     # ordered steps for state-sequence prediction: "call:<entity>", "T:<transition id>",
-    # "D:<decision id>"; when empty, `calls` is used
+    # "D:<decision id>". The only executable structure of a branch: `calls` is descriptive
+    # (design-value-identity.md, 4; see migrate_executable_calls for old genomes)
     steps: list[str] = field(default_factory=list)
     # how far `absent` reaches after the site is evaluated (genome_state):
     #   "episode" (default): until the next evaluation of the same site or the next call of
@@ -399,7 +406,8 @@ def _item_kwargs(d: dict[str, Any], cls: type, derived_by: str) -> dict[str, Any
     kw = {
         k: v
         for k, v in d.items()
-        if k in fields_ and k not in ("evidence", "status", "status_reason", "derived_by")
+        if k in fields_
+        and k not in ("evidence", "status", "status_reason", "derived_by", "contradicted")
     }
     kw["derived_by"] = derived_by
     kw["evidence"] = [_ref(e) for e in d.get("evidence") or []]
@@ -415,6 +423,30 @@ def _expr_text(v: Any) -> str:
     if v is None:
         return "none"
     return str(v)
+
+
+def bindings_of(v: Variable) -> list[dict[str, Any]]:
+    """A variable's bindings as a list (observed_as may be one dict or a list of them)."""
+    b = v.observed_as
+    if isinstance(b, dict):
+        return [b]
+    return [x for x in b or [] if isinstance(x, dict)]
+
+
+def migrate_executable_calls(proposals: dict[str, Any]) -> dict[str, Any]:
+    """Proposals written under the old contract ("a branch runs its steps, or if it has none
+    its calls") keep their meaning under the current one (calls are descriptive): every
+    branch with calls and no steps gets steps ["call:X", ...]. Apply only to genomes whose
+    recorded results depended on it; never to new proposals."""
+    import copy
+
+    out = copy.deepcopy(proposals)
+    for d in out.get("decisions") or []:
+        for key in ("true_branch", "false_branch"):
+            br = d.get(key) or {}
+            if br.get("calls") and not br.get("steps"):
+                br["steps"] = [f"call:{c}" for c in br["calls"]]
+    return out
 
 
 def genome_from_proposals(proposals: dict[str, Any], subject: dict[str, Any], model: str) -> Genome:
@@ -672,15 +704,13 @@ def _eval_atom(atom: str, facts: dict[str, Any]) -> bool | None:
         if va is None or vb is None:
             rel = facts.get(atom)
             return bool(rel) if rel is not None else None
-        result: bool = {
-            "<": va < vb,
-            ">": va > vb,
-            "<=": va <= vb,
-            ">=": va >= vb,
-            "==": va == vb,
-            "!=": va != vb,
-        }[op]
-        return result
+        if op in ("==", "!="):
+            return bool(va == vb) if op == "==" else bool(va != vb)
+        try:
+            ordered = {"<": va < vb, ">": va > vb, "<=": va <= vb, ">=": va >= vb}[op]
+        except TypeError:  # opaque identities are compared with == and != only
+            return None
+        return bool(ordered)
     neg = atom.startswith("!")
     name = atom[1:].strip() if neg else atom
     if name in ("true", "True", "false", "False"):
@@ -888,10 +918,11 @@ def render_markdown(g: Genome, evaluation: dict[str, Any] | None = None) -> str:
     L.append("")
     for v in g.variables:
         defn = f" := `{v.definition}`" if v.definition else ""
-        bound = (
-            f" ↔ observed `{v.observed_as.get('fact')}` ({v.observed_as.get('kind')})"
-            if v.observed_as
-            else ""
+        bound = "".join(
+            f" ↔ observed `{b.get('fact') or (b.get('at') or {}).get('entity', '?')}"
+            f"{'' if b.get('fact') else ' ' + str((b.get('at') or {}).get('point', ''))}`"
+            f" ({b.get('kind')})"
+            for b in bindings_of(v)
         )
         L.append(f"- `{v.name}` ({v.origin}){defn}{bound} — {_BADGE[v.status]}")
     L.append("")
