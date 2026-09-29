@@ -1,0 +1,533 @@
+.....FFF.                                                                [100%]
+=================================== FAILURES ===================================
+_____________ test_snapshot_with_implicit_array_primary_dependency _____________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x117232450>
+sql = 'UPDATE "database_table_17" SET "field_51" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...AND U2."field_46") AND U0."id" = ("database_table_17"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x117232450>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               psycopg2.errors.InvalidParameterValue: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: InvalidParameterValue
+
+The above exception was the direct cause of the following exception:
+
+data_fixture = <baserow.test_utils.fixtures.Fixtures object at 0x117bbee70>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_snapshot_with_implicit_array_primary_dependency(data_fixture):
+        """
+        When the formula uses field('LinkField') (implicit primary reference),
+        the import-time dependency graph must still resolve the linked table's
+        primary so recalculation order is correct and values are preserved.
+        Previously this crashed with DataError because the consumer formula ran
+        before the producer's column was populated.
+        """
+    
+        user = data_fixture.create_user()
+        database = data_fixture.create_database_application(user=user)
+        parent_table = data_fixture.create_database_table(
+            database=database, name="Parents", order=0
+        )
+        child_table = data_fixture.create_database_table(
+            database=database, name="Children", order=1
+        )
+        detail_table = data_fixture.create_database_table(
+            database=database, name="Details", order=2
+        )
+        data_fixture.create_text_field(table=parent_table, name="Name", primary=True)
+        child_primary = data_fixture.create_text_field(
+            table=child_table, name="ChildId", primary=True
+        )
+        detail_name = data_fixture.create_text_field(
+            table=detail_table, name="Label", primary=True
+        )
+        is_active = data_fixture.create_boolean_field(table=child_table, name="IsActive")
+    
+        fh = FieldHandler()
+        parent_link = fh.create_field(
+            user,
+            parent_table,
+            "link_row",
+            name="LinkedChildren",
+            link_row_table=child_table,
+        )
+        detail_link = fh.create_field(
+            user, child_table, "link_row", name="Detail", link_row_table=detail_table
+        )
+        child_primary = fh.update_field(
+            user,
+            child_primary,
+            new_type_name="formula",
+            formula="concat('ID-', field('Detail'))",
+        )
+    
+        consumer = fh.create_field(
+            user,
+            parent_table,
+            "formula",
+            name="ActiveChildren",
+            formula=(
+                "filter(field('LinkedChildren'), lookup('LinkedChildren', 'IsActive'))"
+            ),
+        )
+        assert child_primary.formula_type == "array"
+        assert "array_agg_unnesting" in consumer.internal_formula
+    
+        rh = RowHandler()
+        detail_row = rh.create_row(user, detail_table, values={detail_name.db_column: "D1"})
+        child_row = rh.create_row(
+            user,
+            child_table,
+            values={is_active.db_column: True, detail_link.db_column: [detail_row.id]},
+        )
+        rh.create_row(user, parent_table, values={parent_link.db_column: [child_row.id]})
+    
+        expected = list(
+            parent_table.get_model().objects.values_list(consumer.db_column, flat=True)
+        )
+        assert expected[0] and expected[0][0]["value"] == "ID-D1"
+    
+        snapshot = data_fixture.create_snapshot(
+            snapshot_from_application=database, created_by=user
+        )
+>       SnapshotHandler().perform_create(snapshot, Progress(total=100))
+
+backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/src/baserow/core/snapshots/handler.py:421: in perform_create
+    application_type.import_serialized(
+backend/src/baserow/contrib/database/application_types.py:1147: in import_serialized
+    self.import_tables_serialized(
+backend/src/baserow/contrib/database/application_types.py:685: in import_tables_serialized
+    self._import_table_rows(
+backend/src/baserow/contrib/database/application_types.py:866: in _import_table_rows
+    self._after_rows_imported(imported_fields, progress)
+backend/src/baserow/contrib/database/application_types.py:972: in _after_rows_imported
+    field_type.after_rows_imported(
+backend/src/baserow/contrib/database/fields/field_types.py:6149: in after_rows_imported
+    update_collector.apply_updates_and_get_updated_fields(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:872: in apply_updates_and_get_updated_fields
+    updated_rows_per_table = self.apply_updates(field_cache)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:766: in apply_updates
+    updated_rows_per_table = self._update_statement_collector.execute_all(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:278: in execute_all
+    updated_row_ids = self._execute_pending_update_statements(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:556: in _execute_pending_update_statements
+    qs.annotate(**annotations)
+backend/src/baserow/contrib/database/table/queryset.py:85: in update_returning_ids
+    return super().update(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/table/queryset.py:25: in execute_sql
+    cursor = super().execute_sql(CURSOR)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x117232450>
+sql = 'UPDATE "database_table_17" SET "field_51" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...AND U2."field_46") AND U0."id" = ("database_table_17"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x117232450>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               django.db.utils.DataError: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: DataError
+----------------------------- Captured stderr call -----------------------------
+INFO 2026-09-29 09:22:40,851 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[920211c8-fd59-4a31-a29c-3c80dc68fc1d] succeeded in 0.05344870800036006s: None 
+INFO 2026-09-29 09:22:41,052 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[f318137b-e7c2-465f-bccb-b4599b838590] succeeded in 0.06043616699753329s: None 
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[920211c8-fd59-4a31-a29c-3c80dc68fc1d] succeeded in 0.05344870800036006s: None
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[f318137b-e7c2-465f-bccb-b4599b838590] succeeded in 0.06043616699753329s: None
+--------------------------- Captured stdout teardown ---------------------------
+Checking pgvector extension: not available. It will be retried on next migration.
+_____ test_snapshot_with_implicit_array_primary_dependency_two_links_deep ______
+
+self = <django.db.backends.utils.CursorWrapper object at 0x11cfe3830>
+sql = 'UPDATE "database_table_23" SET "field_67" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...shed"))) WHERE (%s AND U0."id" = ("database_table_23"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x11cfe3830>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               psycopg2.errors.InvalidParameterValue: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: InvalidParameterValue
+
+The above exception was the direct cause of the following exception:
+
+data_fixture = <baserow.test_utils.fixtures.Fixtures object at 0x11bfd6f10>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_snapshot_with_implicit_array_primary_dependency_two_links_deep(data_fixture):
+        """
+        The implied dependency may itself be deferred: here the linked table's primary
+        is an array formula reading through a second link. Resolving one hop is not
+        enough, the whole chain has to be ordered, otherwise the middle table's primary
+        is still NULL when the consumer recalculates.
+        """
+    
+        user = data_fixture.create_user()
+        database = data_fixture.create_database_application(user=user)
+        table_a = data_fixture.create_database_table(database=database, name="A", order=0)
+        table_b = data_fixture.create_database_table(database=database, name="B", order=1)
+        table_c = data_fixture.create_database_table(database=database, name="C", order=2)
+        data_fixture.create_text_field(table=table_a, name="AName", primary=True)
+        b_primary = data_fixture.create_text_field(table=table_b, name="BId", primary=True)
+        c_label = data_fixture.create_text_field(table=table_c, name="CLabel", primary=True)
+    
+        fh = FieldHandler()
+        a_link = fh.create_field(
+            user, table_a, "link_row", name="ToB", link_row_table=table_b
+        )
+        b_link = fh.create_field(
+            user, table_b, "link_row", name="ToC", link_row_table=table_c
+        )
+        b_primary = fh.update_field(
+            user, b_primary, new_type_name="formula", formula="field('ToC')"
+        )
+    
+        consumer = fh.create_field(
+            user, table_a, "formula", name="AConsumer", formula="field('ToB')"
+        )
+        assert b_primary.formula_type == "array"
+        assert "array_agg_unnesting" in consumer.internal_formula
+    
+        rh = RowHandler()
+        c_row = rh.create_row(user, table_c, values={c_label.db_column: "C1"})
+        b_row = rh.create_row(user, table_b, values={b_link.db_column: [c_row.id]})
+        rh.create_row(user, table_a, values={a_link.db_column: [b_row.id]})
+    
+        expected = list(
+            table_a.get_model().objects.values_list(consumer.db_column, flat=True)
+        )
+        assert expected[0] and expected[0][0]["value"] == "C1"
+    
+        snapshot = data_fixture.create_snapshot(
+            snapshot_from_application=database, created_by=user
+        )
+>       SnapshotHandler().perform_create(snapshot, Progress(total=100))
+
+backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/src/baserow/core/snapshots/handler.py:421: in perform_create
+    application_type.import_serialized(
+backend/src/baserow/contrib/database/application_types.py:1147: in import_serialized
+    self.import_tables_serialized(
+backend/src/baserow/contrib/database/application_types.py:685: in import_tables_serialized
+    self._import_table_rows(
+backend/src/baserow/contrib/database/application_types.py:866: in _import_table_rows
+    self._after_rows_imported(imported_fields, progress)
+backend/src/baserow/contrib/database/application_types.py:972: in _after_rows_imported
+    field_type.after_rows_imported(
+backend/src/baserow/contrib/database/fields/field_types.py:6149: in after_rows_imported
+    update_collector.apply_updates_and_get_updated_fields(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:872: in apply_updates_and_get_updated_fields
+    updated_rows_per_table = self.apply_updates(field_cache)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:766: in apply_updates
+    updated_rows_per_table = self._update_statement_collector.execute_all(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:278: in execute_all
+    updated_row_ids = self._execute_pending_update_statements(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:556: in _execute_pending_update_statements
+    qs.annotate(**annotations)
+backend/src/baserow/contrib/database/table/queryset.py:85: in update_returning_ids
+    return super().update(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/table/queryset.py:25: in execute_sql
+    cursor = super().execute_sql(CURSOR)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x11cfe3830>
+sql = 'UPDATE "database_table_23" SET "field_67" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...shed"))) WHERE (%s AND U0."id" = ("database_table_23"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x11cfe3830>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               django.db.utils.DataError: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: DataError
+----------------------------- Captured stderr call -----------------------------
+INFO 2026-09-29 09:22:44,815 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[e66ec9ba-647f-4941-be9e-960b4d216d86] succeeded in 0.041616792004788294s: None 
+INFO 2026-09-29 09:22:44,974 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[7c184ea5-3e31-4b10-8be9-b54a9636fdbc] succeeded in 0.05409579200204462s: None 
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[e66ec9ba-647f-4941-be9e-960b4d216d86] succeeded in 0.041616792004788294s: None
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[7c184ea5-3e31-4b10-8be9-b54a9636fdbc] succeeded in 0.05409579200204462s: None
+--------------------------- Captured stdout teardown ---------------------------
+Checking pgvector extension: not available. It will be retried on next migration.
+______ test_duplicate_application_with_implicit_array_primary_dependency _______
+
+self = <django.db.backends.utils.CursorWrapper object at 0x120f62f90>
+sql = 'UPDATE "database_table_29" SET "field_85" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...AND U2."field_80") AND U0."id" = ("database_table_29"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x120f62f90>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               psycopg2.errors.InvalidParameterValue: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: InvalidParameterValue
+
+The above exception was the direct cause of the following exception:
+
+data_fixture = <baserow.test_utils.fixtures.Fixtures object at 0x11bfd7790>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_duplicate_application_with_implicit_array_primary_dependency(data_fixture):
+        """
+        Duplicating an application imports the serialized fields through the same
+        dependency ordering, so the implicit `field('LinkField')` reference must be
+        resolved there too.
+        """
+    
+        user = data_fixture.create_user()
+        database = data_fixture.create_database_application(user=user)
+        parent_table = data_fixture.create_database_table(
+            database=database, name="Parents", order=0
+        )
+        child_table = data_fixture.create_database_table(
+            database=database, name="Children", order=1
+        )
+        detail_table = data_fixture.create_database_table(
+            database=database, name="Details", order=2
+        )
+        data_fixture.create_text_field(table=parent_table, name="Name", primary=True)
+        child_primary = data_fixture.create_text_field(
+            table=child_table, name="ChildId", primary=True
+        )
+        detail_name = data_fixture.create_text_field(
+            table=detail_table, name="Label", primary=True
+        )
+        is_active = data_fixture.create_boolean_field(table=child_table, name="IsActive")
+    
+        fh = FieldHandler()
+        parent_link = fh.create_field(
+            user,
+            parent_table,
+            "link_row",
+            name="LinkedChildren",
+            link_row_table=child_table,
+        )
+        detail_link = fh.create_field(
+            user, child_table, "link_row", name="Detail", link_row_table=detail_table
+        )
+        child_primary = fh.update_field(
+            user,
+            child_primary,
+            new_type_name="formula",
+            formula="concat('ID-', field('Detail'))",
+        )
+    
+        consumer = fh.create_field(
+            user,
+            parent_table,
+            "formula",
+            name="ActiveChildren",
+            formula=(
+                "filter(field('LinkedChildren'), lookup('LinkedChildren', 'IsActive'))"
+            ),
+        )
+        assert child_primary.formula_type == "array"
+        assert "array_agg_unnesting" in consumer.internal_formula
+    
+        rh = RowHandler()
+        detail_row = rh.create_row(user, detail_table, values={detail_name.db_column: "D1"})
+        child_row = rh.create_row(
+            user,
+            child_table,
+            values={is_active.db_column: True, detail_link.db_column: [detail_row.id]},
+        )
+        rh.create_row(user, parent_table, values={parent_link.db_column: [child_row.id]})
+    
+        expected = list(
+            parent_table.get_model().objects.values_list(consumer.db_column, flat=True)
+        )
+        assert expected[0] and expected[0][0]["value"] == "ID-D1"
+    
+>       duplicated = CoreHandler().duplicate_application(user, database)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/src/baserow/core/telemetry/utils.py:210: in _sync_wrapper
+    return wrapped_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/core/handler.py:1633: in duplicate_application
+    new_application_clone = application_type.import_serialized(
+backend/src/baserow/contrib/database/application_types.py:1147: in import_serialized
+    self.import_tables_serialized(
+backend/src/baserow/contrib/database/application_types.py:685: in import_tables_serialized
+    self._import_table_rows(
+backend/src/baserow/contrib/database/application_types.py:866: in _import_table_rows
+    self._after_rows_imported(imported_fields, progress)
+backend/src/baserow/contrib/database/application_types.py:972: in _after_rows_imported
+    field_type.after_rows_imported(
+backend/src/baserow/contrib/database/fields/field_types.py:6149: in after_rows_imported
+    update_collector.apply_updates_and_get_updated_fields(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:872: in apply_updates_and_get_updated_fields
+    updated_rows_per_table = self.apply_updates(field_cache)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:766: in apply_updates
+    updated_rows_per_table = self._update_statement_collector.execute_all(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:278: in execute_all
+    updated_row_ids = self._execute_pending_update_statements(
+backend/src/baserow/contrib/database/fields/dependencies/update_collector.py:556: in _execute_pending_update_statements
+    qs.annotate(**annotations)
+backend/src/baserow/contrib/database/table/queryset.py:85: in update_returning_ids
+    return super().update(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/src/baserow/contrib/database/table/queryset.py:25: in execute_sql
+    cursor = super().execute_sql(CURSOR)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/models/sql/compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x120f62f90>
+sql = 'UPDATE "database_table_29" SET "field_85" = replace_errors_with_null(to_jsonb(array((SELECT jsonb_array_elements(json...AND U2."field_80") AND U0."id" = ("database_table_29"."id") AND U2."id" IS NOT NULL) GROUP BY U0."id")))) RETURNING id'
+params = (True,)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x120f62f90>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               django.db.utils.DataError: cannot extract elements from a scalar
+
+../../../../bw-head/backend/.venv/lib/python3.14/site-packages/django/db/backends/utils.py:105: DataError
+----------------------------- Captured stderr call -----------------------------
+INFO 2026-09-29 09:22:48,699 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[5a97bd6e-0d84-4f6d-b59e-42927d41f081] succeeded in 0.05598574999021366s: None 
+INFO 2026-09-29 09:22:48,901 celery.app.trace.info:128- Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[cf47e514-d75d-4626-a178-9fdadf89b6fe] succeeded in 0.0645164999878034s: None 
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[5a97bd6e-0d84-4f6d-b59e-42927d41f081] succeeded in 0.05598574999021366s: None
+INFO     celery.app.trace:trace.py:128 Task baserow.contrib.database.ws.rows.tasks.broadcast_dependant_rows_updated[cf47e514-d75d-4626-a178-9fdadf89b6fe] succeeded in 0.0645164999878034s: None
+--------------------------- Captured stdout teardown ---------------------------
+Checking pgvector extension: not available. It will be retried on next migration.
+=========================== short test summary info ============================
+FAILED backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency
+FAILED backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep
+FAILED backend/tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency
+3 failed, 6 passed, 792 warnings in 19.35s
+

@@ -278,3 +278,41 @@ def test_state_sequence_prediction_and_missing_transition(tmp_path: Path) -> Non
         },
     )
     assert pred.indeterminate and "T2" in pred.indeterminate
+
+
+def test_runtime_site_ids_are_repository_relative_under_a_nested_source_root(
+    tmp_path: Path,
+) -> None:
+    """Experiment 10 (Baserow, F2): with the source root below the repository root
+    (backend/src), runtime site ids must hash the repository-relative path, as the static
+    front end does. The plugin used the first source root as the repository root."""
+    import subprocess
+    import sys
+
+    from diffgenome.serialize import execution_from_json
+    from diffgenome.sites import site_id
+
+    repo = tmp_path / "repo"
+    (repo / "backend/src/pkg").mkdir(parents=True)
+    (repo / "backend/tests").mkdir(parents=True)
+    (repo / "backend/src/pkg/__init__.py").write_text("")
+    (repo / "backend/src/pkg/mod.py").write_text(
+        "def f(x):\n    if x > 1:\n        return 1\n    return 0\n"
+    )
+    (repo / "backend/tests/test_m.py").write_text(
+        "from pkg.mod import f\n\n\ndef test_f():\n    assert f(2) == 1\n"
+    )
+    src_dir = Path(__file__).resolve().parents[1] / "src"
+    out = tmp_path / "out"
+    r = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         "-p", "diffgenome.collect.pytest_plugin", "--diffgenome-out", str(out),
+         "--diffgenome-repo-root", ".", "--diffgenome-source-root", "backend/src",
+         "--diffgenome-test-root", "backend/tests", "backend/tests"],
+        cwd=repo, capture_output=True, text=True,
+        env={"PYTHONPATH": f"backend/src:{src_dir}", "PATH": "/usr/bin:/bin"},
+    )  # fmt: skip
+    assert r.returncode == 0, r.stdout + r.stderr
+    ex = execution_from_json(next(out.glob("*.json")).read_text())
+    expected = site_id("backend/src/pkg/mod.py", (2, 8, 2, 13))
+    assert [(b.site, b.outcome) for b in ex.branches] == [(expected, True)]

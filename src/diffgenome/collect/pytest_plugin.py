@@ -36,6 +36,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--diffgenome-test-root", action="append", default=[], help="test root (repeatable)"
     )
     group.addoption(
+        "--diffgenome-repo-root",
+        default=None,
+        help="repository root that site ids and paths are relative to (default: first source root)",
+    )
+    group.addoption(
         "--diffgenome-stimulus",
         default="existing_test",
         choices=[s.value for s in Stimulus],
@@ -66,7 +71,13 @@ class _Plugin:
         if not roots:
             roots = [Path(config.rootpath).resolve()]
         tests = [Path(p).resolve() for p in config.getoption("--diffgenome-test-root")]
-        self.tracer = Tracer(repo_root=roots[0], source_roots=tuple(roots), test_roots=tuple(tests))
+        # Site ids hash the repository-relative path (sites.py); a source root below the
+        # repository root (Baserow: backend/src) must not become the base. Experiment 10, F2.
+        repo_opt = config.getoption("--diffgenome-repo-root")
+        repo_root = Path(repo_opt).resolve() if repo_opt else roots[0]
+        self.tracer = Tracer(
+            repo_root=repo_root, source_roots=tuple(roots), test_roots=tuple(tests)
+        )
         self.tracer.install_patch_hook()
         self.stimulus = Stimulus(config.getoption("--diffgenome-stimulus"))
         self.collectors: tuple[Collector, ...] = (COLLECTOR,)

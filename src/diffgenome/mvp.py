@@ -95,7 +95,11 @@ def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -
         python = Path(
             os.path.abspath(args.python if args.python.is_absolute() else repo / args.python)
         )
-        return PytestRuntime(repo, python, args.source_root, args.test_root, tests, pytest_args)
+        test_env = dict(kv.split("=", 1) for kv in args.test_env)
+        return PytestRuntime(
+            repo, python, args.source_root, args.test_root, tests, pytest_args,
+            pythonpath=args.pythonpath, test_env=test_env, allow_loopback=args.allow_loopback,
+        )  # fmt: skip
     if args.runtime == "node":
         from diffgenome.collect.node_jest import NodeJestRuntime
 
@@ -122,6 +126,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--test-root", required=True)
     ap.add_argument("--tests", default=None, help="test target path (default: test root)")
     ap.add_argument("--pytest-arg", action="append", default=[])
+    ap.add_argument(
+        "--pythonpath", action="append", default=[],
+        help="python: repo-relative import root, prepended inside the workspace (repeatable)",
+    )  # fmt: skip
+    ap.add_argument(
+        "--test-env", action="append", default=[],
+        help="python: KEY=VALUE for the target tests; non-secret test values (repeatable)",
+    )  # fmt: skip
+    ap.add_argument(
+        "--allow-loopback", action="store_true",
+        help="python: allow localhost sockets for local test services; other network denied",
+    )  # fmt: skip
     ap.add_argument("--diff", help="git revspec: base..head, or a commit (vs its parent)")
     ap.add_argument(
         "--rev", help="analyze this git revision (workspace from `git archive`), not the checkout"

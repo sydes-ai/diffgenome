@@ -26,6 +26,9 @@ class PytestRuntime:
         test_root: str,
         tests: str,
         pytest_args: list[str],
+        pythonpath: list[str] | None = None,
+        test_env: dict[str, str] | None = None,
+        allow_loopback: bool = False,
     ) -> None:
         self.repo = repo
         self.python = python
@@ -33,6 +36,13 @@ class PytestRuntime:
         self.test_root = test_root
         self.tests = tests
         self.pytest_args = pytest_args
+        # Generic target-environment options (experiment 10, Baserow): repo-relative import
+        # roots resolved inside the disposable workspace; allow-listed, non-secret test
+        # variables (e.g. a local disposable database); loopback-only networking for local
+        # services. Target code still runs under the OS sandbox with no other network.
+        self.pythonpath = list(pythonpath or [])
+        self.test_env = dict(test_env or {})
+        self.allow_loopback = allow_loopback
 
     def prepare(self, ws: Workspace) -> SymbolIndex:
         return PythonSymbolIndex(
@@ -49,6 +59,7 @@ class PytestRuntime:
             str(self.python), "-m", "pytest", "-q", "-p", "no:cacheprovider",
             "-p", "diffgenome.collect.pytest_plugin",
             "--diffgenome-out", str(traces_ws),
+            "--diffgenome-repo-root", ".",
             "--diffgenome-source-root", self.source_root,
             "--diffgenome-test-root", self.test_root,
             "--diffgenome-stimulus", stimulus.value,
@@ -56,7 +67,9 @@ class PytestRuntime:
             *self.pytest_args,
             *(only if only else [self.tests]),
         ]  # fmt: skip
-        result = ws.run(argv, env={"PYTHONPATH": str(DIFFGENOME_SRC)}, timeout=1800)
+        roots = [str(ws.repo / p) for p in self.pythonpath]
+        env = {**self.test_env, "PYTHONPATH": ":".join([*roots, str(DIFFGENOME_SRC)])}
+        result = ws.run(argv, env=env, timeout=1800, allow_loopback=self.allow_loopback)
         out_dir.mkdir(parents=True, exist_ok=True)
         copy_probe_traces(traces_ws, out_dir)
         executions = [execution_from_json(f.read_text()) for f in sorted(out_dir.glob("*.json"))]

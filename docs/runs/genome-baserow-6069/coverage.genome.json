@@ -1,0 +1,1520 @@
+{
+ "format": "diffgenome-genome/0",
+ "subject": {
+  "repo": "baserow",
+  "entry": "_import_table_fields"
+ },
+ "entities": [],
+ "variables": [
+  {
+   "id": "formula_present",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 6249,
+     "text": "if \"formula\" not in serialized_field:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "formula_present",
+   "origin": "input",
+   "description": "The serialized formula field carries a 'formula' key (always true for real formula fields).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "through_in_import",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 6942,
+     "text": "if through_field_id is None or through_field_id not in serialized_fields_map:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "through_in_import",
+   "origin": "input",
+   "description": "A lookup's through (link) field id is present in the serialized fields of this import.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "target_in_import",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 6951,
+     "text": "if target_field_id is None or target_field_id not in serialized_fields_map:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "target_in_import",
+   "origin": "input",
+   "description": "A lookup's target field id is present in the serialized fields of this import.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "has_raw_deps",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "dataflow",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:47a63ce03fc8",
+     "outcome": null,
+     "origin": "call:_expand_implied_import_dependencies",
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (dataflow)",
+   "name": "has_raw_deps",
+   "origin": "input",
+   "description": "The field type's get_field_depdendencies_before_import_serialized returned a non-empty set (formula, lookup, count, rollup with resolvable references); plain fields return None.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "has_deps",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 508,
+     "text": "expanded.add(implied or (name, via))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "has_deps",
+   "origin": "derived",
+   "description": "The expanded dependency set is non-empty. Expansion maps each dependency to exactly one dependency, so it never empties or fills a set: has_deps equals has_raw_deps.",
+   "definition": "has_raw_deps",
+   "observed_as": null
+  },
+  {
+   "id": "link_table_in_import",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3710,
+     "text": "if related_table_id is None or related_table_id not in primary_table_fields_map:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "link_table_in_import",
+   "origin": "input",
+   "description": "For a referenced link_row field: its link_row_table_id is set and that table is part of this import (has an entry in primary_table_fields_map).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "link_primary_serialized",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3714,
+     "text": "if primary_field_id not in serialized_fields_map:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "link_primary_serialized",
+   "origin": "input",
+   "description": "The linked table's primary field id is among the serialized fields of this import.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "implied_primary_dep",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3717,
+     "text": "return (serialized_fields_map[primary_field_id][\"name\"], reference_name)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "implied_primary_dep",
+   "origin": "state",
+   "description": "Some deferred field's same-table by-name reference to a link_row field has been rewritten into (linked primary name, link name), i.e. the deferred importer now knows it depends on the linked table's primary field.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "explicit_primary_lookup",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:be7d3ee9e3b1",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "explicit_primary_lookup",
+   "origin": "input",
+   "description": "The consumer formula names the linked primary explicitly (lookup('Link','Primary')), so its raw deps already contain (primary, link).",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "implicit_link_reference",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:a0d4e306fb5a",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "implicit_link_reference",
+   "origin": "input",
+   "description": "A deferred formula references a link_row field by name only (field('Link')) while the linked table's primary field is itself a deferred (formula) field of the import.",
+   "definition": null,
+   "observed_as": null
+  },
+  {
+   "id": "consumer_ordered_after_primary",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 68,
+     "text": "if via_field_name is not None:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "consumer_ordered_after_primary",
+   "origin": "derived",
+   "description": "The deferred importer places the consumer in a strictly later level than the linked table's primary field it actually reads.",
+   "definition": "!implicit_link_reference || explicit_primary_lookup || implied_primary_dep",
+   "observed_as": null
+  }
+ ],
+ "data_dependencies": [],
+ "decisions": [
+  {
+   "id": "d_formula_has_formula",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:49c2edb05730",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "control",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": "FormulaHandler.get_dependencies_field_names",
+     "site": "br:49c2edb05730",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, control); site: br:49c2edb05730 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "entity": "FormulaFieldType.get_field_depdendencies_before_import_serialized",
+   "site": "br:49c2edb05730",
+   "inputs": [
+    "formula_present"
+   ],
+   "predicate": "!formula_present",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [
+     "NotImplementedError"
+    ],
+    "absent": [
+     "FormulaHandler.get_dependencies_field_names"
+    ],
+    "stops": true,
+    "effect": "raise: formula subtype must implement",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [
+     "FormulaHandler.get_dependencies_field_names"
+    ],
+    "absent": [
+     "NotImplementedError"
+    ],
+    "stops": false,
+    "effect": "returns the set of (name, via) references parsed from the formula",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_lookup_through",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:df188b1f6d10",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:df188b1f6d10 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "entity": "LookupFieldType.get_field_depdendencies_before_import_serialized",
+   "site": "br:df188b1f6d10",
+   "inputs": [
+    "through_in_import"
+   ],
+   "predicate": "!through_in_import",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "returns None (broken reference): no deps",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "continue to target check",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_lookup_target",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:b0d9d883d08b",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch); site: br:b0d9d883d08b (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "entity": "LookupFieldType.get_field_depdendencies_before_import_serialized",
+   "site": "br:b0d9d883d08b",
+   "inputs": [
+    "target_in_import"
+   ],
+   "predicate": "!target_in_import",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "returns None: target pre-exists the import",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "returns {(target_name, via_name)}",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_expand_empty",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 497,
+     "text": "if not field_deps:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:be7d3ee9e3b1",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:be7d3ee9e3b1",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "rejected",
+   "status_reason": "contradicted by observed branches: tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies: FieldType.get_import_dependency_when_referenced ran after br:be7d3ee9e3b1=True; tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency: LinkRowFieldType.get_import_dependency_when_referenced ran after br:be7d3ee9e3b1=True; tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency: LinkRowFieldType.get_import_dependency_when_referenced ran after br:be7d3ee9e3b1=True",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "site": "br:be7d3ee9e3b1",
+   "inputs": [
+    "has_raw_deps"
+   ],
+   "predicate": "!has_raw_deps",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "LinkRowFieldType.get_import_dependency_when_referenced",
+     "FieldType.get_import_dependency_when_referenced"
+    ],
+    "stops": false,
+    "effect": "returns field_deps unchanged (None); no referenced field type is consulted",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "for each (name, None) whose name is a field of the same table, asks that field's type for an implied dependency; replaces the reference with it if not None",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_defer_field",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "control",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": "deferred_field_importer.add_deferred_field_import",
+     "site": "br:47a63ce03fc8",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "control",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": "_import_field_serialized",
+     "site": "br:47a63ce03fc8",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "dataflow",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:47a63ce03fc8",
+     "outcome": null,
+     "origin": "call:_expand_implied_import_dependencies",
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:47a63ce03fc8",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:47a63ce03fc8",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "rejected",
+   "status_reason": "contradicted by observed branches: tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies: DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized ran after br:47a63ce03fc8=True; tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies: DeferredFieldImporter.add_deferred_field_import ran after br:47a63ce03fc8=False; tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency: DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized ran after br:47a63ce03fc8=True",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:47a63ce03fc8",
+   "inputs": [
+    "has_deps"
+   ],
+   "predicate": "has_deps",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [
+     "DeferredFieldImporter.add_deferred_field_import"
+    ],
+    "absent": [
+     "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized"
+    ],
+    "stops": false,
+    "effect": "field is deferred with its (expanded) dependency set",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [
+     "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized"
+    ],
+    "absent": [
+     "DeferredFieldImporter.add_deferred_field_import"
+    ],
+    "stops": false,
+    "effect": "field imported immediately (level 0)",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_link_table_in_import",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "dataflow",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:a0d4e306fb5a",
+     "outcome": null,
+     "origin": "param:primary_table_fields_map",
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:a0d4e306fb5a",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, dataflow); site: br:a0d4e306fb5a (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "site": "br:a0d4e306fb5a",
+   "inputs": [
+    "link_table_in_import"
+   ],
+   "predicate": "!link_table_in_import",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "returns None: linked table pre-exists the import, reference kept as (name, None)",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "look up linked table's primary field id",
+    "steps": []
+   }
+  },
+  {
+   "id": "d_link_primary_serialized",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "dataflow",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:f960d9f63045",
+     "outcome": null,
+     "origin": "param:serialized_fields_map",
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_explicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:f960d9f63045",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch, dataflow); site: br:f960d9f63045 (given); not verified: neither the observed state at the site nor any stated input facts decide the predicate, so its meaning cannot be checked",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "site": "br:f960d9f63045",
+   "inputs": [
+    "link_primary_serialized"
+   ],
+   "predicate": "!link_primary_serialized",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "effect": "returns None",
+    "steps": []
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "returns (linked primary name, reference_name)",
+    "steps": []
+   }
+  }
+ ],
+ "effects": [],
+ "transitions": [
+  {
+   "id": "t_expand_preserves_emptiness",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 508,
+     "text": "expanded.add(implied or (name, via))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "state_before": "raw dependency set from the field type",
+   "action": "map each dependency 1:1 to implied-or-self",
+   "state_after": "expanded set, empty iff raw set empty",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "when": "true",
+   "sets": {
+    "has_deps": "has_raw_deps"
+   }
+  },
+  {
+   "id": "t_link_implies_primary",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3717,
+     "text": "return (serialized_fields_map[primary_field_id][\"name\"], reference_name)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: no observed call of the entity with a bound delta",
+   "state_before": "consumer depends on (LinkField, None): a same-table field already imported at level 0",
+   "action": "return (linked primary name, LinkField)",
+   "state_after": "consumer depends on the linked table's primary field via LinkField",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "when": "link_table_in_import && link_primary_serialized",
+   "sets": {
+    "implied_primary_dep": "true"
+   }
+  }
+ ],
+ "procedures": [
+  {
+   "id": "p_formula_deps",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 6254,
+     "text": "return FormulaHandler.get_dependencies_field_names(serialized_field[\"formula\"])",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "entity": "FormulaFieldType.get_field_depdendencies_before_import_serialized",
+   "steps": [
+    "D:d_formula_has_formula"
+   ]
+  },
+  {
+   "id": "p_lookup_deps",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 6958,
+     "text": "return {(target_field_name, via_field_name)}",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "entity": "LookupFieldType.get_field_depdendencies_before_import_serialized",
+   "steps": [
+    "D:d_lookup_through",
+    "D:d_lookup_target"
+   ]
+  },
+  {
+   "id": "p_expand_and_route",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/application_types.py",
+     "line": 526,
+     "text": "field_deps = _expand_implied_import_dependencies(",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "steps": [
+    "T:t_expand_preserves_emptiness",
+    "D:d_expand_empty",
+    "D:d_defer_field"
+   ]
+  },
+  {
+   "id": "p_link_implied",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+     "line": 3706,
+     "text": "related_table_id = serialized_field.get(\"link_row_table_id\", None)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+   "steps": [
+    "D:d_link_table_in_import",
+    "D:d_link_primary_serialized",
+    "T:t_link_implies_primary"
+   ]
+  }
+ ],
+ "rules": [
+  {
+   "id": "r_defer_iff_deps",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:47a63ce03fc8",
+     "outcome": true,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "A field is deferred iff its type reports dependencies",
+   "inputs": [
+    "has_raw_deps"
+   ],
+   "relevant_state": [],
+   "condition": "has_raw_deps",
+   "consequences": [
+    "add_deferred_field_import called with the expanded set",
+    "otherwise _import_field_serialized called immediately"
+   ],
+   "decision": "d_defer_field"
+  },
+  {
+   "id": "r_link_reference_expands",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:f960d9f63045",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "A by-name reference to a same-table link_row field becomes a dependency on the linked primary",
+   "inputs": [
+    "link_table_in_import",
+    "link_primary_serialized"
+   ],
+   "relevant_state": [
+    "implied_primary_dep"
+   ],
+   "condition": "link_table_in_import && link_primary_serialized",
+   "consequences": [
+    "(LinkField, None) replaced by (LinkedPrimary, LinkField)",
+    "implied_primary_dep := true"
+   ],
+   "decision": "d_link_primary_serialized"
+  },
+  {
+   "id": "r_non_link_reference_unchanged",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:be7d3ee9e3b1",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "References to non-link fields, or with a via, are kept as-is",
+   "inputs": [
+    "has_raw_deps"
+   ],
+   "relevant_state": [],
+   "condition": "has_raw_deps",
+   "consequences": [
+    "FieldType.get_import_dependency_when_referenced returns None for non-link types; dependency unchanged",
+    "(name, via) with via set is never consulted"
+   ],
+   "decision": "d_expand_empty"
+  },
+  {
+   "id": "r_ordering_phenotype",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+     "line": 68,
+     "text": "if via_field_name is not None:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": null,
+     "outcome": null,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "A consumer must be levelled after the primary it reads through a link",
+   "inputs": [
+    "implicit_link_reference",
+    "explicit_primary_lookup"
+   ],
+   "relevant_state": [
+    "implied_primary_dep"
+   ],
+   "condition": "implicit_link_reference && !explicit_primary_lookup && !implied_primary_dep",
+   "consequences": [
+    "base: consumer depends only on already-imported level-0 fields, so it lands in the same deferred level as the linked table's primary formula and may be recalculated before that column is populated -> DataError in FormulaFieldType.after_rows_imported",
+    "head: implied (primary, link) dependency makes the consumer's level strictly greater; import succeeds"
+   ],
+   "decision": null
+  }
+ ],
+ "regimes": [
+  {
+   "id": "g_implicit_link",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_snapshot_with_implicit_array_primary_dependency",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:a0d4e306fb5a",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "Formula references a link_row field by name; linked primary is a deferred formula in the import",
+   "facts": {
+    "implicit_link_reference": true,
+    "explicit_primary_lookup": false,
+    "link_table_in_import": true,
+    "link_primary_serialized": true
+   },
+   "members": [
+    "test_snapshot_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "test_duplicate_application_with_implicit_array_primary_dependency"
+   ]
+  },
+  {
+   "id": "g_dependencies_already_explicit",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "branch",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "test_can_import_database_with_formula_dependencies",
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "site": "br:be7d3ee9e3b1",
+     "outcome": false,
+     "origin": null,
+     "entity": null,
+     "fact": null,
+     "before": null,
+     "after": null,
+     "path": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (branch)",
+   "name": "Dependency graph already complete without expansion",
+   "facts": {
+    "implicit_link_reference": false
+   },
+   "members": [
+    "test_snapshot_with_explicit_array_primary_dependency",
+    "test_can_import_database_with_formula_dependencies"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "what": "Per-reference dispatch inside _expand_implied_import_dependencies (whether a referenced type method is called, and which type)",
+   "why": "Lines 502-507 are expressions (conditional expression and `and`), not `if` statements, so no site id exists; the genome cannot put a sited decision there. I list the referenced-type call as its own scenario call after the expand call, and place the br:47a63ce03fc8 decision inside the expand procedure, so predicted call nesting/order around add_deferred_field_import differs from the trace even though per-site outcome sequences match."
+  },
+  {
+   "what": "br:cbfe8c1c2b07 (via_field_name is not None) in DeferredFieldImporter.get_all_fields_dependencies",
+   "why": "This site directly shows the phenotype (base implicit: T,F,F; head: T,T,T), but its evaluation order follows dict/set iteration over deferred fields and their dependency sets, which is not determined by anything I can express without loops or sets; left uncovered."
+  },
+  {
+   "what": "Why the same-level order at base puts the consumer before the linked primary",
+   "why": "group_dependencies_by_level is not shown; within a level the order is not derivable from the bundle. The base failure is attributed to lack of ordering, not to a proven deterministic misordering; the withheld two-links-deep base outcome is predicted by analogy."
+  },
+  {
+   "what": "Mechanism of the DataError",
+   "why": "It is raised in FormulaFieldType.after_rows_imported, outside _import_table_fields; the link between field import order and row-phase recalculation (e.g. formula type/ internal formula computed against a not-yet-typed primary) is inferred from the test docstring, not traced."
+  },
+  {
+   "what": "Duplication path facts",
+   "why": "Assumed that duplicate_application serializes link_row_table_id with old table ids matching serialized_table ids, so link_table_in_import holds; not observable in the bundle (the LinkRow docstring says a missing table corresponds to duplicating a table/field, which is a different case)."
+  },
+  {
+   "what": "Sets, names, and value-level dependency content",
+   "why": "The format has booleans/integers only and no loops, so the actual dependency tuples, the rewrite (LinkField,None)->(Primary,LinkField), and the level assignment of the deferred graph are expressed only as the boolean implied_primary_dep and a derived ordering flag."
+  },
+  {
+   "what": "br:34ec71ee29c9 and br:09962e1ae1b2",
+   "why": "Deliberately not covered: they are unchanged by the change and their observed evaluation counts (e.g. only T recorded for the primary check) do not map onto a per-field call list I can state reliably."
+  }
+ ],
+ "provenance": {
+  "model": "claude-opus-5-5",
+  "context_bundle_sha": "c90d89e1a1d10cbf",
+  "checker": "genome-check/1 (genome_state at 5f45eb2, unchanged)",
+  "established_from": [
+   "test_snapshot_with_explicit_array_primary_dependency",
+   "test_snapshot_with_implicit_array_primary_dependency",
+   "test_can_import_database_with_formula_dependencies"
+  ],
+  "withheld_from_model_and_checker": [
+   "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+   "test_duplicate_application_with_implicit_array_primary_dependency"
+  ]
+ }
+}

@@ -1,0 +1,166 @@
+{
+ "head": {
+  "branch_observations": 70197,
+  "mapped_to_static_site": 2083,
+  "changed_function_observations": {
+   "application_types.DatabaseApplicationType._import_table_fields": {
+    "total": 68,
+    "mapped": 68
+   },
+   "application_types.DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies": {
+    "total": 43,
+    "mapped": 0
+   },
+   "application_types.DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized": {
+    "total": 43,
+    "mapped": 0
+   },
+   "fields.field_types.FormulaFieldType.get_field_depdendencies_before_import_serialized": {
+    "total": 10,
+    "mapped": 10
+   },
+   "fields.field_types.LookupFieldType.get_field_depdendencies_before_import_serialized": {
+    "total": 2,
+    "mapped": 2
+   },
+   "fields.field_types.LinkRowFieldType.get_import_dependency_when_referenced": {
+    "total": 14,
+    "mapped": 14
+   }
+  },
+  "unmapped_distinct_sites_in_changed_functions": [
+   "br:3f16965dcd1f",
+   "br:be7d3ee9e3b1"
+  ],
+  "decision_operands": 20,
+  "decision_operands_unknown": 1,
+  "call_args": 54,
+  "call_args_unknown": 33,
+  "opaque_statements": [
+   {
+    "function": "_import_table_fields",
+    "line": 464,
+    "reason": "FunctionDef"
+   },
+   {
+    "function": "_import_table_fields",
+    "line": 489,
+    "reason": "FunctionDef"
+   }
+  ],
+  "per_test_importer_signature": {
+   "test_can_import_database_with_formula_dependencies": {
+    "outcome": "passed",
+    "importer_via_not_none": "FTT",
+    "levels_digest": [
+     "2e88e468f89a"
+    ]
+   },
+   "test_duplicate_application_with_implicit_array_primary_dependency": {
+    "outcome": "passed",
+    "importer_via_not_none": "TTT",
+    "levels_digest": [
+     "b969d7fccece"
+    ]
+   },
+   "test_snapshot_with_explicit_array_primary_dependency": {
+    "outcome": "passed",
+    "importer_via_not_none": "TTT",
+    "levels_digest": [
+     "7e94afc77cf1"
+    ]
+   },
+   "test_snapshot_with_implicit_array_primary_dependency": {
+    "outcome": "passed",
+    "importer_via_not_none": "TTT",
+    "levels_digest": [
+     "62601a706a38"
+    ]
+   },
+   "test_snapshot_with_implicit_array_primary_dependency_two_links_deep": {
+    "outcome": "passed",
+    "importer_via_not_none": "TT",
+    "levels_digest": [
+     "fdd332533fa9"
+    ]
+   }
+  }
+ },
+ "base": {
+  "branch_observations": 68879,
+  "mapped_to_static_site": 1998,
+  "changed_function_observations": {
+   "application_types.DatabaseApplicationType._import_table_fields": {
+    "total": 68,
+    "mapped": 68
+   },
+   "application_types.DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized": {
+    "total": 43,
+    "mapped": 0
+   },
+   "fields.field_types.FormulaFieldType.get_field_depdendencies_before_import_serialized": {
+    "total": 10,
+    "mapped": 10
+   },
+   "fields.field_types.LookupFieldType.get_field_depdendencies_before_import_serialized": {
+    "total": 2,
+    "mapped": 2
+   }
+  },
+  "unmapped_distinct_sites_in_changed_functions": [
+   "br:3f16965dcd1f"
+  ],
+  "decision_operands": 16,
+  "decision_operands_unknown": 1,
+  "call_args": 50,
+  "call_args_unknown": 30,
+  "opaque_statements": [
+   {
+    "function": "_import_table_fields",
+    "line": 464,
+    "reason": "FunctionDef"
+   }
+  ],
+  "per_test_importer_signature": {
+   "test_can_import_database_with_formula_dependencies": {
+    "outcome": "passed",
+    "importer_via_not_none": "FTT",
+    "levels_digest": [
+     "2e88e468f89a"
+    ]
+   },
+   "test_duplicate_application_with_implicit_array_primary_dependency": {
+    "outcome": "failed",
+    "importer_via_not_none": "TFF",
+    "levels_digest": [
+     "4970a553a5e0"
+    ]
+   },
+   "test_snapshot_with_explicit_array_primary_dependency": {
+    "outcome": "passed",
+    "importer_via_not_none": "TTF",
+    "levels_digest": [
+     "c537c8894282"
+    ]
+   },
+   "test_snapshot_with_implicit_array_primary_dependency": {
+    "outcome": "failed",
+    "importer_via_not_none": "TFF",
+    "levels_digest": [
+     "0010171d669d"
+    ]
+   },
+   "test_snapshot_with_implicit_array_primary_dependency_two_links_deep": {
+    "outcome": "failed",
+    "importer_via_not_none": "FF",
+    "levels_digest": [
+     "df08293e074b"
+    ]
+   }
+  }
+ },
+ "frozen_head_run_before_F2_fix": {
+  "branch_observations": 70197,
+  "mapped_to_static_site": 0
+ }
+}

@@ -1,0 +1,1243 @@
+{
+ "frozen": {
+  "statuses": {
+   "variables": {
+    "supported": 10,
+    "rejected": 1
+   },
+   "decisions": {
+    "supported": 4,
+    "hypothesis": 1,
+    "rejected": 1
+   },
+   "transitions": {
+    "supported": 2
+   },
+   "procedures": {
+    "supported": 4
+   },
+   "rules": {
+    "supported": 3,
+    "rejected": 1
+   },
+   "regimes": {
+    "supported": 1,
+    "rejected": 1
+   }
+  },
+  "per_test": [
+   {
+    "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:df188b1f6d10",
+      false
+     ],
+     [
+      "br:b0d9d883d08b",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_can_import_database_with_formula_dependencies",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "passed",
+     "head": "passed",
+     "why": "No formula references a link_row field by name, so r_link_reference_expands never fires (the one consulted referenced type is non-link and returns None) and the dependency sets are identical at base and head."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "passed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 20
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+    "withheld": true,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "Duplication re-imports the same serialized schema through _import_table_fields (the linked tables are in the import, so link_table_in_import holds), hence the same implicit-link ordering bug at base and the same r_link_reference_expands fix at head."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 22
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_explicit_array_primary_dependency",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "passed",
+     "head": "passed",
+     "why": "The consumer's lookup('LinkedChildren','ChildId') already yields (ChildId, LinkedChildren), so it is levelled after the child primary at base and head (r_ordering_phenotype condition false); head only additionally expands the child primary's field('Detail') reference."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "passed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 21
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "field('LinkedChildren') gives only (LinkedChildren, None), a level-0 field, so at base the consumer shares a level with the ChildId formula and recalculates against a NULL column (DataError); at head r_link_reference_expands turns it into (ChildId, LinkedChildren) and orders it after ChildId."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 22
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "withheld": true,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "Both AConsumer=field('ToB') and BId=field('ToC') are by-name link references; at base both depend only on level-0 link fields and share a level, so AConsumer can recalculate before BId is populated; at head each is expanded (AConsumer->(BId,ToB), BId->(CLabel,ToC)) and the chain is levelled C < BId < AConsumer."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 20
+   }
+  ],
+  "regime_classes": [
+   [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   [
+    "test_duplicate_application_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep"
+   ]
+  ],
+  "sites_in_mechanics": [
+   "br:47a63ce03fc8",
+   "br:49c2edb05730",
+   "br:a0d4e306fb5a",
+   "br:b0d9d883d08b",
+   "br:df188b1f6d10"
+  ],
+  "sites_not_in_mechanics": [
+   "br:be7d3ee9e3b1"
+  ],
+  "summary": {
+   "exact_all": "0/5",
+   "exact_withheld": "0/2",
+   "indeterminate": 5,
+   "confidently_wrong": 0,
+   "unchecked_semantics_exact": "0/5",
+   "phenotype_claims_exact": "5/5",
+   "decisions_verified": "0/6",
+   "transitions_verified": "0/2",
+   "rejected": [
+    "explicit_primary_lookup",
+    "d_defer_field",
+    "r_non_link_reference_unchanged",
+    "g_dependencies_already_explicit"
+   ],
+   "hypothesis": [
+    "d_expand_empty"
+   ],
+   "sites_not_in_mechanics": [
+    "br:be7d3ee9e3b1"
+   ]
+  }
+ },
+ "coverage": {
+  "statuses": {
+   "variables": {
+    "supported": 11
+   },
+   "decisions": {
+    "supported": 4,
+    "rejected": 2
+   },
+   "transitions": {
+    "supported": 2
+   },
+   "procedures": {
+    "supported": 4
+   },
+   "rules": {
+    "supported": 4
+   },
+   "regimes": {
+    "supported": 2
+   }
+  },
+  "per_test": [
+   {
+    "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:df188b1f6d10",
+      false
+     ],
+     [
+      "br:b0d9d883d08b",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_can_import_database_with_formula_dependencies",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "passed",
+     "head": "passed",
+     "why": "No formula references a link_row field by name, so r_link_reference_expands never fires (the one consulted referenced type is non-link and returns None) and the dependency sets are identical at base and head."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "passed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 20
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+    "withheld": true,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "Duplication re-imports the same serialized schema through _import_table_fields (the linked tables are in the import, so link_table_in_import holds), hence the same implicit-link ordering bug at base and the same r_link_reference_expands fix at head."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 22
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_explicit_array_primary_dependency",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "passed",
+     "head": "passed",
+     "why": "The consumer's lookup('LinkedChildren','ChildId') already yields (ChildId, LinkedChildren), so it is levelled after the child primary at base and head (r_ordering_phenotype condition false); head only additionally expands the child primary's field('Detail') reference."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "passed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 21
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency",
+    "withheld": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "field('LinkedChildren') gives only (LinkedChildren, None), a level-0 field, so at base the consumer shares a level with the ChildId formula and recalculates against a NULL column (DataError); at head r_link_reference_expands turns it into (ChildId, LinkedChildren) and orders it after ChildId."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 22
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "predicted_branches": [],
+    "observed_branches": [
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:49c2edb05730",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "withheld": true,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": "no procedure for DatabaseApplicationType._import_table_fields",
+    "phenotype_claim": {
+     "base": "failed",
+     "head": "passed",
+     "why": "Both AConsumer=field('ToB') and BId=field('ToC') are by-name link references; at base both depend only on level-0 link fields and share a level, so AConsumer can recalculate before BId is populated; at head each is expanded (AConsumer->(BId,ToB), BId->(CLabel,ToC)) and the chain is levelled C < BId < AConsumer."
+    },
+    "phenotype_observed": {
+     "head": "passed",
+     "base": "failed"
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 20
+   }
+  ],
+  "regime_classes": [
+   [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   [
+    "test_duplicate_application_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep"
+   ]
+  ],
+  "sites_in_mechanics": [
+   "br:47a63ce03fc8",
+   "br:49c2edb05730",
+   "br:a0d4e306fb5a",
+   "br:b0d9d883d08b",
+   "br:be7d3ee9e3b1",
+   "br:df188b1f6d10"
+  ],
+  "sites_not_in_mechanics": [],
+  "summary": {
+   "exact_all": "0/5",
+   "exact_withheld": "0/2",
+   "indeterminate": 5,
+   "confidently_wrong": 0,
+   "unchecked_semantics_exact": "0/5",
+   "phenotype_claims_exact": "5/5",
+   "decisions_verified": "0/6",
+   "transitions_verified": "0/2",
+   "rejected": [
+    "d_expand_empty",
+    "d_defer_field"
+   ],
+   "hypothesis": [],
+   "sites_not_in_mechanics": []
+  }
+ }
+}

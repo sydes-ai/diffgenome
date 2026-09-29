@@ -1,0 +1,12 @@
+{
+ "holdout": [
+  "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+  "test_duplicate_application_with_implicit_array_primary_dependency"
+ ],
+ "shown": [
+  "test_snapshot_with_explicit_array_primary_dependency",
+  "test_snapshot_with_implicit_array_primary_dependency",
+  "test_can_import_database_with_formula_dependencies"
+ ],
+ "not_scored": []
+}
