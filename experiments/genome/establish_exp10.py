@@ -159,7 +159,8 @@ def run(
             if pred.indeterminate and len(p) < len(o):
                 continue
             agree.setdefault(d.id, []).append((test, p == o))
-    establish_state(g, sub, agreement_seq=agree)
+    shown_scen = {t: s for t, s in scenarios.items() if t in holdout["shown"]}
+    establish_state(g, sub, agreement_seq=agree, scenarios=shown_scen if structure else None)
     obs_all = Observations(in_scope)
     sites = {d.site for d in g.decisions if d.site}
     # scored on every observed site of the changed functions (genome_state.change_sites),
@@ -175,7 +176,9 @@ def run(
         if ob is None:
             continue
         pred = predict_sequence(g, sc)
-        r = compare_sequence(g, pred, ob, sites, required, sk)
+        # occurrence facts are checked only where the checker may see the execution
+        visible = sk is not None and test in holdout["shown"]
+        r = compare_sequence(g, pred, ob, sites, required, sk, sc if visible else None)
         chosen = compare_sequence(g, pred, ob, sites)
         # the same prediction with every proposal usable: what the model's semantics alone
         # would have predicted, independent of what the checker could establish
@@ -237,6 +240,10 @@ def summarize(res: dict[str, Any], g: Any) -> dict[str, Any]:
             for st in ("verified", "supported", "rejected", "not established", "unobserved")
         },
         "placement_indeterminate": sum(1 for r in pt if r.get("placement_problems")),
+        "occurrence_facts": {
+            st: sum((r.get("occurrence_checks") or {}).get(st, 0) for r in pt)
+            for st in ("confirmed", "contradicted", "unobservable")
+        },
         "required_sites_uncovered": res["required_sites_uncovered"],
         "indeterminate": sum(1 for r in pt if r["indeterminate"]),
         "confidently_wrong": sum(1 for r in pt if not r["indeterminate"] and not r["match"]),

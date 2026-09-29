@@ -228,11 +228,19 @@ def build_skeleton(executions: list[Execution], vocab: list[str]) -> Skeleton:
             if (y, x) in pairs:
                 sk.interleaved.setdefault(parent, set()).add(frozenset((x, y)))
     all_occs = [occurrences(ex, vocab) for ex in executions]
+    flat = [o for occs in all_occs for o in occs.values()]
     for parent, pairs_i in sk.interleaved.items():
         for members in _components(pairs_i):
-            sk.regions.setdefault(parent, []).append(
-                _segment(parent, members, [o for occs in all_occs for o in occs.values()])
-            )
+            sk.regions.setdefault(parent, []).append(_segment(parent, members, flat))
+    # a family that repeats inside one occurrence without interleaving with another is a
+    # one-member repeated region: it starts every repetition itself
+    for parent, fams in sk.families.items():
+        in_region = {m for r in sk.regions.get(parent, []) for m in r["members"]}
+        for fam, (_, max_n) in fams.items():
+            if max_n > 1 and fam not in in_region:
+                sk.regions.setdefault(parent, []).append(
+                    {"members": [fam], "head": fam, "within": {}, "max_repeats": max_n}
+                )
     return sk
 
 
@@ -397,3 +405,39 @@ def resolve(vocab: list[str], name: str) -> str:
     """A genome/scenario entity name to the vocabulary name it denotes (itself if none)."""
     hits = [v for v in vocab if v == name or v.endswith("." + name) or name.endswith("." + v)]
     return max(hits, key=len) if hits else name
+
+
+def repetitions(
+    occs: dict[int, Occurrence], occ_id: int, members: list[str], head: str
+) -> list[dict[str, Any]]:
+    """The observed repetitions of a repeated region inside one occurrence: the region's
+    member events split at each `head` event. Each repetition lists its own events, the
+    occurrences it contains (child calls and all their modeled descendants), and every
+    branch evaluation inside it (the enclosing call's own, and those of the contained
+    occurrences). Its identity is its ordinal."""
+    reps: list[dict[str, Any]] = []
+    for kind, fam, ref in occs[occ_id].events:
+        if fam not in members:
+            continue
+        if fam == head or not reps:
+            reps.append({"events": [], "occurrences": [], "branches": []})
+        rep = reps[-1]
+        rep["events"].append((kind, fam, ref))
+        if kind == "branch":
+            rep["branches"].append((fam[5:], ref))
+        else:
+            rep["occurrences"].append(ref)
+    children: dict[int, list[int]] = {}
+    for o in occs.values():
+        if o.parent is not None:
+            children.setdefault(o.parent, []).append(o.id)
+    for rep in reps:
+        stack = list(rep["occurrences"])
+        seen: list[int] = []
+        while stack:
+            o = stack.pop(0)
+            seen.append(o)
+            rep["branches"] += [(f[5:], v) for k, f, v in occs[o].events if k == "branch"]
+            stack.extend(children.get(o, []))
+        rep["occurrences"] = seen
+    return reps

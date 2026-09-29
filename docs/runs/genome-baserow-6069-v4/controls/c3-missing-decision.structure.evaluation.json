@@ -1,0 +1,1830 @@
+{
+ "structure": {
+  "statuses": {
+   "variables": {
+    "supported": 8
+   },
+   "decisions": {
+    "supported": 3,
+    "verified": 3
+   },
+   "transitions": {},
+   "procedures": {
+    "supported": 5
+   },
+   "rules": {
+    "supported": 4
+   },
+   "regimes": {
+    "supported": 2
+   }
+  },
+  "per_test": [
+   {
+    "execution": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+    "indeterminate": null,
+    "uncovered_sites": [],
+    "placement_problems": [],
+    "occurrence_checks": {
+     "confirmed": 29,
+     "contradicted": 0,
+     "unobservable": 9
+    },
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {
+     "LinkRowFieldType.get_import_dependency_when_referenced": {
+      "predicted": [
+       "returned"
+      ],
+      "observed": []
+     }
+    },
+    "match": false,
+    "test": "test_can_import_database_with_formula_dependencies",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "No dependency is a by-name reference to a link row field, so the expansion changes nothing and the ordering is the same at base and head."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 29
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+    "indeterminate": "no decision covers observed site(s) br:f960d9f63045",
+    "uncovered_sites": [
+     "br:f960d9f63045"
+    ],
+    "placement_problems": [],
+    "occurrence_checks": {
+     "confirmed": 0,
+     "contradicted": 0,
+     "unobservable": 0
+    },
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+    "withheld": true,
+    "match_on_genome_sites": true,
+    "unchecked_semantics_match": true,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "Duplication serializes and re-imports the same three tables through _import_table_fields, so the implicit field('LinkedChildren') case behaves exactly like the snapshot one: DataError at base, ordered correctly by rule_implied_link at head."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 34
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+    "indeterminate": "no decision covers observed site(s) br:f960d9f63045",
+    "uncovered_sites": [
+     "br:f960d9f63045"
+    ],
+    "placement_problems": [],
+    "occurrence_checks": {
+     "confirmed": 33,
+     "contradicted": 0,
+     "unobservable": 5
+    },
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_explicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": false,
+    "unchecked_semantics_match": false,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "returned",
+     "head": "returned",
+     "why": "The consumer names ChildId via lookup explicitly, so its dependency is already on the linked primary at base; the only expansion (ChildId -> Label via Detail) targets a plain text primary, so ordering is correct at both revisions."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "passed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "returned"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 33
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+    "indeterminate": "no decision covers observed site(s) br:f960d9f63045",
+    "uncovered_sites": [
+     "br:f960d9f63045"
+    ],
+    "placement_problems": [],
+    "occurrence_checks": {
+     "confirmed": 34,
+     "contradicted": 0,
+     "unobservable": 4
+    },
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency",
+    "withheld": false,
+    "match_on_genome_sites": true,
+    "unchecked_semantics_match": true,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "field('LinkedChildren') at base depends only on the link itself, so ActiveChildren shares a level with the deferred array primary ChildId and recalculates against a NULL column (DataError); at head rule_implied_link rewrites it to (ChildId, LinkedChildren) and orders it after ChildId."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 34
+   },
+   {
+    "execution": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "indeterminate": "no decision covers observed site(s) br:f960d9f63045",
+    "uncovered_sites": [
+     "br:f960d9f63045"
+    ],
+    "placement_problems": [],
+    "occurrence_checks": {
+     "confirmed": 0,
+     "contradicted": 0,
+     "unobservable": 0
+    },
+    "predicted_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "observed_branches": [
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:34ec71ee29c9",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      false
+     ],
+     [
+      "br:a0d4e306fb5a",
+      false
+     ],
+     [
+      "br:47a63ce03fc8",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      true
+     ],
+     [
+      "br:be7d3ee9e3b1",
+      true
+     ],
+     [
+      "br:47a63ce03fc8",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:3f16965dcd1f",
+      false
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ],
+     [
+      "br:09962e1ae1b2",
+      true
+     ]
+    ],
+    "branches_exact": false,
+    "state_checked": [],
+    "state_diff": {},
+    "outcome_diff": {},
+    "match": false,
+    "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+    "withheld": true,
+    "match_on_genome_sites": true,
+    "unchecked_semantics_match": true,
+    "unchecked_indeterminate": null,
+    "phenotype_claim": {
+     "base": "raised:django.db.utils.DataError",
+     "head": "returned",
+     "why": "At base AConsumer (field('ToB')) and BId (field('ToC')) are both level-1 deferred fields so the consumer can recalculate before B's array primary exists (DataError); at head rule_implied_link rewrites them to (BId, ToB) and (CLabel, ToC), chaining CLabel < BId < AConsumer."
+    },
+    "phenotype_observed": {
+     "head_test": "passed",
+     "base_test": "failed",
+     "head_exit": [
+      "returned"
+     ],
+     "base_exit": [
+      "raised:py:django.db.utils.DataError"
+     ]
+    },
+    "phenotype_exact": true,
+    "n_observed_at_sites": 31
+   }
+  ],
+  "regime_classes": [
+   [
+    "test_can_import_database_with_formula_dependencies"
+   ],
+   [
+    "test_duplicate_application_with_implicit_array_primary_dependency",
+    "test_snapshot_with_implicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_explicit_array_primary_dependency"
+   ],
+   [
+    "test_snapshot_with_implicit_array_primary_dependency_two_links_deep"
+   ]
+  ],
+  "sites_in_mechanics": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1"
+  ],
+  "sites_not_in_mechanics": [],
+  "required_sites": [
+   "br:09962e1ae1b2",
+   "br:34ec71ee29c9",
+   "br:3f16965dcd1f",
+   "br:47a63ce03fc8",
+   "br:a0d4e306fb5a",
+   "br:be7d3ee9e3b1",
+   "br:f960d9f63045"
+  ],
+  "required_sites_uncovered": [
+   "br:f960d9f63045"
+  ],
+  "structure_claims": [
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DeferredFieldImporter.run_deferred_field_imports during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 3 observed"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 26 observed"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 26 observed"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DeferredFieldImporter.add_deferred_field_import during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 7 observed"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "evaluates",
+    "claim": "d_refresh (br:09962e1ae1b2) evaluated during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 7 evaluations"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "evaluates",
+    "claim": "d_defer (br:47a63ce03fc8) evaluated during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 26 evaluations"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "evaluates",
+    "claim": "d_primary (br:34ec71ee29c9) evaluated during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all 8 evaluations"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "order",
+    "claim": "site:br:34ec71ee29c9 before DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies in DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all of x before all of y in 3 execution(s)"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "order",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies before DeferredFieldImporter.run_deferred_field_imports in DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all of x before all of y in 3 execution(s)"
+   },
+   {
+    "procedure": "p_import_table_fields",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "order",
+    "claim": "DeferredFieldImporter.run_deferred_field_imports before site:br:09962e1ae1b2 in DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "all of x before all of y in 3 execution(s)"
+   },
+   {
+    "procedure": "p_expand",
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "kind": "contains",
+    "claim": "LinkRowFieldType.get_import_dependency_when_referenced during DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "status": "verified",
+    "why": "all 3 observed"
+   },
+   {
+    "procedure": "p_expand",
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "kind": "evaluates",
+    "claim": "d_expand_empty (br:be7d3ee9e3b1) evaluated during DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "status": "verified",
+    "why": "all 26 evaluations"
+   },
+   {
+    "procedure": "p_link_implied",
+    "entity": "LinkRowFieldType.get_import_dependency_when_referenced",
+    "kind": "evaluates",
+    "claim": "d_link_outside (br:a0d4e306fb5a) evaluated during LinkRowFieldType.get_import_dependency_when_referenced",
+    "status": "verified",
+    "why": "all 3 evaluations"
+   },
+   {
+    "procedure": "p_import_field",
+    "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "kind": "evaluates",
+    "claim": "d_first_field (br:3f16965dcd1f) evaluated during DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "status": "verified",
+    "why": "all 26 evaluations"
+   },
+   {
+    "procedure": "p_run_deferred",
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "kind": "contains",
+    "claim": "DeferredFieldImporter.get_all_fields_dependencies during DeferredFieldImporter.run_deferred_field_imports",
+    "status": "verified",
+    "why": "all 3 observed"
+   },
+   {
+    "procedure": "p_run_deferred",
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized during DeferredFieldImporter.run_deferred_field_imports",
+    "status": "supported",
+    "why": "7 of 26 observed"
+   },
+   {
+    "procedure": "p_run_deferred",
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "kind": "order",
+    "claim": "DeferredFieldImporter.get_all_fields_dependencies before DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized in DeferredFieldImporter.run_deferred_field_imports",
+    "status": "verified",
+    "why": "all of x before all of y in 3 execution(s)"
+   },
+   {
+    "procedure": "r_primary_scan",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "region",
+    "claim": "region r_primary_scan: repetitions of DatabaseApplicationType._import_table_fields start with site:br:34ec71ee29c9",
+    "status": "verified",
+    "why": "observed repeated region ['site:br:34ec71ee29c9']"
+   },
+   {
+    "procedure": "r_field",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "region",
+    "claim": "region r_field: repetitions of DatabaseApplicationType._import_table_fields start with DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+    "status": "verified",
+    "why": "observed repeated region ['DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies', 'DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized', 'DeferredFieldImporter.add_deferred_field_import', 'site:br:47a63ce03fc8']"
+   },
+   {
+    "procedure": "r_field",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "order",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies before site:br:47a63ce03fc8 in one repetition of r_field",
+    "status": "verified",
+    "why": "26 repetition(s)"
+   },
+   {
+    "procedure": "r_field",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "observed during the enclosing entity"
+   },
+   {
+    "procedure": "r_field",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "observed during the enclosing entity"
+   },
+   {
+    "procedure": "r_field",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "contains",
+    "claim": "DeferredFieldImporter.add_deferred_field_import during DatabaseApplicationType._import_table_fields",
+    "status": "verified",
+    "why": "observed during the enclosing entity"
+   },
+   {
+    "procedure": "r_deferred_import",
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "kind": "region",
+    "claim": "region r_deferred_import: repetitions of DeferredFieldImporter.run_deferred_field_imports start with DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+    "status": "verified",
+    "why": "observed repeated region ['DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized']"
+   },
+   {
+    "procedure": "r_deferred_import",
+    "entity": "DeferredFieldImporter.run_deferred_field_imports",
+    "kind": "contains",
+    "claim": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized during DeferredFieldImporter.run_deferred_field_imports",
+    "status": "verified",
+    "why": "observed during the enclosing entity"
+   },
+   {
+    "procedure": "r_refresh",
+    "entity": "DatabaseApplicationType._import_table_fields",
+    "kind": "region",
+    "claim": "region r_refresh: repetitions of DatabaseApplicationType._import_table_fields start with site:br:09962e1ae1b2",
+    "status": "verified",
+    "why": "observed repeated region ['site:br:09962e1ae1b2']"
+   }
+  ],
+  "summary": {
+   "exact_all": "0/5",
+   "exact_withheld": "0/2",
+   "exact_on_genome_chosen_sites": "3/5",
+   "structure_claims": {
+    "verified": 25,
+    "supported": 1,
+    "rejected": 0,
+    "not established": 0,
+    "unobserved": 0
+   },
+   "placement_indeterminate": 0,
+   "occurrence_facts": {
+    "confirmed": 96,
+    "contradicted": 0,
+    "unobservable": 18
+   },
+   "required_sites_uncovered": [
+    "br:f960d9f63045"
+   ],
+   "indeterminate": 4,
+   "confidently_wrong": 1,
+   "unchecked_semantics_exact": "3/5",
+   "phenotype_claims_exact": "5/5",
+   "decisions_verified": "3/6",
+   "transitions_verified": "0/0",
+   "rejected": [],
+   "hypothesis": [],
+   "sites_not_in_mechanics": []
+  }
+ }
+}

@@ -39,7 +39,14 @@ from diffgenome.genome import (
     eval_predicate,
 )
 from diffgenome.model import CallNode, Execution
-from diffgenome.structure import Skeleton, build_skeleton, placement_problems, resolve
+from diffgenome.structure import (
+    Skeleton,
+    build_skeleton,
+    occurrences,
+    placement_problems,
+    repetitions,
+    resolve,
+)
 
 RANK = {REJECTED: -1, HYPOTHESIS: 0, SUPPORTED: 1, VERIFIED: 2, STATIC: 2, OBSERVED: 3}
 
@@ -658,22 +665,31 @@ def agreement_from_facts(
 def genome_vocabulary(g: Genome) -> list[str]:
     """Every entity a genome names: procedures, decisions, transitions and called entities."""
     names = {p.entity for p in g.procedures} | {d.entity for d in g.decisions}
-    names |= {t.entity for t in g.transitions}
-    step_lists = [p.steps for p in g.procedures] + [
-        [*b.steps, *(f"call:{c}" for c in b.calls)]
-        for d in g.decisions
-        for b in (d.true_branch, d.false_branch)
-    ]
+    names |= {t.entity for t in g.transitions} | {r.entity for r in g.regions}
+    names |= {r.head for r in g.regions if r.head and not r.head.startswith("site:")}
+    step_lists = (
+        [p.steps for p in g.procedures]
+        + [r.steps for r in g.regions]
+        + [
+            [*b.steps, *(f"call:{c}" for c in b.calls)]
+            for d in g.decisions
+            for b in (d.true_branch, d.false_branch)
+        ]
+    )
     for steps in step_lists:
         names |= {st[5:] for st in steps if st.startswith("call:")}
     return sorted(n for n in names if n)
 
 
 def _reached(
-    steps: list[str], decisions: dict[str, Decision], vocab: list[str]
+    steps: list[str],
+    decisions: dict[str, Decision],
+    vocab: list[str],
+    regions: dict[str, Any] | None = None,
 ) -> tuple[list[str], list[tuple[str, str]]]:
-    """Calls and decision sites reached in a procedure's own body (its steps and its
-    decisions' branches), without entering other entities' procedures."""
+    """Calls and decision sites reached in a procedure's own body (its steps, its
+    decisions' branches and the bodies of regions it places), without entering other
+    entities' procedures."""
     calls: list[str] = []
     dsites: list[tuple[str, str]] = []
     seen: set[str] = set()
@@ -690,6 +706,9 @@ def _reached(
                     dsites.append((d.id, d.site))
                 for br in (d.true_branch, d.false_branch):
                     stack.append(br.steps or [f"call:{c}" for c in br.calls])
+            elif kind == "R" and regions and ref in regions and f"R:{ref}" not in seen:
+                seen.add(f"R:{ref}")
+                stack.append(list(regions[ref].steps))
     return calls, dsites
 
 
@@ -714,6 +733,7 @@ def procedure_structure_claims(g: Genome, sk: Skeleton) -> list[dict[str, Any]]:
     Recursion (a function running during itself) is outside these rules."""
     vocab = sorted(set(genome_vocabulary(g)) | set(sk.seen))
     decisions = {d.id: d for d in g.decisions}
+    region_items = {r.id: r for r in g.regions}
     claims: list[dict[str, Any]] = []
 
     def claim(p: Any, kind: str, what: str, status: str, why: str) -> None:
@@ -724,7 +744,7 @@ def procedure_structure_claims(g: Genome, sk: Skeleton) -> list[dict[str, Any]]:
 
     for p in g.procedures:
         a = resolve(vocab, p.entity)
-        calls, dsites = _reached(p.steps, decisions, vocab)
+        calls, dsites = _reached(p.steps, decisions, vocab, region_items)
         for b in dict.fromkeys(calls):
             n = sk.seen.get(b, 0)
             inside = sk.inside_occ.get(b, {}).get(a, 0)
@@ -767,6 +787,9 @@ def procedure_structure_claims(g: Genome, sk: Skeleton) -> list[dict[str, Any]]:
                 fams.append(resolve(vocab, ref))
             elif kind == "D" and ref in decisions and decisions[ref].site:
                 fams.append(f"site:{decisions[ref].site}")
+            elif kind == "R" and ref in region_items:
+                # a region is placed by its head
+                fams.append(_region_head(region_items[ref], vocab))
         for x, y in itertools.pairwise(fams):
             if x == y:
                 continue
@@ -786,7 +809,91 @@ def procedure_structure_claims(g: Genome, sk: Skeleton) -> list[dict[str, Any]]:
                 claim(p, "order", what, REJECTED, "inside one repetition, observed reversed")
             else:
                 claim(p, "order", what, SUPPORTED, "not established by observation")
+    claims += _region_claims(g, sk, vocab, decisions)
     return claims
+
+
+def _region_head(r: Any, vocab: list[str]) -> str:
+    return r.head if r.head.startswith("site:") else resolve(vocab, r.head)
+
+
+def _region_claims(
+    g: Genome, sk: Skeleton, vocab: list[str], decisions: dict[str, Decision]
+) -> list[dict[str, Any]]:
+    """A region claims (kind `region`) that its head starts every repetition of an observed
+    repeated region of its enclosing entity; its body's consecutive steps are order claims
+    inside ONE repetition; its calls and decisions run during the enclosing entity."""
+    out: list[dict[str, Any]] = []
+
+    def claim(r: Any, kind: str, what: str, status: str, why: str) -> None:
+        out.append(
+            {"procedure": r.id, "entity": r.entity, "kind": kind, "claim": what,
+             "status": status, "why": why}
+        )  # fmt: skip
+
+    for r in g.regions:
+        a = resolve(vocab, r.entity)
+        head = _region_head(r, vocab)
+        observed = [x for x in sk.regions.get(a, []) if x["head"] == head]
+        what = f"region {r.id}: repetitions of {a} start with {head}"
+        if observed:
+            n_ex = sk.ancestry.get(head, {}).get(a, 0) if not head.startswith("site:") else 2
+            claim(r, "region", what, VERIFIED if n_ex >= 2 else SUPPORTED,
+                  f"observed repeated region {observed[0]['members']}")  # fmt: skip
+        elif head in sk.families.get(a, {}) and sk.families[a][head][1] <= 1:
+            claim(r, "region", what, REJECTED, f"{head} is observed in {a} but never repeated")
+        else:
+            claim(
+                r,
+                "region",
+                what,
+                "unobserved",
+                f"no observed repeated region of {a} with that head",
+            )
+        within = observed[0]["within"] if observed else {}
+        fams: list[str] = []
+        for st in r.steps:
+            kind, _, ref = st.partition(":")
+            if kind == "call":
+                fams.append(resolve(vocab, ref))
+            elif kind == "D" and ref in decisions and decisions[ref].site:
+                fams.append(f"site:{decisions[ref].site}")
+        for x, y in itertools.pairwise(fams):
+            if x == y:
+                continue
+            w = f"{x} before {y} in one repetition of {r.id}"
+            if (x, y) in within:
+                claim(r, "order", w, VERIFIED if within[(x, y)] >= 2 else SUPPORTED,
+                      f"{within[(x, y)]} repetition(s)")  # fmt: skip
+            elif (y, x) in within:
+                claim(r, "order", w, REJECTED, "inside one repetition, observed reversed")
+            else:
+                claim(r, "order", w, SUPPORTED, "not established by observation")
+        calls, dsites = _reached(r.steps, decisions, vocab)
+        for b in dict.fromkeys(calls):
+            if sk.seen.get(b, 0) and b != a and sk.always_during(a, b):
+                claim(r, "contains", f"{b} during {a}", REJECTED,
+                      f"inverted: every observed {a} ran during {b}")  # fmt: skip
+            elif sk.inside_occ.get(b, {}).get(a, 0):
+                claim(
+                    r,
+                    "contains",
+                    f"{b} during {a}",
+                    VERIFIED,
+                    "observed during the enclosing entity",
+                )
+        for did, site in dsites:
+            during = sk.site_during.get(site) or {}
+            owners = [o for o in sk.site_owner.get(site, {}) if o != a]
+            if (
+                during
+                and a not in during
+                and owners
+                and all(sk.always_during(a, o) for o in owners)
+            ):
+                claim(r, "evaluates", f"{did} ({site}) evaluated during {a}", REJECTED,
+                      "inverted: the deciding function encloses the region's entity")  # fmt: skip
+    return out
 
 
 # evidence kinds that report what executed: a failure is an observed contradiction
@@ -799,13 +906,14 @@ def establish_state(
     agreement: dict[str, list[tuple[str, bool]]] | None = None,
     agreement_seq: dict[str, list[tuple[str, bool]]] | None = None,
     out_of_scope: set[str] | None = None,
+    scenarios: dict[str, dict[str, Any]] | None = None,
 ) -> Genome:
     """Statuses over the stronger substrate. Same principle as `establish`: only evidence
     decides; decisions are verified through their site's observed outcomes and static
     control facts, transitions through observed state deltas."""
     items: list[Item] = [
         *g.variables, *g.data_dependencies, *g.decisions, *g.effects, *g.transitions,
-        *g.procedures, *g.rules, *g.regimes,
+        *g.procedures, *g.regions, *g.rules, *g.regimes,
     ]  # fmt: skip
     for it in items:
         for ref in it.evidence:
@@ -925,12 +1033,43 @@ def establish_state(
         else:
             missing = "true" if not seen[True] else "false"
             d.status_reason += f"; not verified: outcome {missing} never observed at {site}"
+    # occurrence agreement (regions only): at each shown occurrence where a decision's site
+    # was evaluated, its predicate on that occurrence's supplied facts must give the observed
+    # outcome. A disagreement cannot be attributed to the predicate or to the supplied fact,
+    # so the decision is CONTESTED: demoted to hypothesis (predictions that need it stop),
+    # never rejected. Agreement everywhere counts as support for verification.
+    if scenarios and g.regions:
+        sk_occ = build_skeleton(
+            [ob.execution for ob in sub.obs.by_test.values()], genome_vocabulary(g)
+        )
+        per: dict[str, list[tuple[str, int, bool]]] = {}
+        for test, sc in scenarios.items():
+            ob = sub.obs.get(test)
+            if ob is None:
+                continue
+            for did, found in occurrence_agreement(g, sc, ob, sk_occ).items():
+                per.setdefault(did, []).extend((test, i, same) for i, same in found)
+        for d in g.decisions:
+            rows = per.get(d.id, [])
+            bad = [r for r in rows if not r[2]]
+            if bad and d.status in (SUPPORTED, VERIFIED):
+                d.status = HYPOTHESIS
+                d.status_reason = (
+                    "contested: predicate disagrees with the observed outcome at "
+                    + ("; ".join(f"{t.split('::')[-1]}[{i}]" for t, i, _ in bad[:3]))
+                    + " given the supplied occurrence facts"
+                )
+            elif rows and d.status == SUPPORTED:
+                d.status_reason += (
+                    f"; agrees with the observed outcome at {len(rows)} occurrence evaluation(s)"
+                )
     # transitions: observed deltas at the entity's calls, through variable bindings. When
     # a procedure places the transition (T:id), it is checked where the genome says it
     # happens: the entity's procedure is run from the call's observed entry state, and the
     # transition is compared only if that run reaches it.
     kinds = {v.name: (v.observed_as or {}).get("kind", "is_set") for v in g.variables}
-    placed = {st[2:] for p in g.procedures for st in p.steps if st.startswith("T:")}
+    step_lists = [p.steps for p in g.procedures] + [r.steps for r in g.regions]
+    placed = {st[2:] for steps in step_lists for st in steps if st.startswith("T:")}
     placed |= {
         st[2:]
         for d in g.decisions
@@ -1037,11 +1176,12 @@ def establish_state(
     # execution structure: where a procedure places calls and decisions, and their order,
     # judged against the skeleton of the observed executions
     sk = build_skeleton([ob.execution for ob in sub.obs.by_test.values()], genome_vocabulary(g))
+    owners_by_id: dict[str, Item] = {q.id: q for q in (*g.procedures, *g.regions)}
     for c in procedure_structure_claims(g, sk):
-        p = next(q for q in g.procedures if q.id == c["procedure"])
-        if c["status"] == REJECTED and p.status != REJECTED:
-            p.status = REJECTED
-            p.status_reason = f"structure contradicted: {c['claim']}: {c['why']}"
+        owner = owners_by_id[c["procedure"]]
+        if c["status"] == REJECTED and owner.status != REJECTED:
+            owner.status = REJECTED
+            owner.status_reason = f"structure contradicted: {c['claim']}: {c['why']}"
     return g
 
 
@@ -1096,6 +1236,10 @@ def predict_sequence(
     decisions = {d.id: d for d in g.decisions}
     transitions = {t.id: t for t in g.transitions}
     procedures = {p.entity: p for p in g.procedures}
+    regions = {r.id: r for r in g.regions}
+    # occurrence facts are local to one occurrence; state-bound variables persist
+    state_vars = {v.name for v in g.variables if (v.observed_as or {}).get("fact")}
+    ctx: list[dict[str, Any]] = []  # the scenario item whose occurrences a region reads
     pred = SeqPrediction(state=dict(scenario.get("state") or {}))
 
     def usable(it: Item) -> bool:
@@ -1144,6 +1288,31 @@ def predict_sequence(
                             return True
                         env[var] = val
                         pred.events.append(("set", var, val, ref))
+            elif kind == "R":
+                r = regions.get(ref)
+                if r is None or not usable(r):
+                    pred.indeterminate = f"region {ref} is {'missing' if r is None else r.status}"
+                    return True
+                items = (ctx[-1].get("occurrences") or {}).get(ref) if ctx else None
+                if items is None:
+                    pred.indeterminate = f"occurrence facts not supplied for region {ref}"
+                    return True
+                for k, item in enumerate(items):
+                    before = dict(env)
+                    env.update(item.get("facts") or {})
+                    pred.events.append(("occurrence", ref, k))
+                    ctx.append(item)
+                    stopped = run_steps(r.steps, env, depth, occ)
+                    ctx.pop()
+                    for var in list(env):
+                        if var in state_vars:
+                            continue
+                        if var in before:
+                            env[var] = before[var]
+                        else:
+                            del env[var]
+                    if stopped:  # `stops` ends the enclosing entity; there is no `continue`
+                        return True
             elif kind == "D":
                 d = decisions.get(ref)
                 if d is None or not usable(d):
@@ -1188,6 +1357,7 @@ def predict_sequence(
         pred.events.append(("call", e))
         key = entity_key(e)
         top = new_occurrence(key or e, None)
+        ctx[:] = [call]
         if key is None:
             # an entity the genome says nothing about is a call with no modeled behavior;
             # one the genome has decisions for but no procedure cannot be predicted
@@ -1295,6 +1465,8 @@ def replay_observed(
                     return stopped, prob
                 if stopped or b.stops:
                     return True, None
+            elif kind == "R":
+                return False, f"region {ref}: repetitions are not replayed"
             elif kind == "T":
                 t = transitions.get(ref)
                 if t is None:
@@ -1320,6 +1492,189 @@ def replay_observed(
     return events, stopped, problem
 
 
+def _occurrence_values(
+    g: Genome,
+    body: list[str],
+    rep: dict[str, Any],
+    occs: dict[int, Any],
+    ob: ExecObs,
+    vocab: list[str],
+) -> dict[str, Any]:
+    """What one observed repetition shows about the genome's variables: boundary facts of
+    the calls inside it (boundary-bound variables), and the variables that atomic decisions
+    reached from the region body (`v` / `!v`) bind from their outcomes in it."""
+    out: dict[str, Any] = {}
+    nodes = ob.execution.nodes
+    inside = [occs[i] for i in rep["occurrences"]]
+    for v in g.variables:
+        b = v.observed_as or {}
+        at = b.get("at")
+        if not isinstance(at, dict):
+            continue
+        target = resolve(vocab, str(at.get("entity", "")))
+        vals = {
+            boundary_fact(nodes[o.id], str(at.get("point", "")), str(b.get("kind", "is_set")))
+            for o in inside
+            if o.entity == target
+        } - {None}
+        if len(vals) == 1:
+            out[v.name] = vals.pop()
+    procedures = {p.entity: p for p in g.procedures}
+    decisions = {d.id: d for d in g.decisions}
+    first: dict[str, bool] = {}
+    for site, outcome in rep["branches"]:
+        first.setdefault(site, outcome)
+    seen: set[str] = set()
+    stack = [list(body)]
+    while stack:
+        for st in stack.pop():
+            kind, _, ref = st.partition(":")
+            if kind == "call":
+                keys = [k for k in procedures if k == ref or k.endswith("." + ref)]
+                keys += [k for k in procedures if ref.endswith("." + k)]
+                key = keys[0] if keys else None
+                if key is not None and key not in seen:
+                    seen.add(key)
+                    stack.append(list(procedures[key].steps))
+            elif kind == "D" and ref in decisions and ref not in seen:
+                seen.add(ref)
+                d = decisions[ref]
+                m = re.fullmatch(r"\s*(!?)\s*([\w.]+)\s*", d.predicate)
+                if d.site in first and m and m.group(2) not in ("true", "false"):
+                    out.setdefault(m.group(2), (not first[d.site]) if m.group(1) else first[d.site])
+                for br in (d.true_branch, d.false_branch):
+                    stack.append(br.steps or [f"call:{c}" for c in br.calls])
+    return out
+
+
+def check_scenario_occurrences(
+    g: Genome, scenario: dict[str, Any], ob: ExecObs, sk: Skeleton
+) -> list[dict[str, Any]]:
+    """Align a scenario's supplied region occurrences with the observed repetitions (the
+    k-th supplied occurrence with the k-th observed repetition of that region, inside the
+    matching observed call) and check each supplied fact. Statuses: confirmed, contradicted,
+    unobservable. A supplied count that differs from the observed count is contradicted."""
+    vocab = sorted(set(genome_vocabulary(g)) | set(sk.seen))
+    occs = occurrences(ob.execution, vocab)
+    regions = {r.id: r for r in g.regions}
+    out: list[dict[str, Any]] = []
+    seen_calls: dict[str, int] = {}
+    for call in scenario.get("calls") or []:
+        e = resolve(vocab, call["entity"])
+        k = seen_calls.get(e, 0)
+        seen_calls[e] = k + 1
+        supplied = call.get("occurrences") or {}
+        if not supplied:
+            continue
+        cands = sorted((o for o in occs.values() if o.entity == e), key=lambda o: o.id)
+        if k >= len(cands):
+            out.append(
+                {"call": e, "status": "contradicted", "why": f"no observed call #{k} of {e}"}
+            )
+            continue
+        for rid, items in supplied.items():
+            r = regions.get(rid)
+            if r is None:
+                continue
+            head = _region_head(r, vocab)
+            observed = [
+                x for x in sk.regions.get(resolve(vocab, r.entity), []) if x["head"] == head
+            ]
+            if not observed:
+                out.append({"region": rid, "status": "unobservable", "why": "no observed region"})
+                continue
+            # the region lives in its own entity: the scenario call's occurrence itself, or
+            # the one occurrence of that entity running during it
+            r_entity = resolve(vocab, r.entity)
+            call_occ = cands[k]
+            homes = [
+                o
+                for o in occs.values()
+                if o.entity == r_entity
+                and (o.id == call_occ.id or call_occ.entity in o.ancestors)
+                and call_occ.first <= o.id <= call_occ.last
+            ]
+            if len(homes) != 1:
+                out.append(
+                    {"region": rid, "status": "unobservable",
+                     "why": f"{len(homes)} occurrence(s) of {r_entity} in this call"}
+                )  # fmt: skip
+                continue
+            reps = repetitions(occs, homes[0].id, observed[0]["members"], head)
+            if len(reps) != len(items):
+                out.append(
+                    {"region": rid, "status": "contradicted",
+                     "why": f"{len(items)} occurrence(s) supplied, {len(reps)} observed"}
+                )  # fmt: skip
+            for i, (item, rep) in enumerate(zip(items, reps, strict=False)):
+                seen_vals = _occurrence_values(g, r.steps, rep, occs, ob, vocab)
+                for var, val in (item.get("facts") or {}).items():
+                    if var not in seen_vals:
+                        status = "unobservable"
+                    elif seen_vals[var] == val:
+                        status = "confirmed"
+                    else:
+                        status = "contradicted"
+                    out.append(
+                        {"region": rid, "occurrence": i, "fact": var, "supplied": val,
+                         "observed": seen_vals.get(var), "status": status}
+                    )  # fmt: skip
+    return out
+
+
+def occurrence_agreement(
+    g: Genome, scenario: dict[str, Any], ob: ExecObs, sk: Skeleton
+) -> dict[str, list[tuple[int, bool]]]:
+    """Per decision: at every evaluation of its site inside an aligned occurrence of a
+    region, (occurrence ordinal, whether its predicate on that occurrence's supplied facts,
+    plus the scenario call's facts, gives the observed outcome). Only meaningful where the
+    checker can see the execution (shown tests)."""
+    vocab = sorted(set(genome_vocabulary(g)) | set(sk.seen))
+    occs = occurrences(ob.execution, vocab)
+    regions = {r.id: r for r in g.regions}
+    decisions = [d for d in g.decisions if d.site]
+    out: dict[str, list[tuple[int, bool]]] = {}
+    seen_calls: dict[str, int] = {}
+    for call in scenario.get("calls") or []:
+        e = resolve(vocab, call["entity"])
+        k = seen_calls.get(e, 0)
+        seen_calls[e] = k + 1
+        cands = sorted((o for o in occs.values() if o.entity == e), key=lambda o: o.id)
+        if k >= len(cands):
+            continue
+        call_occ = cands[k]
+        for rid, items in (call.get("occurrences") or {}).items():
+            r = regions.get(rid)
+            if r is None:
+                continue
+            head = _region_head(r, vocab)
+            observed = [
+                x for x in sk.regions.get(resolve(vocab, r.entity), []) if x["head"] == head
+            ]
+            homes = [
+                o for o in occs.values()
+                if o.entity == resolve(vocab, r.entity)
+                and (o.id == call_occ.id or call_occ.entity in o.ancestors)
+                and call_occ.first <= o.id <= call_occ.last
+            ]  # fmt: skip
+            if not observed or len(homes) != 1:
+                continue
+            reps = repetitions(occs, homes[0].id, observed[0]["members"], head)
+            if len(reps) != len(items):
+                continue
+            for i, (item, rp) in enumerate(zip(items, reps, strict=True)):
+                env = derive(g, {**(call.get("facts") or {}), **(item.get("facts") or {})})
+                for d in decisions:
+                    outcomes = [v for site, v in rp["branches"] if site == d.site]
+                    if not outcomes:
+                        continue
+                    val = eval_predicate(d.predicate, env)
+                    if val is None:
+                        continue
+                    out.setdefault(d.id, []).extend((i, val == o) for o in outcomes)
+    return out
+
+
 def change_sites(mech: Mechanics, obs: Observations, symbols: list[str]) -> set[str]:
     """Every decision site of the given functions and of functions nested in them: their
     static sites, plus sites observed at runtime inside calls of them. A genome is scored
@@ -1343,6 +1698,7 @@ def compare_sequence(
     sites: set[str],
     required_sites: set[str] | None = None,
     skeleton: Skeleton | None = None,
+    scenario: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Predicted branch events vs the observed branch vector over the genome's sites (exact,
     in order), and the predicted final state vs the last observed exit state of each bound
@@ -1390,16 +1746,36 @@ def compare_sequence(
         vocab = sorted(skeleton.seen)
         tree = [{**o, "entity": resolve(vocab, o["entity"])} for o in pred.occurrences]
         placement = placement_problems(tree, skeleton)
+    # supplied occurrence facts, where the checker can see the execution: a scenario that is
+    # wrong about its own input cannot support a prediction
+    occ_checks: list[dict[str, Any]] = []
+    if skeleton is not None and scenario is not None and g.regions:
+        occ_checks = check_scenario_occurrences(g, scenario, ob, skeleton)
+    contradicted = [c for c in occ_checks if c["status"] == "contradicted"]
     indeterminate = (
         pred.indeterminate
         or (f"no decision covers observed site(s) {', '.join(uncovered)}" if uncovered else None)
         or (f"placement: {'; '.join(placement[:3])}" if placement else None)
+        or (
+            "occurrence facts contradicted: "
+            + "; ".join(
+                f"{c.get('region')}[{c.get('occurrence', '?')}] {c.get('fact', '')} "
+                f"{c.get('why', '')}".strip()
+                for c in contradicted[:3]
+            )
+            if contradicted
+            else None
+        )
     )
     return {
         "execution": ob.execution.stimulus_ref,
         "indeterminate": indeterminate,
         "uncovered_sites": uncovered,
         "placement_problems": placement,
+        "occurrence_checks": {
+            st: sum(1 for c in occ_checks if c["status"] == st)
+            for st in ("confirmed", "contradicted", "unobservable")
+        },
         "predicted_branches": predicted_vec,
         "observed_branches": observed_vec,
         "branches_exact": indeterminate is None and predicted_vec == observed_vec,

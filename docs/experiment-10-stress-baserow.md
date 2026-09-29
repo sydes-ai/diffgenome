@@ -470,6 +470,115 @@ occurrences, not a relation, and it has no `respecting` order. It is not built i
   deferral. It would not let it predict the order the importer runs them in, or the failure
   that order causes.
 
+## Step 2c: per-occurrence fact binding (Baserow v4)
+
+This step builds the smallest concept Step 2b exposed: `docs/design-occurrence-binding.md`.
+- **Mechanics** supply a repeated region's place, members, head and order inside one
+  repetition.
+- **The scenario** supplies each concrete occurrence's facts, in order.
+- **The genome** supplies one body per region, placed by `"R:<region>"`.
+
+The genome never claims a count. Occurrence facts are local to their occurrence. For shown
+tests, the checker aligns supplied occurrences with observed repetitions and checks the facts
+it can see. Where they are contradicted, the prediction is indeterminate. There are no loop
+variables, collections, relations or derived order.
+
+The checker gained three things while this was built:
+- **One-member regions.** A single repeating family counts as a region, such as the
+  primary-field scan once per table.
+- **Home occurrence.** A region's repetitions are taken from its own entity's occurrence
+  inside the scenario call. Before this fix, checks aligned a region in
+  `run_deferred_field_imports` with `_import_table_fields`.
+- **Contested decisions**, described below.
+
+Occurrence checks run on shown tests only. At first they also ran on held-out tests, which is
+leakage; every fact there was confirmed, so no result changed.
+
+**Case A v4.** The bundle is 1,803 lines, digest `42e94518e62ff39b`. It uses the same change,
+shown tests, holdout, structure and schema as v3, plus regions. A fresh Opus proposer read only
+the bundle. It proposed 4 regions:
+- per-field work (head: the expansion);
+- the primary scan (head: its site);
+- the refresh pass;
+- the deferred imports inside the deferred run.
+
+It also proposed 7 decisions, 5 procedures, 0 transitions, and occurrence facts for all 5 tests.
+For the withheld tests it rebuilt each table's fields in id order from the test source,
+including the reverse link fields.
+
+| | v3 | **v4** |
+|---|---|---|
+| held-out exact | 0 / 2 | **2 / 2** |
+| all scenarios exact | 0 / 5 | 3 / 5 |
+| confidently wrong | 0 | **2**: both shown tests, explained below |
+| indeterminate | 5 | 0 |
+| verified decisions | 1 / 7 | 3 / 7: empty dependencies, defer vs import now, first field of a table |
+| verified transitions | 2 / 2 | 0 / 0 (none proposed; see "Semantics moved into inputs") |
+| **verified occurrence-bound facts** (shown tests) | — | **99 confirmed, 0 contradicted**, 15 unobservable |
+| structure claims: verified / supported / rejected | 5 / 0 / 0 | **26 / 1 / 0** |
+
+**Local / procedural prediction.** This is per field occurrence of the per-field region: is
+the dependency set empty, does the hook run, is the field deferred or imported now.
+
+| | exact occurrences |
+|---|---|
+| all tests | **39 / 43** |
+| withheld tests | **17 / 17** (two links deep 8/8, duplication 9/9) |
+| misses | 4, all in shown tests (explicit 1, formula dependencies 3) |
+
+The same misses cause the two wrong shown-test predictions. The proposer modeled "the link-row
+hook is called whenever the dependency set is non-empty". The real rule is a type dispatch per
+dependency: a same-table reference by name to a link-row field calls the link-row hook; other
+references call the default or nothing. The proposer flagged this in `unknowns`. The checker saw
+it: both link-row decisions are "not verified: replayed outcome sequence differs". But supported
+items are usable for prediction.
+- **Current policy:** held-out 2/2 exact, 2 in-sample wrong.
+- **Stricter policy,** barring decisions whose shown-test replay disagrees: 0 wrong, 0 exact,
+  all 5 indeterminate.
+
+This policy is an open checker decision and was not changed. The rule itself is expressible
+with the existing concepts: a per-occurrence fact "references a link-row field by name" and a
+siteless decision. It needs neither item identity nor a loop over the dependency set.
+
+**Full phenotype.** The genome does not derive "base raises DataError, head returns". It
+predicts `_import_table_fields` returning at both revisions. The DataError appears only in the
+model's phenotype claims: 5/5 exact on exits, including the 2 withheld tests. It is not derived.
+Deriving it needs relations and derived order (below).
+
+**Semantics moved into inputs.** v2 and v3 derived "the reference implies a dependency" through
+a transition the checker verified at the boundary. v4 supplies "the expansion rewrote the
+dependency set" as a per-occurrence *input* fact. The fact is observed and confirmed in every
+shown occurrence, but the genome no longer derives it. Occurrence binding makes it easy to move
+meaning into scenario inputs. The checker can confirm such facts. It cannot tell that they
+should have been consequences. This is a proposer and schema risk to watch.
+
+**Controls (v4, structure mode):**
+
+| control | wrong | result |
+|---|---|---|
+| c1 inverted link-row guard | **0** | **contested**: its predicate on the supplied facts disagrees with the observed outcome at the occurrences, so it is demoted and all 5 predictions are indeterminate |
+| c2 pre-change semantics in the genome (the expansion never rewrites) | **0** | **REJECTED** at the expansion boundary; all 5 indeterminate |
+| c2i pre-change semantics in the input (every rewrite fact false) | 1 (inherited, formula dependencies) | 3 facts contradicted, so shown tests are indeterminate; held-out still exact, because no decision reads that fact |
+| c3 missing decision | 1 (inherited) | the site is uncovered where the hook runs |
+| c4 fabricated site | **0** | hypothesis; all indeterminate |
+| **c5 occurrence permutation (shown)** | **0** | **caught**: 7 contradicted facts; 3 decisions contested (empty dependencies, defer, first field); all 5 indeterminate. Binding is not an unordered bag |
+| c5h the same permutation in the withheld scenarios | 2 withheld, plus 2 inherited | **not catchable**: a wrong claim about an unseen input gives a wrong prediction. No checker can see a withheld execution; the same holds for any scenario fact since Experiment 09 |
+
+"Inherited" means the main genome's two shown-test errors, which every control still using
+those decisions carries.
+
+**Regression.**
+- Experiment 09: 0 differences (13/13, withheld 4/4, stateless 3/13, controls unchanged).
+- Experiment 08: identical.
+- Baserow v2 and v3, main and controls in structure mode: identical.
+- Tests: 93 pass. The new ones are in `tests/test_occurrence_binding.py`.
+
+**Which outcome this is: Outcome A** for repetition. Occurrence structure plus per-occurrence
+binding predicts the per-field procedure: 17/17 withheld occurrences and 2/2 withheld tests
+exact. A general iteration primitive is not justified by this case. The remaining per-field
+errors are one rule the proposer simplified, which the representation can express. No item
+identity or collection is required.
+
 ## Artifacts
 
 `docs/runs/genome-baserow-6069/`:

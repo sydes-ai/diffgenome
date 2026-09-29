@@ -318,6 +318,18 @@ class Procedure(Item):
 
 
 @dataclass
+class Region(Item):
+    """A repeated region inside one entity (docs/design-occurrence-binding.md). Mechanics
+    supply where it lives and what belongs to it (`head`: the observed family that starts
+    each repetition); the scenario supplies each concrete occurrence's facts; `steps` is the
+    one body every occurrence runs. A procedure places it with the step "R:<id>"."""
+
+    entity: str = ""
+    head: str = ""
+    steps: list[str] = field(default_factory=list)
+
+
+@dataclass
 class Rule(Item):
     name: str = ""
     inputs: list[str] = field(default_factory=list)
@@ -346,6 +358,7 @@ class Genome:
     effects: list[Effect] = field(default_factory=list)
     transitions: list[Transition] = field(default_factory=list)
     procedures: list[Procedure] = field(default_factory=list)
+    regions: list[Region] = field(default_factory=list)
     rules: list[Rule] = field(default_factory=list)
     regimes: list[Regime] = field(default_factory=list)
     unknowns: list[dict[str, Any]] = field(default_factory=list)
@@ -412,6 +425,8 @@ def genome_from_proposals(proposals: dict[str, Any], subject: dict[str, Any], mo
         g.transitions.append(Transition(**_item_kwargs(d, Transition, by)))
     for d in proposals.get("procedures") or []:
         g.procedures.append(Procedure(**_item_kwargs(d, Procedure, by)))
+    for d in proposals.get("regions") or []:
+        g.regions.append(Region(**_item_kwargs(d, Region, by)))
     for d in proposals.get("rules") or []:
         g.rules.append(Rule(**_item_kwargs(d, Rule, by)))
     for d in proposals.get("regimes") or []:

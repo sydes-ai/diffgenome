@@ -1,0 +1,42 @@
+[
+ {
+  "test": "test_can_import_database_with_formula_dependencies",
+  "withheld": false,
+  "predicted": 8,
+  "observed": 8,
+  "exact_occurrences": 5,
+  "indeterminate": null
+ },
+ {
+  "test": "test_duplicate_application_with_implicit_array_primary_dependency",
+  "withheld": true,
+  "predicted": 9,
+  "observed": 9,
+  "exact_occurrences": 9,
+  "indeterminate": null
+ },
+ {
+  "test": "test_snapshot_with_explicit_array_primary_dependency",
+  "withheld": false,
+  "predicted": 9,
+  "observed": 9,
+  "exact_occurrences": 8,
+  "indeterminate": null
+ },
+ {
+  "test": "test_snapshot_with_implicit_array_primary_dependency",
+  "withheld": false,
+  "predicted": 9,
+  "observed": 9,
+  "exact_occurrences": 9,
+  "indeterminate": null
+ },
+ {
+  "test": "test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+  "withheld": true,
+  "predicted": 8,
+  "observed": 8,
+  "exact_occurrences": 8,
+  "indeterminate": null
+ }
+]
