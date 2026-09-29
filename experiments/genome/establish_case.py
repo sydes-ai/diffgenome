@@ -75,7 +75,14 @@ def main() -> int:
             for f in sorted((run / "traces-existing").glob("*.json"))
         )
     }
-    tests = {k.split("/", 1)[1]: v for k, v in runs.items() if k.startswith(prefix)}
+    # one prefix: tests named by subtest; several (comma-separated): by full reference
+    prefixes = prefix.split(",")
+    full = len(prefixes) > 1
+    tests = {
+        (k if full else k.split("/", 1)[1]): v
+        for k, v in runs.items()
+        if k.startswith(tuple(prefixes))
+    }
     shown = [tests[t] for t in hold["shown"]]
     mfns = json.loads((run / "mechanics.json").read_text())["functions"]
     mech = Mechanics(mfns)
@@ -85,7 +92,7 @@ def main() -> int:
     g = genome_from_proposals(proposals, {"case": case.name}, MODEL)
     scenarios = proposals.get("scenarios") or {}
     # observations are keyed by the full stimulus ref; scenarios by the subtest name
-    ref = {t: f"{prefix}{t}" for t in tests}
+    ref = {t: (t if full else f"{prefix}{t}") for t in tests}
     agree: dict[str, list[tuple[str, bool]]] = {}
     for t, sc in scenarios.items():
         if t not in hold["shown"]:
@@ -114,11 +121,10 @@ def main() -> int:
         pred = predict_sequence(g, sc)
         visible = t in hold["shown"]
         r = compare_sequence(g, pred, ob, sites, required, sk, sc if visible else None)
-        exits = [
-            n.outcome
-            for n in ob.execution.nodes
-            if isinstance(n, CallNode) and n.symbol.endswith(entry)
-        ]
+        # the test's entry: the first listed entry (comma-separated, outermost first) it calls
+        calls = [n for n in ob.execution.nodes if isinstance(n, CallNode)]
+        chosen = next((e for e in entry.split(",") if any(e in n.symbol for n in calls)), None)
+        exits = [n.outcome for n in calls if chosen and chosen in n.symbol]
         ph = (sc.get("phenotype") or {}).get("head")
         r.update(test=t, withheld=t in hold["holdout"], observed_entry_exits=exits,
                  phenotype_claim=ph, phenotype_exact=bool(exits) and ph is not None and all(exit_matches(ph, o) is True for o in exits))  # fmt: skip

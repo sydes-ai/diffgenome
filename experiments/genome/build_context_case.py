@@ -65,6 +65,64 @@ CASES: dict[str, dict[str, Any]] = {
         ],
         "test_sources": ["gapi/rpc_update_user_test.go", "gapi/main_test.go"],
     },
+    "C": {
+        "title": "simplebank #136 (upstream techschool/simplebank#136; fork sydes-examples/simplebank#4)",
+        "base": "7c6f92f2bc5dd7ffe30552bd2fe9699de06b5512",
+        "head": "97f000fe58ad01a0774179ffa8884ac7784cf263",
+        "summary": (
+            '"add token type to token payload". A `TokenType` (`TokenTypeAccessToken = 1`, '
+            "`TokenTypeRefreshToken = 2`) is passed to token creation and stored in the payload. "
+            "Verification (`VerifyToken`, both the PASETO and the JWT maker) now takes the expected type, "
+            "and `Payload.Valid` rejects a payload whose type differs with `ErrInvalidToken`. The gRPC "
+            "`authorizeUser` and the HTTP `authMiddleware` expect access tokens; the HTTP `renewAccessToken` "
+            "expects a refresh token; login creates one token of each type."
+        ),
+        "vocab": [
+            "token.PasetoMaker.CreateToken",
+            "token.JWTMaker.CreateToken",
+            "token.NewPayload",
+            "token.PasetoMaker.VerifyToken",
+            "token.JWTMaker.VerifyToken",
+            "token.Payload.Valid",
+            "gapi.Server.UpdateUser",
+            "gapi.Server.authorizeUser",
+            "gapi.hasPermission",
+            "gapi.validateUpdateUserRequest",
+            "db/sqlc.Queries.UpdateUser",
+            "gapi.convertUser",
+            "api.authMiddleware.<anon>@21",
+        ],
+        "entries": ["gapi.Server.UpdateUser", "api.authMiddleware.<anon>", "VerifyToken"],
+        "tests_prefixes": [
+            "TestPaseto",
+            "TestJWT",
+            "TestExpired",
+            "TestInvalidJWT",
+            "TestUpdateUserAPI/",
+            "TestAuthMiddleware/",
+        ],
+        "holdout": [
+            "TestJWTWrongTokenType",
+            "TestUpdateUserAPI/WrongTokenType",
+            "TestAuthMiddleware/OK",
+        ],
+        "diff_paths": ["token", "gapi", "api"],
+        "sources": [
+            "token/payload.go",
+            "token/paseto_maker.go",
+            "token/jwt_maker.go",
+            "gapi/authorization.go",
+            "api/middleware.go",
+            "api/token.go",
+        ],
+        "test_sources": [
+            "token/paseto_maker_test.go",
+            "token/jwt_maker_test.go",
+            "gapi/rpc_update_user_test.go",
+            "gapi/main_test.go",
+            "api/middleware_test.go",
+        ],
+    },
 }
 
 HEAD_TMPL = """\
@@ -168,7 +226,12 @@ def main() -> int:
             for f in sorted((run / "traces-existing").glob("*.json"))
         )
     }
-    tests = {k.split("/", 1)[1]: v for k, v in runs.items() if k.startswith(cfg["tests_prefix"])}
+    if "tests_prefixes" in cfg:  # several packages: tests are named by their full reference
+        tests = {k: v for k, v in runs.items() if k.startswith(tuple(cfg["tests_prefixes"]))}
+    else:
+        tests = {
+            k.split("/", 1)[1]: v for k, v in runs.items() if k.startswith(cfg["tests_prefix"])
+        }
     shown = sorted(t for t in tests if t not in cfg["holdout"])
     mfns = json.loads((run / "mechanics.json").read_text())["functions"]
     mech = Mechanics(mfns)
@@ -185,12 +248,27 @@ def main() -> int:
             f"- {s} {mech.sites[s]['symbol']} line {mech.sites[s]['line']}: `{mech.sites[s]['pred']}`"
             + ("" if s in seen_sites else "   (not evaluated in the shown tests)")
             for s in sorted(
-                required, key=lambda s: (mech.sites[s]["symbol"], mech.sites[s]["line"])
+                (s for s in required if s in mech.sites),
+                key=lambda s: (mech.sites[s]["symbol"], mech.sites[s]["line"]),
             )
-            if s in mech.sites
         )
         + "\n"
     )
+    # sites observed at runtime inside a changed function that has no static facts (Go
+    # closures are not lowered): listed with where they were evaluated, no predicate text
+    runtime_only: dict[str, set[str]] = {}
+    for t in shown:
+        for b in tests[t].branches:
+            if b.site in required and b.site not in mech.sites:
+                runtime_only.setdefault(b.site, set()).add(
+                    getattr(tests[t].nodes[b.node], "symbol", "?")
+                )
+    if runtime_only:
+        parts.append(
+            "Runtime-only required sites (observed; no static facts, e.g. in closures): "
+            + "; ".join(f"{s} in {', '.join(sorted(v))}" for s, v in sorted(runtime_only.items()))
+            + "\n"
+        )
     parts.append(
         "## Observed execution structure (deterministic; shown executions only)\n\n```\n"
         + render(sk)
@@ -230,7 +308,7 @@ def main() -> int:
         entry_exits = [
             f"{short(n.symbol)} {n.outcome}"
             for n in ex.nodes
-            if isinstance(n, CallNode) and any(n.symbol.endswith(e) for e in cfg["entries"])
+            if isinstance(n, CallNode) and any(e in n.symbol for e in cfg["entries"])
         ]
         logs.append(
             f"### {t}  test: {ex.outcome}  exits: {'; '.join(entry_exits)}\n"

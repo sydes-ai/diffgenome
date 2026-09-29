@@ -1,0 +1,27 @@
+{
+ "holdout": [
+  "TestJWTWrongTokenType",
+  "TestUpdateUserAPI/WrongTokenType",
+  "TestAuthMiddleware/OK"
+ ],
+ "shown": [
+  "TestAuthMiddleware/ExpiredToken",
+  "TestAuthMiddleware/InvalidAuthorizationFormat",
+  "TestAuthMiddleware/NoAuthorization",
+  "TestAuthMiddleware/UnsupportedAuthorization",
+  "TestExpiredJWTToken",
+  "TestExpiredPasetoToken",
+  "TestInvalidJWTTokenAlgNone",
+  "TestJWTMaker",
+  "TestPasetoMaker",
+  "TestPasetoWrongTokenType",
+  "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+  "TestUpdateUserAPI/ExpiredToken",
+  "TestUpdateUserAPI/InvalidEmail",
+  "TestUpdateUserAPI/NoAuthorization",
+  "TestUpdateUserAPI/OK",
+  "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+  "TestUpdateUserAPI/UserNotFound"
+ ],
+ "not_scored": []
+}

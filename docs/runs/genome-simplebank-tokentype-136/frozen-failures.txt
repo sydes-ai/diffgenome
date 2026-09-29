@@ -1,0 +1,10 @@
+C-F0 target test/environment: head tests do not compile against the base (CreateToken/VerifyToken
+     gained a parameter): no before-phenotype. No test exercises renewAccessToken: "refresh token
+     accepted for renewal" is not scorable. api/gapi CreateUser traces share file names (out of
+     scope; merged run keeps one of each).
+C-F1 mechanics (known since Exp09): Go closures are not lowered; 4 required sites in the HTTP
+     authMiddleware closure are runtime-only (no static facts).
+C-F2 checker (DiffGenome): a proposal wrote transition values as JSON literals (true, 1); the
+     checker crashed (str method on bool). Fixed generically: literals normalized to expression
+     text at load; test added.
+C-F3 proposer: 59 items (all token-creation procedures, 16 transitions, 13 variables, ...) cite no evidence, so they stay hypotheses and 19/20 predictions stop. Frozen: exact 1/20, withheld 0/3, 0 wrong, 19 indeterminate, 11/55 decisions verified (incl. the type check d_valid_type).

@@ -406,6 +406,17 @@ def _item_kwargs(d: dict[str, Any], cls: type, derived_by: str) -> dict[str, Any
     return kw
 
 
+def _expr_text(v: Any) -> str:
+    """Transition expressions are text; JSON literals are accepted and written as the
+    expression language spells them (true/false/none/integers). Experiment 11, Case C: a
+    proposal wrote `true` and `1` as JSON values and the checker crashed on them."""
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if v is None:
+        return "none"
+    return str(v)
+
+
 def genome_from_proposals(proposals: dict[str, Any], subject: dict[str, Any], model: str) -> Genome:
     """Load model proposals into the schema. Everything starts as a hypothesis."""
     by = f"llm:{model}"
@@ -422,7 +433,10 @@ def genome_from_proposals(proposals: dict[str, Any], subject: dict[str, Any], mo
     for d in proposals.get("effects") or []:
         g.effects.append(Effect(**_item_kwargs(d, Effect, by)))
     for d in proposals.get("transitions") or []:
-        g.transitions.append(Transition(**_item_kwargs(d, Transition, by)))
+        t = Transition(**_item_kwargs(d, Transition, by))
+        t.sets = {k: _expr_text(v) for k, v in (t.sets or {}).items()}
+        t.when = _expr_text(t.when) if t.when is not None else "true"
+        g.transitions.append(t)
     for d in proposals.get("procedures") or []:
         g.procedures.append(Procedure(**_item_kwargs(d, Procedure, by)))
     for d in proposals.get("regions") or []:

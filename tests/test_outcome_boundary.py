@@ -218,3 +218,10 @@ def test_predicted_outcomes_are_compared_per_entity() -> None:
     g.procedures[0].outcome = {"is": "raised:KeyError"}
     r = compare_sequence(g, predict_sequence(g, sc), ob, {_site()})
     assert not r["match"] and "hook" in r["outcome_diff"]
+
+
+def test_transition_values_may_be_json_literals() -> None:
+    p = _proposals()
+    p["transitions"][0]["sets"] = {"implied": True, "count": 1, "gone": None}
+    t = genome_from_proposals(p, {}, "m").transitions[0]
+    assert t.sets == {"implied": "true", "count": "1", "gone": "none"}
