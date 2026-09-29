@@ -201,6 +201,9 @@ class EvidenceRef:
     # filled by the checker
     ok: bool | None = None
     why: str = ""
+    # the reference could not be placed (e.g. a site id nothing knows): its failure is
+    # missing support, not a contradiction by observation
+    unanchored: bool = False
 
 
 @dataclass
@@ -253,6 +256,12 @@ class Branch:
     # ordered steps for state-sequence prediction: "call:<entity>", "T:<transition id>",
     # "D:<decision id>"; when empty, `calls` is used
     steps: list[str] = field(default_factory=list)
+    # how far `absent` reaches after the site is evaluated (genome_state):
+    #   "episode" (default): until the next evaluation of the same site or the next call of
+    #     the deciding function, and within a loop until control leaves the loop; the
+    #     caller's continuation only when this branch exits the deciding function;
+    #   "run": everything after, including deferred callbacks and later iterations
+    absent_scope: str = "episode"
 
 
 @dataclass
@@ -339,7 +348,9 @@ class Genome:
 
 def _ref(d: dict[str, Any]) -> EvidenceRef:
     keys = EvidenceRef.__dataclass_fields__
-    return EvidenceRef(**{k: v for k, v in d.items() if k in keys and k not in ("ok", "why")})
+    return EvidenceRef(
+        **{k: v for k, v in d.items() if k in keys and k not in ("ok", "why", "unanchored")}
+    )
 
 
 def _branch(d: dict[str, Any] | None, when: bool) -> Branch:
@@ -352,6 +363,7 @@ def _branch(d: dict[str, Any] | None, when: bool) -> Branch:
         stops=bool(d.get("stops")),
         effect=str(d.get("effect") or ""),
         steps=list(d.get("steps") or []),
+        absent_scope=str(d.get("absent_scope") or "episode"),
     )
 
 

@@ -6,7 +6,8 @@ function to a small structured IR; this module is language-neutral. It establish
 - **local def-use** by reaching definitions over structured code: every operand of every
   decision, argument of every call and value of every field store is resolved to its
   origins (`param:account.Balance`, `call:server.validAccount#0`, `global:settings.x`,
-  `const`), or to `unknown:<reason>` when the analysis cannot follow it;
+  `closure:x` for a nested function reading its enclosing scope, `const`), or to
+  `unknown:<reason>` when the analysis cannot follow it;
 - **control requirements**: for every call, store, return and decision, the conjunction of
   (site, outcome) pairs that must hold to reach it. For structured code without goto or
   labelled break this is the transitive control dependence a post-dominator computation
@@ -65,6 +66,7 @@ def _req(r: Req) -> list[list[Any]]:
 class _Analyzer:
     def __init__(self, fn: dict[str, Any]) -> None:
         self.params = list(fn.get("params") or [])
+        self.closure = set(fn.get("closure") or [])  # names bound by enclosing functions
         self.facts = Facts(fn["symbol"], fn["file"], self.params)
         self.order = 0
 
@@ -85,6 +87,8 @@ class _Analyzer:
             return frozenset(out)
         if base in self.params:
             return frozenset({f"param:{path}"})
+        if base in self.closure:
+            return frozenset({f"closure:{path}"})
         return frozenset({f"global:{path}"})
 
     def origins(self, paths: list[str], env: Env) -> list[str]:

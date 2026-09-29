@@ -1,0 +1,40 @@
+{
+ "head": {
+  "files": {
+   "backend/src/baserow/contrib/database/application_types.py": "changed",
+   "backend/src/baserow/contrib/database/fields/field_types.py": "changed",
+   "backend/src/baserow/contrib/database/fields/registries.py": "changed",
+   "backend/src/baserow/contrib/database/fields/field_cache.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/models.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/utils/deferred_foreign_key_updater.py": "frontier",
+   "backend/src/baserow/core/registry.py": "frontier",
+   "backend/src/baserow/core/utils.py": "frontier"
+  },
+  "functions": 859,
+  "decision_operands": 24,
+  "decision_operands_unknown": 2,
+  "call_args": 78,
+  "call_args_unknown": 40,
+  "opaque": []
+ },
+ "base": {
+  "files": {
+   "backend/src/baserow/contrib/database/application_types.py": "changed",
+   "backend/src/baserow/contrib/database/fields/field_types.py": "changed",
+   "backend/src/baserow/contrib/database/fields/registries.py": "changed",
+   "backend/src/baserow/contrib/database/fields/field_cache.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/models.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py": "frontier",
+   "backend/src/baserow/contrib/database/fields/utils/deferred_foreign_key_updater.py": "frontier",
+   "backend/src/baserow/core/registry.py": "frontier",
+   "backend/src/baserow/core/utils.py": "frontier"
+  },
+  "functions": 856,
+  "decision_operands": 19,
+  "decision_operands_unknown": 2,
+  "call_args": 67,
+  "call_args_unknown": 32,
+  "opaque": []
+ }
+}

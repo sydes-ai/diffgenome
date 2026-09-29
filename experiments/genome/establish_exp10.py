@@ -8,7 +8,7 @@ Two substrates, same proposal and same frozen checker (genome_state at 5f45eb2):
              DeferredFieldImporter file. Closure variables of a nested function resolve as
              `global:` (the front end has no closure scope) — a stated caveat.
 
-usage: establish_exp10.py <head-run> <base-run> <case-dir> <head-tree> [<proposals.json>] [<out-prefix>]
+usage: establish_exp10.py <head-run> <base-run> <case-dir> <head-tree> [<proposals.json>] [<out-prefix>] [frozen|repaired]
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ from diffgenome.genome_state import (
     Mechanics,
     Observations,
     StateSubstrate,
+    change_sites,
     compare_sequence,
     establish_state,
     predict_sequence,
@@ -86,6 +87,7 @@ def run(
     proposals: dict[str, Any],
     mech_fns: list[dict[str, Any]],
     tree: Path,
+    required_symbols: list[str] | None = None,
 ) -> dict[str, Any]:
     holdout = json.loads((case / "holdout.json").read_text())
     scenarios = proposals.get("scenarios") or {}
@@ -132,13 +134,17 @@ def run(
     establish_state(g, sub, agreement_seq=agree)
     obs_all = Observations(in_scope)
     sites = {d.site for d in g.decisions if d.site}
+    # scored on every observed site of the changed functions (genome_state.change_sites),
+    # not only on the sites the genome chose; None keeps Experiment 09's rule
+    required = change_sites(mech, obs_all, required_symbols) if required_symbols else None
     per_test = []
     for test, sc in sorted(scenarios.items()):
         ob = obs_all.get(test)
         if ob is None:
             continue
         pred = predict_sequence(g, sc)
-        r = compare_sequence(g, pred, ob, sites)
+        r = compare_sequence(g, pred, ob, sites, required)
+        chosen = compare_sequence(g, pred, ob, sites)
         # the same prediction with every proposal usable: what the model's semantics alone
         # would have predicted, independent of what the checker could establish
         rh = compare_sequence(g, predict_sequence(g, sc, min_status="hypothesis"), ob, sites)
@@ -147,6 +153,7 @@ def run(
         r.update(
             test=test,
             withheld=test in holdout["holdout"],
+            match_on_genome_sites=chosen["match"],
             unchecked_semantics_match=rh["match"],
             unchecked_indeterminate=rh["indeterminate"],
             phenotype_claim=ph,
@@ -180,6 +187,8 @@ def run(
         ],
         "sites_in_mechanics": sorted(s for s in sites if s in mech.sites),
         "sites_not_in_mechanics": sorted(s for s in sites if s not in mech.sites),
+        "required_sites": sorted(required or []),
+        "required_sites_uncovered": sorted((required or set()) - sites),
     }
 
 
@@ -189,6 +198,8 @@ def summarize(res: dict[str, Any], g: Any) -> dict[str, Any]:
     return {
         "exact_all": f"{sum(r['match'] for r in pt)}/{len(pt)}",
         "exact_withheld": f"{sum(r['match'] for r in held)}/{len(held)}",
+        "exact_on_genome_chosen_sites": f"{sum(r['match_on_genome_sites'] for r in pt)}/{len(pt)}",
+        "required_sites_uncovered": res["required_sites_uncovered"],
         "indeterminate": sum(1 for r in pt if r["indeterminate"]),
         "confidently_wrong": sum(1 for r in pt if not r["indeterminate"] and not r["match"]),
         "unchecked_semantics_exact": f"{sum(r['unchecked_semantics_match'] for r in pt)}/{len(pt)}",
@@ -220,11 +231,22 @@ def main() -> int:
     )
     prop_path = Path(sys.argv[5]) if len(sys.argv) > 5 else case / "proposals.json"
     prefix = sys.argv[6] if len(sys.argv) > 6 else ""
+    # "frozen": the recorded 5f45eb2 substrate (+ the coverage ablation);
+    # "repaired": mechanics.json written by the repaired DiffGenome, scored on every
+    # observed site of the changed symbols listed in its own change artifact
+    mode = sys.argv[7] if len(sys.argv) > 7 else "frozen"
     proposals = json.loads(prop_path.read_text())
     frozen = json.loads((head_run / "mechanics.json").read_text())["functions"]
     report: dict[str, Any] = {}
-    for tag, fns in (("frozen", frozen), ("coverage", coverage_mechanics(frozen, tree))):
-        res = run(head_run, base_run, case, proposals, fns, tree)
+    required: list[str] | None = None
+    if mode == "repaired":
+        substrates = [("repaired", frozen)]
+        artifact = json.loads((head_run / "diffgenome-change.json").read_text())
+        required = list(artifact["change"]["symbols"])
+    else:
+        substrates = [("frozen", frozen), ("coverage", coverage_mechanics(frozen, tree))]
+    for tag, fns in substrates:
+        res = run(head_run, base_run, case, proposals, fns, tree, required)
         g = res.pop("genome")
         res["summary"] = summarize(res, g)
         report[tag] = res
@@ -253,7 +275,8 @@ def main() -> int:
             print(f"    {d.id:28} {d.status:10} {d.status_reason[-150:]}")
         for t in g.transitions:
             print(f"    {t.id:28} {t.status:10} {t.status_reason[-120:]}")
-    (case / f"{prefix}evaluation.json").write_text(json.dumps(report, indent=1, default=str) + "\n")
+    name = "evaluation.json" if mode == "frozen" else f"{mode}.evaluation.json"
+    (case / f"{prefix}{name}").write_text(json.dumps(report, indent=1, default=str) + "\n")
     return 0
 
 

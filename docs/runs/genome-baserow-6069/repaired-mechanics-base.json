@@ -1,0 +1,1578 @@
+{
+ "format": "diffgenome-mechanics/0",
+ "files": {
+  "backend/src/baserow/contrib/database/application_types.py": "changed",
+  "backend/src/baserow/contrib/database/fields/field_types.py": "changed",
+  "backend/src/baserow/contrib/database/fields/registries.py": "changed",
+  "backend/src/baserow/contrib/database/fields/field_cache.py": "frontier",
+  "backend/src/baserow/contrib/database/fields/models.py": "frontier",
+  "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py": "frontier",
+  "backend/src/baserow/contrib/database/fields/utils/deferred_foreign_key_updater.py": "frontier",
+  "backend/src/baserow/core/registry.py": "frontier",
+  "backend/src/baserow/core/utils.py": "frontier"
+ },
+ "note": "filtered to the functions of the change and the importer",
+ "functions": [
+  {
+   "symbol": "py:baserow.contrib.database.application_types.DatabaseApplicationType._import_table_fields",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "params": [
+    "self",
+    "serialized_tables",
+    "id_mapping",
+    "import_export_config",
+    "external_table_fields_to_import",
+    "deferred_fk_update_collector",
+    "progress"
+   ],
+   "sites": [
+    {
+     "site": "br:34ec71ee29c9",
+     "span": [
+      456,
+      20,
+      456,
+      47
+     ],
+     "pred": "serialized_field['primary']",
+     "line": 456,
+     "order": 0,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "operands": [
+      {
+       "path": "serialized_field",
+       "origins": [
+        "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    },
+    {
+     "site": "br:0771b757bce0",
+     "span": [
+      504,
+      20,
+      504,
+      30
+     ],
+     "pred": "field_deps",
+     "line": 504,
+     "order": 1,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "operands": [
+      {
+       "path": "field_deps",
+       "origins": [
+        "call:field_type.get_field_depdendencies_before_import_serialized"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    },
+    {
+     "site": "br:f38c5af64076",
+     "span": [
+      561,
+      20,
+      561,
+      68
+     ],
+     "pred": "field_type.needs_refresh_after_import_serialized",
+     "line": 561,
+     "order": 2,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "operands": [
+      {
+       "path": "field_type.needs_refresh_after_import_serialized",
+       "origins": [
+        "call:field_type_registry.get_by_model.needs_refresh_after_import_serialized"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "FieldCache",
+     "line": 445,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "DeferredFieldImporter",
+     "line": 447,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "field_type_registry.get",
+     "line": 493,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type.get_field_depdendencies_before_import_serialized",
+     "line": 495,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "param:id_mapping"
+      ],
+      [
+       "param:id_mapping"
+      ]
+     ]
+    },
+    {
+     "callee": "partial",
+     "line": 505,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:0771b757bce0",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "const"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "deferred_field_importer.add_deferred_field_import",
+     "line": 509,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:0771b757bce0",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "call:field_type.get_field_depdendencies_before_import_serialized"
+      ],
+      [
+       "call:partial"
+      ]
+     ]
+    },
+    {
+     "callee": "_import_field_serialized",
+     "line": 517,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:0771b757bce0",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "fields_without_dependencies.append",
+     "line": 520,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:0771b757bce0",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:_import_field_serialized"
+      ]
+     ]
+    },
+    {
+     "callee": "deferred_field_importer.run_deferred_field_imports",
+     "line": 524,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:id_mapping"
+      ]
+     ]
+    },
+    {
+     "callee": "deferred_fk_update_collector.run_deferred_fk_updates",
+     "line": 528,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:id_mapping"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type_registry.get",
+     "line": 533,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type.import_serialized",
+     "line": 534,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "param:import_export_config"
+      ],
+      [
+       "param:id_mapping"
+      ],
+      [
+       "param:deferred_fk_update_collector"
+      ]
+     ]
+    },
+    {
+     "callee": "SearchHandler.schedule_update_search_data",
+     "line": 541,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "call:field_type.import_serialized"
+      ]
+     ]
+    },
+    {
+     "callee": "progress.increment",
+     "line": 544,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "deferred_fk_update_collector.run_deferred_fk_updates",
+     "line": 546,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:id_mapping"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type_registry.get_by_model",
+     "line": 553,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type.after_import_serialized",
+     "line": 554,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "call:FieldCache"
+      ],
+      [
+       "param:id_mapping"
+      ]
+     ]
+    },
+    {
+     "callee": "table_fields_by_name.values",
+     "line": 558,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "table_fields.values",
+     "line": 559,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "field_type_registry.get_by_model",
+     "line": 560,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "field_instance.refresh_from_db",
+     "line": 562,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:f38c5af64076",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "ImportedFields",
+     "line": 564,
+     "requires": [],
+     "arg_origins": [
+      [
+       "const"
+      ],
+      [
+       "const"
+      ],
+      [
+       "call:deferred_field_importer.run_deferred_field_imports"
+      ],
+      [
+       "call:FieldCache"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "database_fields_map[]",
+     "line": 455,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "origins": [
+      "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+     ]
+    },
+    {
+     "path": "primary_table_fields_map[]",
+     "line": 457,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:34ec71ee29c9",
+       true
+      ]
+     ],
+     "origins": [
+      "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+     ]
+    },
+    {
+     "path": "id_mapping[]",
+     "line": 461,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "id_mapping[]",
+     "line": 462,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "returns": [
+    {
+     "line": 564,
+     "requires": [],
+     "origins": [
+      "call:FieldCache",
+      "call:deferred_field_importer.run_deferred_field_imports",
+      "const",
+      "call:ImportedFields"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.application_types.DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "params": [
+    "serialized_table",
+    "serialized_field"
+   ],
+   "sites": [
+    {
+     "site": "br:3f16965dcd1f",
+     "span": [
+      480,
+      16,
+      480,
+      58
+     ],
+     "pred": "table_instance not in table_fields_by_name",
+     "line": 480,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "table_fields_by_name",
+       "origins": [
+        "closure:table_fields_by_name"
+       ]
+      },
+      {
+       "path": "table_instance",
+       "origins": [
+        "param:serialized_table"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "field_type_registry.get",
+     "line": 471,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:serialized_field"
+      ]
+     ]
+    },
+    {
+     "callee": "field_type.import_serialized",
+     "line": 472,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:serialized_table"
+      ],
+      [
+       "param:serialized_field"
+      ],
+      [
+       "closure:import_export_config"
+      ],
+      [
+       "closure:id_mapping"
+      ],
+      [
+       "closure:deferred_fk_update_collector"
+      ]
+     ]
+    },
+    {
+     "callee": "serialized_table['field_instances'].append",
+     "line": 479,
+     "requires": [],
+     "arg_origins": [
+      [
+       "call:field_type.import_serialized"
+      ]
+     ]
+    },
+    {
+     "callee": "progress.increment",
+     "line": 484,
+     "requires": [],
+     "arg_origins": [
+      [
+       "global:IMPORT_SERIALIZED_IMPORTING_TABLE_STRUCTURE",
+       "param:serialized_table"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "table_fields_by_name[]",
+     "line": 481,
+     "requires": [
+      [
+       "br:3f16965dcd1f",
+       true
+      ]
+     ],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "?[]",
+     "line": 482,
+     "requires": [],
+     "origins": [
+      "call:field_type.import_serialized"
+     ]
+    }
+   ],
+   "returns": [
+    {
+     "line": 487,
+     "requires": [],
+     "origins": [
+      "call:field_type.import_serialized"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.field_types.FormulaFieldType.get_field_depdendencies_before_import_serialized",
+   "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+   "params": [
+    "self",
+    "serialized_field",
+    "serialized_fields_map",
+    "primary_table_fields_map"
+   ],
+   "sites": [
+    {
+     "site": "br:1c6b5568b809",
+     "span": [
+      6226,
+      12,
+      6226,
+      45
+     ],
+     "pred": "'formula' not in serialized_field",
+     "line": 6226,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "serialized_field",
+       "origins": [
+        "param:serialized_field"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "NotImplementedError",
+     "line": 6227,
+     "requires": [
+      [
+       "br:1c6b5568b809",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "FormulaHandler.get_dependencies_field_names",
+     "line": 6231,
+     "requires": [
+      [
+       "br:1c6b5568b809",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:serialized_field"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 6231,
+     "requires": [
+      [
+       "br:1c6b5568b809",
+       false
+      ]
+     ],
+     "origins": [
+      "global:FormulaHandler",
+      "param:serialized_field",
+      "call:FormulaHandler.get_dependencies_field_names"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.field_types.CountFieldType.get_field_depdendencies_before_import_serialized",
+   "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+   "params": [
+    "self",
+    "serialized_field",
+    "serialized_fields_map",
+    "primary_table_fields_map"
+   ],
+   "sites": [
+    {
+     "site": "br:a4f6decee75e",
+     "span": [
+      6390,
+      12,
+      6390,
+      85
+     ],
+     "pred": "through_field_id is None or through_field_id not in serialized_fields_map",
+     "line": 6390,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "serialized_fields_map",
+       "origins": [
+        "param:serialized_fields_map"
+       ]
+      },
+      {
+       "path": "through_field_id",
+       "origins": [
+        "call:serialized_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:eee11c8172c5",
+     "span": [
+      6398,
+      12,
+      6398,
+      88
+     ],
+     "pred": "related_table_id is None or related_table_id not in primary_table_fields_map",
+     "line": 6398,
+     "order": 1,
+     "requires": [
+      [
+       "br:a4f6decee75e",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "primary_table_fields_map",
+       "origins": [
+        "param:primary_table_fields_map"
+       ]
+      },
+      {
+       "path": "related_table_id",
+       "origins": [
+        "call:through_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "serialized_field.get",
+     "line": 6389,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "through_field.get",
+     "line": 6394,
+     "requires": [
+      [
+       "br:a4f6decee75e",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 6391,
+     "requires": [
+      [
+       "br:a4f6decee75e",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6399,
+     "requires": [
+      [
+       "br:a4f6decee75e",
+       false
+      ],
+      [
+       "br:eee11c8172c5",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6404,
+     "requires": [
+      [
+       "br:a4f6decee75e",
+       false
+      ],
+      [
+       "br:eee11c8172c5",
+       false
+      ]
+     ],
+     "origins": [
+      "call:serialized_field.get",
+      "call:through_field.get",
+      "param:primary_table_fields_map",
+      "param:serialized_fields_map"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.field_types.RollupFieldType.get_field_depdendencies_before_import_serialized",
+   "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+   "params": [
+    "self",
+    "serialized_field",
+    "serialized_fields_map",
+    "primary_table_fields_map"
+   ],
+   "sites": [
+    {
+     "site": "br:08657ea9c310",
+     "span": [
+      6600,
+      12,
+      6600,
+      85
+     ],
+     "pred": "through_field_id is None or through_field_id not in serialized_fields_map",
+     "line": 6600,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "serialized_fields_map",
+       "origins": [
+        "param:serialized_fields_map"
+       ]
+      },
+      {
+       "path": "through_field_id",
+       "origins": [
+        "call:serialized_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:0f2510d7a928",
+     "span": [
+      6609,
+      12,
+      6609,
+      83
+     ],
+     "pred": "target_field_id is None or target_field_id not in serialized_fields_map",
+     "line": 6609,
+     "order": 1,
+     "requires": [
+      [
+       "br:08657ea9c310",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "serialized_fields_map",
+       "origins": [
+        "param:serialized_fields_map"
+       ]
+      },
+      {
+       "path": "target_field_id",
+       "origins": [
+        "call:serialized_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "serialized_field.get",
+     "line": 6599,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "serialized_field.get",
+     "line": 6605,
+     "requires": [
+      [
+       "br:08657ea9c310",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 6601,
+     "requires": [
+      [
+       "br:08657ea9c310",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6610,
+     "requires": [
+      [
+       "br:08657ea9c310",
+       false
+      ],
+      [
+       "br:0f2510d7a928",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6614,
+     "requires": [
+      [
+       "br:08657ea9c310",
+       false
+      ],
+      [
+       "br:0f2510d7a928",
+       false
+      ]
+     ],
+     "origins": [
+      "call:serialized_field.get",
+      "param:serialized_fields_map"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.field_types.LookupFieldType.get_field_depdendencies_before_import_serialized",
+   "file": "backend/src/baserow/contrib/database/fields/field_types.py",
+   "params": [
+    "self",
+    "serialized_field",
+    "serialized_fields_map",
+    "primary_table_fields_map"
+   ],
+   "sites": [
+    {
+     "site": "br:ef6ec241fb07",
+     "span": [
+      6919,
+      12,
+      6919,
+      85
+     ],
+     "pred": "through_field_id is None or through_field_id not in serialized_fields_map",
+     "line": 6919,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "serialized_fields_map",
+       "origins": [
+        "param:serialized_fields_map"
+       ]
+      },
+      {
+       "path": "through_field_id",
+       "origins": [
+        "call:serialized_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:0f9dcde0ef18",
+     "span": [
+      6928,
+      12,
+      6928,
+      83
+     ],
+     "pred": "target_field_id is None or target_field_id not in serialized_fields_map",
+     "line": 6928,
+     "order": 1,
+     "requires": [
+      [
+       "br:ef6ec241fb07",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "serialized_fields_map",
+       "origins": [
+        "param:serialized_fields_map"
+       ]
+      },
+      {
+       "path": "target_field_id",
+       "origins": [
+        "call:serialized_field.get"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "serialized_field.get",
+     "line": 6918,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "serialized_field.get",
+     "line": 6924,
+     "requires": [
+      [
+       "br:ef6ec241fb07",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 6920,
+     "requires": [
+      [
+       "br:ef6ec241fb07",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6929,
+     "requires": [
+      [
+       "br:ef6ec241fb07",
+       false
+      ],
+      [
+       "br:0f9dcde0ef18",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 6935,
+     "requires": [
+      [
+       "br:ef6ec241fb07",
+       false
+      ],
+      [
+       "br:0f9dcde0ef18",
+       false
+      ]
+     ],
+     "origins": [
+      "call:serialized_field.get",
+      "param:serialized_field",
+      "param:serialized_fields_map"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.registries.FieldType.get_field_depdendencies_before_import_serialized",
+   "file": "backend/src/baserow/contrib/database/fields/registries.py",
+   "params": [
+    "self",
+    "serialized_field",
+    "serialized_fields_map",
+    "primary_table_fields_map"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [],
+   "returns": [
+    {
+     "line": 1600,
+     "requires": [],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.utils.deferred_field_importer.DeferredFieldImporter.__init__",
+   "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [
+    {
+     "path": "self.deferred_field_imports",
+     "line": 19,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self.field_import_callback_mapping",
+     "line": 20,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.utils.deferred_field_importer.DeferredFieldImporter._unique_field_name",
+   "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+   "params": [
+    "self",
+    "table_id",
+    "field_name"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [],
+   "returns": [
+    {
+     "line": 23,
+     "requires": [],
+     "origins": [
+      "param:field_name",
+      "param:table_id"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.utils.deferred_field_importer.DeferredFieldImporter.add_deferred_field_import",
+   "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+   "params": [
+    "self",
+    "table",
+    "field_name",
+    "field_dependencies",
+    "import_field_callback"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._unique_field_name",
+     "line": 46,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:table.id"
+      ],
+      [
+       "param:field_name"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "self.deferred_field_imports[]",
+     "line": 47,
+     "requires": [],
+     "origins": [
+      "param:field_dependencies",
+      "param:table"
+     ]
+    },
+    {
+     "path": "self.field_import_callback_mapping[]",
+     "line": 48,
+     "requires": [],
+     "origins": [
+      "param:import_field_callback"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.utils.deferred_field_importer.DeferredFieldImporter.get_all_fields_dependencies",
+   "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+   "params": [
+    "self",
+    "field_name_fields_mapping"
+   ],
+   "sites": [
+    {
+     "site": "br:cbfe8c1c2b07",
+     "span": [
+      68,
+      20,
+      68,
+      46
+     ],
+     "pred": "via_field_name is not None",
+     "line": 68,
+     "order": 0,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "operands": [
+      {
+       "path": "via_field_name",
+       "origins": [
+        "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "defaultdict",
+     "line": 64,
+     "requires": [],
+     "arg_origins": [
+      [
+       "global:set"
+      ]
+     ]
+    },
+    {
+     "callee": "self.deferred_field_imports.items",
+     "line": 66,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._unique_field_name",
+     "line": 85,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:field_name_fields_mapping.link_row_table_id",
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ],
+      [
+       "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+      ]
+     ]
+    },
+    {
+     "callee": "dependencies[field_temp_id].add",
+     "line": 88,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:self._unique_field_name"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 90,
+     "requires": [],
+     "origins": [
+      "call:defaultdict"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.utils.deferred_field_importer.DeferredFieldImporter.run_deferred_field_imports",
+   "file": "backend/src/baserow/contrib/database/fields/utils/deferred_field_importer.py",
+   "params": [
+    "self",
+    "field_name_fields_mapping"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self.get_all_fields_dependencies",
+     "line": 110,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:field_name_fields_mapping"
+      ]
+     ]
+    },
+    {
+     "callee": "FieldDependencyHandler.group_dependencies_by_level",
+     "line": 114,
+     "requires": [],
+     "arg_origins": [
+      [
+       "call:self.get_all_fields_dependencies"
+      ]
+     ]
+    },
+    {
+     "callee": "import_field_callback",
+     "line": 125,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "imported_fields.append",
+     "line": 126,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:import_field_callback"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 128,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "unknown": []
+  }
+ ]
+}

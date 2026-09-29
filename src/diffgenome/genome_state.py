@@ -207,6 +207,12 @@ class StateSubstrate(Substrate):
         )
         self.mech = mech
         self.obs = obs
+        # sites evaluated at runtime; a site may be observed without static facts (a file or
+        # nested function the front end did not lower): it exists, but is not anchored
+        self.runtime_sites = {b.site for ob in obs.by_test.values() for b in ob.branches}
+
+    def site_exists(self, site: str | None) -> bool:
+        return bool(site) and (site in self.mech.sites or site in self.runtime_sites)
 
     def check(self, ref: EvidenceRef) -> None:
         k = ref.kind
@@ -214,8 +220,9 @@ class StateSubstrate(Substrate):
             ob = self.obs.get(ref.test or "")
             if ob is None:
                 ref.ok, ref.why = False, f"no execution {ref.test!r}"
-            elif ref.site not in self.mech.sites:
-                ref.ok, ref.why = False, f"unknown site {ref.site}"
+            elif not self.site_exists(ref.site):
+                # nothing knows this site: missing support, not an observed contradiction
+                ref.ok, ref.why, ref.unanchored = False, f"unknown site {ref.site}", True
             else:
                 ref.ok = any(b.site == ref.site and b.outcome == ref.outcome for b in ob.branches)
                 ref.why = "" if ref.ok else f"{ref.site} never evaluated to {ref.outcome} there"
@@ -273,7 +280,11 @@ class StateSubstrate(Substrate):
 
 def _link_site(d: Decision, sub: StateSubstrate) -> tuple[str | None, str]:
     if d.site:
-        return (d.site, "given") if d.site in sub.mech.sites else (None, f"unknown site {d.site}")
+        if d.site in sub.mech.sites:
+            return d.site, "given"
+        if d.site in sub.runtime_sites:
+            return d.site, "given; observed at runtime, no static facts"
+        return None, f"unknown site {d.site}"
     cited = {
         s
         for r in d.evidence
@@ -291,7 +302,9 @@ def _static_consistent(d: Decision, site: str, sub: StateSubstrate) -> list[str]
     """Claimed consequences vs the site's static control facts. Only calls that exist in the
     site's function and lie after it are judged; 'stops' is not checked statically, since
     whether a genome-level step follows is not a local property."""
-    problems = []
+    problems: list[str] = []
+    if site not in sub.mech.sites:
+        return problems  # no static facts to be consistent with
     for b in (d.true_branch, d.false_branch):
         for c in b.calls:
             if _name_match(c, sub.mech.sites[site]["symbol"]):
@@ -304,6 +317,64 @@ def _static_consistent(d: Decision, site: str, sub: StateSubstrate) -> list[str]
     return problems
 
 
+def _symbol(n: Any) -> str:
+    return getattr(n, "symbol", None) or getattr(n, "claimed_target", None) or ""
+
+
+def episode_calls(ob: ExecObs, ev: BranchEvent, mech: Mechanics) -> list[str]:
+    """Calls that belong to the episode a branch evaluation decides, in order.
+
+    Node ids and branch `seq` share one clock, so every bound is a time cut:
+    - inside the deciding call: everything after the evaluation, up to the next evaluation
+      of the same site in that call (the next loop iteration) and, when the site lies in a
+      loop, up to the first direct call that the static facts place outside every loop
+      (control has left the loop);
+    - the caller's continuation only when the taken branch leaves the deciding function
+      (static exit facts), up to the next call of the same function or the next
+      evaluation of the site anywhere.
+    Deferred callbacks and later iterations are therefore outside the episode; claims about
+    them need `absent_scope: "run"`."""
+    nodes = ob.execution.nodes
+    kids = ob.children_of(ev.node)  # the whole parent -> children map
+    later = [
+        b.seq for b in ob.branches if b.site == ev.site and b.node == ev.node and b.seq > ev.seq
+    ]
+    end: int | None = min(later) if later else None
+    rec = mech.sites.get(ev.site)
+    fn = mech.function_of(ev.site)
+    if rec is not None and fn is not None and any(r[0] == "?loop" for r in rec["requires"]):
+        for k in kids.get(ev.node, []):
+            if k < ev.seq or (end is not None and k >= end):
+                continue
+            tail = _symbol(nodes[k]).split(":", 1)[-1]
+            matches = [c for c in fn["calls"] if _callee_match(tail, c["callee"])]
+            if matches and all(not any(r[0] == "?loop" for r in c["requires"]) for c in matches):
+                end = k
+                break
+    out: list[str] = []
+
+    def walk(tree: dict[int, list[int]], n: int, floor: int, ceil: int | None) -> None:
+        for k in tree.get(n, []):
+            if k >= floor and (ceil is None or k < ceil):
+                out.append(_symbol(nodes[k]))
+                walk(tree, k, 0, ceil)
+
+    walk(kids, ev.node, ev.seq, end)
+    parent = nodes[ev.node].parent if ev.node < len(nodes) else None
+    if end is None and parent is not None and mech.exits_under(ev.site, ev.outcome):
+        me = _symbol(nodes[ev.node])
+        nxt = [b.seq for b in ob.branches if b.site == ev.site and b.seq > ev.seq]
+        stop: int | None = min(nxt) if nxt else None
+        for k in kids.get(parent, []):
+            if k <= ev.node:
+                continue
+            if (stop is not None and k >= stop) or _symbol(nodes[k]) == me:
+                break
+            out.append(_symbol(nodes[k]))
+            walk(kids, k, 0, stop)
+    return out
+
+
 def _observed_contradictions(d: Decision, site: str, sub: StateSubstrate) -> list[str]:
     bad = []
     for test, ob in sub.obs.by_test.items():
@@ -311,7 +382,13 @@ def _observed_contradictions(d: Decision, site: str, sub: StateSubstrate) -> lis
             if ev.site != site:
                 continue
             b = d.true_branch if ev.outcome else d.false_branch
-            after = ob.subtree_after(ev.node, ev.seq)
+            if not b.absent:
+                continue
+            after = (
+                ob.subtree_after(ev.node, ev.seq)
+                if b.absent_scope == "run"
+                else episode_calls(ob, ev, sub.mech)
+            )
             for a in b.absent:
                 if any(_name_match(a, s) for s in after if s):
                     bad.append(f"{test}: {a} ran after {site}={ev.outcome}")
@@ -336,7 +413,11 @@ def _local_agreement(
     function itself stores before the site. Interleaved tasks (another coroutine running
     across an await) break that assumption, so executions outside the genome's sequential
     scope are excluded."""
-    rec = sub.mech.sites[site]
+    rec = sub.mech.sites.get(site)
+    if rec is None:
+        # without static facts it is unknown which fields the function writes before the
+        # site, so the entry state cannot stand in for the state at the site
+        return [], []
     fn = sub.mech.function_of(site) or {"stores": []}
     stored_before = {st["path"] for st in fn["stores"] if st["line"] < rec["line"]}
     agree: list[str] = []
@@ -452,10 +533,12 @@ def establish_state(
         failed = [r for r in it.evidence if not r.ok]
         if not it.evidence:
             it.status, it.status_reason = HYPOTHESIS, "no evidence cited"
-        elif [r for r in failed if r.kind in ("execution", "branch", "delta")]:
+        elif [r for r in failed if r.kind in ("execution", "branch", "delta") and not r.unanchored]:
             it.status = REJECTED
             it.status_reason = "contradicted: " + "; ".join(
-                r.why for r in failed if r.kind in ("execution", "branch", "delta")
+                r.why
+                for r in failed
+                if r.kind in ("execution", "branch", "delta") and not r.unanchored
             )
         elif failed:
             it.status = HYPOTHESIS
@@ -472,7 +555,7 @@ def establish_state(
     anchors: dict[str, list[str]] = {}
     model_sited = {d.id for d in g.decisions if d.site}
     for d in g.decisions:
-        if d.site and d.site not in sub.mech.sites:
+        if d.site and not sub.site_exists(d.site):
             d.status = HYPOTHESIS
             d.status_reason = f"names a decision site that does not exist: {d.site}"
             continue
@@ -484,10 +567,11 @@ def establish_state(
     for d in g.decisions:
         if d.status != SUPPORTED:
             continue
-        site = d.site if d.site in sub.mech.sites else None
+        site = d.site if sub.site_exists(d.site) else None
         if site is None:
             d.status_reason += "; not verified: no decision site"
             continue
+        anchored = site in sub.mech.sites
         if len(anchors.get(site, [])) > 1:
             others = ", ".join(x for x in anchors[site] if x != d.id)
             d.status_reason += (
@@ -543,6 +627,12 @@ def establish_state(
             d.status_reason += (
                 "; not verified: neither the observed state at the site nor any stated input "
                 "facts decide the predicate, so its meaning cannot be checked"
+            )
+        elif seen[True] and seen[False] and not anchored:
+            d.status_reason += (
+                f"; not verified: site {site} is observed both ways and the predicate agrees "
+                f"{len(agree)} time(s), but it has no static facts (unanchored), so its "
+                "consequences cannot be checked"
             )
         elif seen[True] and seen[False]:
             d.status = VERIFIED
@@ -753,20 +843,52 @@ def predict_sequence(
         pred.events.append(("call", e))
         key = entity_key(e)
         if key is None:
-            pred.indeterminate = f"no procedure for {e}"
-            break
+            # an entity the genome says nothing about is a call with no modeled behavior;
+            # one the genome has decisions for but no procedure cannot be predicted
+            if any(
+                d.entity == e or d.entity.endswith("." + e) or e.endswith("." + d.entity)
+                for d in g.decisions
+            ):
+                pred.indeterminate = f"no procedure for {e}, which has decisions"
+                break
+            continue
         run_entity(key, env, 0)
         if pred.indeterminate:
             break
     return pred
 
 
+def change_sites(mech: Mechanics, obs: Observations, symbols: list[str]) -> set[str]:
+    """Every decision site of the given functions and of functions nested in them: their
+    static sites, plus sites observed at runtime inside calls of them. A genome is scored
+    on all of these, not only on the sites it chooses to cover."""
+    tails = [s.split(":", 1)[-1] for s in symbols]
+
+    def mine(sym: str) -> bool:
+        t = sym.split(":", 1)[-1]
+        return any(t == x or t.startswith(x + ".<locals>.") for x in tails)
+
+    out = {sid for sid, rec in mech.sites.items() if mine(rec["symbol"])}
+    for ob in obs.by_test.values():
+        out |= {b.site for b in ob.branches if mine(b.symbol)}
+    return out
+
+
 def compare_sequence(
-    g: Genome, pred: SeqPrediction, ob: ExecObs, sites: set[str]
+    g: Genome,
+    pred: SeqPrediction,
+    ob: ExecObs,
+    sites: set[str],
+    required_sites: set[str] | None = None,
 ) -> dict[str, Any]:
     """Predicted branch events vs the observed branch vector over the genome's sites (exact,
     in order), and the predicted final state vs the last observed exit state of each bound
-    variable."""
+    variable. With `required_sites` (e.g. `change_sites`), an observed evaluation of a
+    required site that no decision covers makes the prediction incomplete: indeterminate,
+    never a match."""
+    uncovered = sorted(
+        {b.site for b in ob.branches if required_sites and b.site in required_sites} - sites
+    )
     observed_vec = [(b.site, b.outcome) for b in ob.branches if b.site in sites]
     predicted_vec = [(e[1], e[2]) for e in pred.events if e[0] == "branch"]
     last: dict[str, str] = {}
@@ -780,13 +902,17 @@ def compare_sequence(
         for k, v in observed_state.items()
         if k in pred.state and not _abstract_equal(kinds.get(k, "is_set"), pred.state[k], v)
     }
+    indeterminate = pred.indeterminate or (
+        f"no decision covers observed site(s) {', '.join(uncovered)}" if uncovered else None
+    )
     return {
         "execution": ob.execution.stimulus_ref,
-        "indeterminate": pred.indeterminate,
+        "indeterminate": indeterminate,
+        "uncovered_sites": uncovered,
         "predicted_branches": predicted_vec,
         "observed_branches": observed_vec,
-        "branches_exact": pred.indeterminate is None and predicted_vec == observed_vec,
+        "branches_exact": indeterminate is None and predicted_vec == observed_vec,
         "state_checked": sorted(k for k in observed_state if k in pred.state),
         "state_diff": state_diff,
-        "match": pred.indeterminate is None and predicted_vec == observed_vec and not state_diff,
+        "match": indeterminate is None and predicted_vec == observed_vec and not state_diff,
     }

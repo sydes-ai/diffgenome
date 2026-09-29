@@ -217,7 +217,62 @@ This change's behavior is a relation.
    of name pairs, under the existing value-free default, so that the relation can be observed
    rather than inferred.
 
-Per the brief, no architectural change has been made for Cases B and C. They have not been run.
+Per the brief, no architectural change was made for Cases B and C before this analysis. They have not been run. Items 1 and 2 were later applied as the Step 1 repairs below. Items 3 and 4 remain open.
+
+## Step 1 repairs (applied after the failures above were recorded)
+
+These are generic repairs with no Baserow logic. Mechanics, checker and predictor changed. The
+schema gained only an explicit absence scope. The proposal is **the same frozen proposal**, not
+re-asked. Tests: `tests/test_exp10.py`, a synthetic importer with the same shape.
+
+| repair | fixes | where |
+|---|---|---|
+| Nested functions are lowered as functions of their own, named like the collector's `co_qualname` (`outer.<locals>.inner`). A nested `def` statement is a local definition, not opaque. Free variables of the enclosing scopes resolve to `closure:<name>`, not `global:` | F3 | `frontends/python_ir.py`, `dependence.py` |
+| Comprehension targets are bound by the comprehension. Previously `{f.name: f for f in xs}` produced `global:f` | found while repairing F3 | `frontends/python_ir.py` |
+| Mechanics frontier: Python mechanics also cover the files of in-repo functions that changed code (or code nested in it) was observed calling *directly*. `mechanics.json` records each file's role (`changed` / `frontier`) | F4 | `mvp.py` (`mechanics_frontier`) |
+| A branch reference or decision site that was observed at runtime but has no static facts is *unanchored*. It can support, never contradict, and never verifies. A site nothing knows is missing support (hypothesis), not a contradiction | F11 | `genome_state.py`, `EvidenceRef.unanchored` |
+| `absent` is judged per **episode**. The episode runs up to the next evaluation of the same site or the next call of the deciding function. For a site inside a loop, it ends at the first call the static facts place outside every loop. It reaches into the caller's continuation only when the branch exits. `absent_scope: "run"` keeps the old meaning | F12 | `genome_state.episode_calls`, `Branch.absent_scope` |
+| A genome is scored on every observed site of the changed functions and of functions nested in them (`change_sites`). An observed evaluation that no decision covers makes the prediction indeterminate | F14 | `genome_state.compare_sequence(required_sites=…)` |
+| A top-level scenario call of an entity the genome says nothing about is skipped. An entity that has decisions but no procedure still stops the prediction, with that reason | F15 (the silent part) | `genome_state.predict_sequence` |
+
+**No regression on earlier experiments:**
+- Experiment 09 (Kokoro), re-established with the repaired checker: every status and every
+  per-test result is identical in the main genome and the four controls (13/13, withheld 4/4,
+  stateless 3/13).
+- Kokoro's mechanics regenerated with the repaired front end are identical: 24 functions, no
+  change.
+- Experiment 08 (simplebank, Go), re-checked: identical statuses. Only reason wording differs.
+
+**Case A, rerun** (DiffGenome at head and base again, same phenotype: 9/9 and 6/9 passed):
+
+| | frozen 5f45eb2 | repaired |
+|---|---|---|
+| mechanics files | 3 (changed) | 3 changed + 6 frontier, including `deferred_field_importer.py` |
+| observations in changed functions mapped to a static site | 94 / 180 | **180 / 180** |
+| whole-run observations mapped | 2,083 / 70,197 | 11,862 / 70,197 |
+| opaque statements in the change | 2 | **0** |
+| `UNKNOWN_DEPENDENCE` (the change's functions and the importer) | operands 1/20, arguments 33/54 | operands 2/24, arguments 40/78 (more functions now have facts) |
+| proposal items rejected / demoted | 4 rejected + 1 hypothesis, none actually wrong | **0 / 0** |
+| decisions anchored at a static site | 6 / 7 | **7 / 7** |
+| verified decisions / transitions | 0/7, 0/2 | 0/7, 0/2 |
+| held-out exact | 0 / 2 | 0 / 2 |
+| confidently wrong | 0 | 0 |
+| indeterminate | 5/5, silently at the first call | 5/5, stated: "no procedure for `_import_table_fields`, which has decisions", and 3 observed change sites no decision covers |
+| control c1 inverted guard | not caught | not caught (F13) |
+| control c2 pre-change semantics | indistinguishable | indistinguishable (F9) |
+| control c3 missing decision | invisible | **detected**: its site is reported uncovered, and prediction is indeterminate |
+| control c4 fabricated site | hypothesis | hypothesis |
+
+**What the repairs settle:**
+- **Tooling.** The wrongful rejections and the mapping gap were tooling faults, and they are gone.
+- **The indeterminacy.** It is now principled and attributed to named causes.
+
+**What they do not settle:**
+- **Verification.** Nothing verifies, because these decisions read input facts that no
+  observed state binds. Verification would need a completing scenario replay, and the
+  proposal's flattening (F8, F15) prevents that.
+- **The semantic gap.** c2 remains indistinguishable. That is the Step 2 question, relations
+  with a derived order (F9), and it is untouched here.
 
 ## Artifacts
 
@@ -237,4 +292,8 @@ Per the brief, no architectural change has been made for Cases B and C. They hav
 | `frozen-failures.md` | failures recorded before any fix |
 | `existing-tests-*.log` | test logs |
 
+| `repaired.evaluation.json`, `repaired.genome.*`, `controls/*.repaired.*` | the same proposal and controls on the repaired substrate |
+| `repaired-mechanics-*.json`, `repaired-substrate-stats.json` | repaired mechanics (filtered) and statistics |
+
 Scripts: `experiments/genome/{run_baserow_6069.sh, build_context_exp10.py, establish_exp10.py, controls_exp10.py, diagnose_exp10.py}`.
+`establish_exp10.py … repaired` scores on the repaired substrate.

@@ -26,7 +26,7 @@ from diffgenome.change_artifact import dumps as dump_artifact
 from diffgenome.compose import build_corpus
 from diffgenome.graph import build_graph
 from diffgenome.llm import OpenAIProbeWriter, ProbeWriter, RecordedProbeWriter
-from diffgenome.model import Origin, Stimulus
+from diffgenome.model import CallNode, Execution, Origin, Stimulus
 from diffgenome.probe import ProbeAttempt, ProbeRunner, run_probe_loop
 from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
@@ -36,15 +36,43 @@ from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
 
 
+def mechanics_frontier(executions: list[Execution], seeds: list[str]) -> set[str]:
+    """In-repo symbols observed as DIRECT callees of a changed symbol (or of a function
+    nested in one). The change's behavior often lives one call away, in code the diff does
+    not touch (Baserow #6069: the importer whose ordering is the phenotype)."""
+    seed_set = set(seeds)
+
+    def is_seed(sym: str) -> bool:
+        return sym in seed_set or any(sym.startswith(s + ".<locals>.") for s in seed_set)
+
+    out: set[str] = set()
+    for ex in executions:
+        for n in ex.nodes:
+            if not isinstance(n, CallNode) or n.parent is None:
+                continue
+            parent = ex.nodes[n.parent]
+            if isinstance(parent, CallNode) and is_seed(parent.symbol):
+                out.add(n.symbol)
+    return out
+
+
 def write_mechanics(
-    out: Path, ws: Workspace, repo: Path, runtime_name: str, seeds: list[str], index: SymbolIndex
+    out: Path,
+    ws: Workspace,
+    repo: Path,
+    runtime_name: str,
+    seeds: list[str],
+    index: SymbolIndex,
+    executions: list[Execution] | None = None,
 ) -> None:
     """Deterministic intra-procedural facts (decision sites, local def-use, control
-    requirements, field stores) for the files of the changed symbols, from the ORIGINAL
-    source. Go: the instrumenter's IR of every repo function; Python: lowered here."""
+    requirements, field stores) from the ORIGINAL source. Go: the instrumenter's IR of every
+    repo function. Python: lowered here, for the files of the changed symbols and for the
+    files of in-repo functions they were observed calling directly (the frontier)."""
     from diffgenome.dependence import analyze_all
 
     functions: list[dict[str, Any]] = []
+    file_roles: dict[str, str] = {}
     if runtime_name.startswith("go"):
         ir = ws.root / "mechanics-ir.json"
         if ir.is_file():
@@ -52,12 +80,19 @@ def write_mechanics(
     elif runtime_name.startswith("python"):
         from diffgenome.frontends.python_ir import lower_functions
 
-        files = sorted({d.path for s in seeds if (d := index.find(s)) is not None})
-        for rel in files:
-            module = (
-                index.module_of(next(s for s in seeds if (d := index.find(s)) and d.path == rel))
-                or ""
-            )
+        owner: dict[str, str] = {}
+        for s in seeds:
+            if (d := index.find(s)) is not None:
+                owner.setdefault(d.path, s)
+                file_roles[d.path] = "changed"
+        for s in sorted(mechanics_frontier(executions or [], seeds)):
+            d = index.find(s)
+            if d is None or index.is_test(s) or d.path in owner:
+                continue
+            owner[d.path] = s
+            file_roles[d.path] = "frontier"
+        for rel in sorted(owner):
+            module = index.module_of(owner[rel]) or ""
             try:
                 functions += lower_functions((repo / rel).read_text(encoding="utf-8"), rel, module)
             except (OSError, SyntaxError):
@@ -65,7 +100,12 @@ def write_mechanics(
     if functions:
         (out / "mechanics.json").write_text(
             json.dumps(
-                {"format": "diffgenome-mechanics/0", "functions": analyze_all(functions)}, indent=1
+                {
+                    "format": "diffgenome-mechanics/0",
+                    "files": file_roles,
+                    "functions": analyze_all(functions),
+                },
+                indent=1,
             )
             + "\n"
         )
@@ -328,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
             graph_before=graph if graph_after else None,
         )
         (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
-        write_mechanics(out, ws, repo, runtime.name, seeds, index)
+        write_mechanics(out, ws, repo, runtime.name, seeds, index, executions)
         (out / "behavioral-map.md").write_text(behavior_map)
         print(text)
         _log(f"report: {out / 'report.md'}  graph: {out / 'graph.json'}  map: {out / 'map.md'}")

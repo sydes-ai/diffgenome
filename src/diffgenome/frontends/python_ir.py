@@ -59,6 +59,29 @@ class _Expr(ast.NodeVisitor):
     def visit_Lambda(self, node: ast.Lambda) -> None:
         return  # a nested function body is not this function's dataflow
 
+    def _comprehension(
+        self, node: ast.ListComp | ast.SetComp | ast.DictComp | ast.GeneratorExp
+    ) -> None:
+        """Comprehension targets are bound by the comprehension, not read from the
+        enclosing scope: their reads are dropped; the iterables' reads remain."""
+        bound = {
+            n.id for g in node.generators for n in ast.walk(g.target) if isinstance(n, ast.Name)
+        }
+        inner = _Expr()
+        for child in ast.iter_child_nodes(node):
+            inner.visit(child)
+        self.uses.extend(u for u in inner.uses if u.split(".", 1)[0] not in bound)
+        for c in inner.calls:  # an argument that is a comprehension target is an element
+            c["args"] = [
+                [u for u in a if u.split(".", 1)[0] not in bound] or ["?"] for a in c["args"]
+            ]
+            self.calls.append(c)
+
+    visit_ListComp = _comprehension
+    visit_SetComp = _comprehension
+    visit_DictComp = _comprehension
+    visit_GeneratorExp = _comprehension
+
 
 def _expr(e: ast.expr | None) -> tuple[list[str], list[dict[str, Any]]]:
     if e is None:
@@ -188,6 +211,23 @@ class _Lower:
             return [{"k": "break", "line": line}]
         if isinstance(s, ast.Pass | ast.Global | ast.Nonlocal | ast.Import | ast.ImportFrom):
             return []
+        if isinstance(s, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+            # A nested definition binds a local name; its body is lowered as a function of
+            # its own (`lower_functions`), not as this function's dataflow. Decorators and
+            # default values are evaluated here.
+            d_uses: list[str] = []
+            d_calls: list[dict[str, Any]] = []
+            evaluated = list(s.decorator_list)
+            if not isinstance(s, ast.ClassDef):
+                evaluated += [*s.args.defaults, *(d for d in s.args.kw_defaults if d)]
+            for e in evaluated:
+                u, c = _expr(e)
+                d_uses += u
+                d_calls += c
+            return [
+                {"k": "assign", "line": line, "defs": [s.name], "stores": [],
+                 "uses": sorted(set(d_uses)), "calls": d_calls, "value_is_call": False}
+            ]  # fmt: skip
         if isinstance(s, ast.Assert):
             uses, calls = _expr(s.test)
             return [{"k": "expr", "line": line, "uses": uses, "calls": calls}]
@@ -203,28 +243,93 @@ class _Lower:
         return [{"k": "opaque", "line": line, "reason": type(s).__name__}]
 
 
+def _params(n: ast.FunctionDef | ast.AsyncFunctionDef) -> list[str]:
+    a = n.args
+    params = [x.arg for x in [*a.posonlyargs, *a.args, *a.kwonlyargs]]
+    return params + [x.arg for x in (a.vararg, a.kwarg) if x is not None]
+
+
+def _bound_names(n: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+    """Names bound in a function's own scope: parameters, assignment/loop/with/except
+    targets, imports and nested definitions. Nested function bodies are not entered."""
+    names = set(_params(n))
+
+    def walk(node: ast.AST) -> None:
+        for ch in ast.iter_child_nodes(node):
+            if isinstance(ch, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+                names.add(ch.name)
+                continue  # its body is another scope
+            if isinstance(ch, ast.Lambda):
+                continue
+            if isinstance(ch, ast.Name) and isinstance(ch.ctx, ast.Store):
+                names.add(ch.id)
+            elif isinstance(ch, ast.ExceptHandler) and ch.name:
+                names.add(ch.name)
+            elif isinstance(ch, ast.alias):
+                names.add((ch.asname or ch.name).split(".")[0])
+            walk(ch)
+
+    for st in n.body:
+        if isinstance(st, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+            names.add(st.name)
+        else:
+            walk(st)
+    return names
+
+
 def lower_functions(
     source: str, rel_path: str, module: str, qualnames: list[str] | None = None
 ) -> list[dict[str, Any]]:
-    """Lower every function (or the given qualnames) of one Python file. Symbols use the
-    collector's naming: `py:<module>.<qualname>`."""
+    """Lower every function (or the given qualnames) of one Python file, including nested
+    functions. Symbols use the collector's naming: `py:<module>.<qualname>`, where a nested
+    function's qualname is `<outer>.<locals>.<name>` (Python's `co_qualname`). A nested
+    function's `closure` lists the names bound by its enclosing functions; reads of them
+    resolve to `closure:<name>` rather than `global:<name>`."""
     tree = ast.parse(source)
     out: list[dict[str, Any]] = []
 
-    def visit(body: list[ast.stmt], prefix: str) -> None:
+    def visit(body: list[ast.stmt], prefix: str, closure: set[str]) -> None:
         for n in body:
             if isinstance(n, ast.ClassDef):
-                visit(n.body, f"{prefix}{n.name}.")
+                # a class body is not an enclosing scope for its methods
+                visit(n.body, f"{prefix}{n.name}.", closure)
             elif isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef):
                 q = f"{prefix}{n.name}"
                 if qualnames is None or q in qualnames:
-                    a = n.args
-                    params = [x.arg for x in [*a.posonlyargs, *a.args, *a.kwonlyargs]]
-                    params += [x.arg for x in (a.vararg, a.kwarg) if x is not None]
-                    out.append(
-                        {"symbol": f"py:{module}.{q}", "file": rel_path, "params": params,
-                         "body": _Lower(rel_path).block(n.body)}
-                    )  # fmt: skip
+                    fn: dict[str, Any] = {
+                        "symbol": f"py:{module}.{q}", "file": rel_path, "params": _params(n),
+                        "body": _Lower(rel_path).block(n.body),
+                    }  # fmt: skip
+                    if closure:
+                        fn["closure"] = sorted(closure - set(_params(n)))
+                    out.append(fn)
+                visit(n.body, f"{q}.<locals>.", closure | _bound_names(n))
+            elif isinstance(
+                n,
+                ast.If
+                | ast.For
+                | ast.AsyncFor
+                | ast.While
+                | ast.With
+                | ast.AsyncWith
+                | ast.Try
+                | ast.TryStar,
+            ):
+                # definitions nested in compound statements (module-level `if TYPE_CHECKING:`
+                # or inside a function body) belong to the same scope
+                for blk in _blocks(n):
+                    visit(blk, prefix, closure)
 
-    visit(tree.body, "")
+    visit(tree.body, "", set())
+    return out
+
+
+def _blocks(n: ast.stmt) -> list[list[ast.stmt]]:
+    out: list[list[ast.stmt]] = []
+    for attr in ("body", "orelse", "finalbody"):
+        blk = getattr(n, attr, None)
+        if blk:
+            out.append(blk)
+    for h in getattr(n, "handlers", []) or []:
+        out.append(h.body)
     return out
