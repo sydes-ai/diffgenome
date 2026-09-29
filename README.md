@@ -106,6 +106,7 @@ its caveats are in [docs/architecture.md §1](docs/architecture.md#1-goal-and-no
 | **STATE rung** (bounded, value-free state facts on all three runtimes), exit categories (`returned-error`/`panic`), adversarial ground truth VALUE-only vs STATE, join matrix and path precision/recall with explanations, state-condition probe objective | done; see `docs/experiment-07.md` and `docs/runs/exp07-state/` |
 | **Integration surface**: `diffgenome change` / `diffgenome.api`, the `diffgenome-change/1` artifact, consumed by Sydes `verify-change --behavioral-map diffgenome` | done; see `docs/integration-artifact.md` and `docs/integration-sydes.md` |
 | **Behavioral Genome IR (experimental, `diffgenome-genome/0`)**: model-proposed decisions, rules and regimes above the evidence graph, with every status assigned by a deterministic checker; predicted 11/11 simplebank paths exactly, including 4 withheld from the model | experiment; see `docs/experiment-08-genome.md` |
+| **Exact mechanics under the genome**: stable decision-site identity with runtime branch outcomes (Python, Go), conservative intra-procedural def-use and control requirements, observed state deltas; a state genome of Kokoro's ModelManager predicts 13/13 state sequences exactly (4/4 withheld; stateless ablation 3/13) | experiment; see `docs/experiment-09-state-genome.md` |
 | Goroutine/coroutine spawn causality, Linux OS-plane collector, larger targets, state-condition probes against a live writer | next |
 | Sandbox | built alongside the OS-plane collector |
 | Generated probes, second runtime, ground-truth comparison, Go | later experiments |
@@ -155,6 +156,9 @@ whole run.
 - [docs/experiment-06.md](docs/experiment-06.md): three real changes across Python, Node and Go,
   the behavioral projection, ambiguity analysis, path-level ground truth, and the
   language-neutrality accounting after three runtimes.
+- [docs/experiment-09-state-genome.md](docs/experiment-09-state-genome.md): deterministic
+  mechanics (branch outcomes, def-use, control, state deltas) under the genome, and a state
+  genome that predicts held-out state-dependent behavior.
 - [docs/experiment-08-genome.md](docs/experiment-08-genome.md): a Behavioral Genome IR above
   the graph, with model-proposed semantics, deterministic status assignment, a holdout-based
   generative check and seeded-error controls.

@@ -160,6 +160,7 @@ class CallNode:
     outcome: Outcome = "unknown"
     result: str = ""  # digest of the returned value (same scheme as ArgShapes), "" if unavailable
     state: StateFacts = ()  # receiver/global state at entry; the fragment side of STATE
+    state_after: StateFacts = ()  # the same bounded view on exit (observed state deltas)
 
 
 @dataclass(frozen=True)
@@ -231,6 +232,18 @@ Node = CallNode | SubstitutionNode | OsEventNode
 
 
 @dataclass(frozen=True)
+class BranchObs:
+    """One observed decision: the condition at `site` (see `diffgenome.sites`) evaluated to
+    `outcome` inside call node `node`. `seq` is the number of nodes that existed when the
+    branch was taken, which orders it against the calls around it."""
+
+    site: str
+    outcome: bool
+    node: int
+    seq: int
+
+
+@dataclass(frozen=True)
 class Execution:
     """One stimulus applied to one process, and everything observed about it."""
 
@@ -245,6 +258,7 @@ class Execution:
     diagnostics: tuple[tuple[str, str], ...] = ()
     """Collector self-reports as (key, value), e.g. ``("stack_repairs", "3")``. Facts about
     the instrument, not about the target; a reader uses them to judge the trace."""
+    branches: tuple[BranchObs, ...] = ()  # observed decision outcomes, in order
 
 
 # ------------------------------------------------------------------------ interpretation

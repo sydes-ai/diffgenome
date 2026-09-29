@@ -98,6 +98,7 @@ class _Plugin:
                 collectors=self.collectors,
                 symbols=result.symbols,
                 nodes=result.nodes,
+                branches=result.branches,
                 diagnostics=(
                     ("stack_repairs", str(result.stack_repairs)),
                     ("attribution_disagreements", str(result.attribution_disagreements)),

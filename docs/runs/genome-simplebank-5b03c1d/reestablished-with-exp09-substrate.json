@@ -1,0 +1,102 @@
+[
+ {
+  "id": "D0",
+  "predicate": "!auth.present",
+  "entity": "authMiddleware",
+  "exp08": "supported",
+  "now": "supported",
+  "site": null,
+  "site_pred": null,
+  "reason": "every cited reference checks out (source); site: none (no unique cited decision site); not verified: no decision site"
+ },
+ {
+  "id": "D1",
+  "predicate": "!request.currency_supported",
+  "entity": "<anon>@8",
+  "exp08": "verified",
+  "now": "supported",
+  "site": "br:896fb396ec78",
+  "site_pred": "err != nil",
+  "reason": "every cited reference checks out (execution, source); site: br:896fb396ec78 (linked by the only cited `if` line); not verified: site shared with D2 \u2014 the observable outcome decides only their disjunction"
+ },
+ {
+  "id": "D2",
+  "predicate": "request.amount <= 0",
+  "entity": "createTransfer",
+  "exp08": "supported",
+  "now": "supported",
+  "site": "br:896fb396ec78",
+  "site_pred": "err != nil",
+  "reason": "every cited reference checks out (execution, source); site: br:896fb396ec78 (linked by the only cited `if` line); not verified: site shared with D1 \u2014 the observable outcome decides only their disjunction"
+ },
+ {
+  "id": "D3",
+  "predicate": "!from_account.found",
+  "entity": "validAccount",
+  "exp08": "supported",
+  "now": "supported",
+  "site": "br:1b0904d8dadc",
+  "site_pred": "errors.Is(err, db.ErrRecordNotFound)",
+  "reason": "every cited reference checks out (execution, source); site: br:1b0904d8dadc (linked by the only cited `if` line); not verified: predicate disagrees with the observed site outcome: ToAccountNotFound: predicate False, site [True]; GetAccountError: predicate True, site [False]"
+ },
+ {
+  "id": "D4",
+  "predicate": "!from_account.currency_match",
+  "entity": "validAccount",
+  "exp08": "supported",
+  "now": "supported",
+  "site": "br:f3ccd85112f2",
+  "site_pred": "account.Currency != currency",
+  "reason": "every cited reference checks out (execution, source); site: br:f3ccd85112f2 (linked by the only cited `if` line); not verified: site shared with D7 \u2014 the observable outcome decides only their disjunction"
+ },
+ {
+  "id": "D5",
+  "predicate": "!from_account.owned_by_auth",
+  "entity": "createTransfer",
+  "exp08": "supported",
+  "now": "verified",
+  "site": "br:20ba526fd4ca",
+  "site_pred": "fromAccount.Owner != authPayload.Username",
+  "reason": "site br:20ba526fd4ca (`fromAccount.Owner != authPayload.Username`) observed true in 1 and false in 5 execution(s); the predicate agrees with the observed outcome in 6 test(s) and disagrees in none; branch consequences consistent with static control facts; no contradiction"
+ },
+ {
+  "id": "D6",
+  "predicate": "!to_account.found",
+  "entity": "validAccount",
+  "exp08": "supported",
+  "now": "supported",
+  "site": null,
+  "site_pred": null,
+  "reason": "every cited reference checks out (execution, source); site: none (no unique cited decision site); not verified: no decision site"
+ },
+ {
+  "id": "D7",
+  "predicate": "!to_account.currency_match",
+  "entity": "validAccount",
+  "exp08": "supported",
+  "now": "supported",
+  "site": "br:f3ccd85112f2",
+  "site_pred": "account.Currency != currency",
+  "reason": "every cited reference checks out (source); site: br:f3ccd85112f2 (linked by the only cited `if` line); not verified: site shared with D4 \u2014 the observable outcome decides only their disjunction"
+ },
+ {
+  "id": "D8",
+  "predicate": "!from_account.balance_sufficient",
+  "entity": "checkSufficientBalance",
+  "exp08": "verified",
+  "now": "verified",
+  "site": "br:4488ad242266",
+  "site_pred": "account.Balance < amount",
+  "reason": "site br:4488ad242266 (`account.Balance < amount`) observed true in 1 and false in 2 execution(s); the predicate agrees with the observed outcome in 3 test(s) and disagrees in none; branch consequences consistent with static control facts; no contradiction"
+ },
+ {
+  "id": "D9",
+  "predicate": "!transfer_tx.ok",
+  "entity": "createTransfer",
+  "exp08": "supported",
+  "now": "verified",
+  "site": "br:8f4ce0afa154",
+  "site_pred": "err != nil",
+  "reason": "site br:8f4ce0afa154 (`err != nil`) observed true in 1 and false in 1 execution(s); the predicate agrees with the observed outcome in 2 test(s) and disagrees in none; branch consequences consistent with static control facts; no contradiction"
+ }
+]

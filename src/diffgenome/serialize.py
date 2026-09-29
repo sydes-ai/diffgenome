@@ -8,6 +8,7 @@ from enum import Enum
 from typing import Any
 
 from diffgenome.model import (
+    BranchObs,
     CallNode,
     Collector,
     Execution,
@@ -55,6 +56,8 @@ def _node_from_dict(d: dict[str, Any]) -> Node:
         d["args"] = tuple((n, sh, dg) for n, sh, dg in d["args"])
     if "state" in d:
         d["state"] = tuple((n, b, dg) for n, b, dg in d["state"])
+    if "state_after" in d:
+        d["state_after"] = tuple((n, b, dg) for n, b, dg in d["state_after"])
     if cls is SubstitutionNode:
         d["mechanism"] = SubstitutionMechanism(d["mechanism"])
         d["path"] = tuple(d["path"])
@@ -86,4 +89,8 @@ def execution_from_json(text: str) -> Execution:
         ),
         nodes=tuple(_node_from_dict(n) for n in d["nodes"]),
         diagnostics=tuple((k, v) for k, v in d.get("diagnostics", [])),
+        branches=tuple(
+            BranchObs(b["site"], bool(b["outcome"]), int(b["node"]), int(b["seq"]))
+            for b in d.get("branches") or []
+        ),
     )

@@ -1,0 +1,23 @@
+{
+ "holdout": [
+  "test_generate_lazy_reinit_when_backend_none",
+  "test_generate_schedules_idle_unload_when_enabled",
+  "test_load_model_does_not_schedule_idle_unload_during_active_request",
+  "test_unload_when_already_none_is_noop"
+ ],
+ "shown": [
+  "test_active_request_blocks_idle_unload",
+  "test_ensure_backend_serializes_concurrent_reloads",
+  "test_generate_skips_reinit_when_backend_set",
+  "test_idle_auto_unload_log_includes_configured_timeout",
+  "test_load_model_schedules_idle_unload_when_enabled",
+  "test_manager_init_creates_lock",
+  "test_status_reports_model_lifecycle_state",
+  "test_unload_calls_cuda_empty_cache_when_available",
+  "test_unload_clears_backend",
+  "test_unload_skips_cuda_empty_cache_when_unavailable"
+ ],
+ "not_scored": [
+  "test_ensure_backend_serializes_concurrent_reloads"
+ ]
+}

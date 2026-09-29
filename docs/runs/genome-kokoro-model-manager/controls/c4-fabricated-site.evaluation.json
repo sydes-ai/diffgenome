@@ -1,0 +1,1240 @@
+{
+ "statuses": {
+  "variables": {
+   "supported": 9
+  },
+  "decisions": {
+   "hypothesis": 1,
+   "supported": 12,
+   "verified": 3
+  },
+  "transitions": {
+   "verified": 7,
+   "supported": 3
+  },
+  "procedures": {
+   "supported": 17
+  },
+  "rules": {
+   "supported": 5
+  },
+  "regimes": {
+   "supported": 2
+  }
+ },
+ "per_test": [
+  {
+   "execution": "api/tests/test_model_unload.py::test_active_request_blocks_idle_unload",
+   "indeterminate": "decision d_eb_fast is hypothesis",
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:1ae6dab118b9",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     true
+    ]
+   ],
+   "branches_exact": false,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {
+    "active_requests": [
+     1,
+     0
+    ],
+    "last_used_set": [
+     false,
+     true
+    ]
+   },
+   "match": false,
+   "test": "test_active_request_blocks_idle_unload",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_ensure_backend_serializes_concurrent_reloads",
+   "indeterminate": "decision d_eb_fast is hypothesis",
+   "predicted_branches": [],
+   "observed_branches": [
+    [
+     "br:2c6c7a26afe6",
+     true
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:2c6c7a26afe6",
+     false
+    ],
+    [
+     "br:2c6c7a26afe6",
+     false
+    ],
+    [
+     "br:2c6c7a26afe6",
+     false
+    ],
+    [
+     "br:2c6c7a26afe6",
+     false
+    ]
+   ],
+   "branches_exact": false,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {
+    "backend_loaded": [
+     false,
+     true
+    ]
+   },
+   "match": false,
+   "test": "test_ensure_backend_serializes_concurrent_reloads",
+   "withheld": false,
+   "scored": false
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_generate_lazy_reinit_when_backend_none",
+   "indeterminate": "decision d_eb_fast is hypothesis",
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:2c6c7a26afe6",
+     true
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:1ae6dab118b9",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     true
+    ]
+   ],
+   "branches_exact": false,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {
+    "backend_loaded": [
+     false,
+     true
+    ],
+    "active_requests": [
+     1,
+     0
+    ],
+    "last_used_set": [
+     false,
+     true
+    ]
+   },
+   "match": false,
+   "test": "test_generate_lazy_reinit_when_backend_none",
+   "withheld": true,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_generate_schedules_idle_unload_when_enabled",
+   "indeterminate": "decision d_eb_fast is hypothesis",
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:1ae6dab118b9",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     false
+    ],
+    [
+     "br:79d02f610d4d",
+     false
+    ],
+    [
+     "br:bad1968a9b60",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:ed05503f84fe",
+     true
+    ],
+    [
+     "br:9eca4b37c953",
+     false
+    ]
+   ],
+   "branches_exact": false,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {
+    "backend_loaded": [
+     true,
+     false
+    ],
+    "active_requests": [
+     1,
+     0
+    ],
+    "last_used_set": [
+     false,
+     true
+    ],
+    "timer_pending": [
+     false,
+     true
+    ]
+   },
+   "match": false,
+   "test": "test_generate_schedules_idle_unload_when_enabled",
+   "withheld": true,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_generate_skips_reinit_when_backend_set",
+   "indeterminate": "decision d_eb_fast is hypothesis",
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:1ae6dab118b9",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     true
+    ]
+   ],
+   "branches_exact": false,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {
+    "active_requests": [
+     1,
+     0
+    ],
+    "last_used_set": [
+     false,
+     true
+    ]
+   },
+   "match": false,
+   "test": "test_generate_skips_reinit_when_backend_set",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_idle_auto_unload_log_includes_configured_timeout",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:79d02f610d4d",
+     false
+    ],
+    [
+     "br:bad1968a9b60",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:ed05503f84fe",
+     true
+    ],
+    [
+     "br:9eca4b37c953",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:79d02f610d4d",
+     false
+    ],
+    [
+     "br:bad1968a9b60",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:ed05503f84fe",
+     true
+    ],
+    [
+     "br:9eca4b37c953",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_idle_auto_unload_log_includes_configured_timeout",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_load_model_does_not_schedule_idle_unload_during_active_request",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:34208645b556",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:34208645b556",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_load_model_does_not_schedule_idle_unload_during_active_request",
+   "withheld": true,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_load_model_schedules_idle_unload_when_enabled",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:34208645b556",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     false
+    ],
+    [
+     "br:79d02f610d4d",
+     false
+    ],
+    [
+     "br:bad1968a9b60",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:ed05503f84fe",
+     true
+    ],
+    [
+     "br:9eca4b37c953",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:34208645b556",
+     false
+    ],
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:075bba2b9a54",
+     false
+    ],
+    [
+     "br:79d02f610d4d",
+     false
+    ],
+    [
+     "br:bad1968a9b60",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:ed05503f84fe",
+     true
+    ],
+    [
+     "br:9eca4b37c953",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_load_model_schedules_idle_unload_when_enabled",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_manager_init_creates_lock",
+   "indeterminate": null,
+   "predicted_branches": [],
+   "observed_branches": [],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_manager_init_creates_lock",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_status_reports_model_lifecycle_state",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:a08083f9aeea",
+     true
+    ],
+    [
+     "br:cfda31c8127c",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:a08083f9aeea",
+     true
+    ],
+    [
+     "br:cfda31c8127c",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending",
+    "unload_timeout"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_status_reports_model_lifecycle_state",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_unload_calls_cuda_empty_cache_when_available",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     true
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     true
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_unload_calls_cuda_empty_cache_when_available",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_unload_clears_backend",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_unload_clears_backend",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_unload_skips_cuda_empty_cache_when_unavailable",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     false
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_unload_skips_cuda_empty_cache_when_unavailable",
+   "withheld": false,
+   "scored": true
+  },
+  {
+   "execution": "api/tests/test_model_unload.py::test_unload_when_already_none_is_noop",
+   "indeterminate": null,
+   "predicted_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     true
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "observed_branches": [
+    [
+     "br:be9c978e2166",
+     false
+    ],
+    [
+     "br:e6f07b6d711d",
+     true
+    ],
+    [
+     "br:4e5a06d4451e",
+     false
+    ]
+   ],
+   "branches_exact": true,
+   "state_checked": [
+    "active_requests",
+    "backend_loaded",
+    "last_used_set",
+    "timer_pending"
+   ],
+   "state_diff": {},
+   "match": true,
+   "test": "test_unload_when_already_none_is_noop",
+   "withheld": true,
+   "scored": true
+  }
+ ],
+ "ablation": [
+  {
+   "test": "test_active_request_blocks_idle_unload",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_generate_lazy_reinit_when_backend_none",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_generate_schedules_idle_unload_when_enabled",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_generate_skips_reinit_when_backend_set",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_idle_auto_unload_log_includes_configured_timeout",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_load_model_does_not_schedule_idle_unload_during_active_request",
+   "match": false,
+   "branches_exact": true
+  },
+  {
+   "test": "test_load_model_schedules_idle_unload_when_enabled",
+   "match": false,
+   "branches_exact": false
+  },
+  {
+   "test": "test_manager_init_creates_lock",
+   "match": true,
+   "branches_exact": true
+  },
+  {
+   "test": "test_status_reports_model_lifecycle_state",
+   "match": true,
+   "branches_exact": true
+  },
+  {
+   "test": "test_unload_calls_cuda_empty_cache_when_available",
+   "match": false,
+   "branches_exact": true
+  },
+  {
+   "test": "test_unload_clears_backend",
+   "match": false,
+   "branches_exact": true
+  },
+  {
+   "test": "test_unload_skips_cuda_empty_cache_when_unavailable",
+   "match": false,
+   "branches_exact": true
+  },
+  {
+   "test": "test_unload_when_already_none_is_noop",
+   "match": true,
+   "branches_exact": true
+  }
+ ],
+ "path_conditions": {
+  "test_active_request_blocks_idle_unload": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:1ae6dab118b9",
+    "outcome": false,
+    "pred": "settings.default_volume_multiplier != 1.0",
+    "in": "py:api.src.inference.model_manager.ModelManager.generate"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": true,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   }
+  ],
+  "test_ensure_backend_serializes_concurrent_reloads": [
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": true,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   },
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   },
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   },
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   }
+  ],
+  "test_generate_lazy_reinit_when_backend_none": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:2c6c7a26afe6",
+    "outcome": true,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.ensure_backend"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:1ae6dab118b9",
+    "outcome": false,
+    "pred": "settings.default_volume_multiplier != 1.0",
+    "in": "py:api.src.inference.model_manager.ModelManager.generate"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": true,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   }
+  ],
+  "test_generate_schedules_idle_unload_when_enabled": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:1ae6dab118b9",
+    "outcome": false,
+    "pred": "settings.default_volume_multiplier != 1.0",
+    "in": "py:api.src.inference.model_manager.ModelManager.generate"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   },
+   {
+    "site": "br:79d02f610d4d",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0 or (self._last_used_at is None)",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:bad1968a9b60",
+    "outcome": false,
+    "pred": "idle_for < self._auto_unload_timeout()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:ed05503f84fe",
+    "outcome": true,
+    "pred": "unloaded",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:9eca4b37c953",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   }
+  ],
+  "test_generate_skips_reinit_when_backend_set": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:1ae6dab118b9",
+    "outcome": false,
+    "pred": "settings.default_volume_multiplier != 1.0",
+    "in": "py:api.src.inference.model_manager.ModelManager.generate"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": true,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   }
+  ],
+  "test_idle_auto_unload_log_includes_configured_timeout": [
+   {
+    "site": "br:79d02f610d4d",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0 or (self._last_used_at is None)",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:bad1968a9b60",
+    "outcome": false,
+    "pred": "idle_for < self._auto_unload_timeout()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:ed05503f84fe",
+    "outcome": true,
+    "pred": "unloaded",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:9eca4b37c953",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   }
+  ],
+  "test_load_model_does_not_schedule_idle_unload_during_active_request": [
+   {
+    "site": "br:34208645b556",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.load_model"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": true,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   }
+  ],
+  "test_load_model_schedules_idle_unload_when_enabled": [
+   {
+    "site": "br:34208645b556",
+    "outcome": false,
+    "pred": "not self._backend",
+    "in": "py:api.src.inference.model_manager.ModelManager.load_model"
+   },
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:075bba2b9a54",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+    "in": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked"
+   },
+   {
+    "site": "br:79d02f610d4d",
+    "outcome": false,
+    "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0 or (self._last_used_at is None)",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:bad1968a9b60",
+    "outcome": false,
+    "pred": "idle_for < self._auto_unload_timeout()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:ed05503f84fe",
+    "outcome": true,
+    "pred": "unloaded",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   },
+   {
+    "site": "br:9eca4b37c953",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager._idle_unload_after"
+   }
+  ],
+  "test_manager_init_creates_lock": [],
+  "test_status_reports_model_lifecycle_state": [
+   {
+    "site": "br:a08083f9aeea",
+    "outcome": true,
+    "pred": "self._last_used_at is not None",
+    "in": "py:api.src.inference.model_manager.ModelManager.status"
+   },
+   {
+    "site": "br:cfda31c8127c",
+    "outcome": true,
+    "pred": "self._auto_unload_enabled() and self._backend is not None",
+    "in": "py:api.src.inference.model_manager.ModelManager.status"
+   }
+  ],
+  "test_unload_calls_cuda_empty_cache_when_available": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:4e5a06d4451e",
+    "outcome": true,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager.unload"
+   }
+  ],
+  "test_unload_clears_backend": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:4e5a06d4451e",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager.unload"
+   }
+  ],
+  "test_unload_skips_cuda_empty_cache_when_unavailable": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": false,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:4e5a06d4451e",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager.unload"
+   }
+  ],
+  "test_unload_when_already_none_is_noop": [
+   {
+    "site": "br:be9c978e2166",
+    "outcome": false,
+    "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+    "in": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer"
+   },
+   {
+    "site": "br:e6f07b6d711d",
+    "outcome": true,
+    "pred": "self._backend is None",
+    "in": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked"
+   },
+   {
+    "site": "br:4e5a06d4451e",
+    "outcome": false,
+    "pred": "torch.cuda.is_available()",
+    "in": "py:api.src.inference.model_manager.ModelManager.unload"
+   }
+  ]
+ },
+ "regime_classes": [
+  [
+   "test_active_request_blocks_idle_unload"
+  ],
+  [
+   "test_ensure_backend_serializes_concurrent_reloads"
+  ],
+  [
+   "test_generate_lazy_reinit_when_backend_none"
+  ],
+  [
+   "test_generate_schedules_idle_unload_when_enabled"
+  ],
+  [
+   "test_generate_skips_reinit_when_backend_set"
+  ],
+  [
+   "test_idle_auto_unload_log_includes_configured_timeout"
+  ],
+  [
+   "test_load_model_does_not_schedule_idle_unload_during_active_request"
+  ],
+  [
+   "test_load_model_schedules_idle_unload_when_enabled"
+  ],
+  [
+   "test_manager_init_creates_lock"
+  ],
+  [
+   "test_status_reports_model_lifecycle_state"
+  ],
+  [
+   "test_unload_calls_cuda_empty_cache_when_available"
+  ],
+  [
+   "test_unload_clears_backend",
+   "test_unload_skips_cuda_empty_cache_when_unavailable"
+  ],
+  [
+   "test_unload_when_already_none_is_noop"
+  ]
+ ],
+ "tag": "controls/c4-fabricated-site."
+}

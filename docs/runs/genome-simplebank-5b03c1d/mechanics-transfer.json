@@ -1,0 +1,1236 @@
+{
+ "format": "diffgenome-mechanics/0",
+ "functions": [
+  {
+   "symbol": "go:api.Server.createTransfer",
+   "file": "api/transfer.go",
+   "params": [
+    "server",
+    "ctx"
+   ],
+   "sites": [
+    {
+     "site": "br:896fb396ec78",
+     "span": [
+      22,
+      38,
+      22,
+      48
+     ],
+     "pred": "err != nil",
+     "line": 22,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "err",
+       "origins": [
+        "call:ctx.ShouldBindJSON"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:60a4c43004b3",
+     "span": [
+      28,
+      5,
+      28,
+      11
+     ],
+     "pred": "!valid",
+     "line": 28,
+     "order": 1,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "valid",
+       "origins": [
+        "call:server.validAccount#1"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:20ba526fd4ca",
+     "span": [
+      33,
+      5,
+      33,
+      46
+     ],
+     "pred": "fromAccount.Owner != authPayload.Username",
+     "line": 33,
+     "order": 2,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "fromAccount.Owner",
+       "origins": [
+        "call:server.validAccount#0.Owner"
+       ]
+      },
+      {
+       "path": "authPayload.Username",
+       "origins": [
+        "call:ctx.MustGet.Username"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:baf5108f6dd3",
+     "span": [
+      40,
+      5,
+      40,
+      11
+     ],
+     "pred": "!valid",
+     "line": 40,
+     "order": 3,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "valid",
+       "origins": [
+        "call:server.validAccount#1"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:251b7c548864",
+     "span": [
+      44,
+      5,
+      44,
+      65
+     ],
+     "pred": "!server.checkSufficientBalance(ctx, fromAccount, req.Amount)",
+     "line": 44,
+     "order": 4,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "server",
+       "origins": [
+        "param:server"
+       ]
+      },
+      {
+       "path": "ctx",
+       "origins": [
+        "param:ctx"
+       ]
+      },
+      {
+       "path": "fromAccount",
+       "origins": [
+        "call:server.validAccount#0"
+       ]
+      },
+      {
+       "path": "req.Amount",
+       "origins": [
+        "const",
+        "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "server.checkSufficientBalance"
+     ],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:8f4ce0afa154",
+     "span": [
+      55,
+      5,
+      55,
+      15
+     ],
+     "pred": "err != nil",
+     "line": 55,
+     "order": 5,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "err",
+       "origins": [
+        "call:server.store.TransferTx#1"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "ctx.ShouldBindJSON",
+     "line": 22,
+     "requires": [],
+     "arg_origins": [
+      [
+       "const"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 23,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 23,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusBadRequest"
+      ],
+      [
+       "call:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "server.validAccount",
+     "line": 27,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:ctx"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.MustGet",
+     "line": 32,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:authorizationPayloadKey"
+      ]
+     ]
+    },
+    {
+     "callee": "errors.New",
+     "line": 34,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 35,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:errors.New"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 35,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusUnauthorized"
+      ],
+      [
+       "call:errors.New"
+      ]
+     ]
+    },
+    {
+     "callee": "server.validAccount",
+     "line": 39,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:ctx"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "server.checkSufficientBalance",
+     "line": 44,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:ctx"
+      ],
+      [
+       "call:server.validAccount#0"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "server.store.TransferTx",
+     "line": 54,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:ctx"
+      ],
+      [
+       "const",
+       "unknown:UNKNOWN_DEPENDENCE:address-passed-to:ctx.ShouldBindJSON"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 56,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ],
+      [
+       "br:8f4ce0afa154",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:server.store.TransferTx#1"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 56,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ],
+      [
+       "br:8f4ce0afa154",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusInternalServerError"
+      ],
+      [
+       "call:server.store.TransferTx#1"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 60,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ],
+      [
+       "br:8f4ce0afa154",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusOK"
+      ],
+      [
+       "call:server.store.TransferTx#0"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 24,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 29,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 36,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 41,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 45,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 57,
+     "requires": [
+      [
+       "br:896fb396ec78",
+       false
+      ],
+      [
+       "br:60a4c43004b3",
+       false
+      ],
+      [
+       "br:20ba526fd4ca",
+       false
+      ],
+      [
+       "br:baf5108f6dd3",
+       false
+      ],
+      [
+       "br:251b7c548864",
+       false
+      ],
+      [
+       "br:8f4ce0afa154",
+       true
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "go:api.Server.validAccount",
+   "file": "api/transfer.go",
+   "params": [
+    "server",
+    "ctx",
+    "accountID",
+    "currency"
+   ],
+   "sites": [
+    {
+     "site": "br:aec10fbd39bf",
+     "span": [
+      65,
+      5,
+      65,
+      15
+     ],
+     "pred": "err != nil",
+     "line": 65,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "err",
+       "origins": [
+        "call:server.store.GetAccount#1"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:1b0904d8dadc",
+     "span": [
+      66,
+      6,
+      66,
+      42
+     ],
+     "pred": "errors.Is(err, db.ErrRecordNotFound)",
+     "line": 66,
+     "order": 1,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ]
+     ],
+     "operands": [
+      {
+       "path": "errors",
+       "origins": [
+        "global:errors"
+       ]
+      },
+      {
+       "path": "err",
+       "origins": [
+        "call:server.store.GetAccount#1"
+       ]
+      },
+      {
+       "path": "db.ErrRecordNotFound",
+       "origins": [
+        "global:db.ErrRecordNotFound"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "errors.Is"
+     ],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:f3ccd85112f2",
+     "span": [
+      75,
+      5,
+      75,
+      33
+     ],
+     "pred": "account.Currency != currency",
+     "line": 75,
+     "order": 2,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "account.Currency",
+       "origins": [
+        "call:server.store.GetAccount#0.Currency"
+       ]
+      },
+      {
+       "path": "currency",
+       "origins": [
+        "param:currency"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "server.store.GetAccount",
+     "line": 64,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:ctx"
+      ],
+      [
+       "param:accountID"
+      ]
+     ]
+    },
+    {
+     "callee": "errors.Is",
+     "line": 66,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:server.store.GetAccount#1"
+      ],
+      [
+       "global:db.ErrRecordNotFound"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 67,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:server.store.GetAccount#1"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 67,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusNotFound"
+      ],
+      [
+       "call:server.store.GetAccount#1"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 71,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:server.store.GetAccount#1"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 71,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusInternalServerError"
+      ],
+      [
+       "call:server.store.GetAccount#1"
+      ]
+     ]
+    },
+    {
+     "callee": "fmt.Errorf",
+     "line": 76,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ],
+      [
+       "br:f3ccd85112f2",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "call:server.store.GetAccount#0.ID"
+      ],
+      [
+       "call:server.store.GetAccount#0.Currency"
+      ],
+      [
+       "param:currency"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 77,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ],
+      [
+       "br:f3ccd85112f2",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:fmt.Errorf"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 77,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ],
+      [
+       "br:f3ccd85112f2",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusBadRequest"
+      ],
+      [
+       "call:fmt.Errorf"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 68,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       true
+      ]
+     ],
+     "origins": [
+      "call:server.store.GetAccount#0"
+     ]
+    },
+    {
+     "line": 72,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       true
+      ],
+      [
+       "br:1b0904d8dadc",
+       false
+      ]
+     ],
+     "origins": [
+      "call:server.store.GetAccount#0"
+     ]
+    },
+    {
+     "line": 78,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ],
+      [
+       "br:f3ccd85112f2",
+       true
+      ]
+     ],
+     "origins": [
+      "call:server.store.GetAccount#0"
+     ]
+    },
+    {
+     "line": 81,
+     "requires": [
+      [
+       "br:aec10fbd39bf",
+       false
+      ],
+      [
+       "br:f3ccd85112f2",
+       false
+      ]
+     ],
+     "origins": [
+      "call:server.store.GetAccount#0"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "go:api.Server.checkSufficientBalance",
+   "file": "api/transfer.go",
+   "params": [
+    "server",
+    "ctx",
+    "account",
+    "amount"
+   ],
+   "sites": [
+    {
+     "site": "br:4488ad242266",
+     "span": [
+      85,
+      5,
+      85,
+      29
+     ],
+     "pred": "account.Balance < amount",
+     "line": 85,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "account.Balance",
+       "origins": [
+        "param:account.Balance"
+       ]
+      },
+      {
+       "path": "amount",
+       "origins": [
+        "param:amount"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "fmt.Errorf",
+     "line": 86,
+     "requires": [
+      [
+       "br:4488ad242266",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "param:account.ID"
+      ],
+      [
+       "param:account.Balance"
+      ],
+      [
+       "param:amount"
+      ]
+     ]
+    },
+    {
+     "callee": "errorResponse",
+     "line": 87,
+     "requires": [
+      [
+       "br:4488ad242266",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:fmt.Errorf"
+      ]
+     ]
+    },
+    {
+     "callee": "ctx.JSON",
+     "line": 87,
+     "requires": [
+      [
+       "br:4488ad242266",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:http.StatusBadRequest"
+      ],
+      [
+       "call:fmt.Errorf"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 88,
+     "requires": [
+      [
+       "br:4488ad242266",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 91,
+     "requires": [
+      [
+       "br:4488ad242266",
+       false
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  }
+ ]
+}

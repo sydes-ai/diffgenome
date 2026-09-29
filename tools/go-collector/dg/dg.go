@@ -70,6 +70,7 @@ type node struct {
 	Relation   string      `json:"relation,omitempty"`
 	Path       []string    `json:"-"`
 	State      [][3]string `json:"-"`
+	StateAfter [][3]string `json:"-"`
 }
 
 // MarshalJSON emits exactly the protocol's fields for each node type.
@@ -85,6 +86,11 @@ func (n *node) MarshalJSON() ([]byte, error) {
 	if n.Type == "call" {
 		m["symbol"] = n.Symbol
 		m["thread"] = n.Thread
+		sa := n.StateAfter
+		if sa == nil {
+			sa = [][3]string{}
+		}
+		m["state_after"] = sa
 	} else {
 		m["mechanism"] = n.Mechanism
 		m["substitute"] = n.Substitute
@@ -99,9 +105,17 @@ func (n *node) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
+type branchObs struct {
+	Site    string `json:"site"`
+	Outcome bool   `json:"outcome"`
+	Node    int    `json:"node"`
+	Seq     int    `json:"seq"`
+}
+
 type execution struct {
 	ref       string
 	nodes     []*node
+	branches  []branchObs
 	symbols   map[string]symbol
 	stacks    map[int64][]int // goroutine id -> node ids
 	goroutine map[int64]int   // goroutine id -> thread number
@@ -113,6 +127,7 @@ type Ctx struct {
 	sub  int // substitution wrapper node id, or -1
 	gid  int64
 	exec *execution
+	recv any // receiver, for the state view on exit
 }
 
 var (
@@ -443,6 +458,7 @@ func End(failed bool) {
 		},
 		"symbols":     syms,
 		"nodes":       e.nodes,
+		"branches":    append([]branchObs{}, e.branches...),
 		"diagnostics": [][2]string{{"goroutines", strconv.Itoa(len(e.goroutine))}},
 	}
 	_ = os.MkdirAll(outDir, 0o755)
@@ -506,7 +522,7 @@ func Enter(m Meta, values ...any) *Ctx {
 		Thread: e.thread(gid), Outcome: "unknown", State: stateFacts(m.Recv)}
 	e.nodes = append(e.nodes, n)
 	e.stacks[gid] = append(stack, n.ID)
-	return &Ctx{id: n.ID, sub: sub, gid: gid, exec: e}
+	return &Ctx{id: n.ID, sub: sub, gid: gid, exec: e, recv: m.Recv}
 }
 
 func settle(e *execution, id int, outcome, result string) {
@@ -564,7 +580,26 @@ func Exit(c *Ctx, results ...any) {
 	if c.sub >= 0 {
 		settle(c.exec, c.sub, outcome, res)
 	}
+	c.exec.nodes[c.id].StateAfter = stateFacts(c.recv)
 	c.exec.pop(c.gid, c.id)
+}
+
+// Branch records the outcome of the `if` condition at `site` (an id computed by the
+// instrumenter from the condition's span in the ORIGINAL source) and returns it unchanged.
+func Branch(site string, cond bool) bool {
+	mu.Lock()
+	defer mu.Unlock()
+	e := current()
+	if e == nil {
+		return cond
+	}
+	stack := e.stacks[goid()]
+	node := 0
+	if len(stack) > 0 {
+		node = stack[len(stack)-1]
+	}
+	e.branches = append(e.branches, branchObs{Site: site, Outcome: cond, Node: node, Seq: len(e.nodes)})
+	return cond
 }
 
 // Panic records a panic unwinding through the call.
@@ -583,5 +618,6 @@ func Panic(c *Ctx, r any) {
 	if c.sub >= 0 {
 		settle(c.exec, c.sub, "panic:"+t, "")
 	}
+	c.exec.nodes[c.id].StateAfter = stateFacts(c.recv)
 	c.exec.pop(c.gid, c.id)
 }

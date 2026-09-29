@@ -142,3 +142,10 @@ def test_rule_is_not_verified_beyond_its_decision(tmp_path: Path) -> None:
     g = establish(genome_from_proposals(props, {}, "m"), _sub(tmp_path))
     assert g.decisions[0].status == VERIFIED
     assert g.rules[0].status == SUPPORTED and "request.currency_ok" in g.rules[0].status_reason
+
+
+def test_boolean_literals_evaluate() -> None:
+    from diffgenome.genome import eval_predicate
+
+    assert eval_predicate("true", {}) is True and eval_predicate("!true", {}) is False
+    assert eval_predicate("false || x", {"x": True}) is True

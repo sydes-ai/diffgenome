@@ -1,0 +1,2085 @@
+{
+ "format": "diffgenome-mechanics/0",
+ "functions": [
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.__init__",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "config"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "asyncio.Lock",
+     "line": 33,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._config",
+     "line": 30,
+     "requires": [],
+     "origins": [
+      "global:model_config",
+      "param:config"
+     ]
+    },
+    {
+     "path": "self._backend",
+     "line": 31,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self._device",
+     "line": 32,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self._lock",
+     "line": 33,
+     "requires": [],
+     "origins": [
+      "call:asyncio.Lock"
+     ]
+    },
+    {
+     "path": "self._active_requests",
+     "line": 34,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self._last_used_at",
+     "line": 35,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self._idle_unload_task",
+     "line": 36,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._determine_device",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [],
+   "returns": [
+    {
+     "line": 40,
+     "requires": [],
+     "origins": [
+      "global:settings.use_gpu"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.initialize",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._determine_device",
+     "line": 45,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "logger.info",
+     "line": 46,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:self._device"
+      ]
+     ]
+    },
+    {
+     "callee": "KokoroV1",
+     "line": 47,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "RuntimeError",
+     "line": 50,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:e"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._device",
+     "line": 45,
+     "requires": [],
+     "origins": [
+      "call:self._determine_device"
+     ]
+    },
+    {
+     "path": "self._backend",
+     "line": 47,
+     "requires": [],
+     "origins": [
+      "call:KokoroV1"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.initialize_with_warmup",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "voice_manager"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "time.perf_counter",
+     "line": 66,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.initialize",
+     "line": 70,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.load_model",
+     "line": 74,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:self._config.pytorch_kokoro_v1_file"
+      ]
+     ]
+    },
+    {
+     "callee": "paths.list_voices",
+     "line": 78,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "paths.get_voice_path",
+     "line": 79,
+     "requires": [],
+     "arg_origins": [
+      [
+       "global:settings.default_voice"
+      ]
+     ]
+    },
+    {
+     "callee": "logger.debug",
+     "line": 85,
+     "requires": [],
+     "arg_origins": [
+      [
+       "global:settings.default_voice"
+      ]
+     ]
+    },
+    {
+     "callee": "self.generate",
+     "line": 86,
+     "requires": [],
+     "arg_origins": [
+      [
+       "const"
+      ],
+      [
+       "call:paths.get_voice_path",
+       "global:settings.default_voice"
+      ]
+     ]
+    },
+    {
+     "callee": "RuntimeError",
+     "line": 89,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:e"
+      ]
+     ]
+    },
+    {
+     "callee": "time.perf_counter",
+     "line": 91,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "int",
+     "line": 91,
+     "requires": [],
+     "arg_origins": [
+      [
+       "call:time.perf_counter",
+       "global:time"
+      ]
+     ]
+    },
+    {
+     "callee": "logger.info",
+     "line": 92,
+     "requires": [],
+     "arg_origins": [
+      [
+       "call:int",
+       "call:time.perf_counter",
+       "global:time"
+      ]
+     ]
+    },
+    {
+     "callee": "len",
+     "line": 94,
+     "requires": [],
+     "arg_origins": [
+      [
+       "call:paths.list_voices"
+      ]
+     ]
+    },
+    {
+     "callee": "logger.error",
+     "line": 96,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "exit",
+     "line": 105,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "RuntimeError",
+     "line": 107,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:e"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 94,
+     "requires": [],
+     "origins": [
+      "call:paths.list_voices",
+      "param:self._device",
+      "call:len"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.ensure_backend",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:1f44d4f2492f",
+     "span": [
+      111,
+      12,
+      111,
+      25
+     ],
+     "pred": "self._backend",
+     "line": 111,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:2c6c7a26afe6",
+     "span": [
+      114,
+      16,
+      114,
+      33
+     ],
+     "pred": "not self._backend",
+     "line": 114,
+     "order": 1,
+     "requires": [
+      [
+       "br:1f44d4f2492f",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 115,
+     "requires": [
+      [
+       "br:1f44d4f2492f",
+       false
+      ],
+      [
+       "br:2c6c7a26afe6",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.initialize",
+     "line": 116,
+     "requires": [
+      [
+       "br:1f44d4f2492f",
+       false
+      ],
+      [
+       "br:2c6c7a26afe6",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.load_model",
+     "line": 117,
+     "requires": [
+      [
+       "br:1f44d4f2492f",
+       false
+      ],
+      [
+       "br:2c6c7a26afe6",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:self._config.pytorch_kokoro_v1_file"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 112,
+     "requires": [
+      [
+       "br:1f44d4f2492f",
+       true
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.get_backend",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:5ea6e7329f80",
+     "span": [
+      128,
+      12,
+      128,
+      29
+     ],
+     "pred": "not self._backend",
+     "line": 128,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "RuntimeError",
+     "line": 129,
+     "requires": [
+      [
+       "br:5ea6e7329f80",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 130,
+     "requires": [
+      [
+       "br:5ea6e7329f80",
+       false
+      ]
+     ],
+     "origins": [
+      "param:self._backend"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.load_model",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "path"
+   ],
+   "sites": [
+    {
+     "site": "br:34208645b556",
+     "span": [
+      141,
+      12,
+      141,
+      29
+     ],
+     "pred": "not self._backend",
+     "line": 141,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "RuntimeError",
+     "line": 142,
+     "requires": [
+      [
+       "br:34208645b556",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    },
+    {
+     "callee": "self._backend.load_model",
+     "line": 145,
+     "requires": [
+      [
+       "br:34208645b556",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:path"
+      ]
+     ]
+    },
+    {
+     "callee": "time.monotonic",
+     "line": 146,
+     "requires": [
+      [
+       "br:34208645b556",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._schedule_idle_unload_timer_locked",
+     "line": 147,
+     "requires": [
+      [
+       "br:34208645b556",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "RuntimeError",
+     "line": 151,
+     "requires": [
+      [
+       "br:34208645b556",
+       false
+      ],
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:e"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._last_used_at",
+     "line": 146,
+     "requires": [
+      [
+       "br:34208645b556",
+       false
+      ]
+     ],
+     "origins": [
+      "call:time.monotonic"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._auto_unload_timeout",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "float",
+     "line": 154,
+     "requires": [],
+     "arg_origins": [
+      [
+       "global:settings.model_auto_unload_timeout_seconds"
+      ]
+     ]
+    },
+    {
+     "callee": "max",
+     "line": 154,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "global:settings.model_auto_unload_timeout_seconds"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 154,
+     "requires": [],
+     "origins": [
+      "global:settings.model_auto_unload_timeout_seconds",
+      "call:float",
+      "call:max"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._format_seconds",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "seconds"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [],
+   "returns": [
+    {
+     "line": 157,
+     "requires": [],
+     "origins": [
+      "param:seconds"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._auto_unload_enabled",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._auto_unload_timeout",
+     "line": 160,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 160,
+     "requires": [],
+     "origins": [
+      "param:self",
+      "call:self._auto_unload_timeout"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._cancel_idle_unload_timer",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:be9c978e2166",
+     "span": [
+      168,
+      13,
+      170,
+      59
+     ],
+     "pred": "self._idle_unload_task and (not self._idle_unload_task.done()) and (self._idle_unload_task is not current_task)",
+     "line": 167,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "current_task",
+       "origins": [
+        "call:asyncio.current_task",
+        "const"
+       ]
+      },
+      {
+       "path": "self._idle_unload_task",
+       "origins": [
+        "param:self._idle_unload_task"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "self._idle_unload_task.done"
+     ],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "asyncio.current_task",
+     "line": 164,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._idle_unload_task.done",
+     "line": 169,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._idle_unload_task.cancel",
+     "line": 172,
+     "requires": [
+      [
+       "br:be9c978e2166",
+       true
+      ]
+     ],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._idle_unload_task",
+     "line": 173,
+     "requires": [],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._unload_backend_locked",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:e6f07b6d711d",
+     "span": [
+      176,
+      12,
+      176,
+      33
+     ],
+     "pred": "self._backend is None",
+     "line": 176,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._backend.unload",
+     "line": 178,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "time.monotonic",
+     "line": 180,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       false
+      ]
+     ],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._backend",
+     "line": 179,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       false
+      ]
+     ],
+     "origins": [
+      "const"
+     ]
+    },
+    {
+     "path": "self._last_used_at",
+     "line": 180,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       false
+      ]
+     ],
+     "origins": [
+      "call:time.monotonic"
+     ]
+    }
+   ],
+   "returns": [
+    {
+     "line": 177,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 181,
+     "requires": [
+      [
+       "br:e6f07b6d711d",
+       false
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._schedule_idle_unload_timer_locked",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:075bba2b9a54",
+     "span": [
+      186,
+      13,
+      188,
+      41
+     ],
+     "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0",
+     "line": 185,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self",
+       "origins": [
+        "param:self"
+       ]
+      },
+      {
+       "path": "self._active_requests",
+       "origins": [
+        "param:self._active_requests"
+       ]
+      },
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "self._auto_unload_enabled"
+     ],
+     "then_exits": true,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 184,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._auto_unload_enabled",
+     "line": 186,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._auto_unload_timeout",
+     "line": 192,
+     "requires": [
+      [
+       "br:075bba2b9a54",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._idle_unload_after",
+     "line": 193,
+     "requires": [
+      [
+       "br:075bba2b9a54",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:self._auto_unload_timeout"
+      ]
+     ]
+    },
+    {
+     "callee": "asyncio.create_task",
+     "line": 193,
+     "requires": [
+      [
+       "br:075bba2b9a54",
+       false
+      ]
+     ],
+     "arg_origins": [
+      [
+       "call:self._auto_unload_timeout",
+       "param:self"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._idle_unload_task",
+     "line": 193,
+     "requires": [
+      [
+       "br:075bba2b9a54",
+       false
+      ]
+     ],
+     "origins": [
+      "call:asyncio.create_task",
+      "call:self._auto_unload_timeout",
+      "call:self._idle_unload_after",
+      "global:asyncio",
+      "param:self"
+     ]
+    }
+   ],
+   "returns": [
+    {
+     "line": 190,
+     "requires": [
+      [
+       "br:075bba2b9a54",
+       true
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._idle_unload_after",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "timeout"
+   ],
+   "sites": [
+    {
+     "site": "br:79d02f610d4d",
+     "span": [
+      200,
+      21,
+      203,
+      50
+     ],
+     "pred": "not self._auto_unload_enabled() or self._backend is None or self._active_requests > 0 or (self._last_used_at is None)",
+     "line": 199,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self",
+       "origins": [
+        "param:self"
+       ]
+      },
+      {
+       "path": "self._active_requests",
+       "origins": [
+        "param:self._active_requests"
+       ]
+      },
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      },
+      {
+       "path": "self._last_used_at",
+       "origins": [
+        "param:self._last_used_at"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "self._auto_unload_enabled"
+     ],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:bad1968a9b60",
+     "span": [
+      208,
+      20,
+      208,
+      58
+     ],
+     "pred": "idle_for < self._auto_unload_timeout()",
+     "line": 208,
+     "order": 1,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ]
+     ],
+     "operands": [
+      {
+       "path": "idle_for",
+       "origins": [
+        "call:time.monotonic",
+        "global:time",
+        "param:self._last_used_at"
+       ]
+      },
+      {
+       "path": "self",
+       "origins": [
+        "param:self"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "self._auto_unload_timeout"
+     ],
+     "then_exits": true,
+     "else_exits": false
+    },
+    {
+     "site": "br:ed05503f84fe",
+     "span": [
+      214,
+      16,
+      214,
+      24
+     ],
+     "pred": "unloaded",
+     "line": 214,
+     "order": 2,
+     "requires": [],
+     "operands": [
+      {
+       "path": "unloaded",
+       "origins": [
+        "call:self._unload_backend_locked"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    },
+    {
+     "site": "br:9eca4b37c953",
+     "span": [
+      215,
+      20,
+      215,
+      45
+     ],
+     "pred": "torch.cuda.is_available()",
+     "line": 215,
+     "order": 3,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ]
+     ],
+     "operands": [
+      {
+       "path": "torch.cuda",
+       "origins": [
+        "global:torch.cuda"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "torch.cuda.is_available"
+     ],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "asyncio.sleep",
+     "line": 197,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:timeout"
+      ]
+     ]
+    },
+    {
+     "callee": "self._auto_unload_enabled",
+     "line": 200,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "time.monotonic",
+     "line": 207,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._auto_unload_timeout",
+     "line": 208,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._schedule_idle_unload_timer_locked",
+     "line": 209,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ],
+      [
+       "br:bad1968a9b60",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._unload_backend_locked",
+     "line": 212,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ],
+      [
+       "br:bad1968a9b60",
+       false
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "torch.cuda.is_available",
+     "line": 215,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "torch.cuda.empty_cache",
+     "line": 216,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ],
+      [
+       "br:9eca4b37c953",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._auto_unload_timeout",
+     "line": 219,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._format_seconds",
+     "line": 219,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:self"
+      ]
+     ]
+    },
+    {
+     "callee": "logger.info",
+     "line": 217,
+     "requires": [
+      [
+       "br:ed05503f84fe",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:self"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 205,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       true
+      ]
+     ],
+     "origins": []
+    },
+    {
+     "line": 210,
+     "requires": [
+      [
+       "br:79d02f610d4d",
+       false
+      ],
+      [
+       "br:bad1968a9b60",
+       true
+      ]
+     ],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._begin_request",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 227,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._active_requests",
+     "line": 226,
+     "requires": [],
+     "origins": [
+      "param:self._active_requests"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager._end_request",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "max",
+     "line": 231,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "param:self._active_requests"
+      ]
+     ]
+    },
+    {
+     "callee": "time.monotonic",
+     "line": 232,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._schedule_idle_unload_timer_locked",
+     "line": 233,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._active_requests",
+     "line": 231,
+     "requires": [],
+     "origins": [
+      "call:max"
+     ]
+    },
+    {
+     "path": "self._last_used_at",
+     "line": 232,
+     "requires": [],
+     "origins": [
+      "call:time.monotonic"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.hold",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._begin_request",
+     "line": 237,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._end_request",
+     "line": 241,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.generate",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self",
+    "args",
+    "kwargs"
+   ],
+   "sites": [
+    {
+     "site": "br:1ae6dab118b9",
+     "span": [
+      254,
+      24,
+      254,
+      65
+     ],
+     "pred": "settings.default_volume_multiplier != 1.0",
+     "line": 254,
+     "order": 0,
+     "requires": [
+      [
+       "?loop",
+       null
+      ]
+     ],
+     "operands": [
+      {
+       "path": "settings.default_volume_multiplier",
+       "origins": [
+        "global:settings.default_volume_multiplier"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self.hold",
+     "line": 250,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.ensure_backend",
+     "line": 251,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._backend.generate",
+     "line": 253,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:args"
+      ],
+      [
+       "param:kwargs"
+      ]
+     ]
+    },
+    {
+     "callee": "RuntimeError",
+     "line": 258,
+     "requires": [
+      [
+       "?exception-handler",
+       null
+      ]
+     ],
+     "arg_origins": [
+      [
+       "global:e"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "chunk.audio",
+     "line": 255,
+     "requires": [
+      [
+       "?loop",
+       null
+      ],
+      [
+       "br:1ae6dab118b9",
+       true
+      ]
+     ],
+     "origins": [
+      "global:settings.default_volume_multiplier",
+      "unknown:UNKNOWN_DEPENDENCE:loop-variable"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.unload_all",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:60ebe4954dd3",
+     "span": [
+      263,
+      12,
+      263,
+      25
+     ],
+     "pred": "self._backend",
+     "line": 263,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 262,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._backend.unload",
+     "line": 264,
+     "requires": [
+      [
+       "br:60ebe4954dd3",
+       true
+      ]
+     ],
+     "arg_origins": []
+    }
+   ],
+   "stores": [
+    {
+     "path": "self._backend",
+     "line": 265,
+     "requires": [
+      [
+       "br:60ebe4954dd3",
+       true
+      ]
+     ],
+     "origins": [
+      "const"
+     ]
+    }
+   ],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.unload",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:4e5a06d4451e",
+     "span": [
+      272,
+      12,
+      272,
+      37
+     ],
+     "pred": "torch.cuda.is_available()",
+     "line": 272,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "torch.cuda",
+       "origins": [
+        "global:torch.cuda"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "torch.cuda.is_available"
+     ],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 270,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._unload_backend_locked",
+     "line": 271,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "torch.cuda.is_available",
+     "line": 272,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "torch.cuda.empty_cache",
+     "line": 273,
+     "requires": [
+      [
+       "br:4e5a06d4451e",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "logger.info",
+     "line": 274,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.reload",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [
+    {
+     "callee": "self._cancel_idle_unload_timer",
+     "line": 279,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self._unload_backend_locked",
+     "line": 280,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.initialize",
+     "line": 281,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "self.load_model",
+     "line": 282,
+     "requires": [],
+     "arg_origins": [
+      [
+       "param:self._config.pytorch_kokoro_v1_file"
+      ]
+     ]
+    },
+    {
+     "callee": "self._schedule_idle_unload_timer_locked",
+     "line": 283,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "logger.info",
+     "line": 284,
+     "requires": [],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ]
+     ]
+    }
+   ],
+   "stores": [],
+   "returns": [],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.status",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [
+    {
+     "site": "br:a08083f9aeea",
+     "span": [
+      291,
+      12,
+      291,
+      42
+     ],
+     "pred": "self._last_used_at is not None",
+     "line": 291,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "self._last_used_at",
+       "origins": [
+        "param:self._last_used_at"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    },
+    {
+     "site": "br:cfda31c8127c",
+     "span": [
+      293,
+      16,
+      293,
+      73
+     ],
+     "pred": "self._auto_unload_enabled() and self._backend is not None",
+     "line": 293,
+     "order": 1,
+     "requires": [
+      [
+       "br:a08083f9aeea",
+       true
+      ]
+     ],
+     "operands": [
+      {
+       "path": "self",
+       "origins": [
+        "param:self"
+       ]
+      },
+      {
+       "path": "self._backend",
+       "origins": [
+        "param:self._backend"
+       ]
+      }
+     ],
+     "operand_calls": [
+      "self._auto_unload_enabled"
+     ],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "self._auto_unload_timeout",
+     "line": 288,
+     "requires": [],
+     "arg_origins": []
+    },
+    {
+     "callee": "time.monotonic",
+     "line": 292,
+     "requires": [
+      [
+       "br:a08083f9aeea",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "max",
+     "line": 292,
+     "requires": [
+      [
+       "br:a08083f9aeea",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "global:time",
+       "param:self._last_used_at"
+      ]
+     ]
+    },
+    {
+     "callee": "self._auto_unload_enabled",
+     "line": 293,
+     "requires": [
+      [
+       "br:a08083f9aeea",
+       true
+      ]
+     ],
+     "arg_origins": []
+    },
+    {
+     "callee": "max",
+     "line": 294,
+     "requires": [
+      [
+       "br:a08083f9aeea",
+       true
+      ],
+      [
+       "br:cfda31c8127c",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "unknown:UNKNOWN_DEPENDENCE:complex-expression"
+      ],
+      [
+       "call:max",
+       "call:self._auto_unload_timeout",
+       "call:time.monotonic",
+       "global:time",
+       "param:self._last_used_at"
+      ]
+     ]
+    },
+    {
+     "callee": "self._auto_unload_enabled",
+     "line": 300,
+     "requires": [],
+     "arg_origins": []
+    }
+   ],
+   "stores": [],
+   "returns": [
+    {
+     "line": 295,
+     "requires": [],
+     "origins": [
+      "call:max",
+      "call:self._auto_unload_timeout",
+      "call:time.monotonic",
+      "const",
+      "global:time",
+      "param:self",
+      "param:self._active_requests",
+      "param:self._backend",
+      "param:self._device",
+      "param:self._last_used_at",
+      "param:self.current_backend",
+      "call:self._auto_unload_enabled"
+     ]
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.ModelManager.current_backend",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "self"
+   ],
+   "sites": [],
+   "calls": [],
+   "stores": [],
+   "returns": [
+    {
+     "line": 309,
+     "requires": [],
+     "origins": []
+    }
+   ],
+   "unknown": []
+  },
+  {
+   "symbol": "py:api.src.inference.model_manager.get_manager",
+   "file": "api/src/inference/model_manager.py",
+   "params": [
+    "config"
+   ],
+   "sites": [
+    {
+     "site": "br:2f19fdb911a4",
+     "span": [
+      321,
+      8,
+      321,
+      38
+     ],
+     "pred": "ModelManager._instance is None",
+     "line": 321,
+     "order": 0,
+     "requires": [],
+     "operands": [
+      {
+       "path": "ModelManager._instance",
+       "origins": [
+        "global:ModelManager._instance"
+       ]
+      }
+     ],
+     "operand_calls": [],
+     "then_exits": false,
+     "else_exits": false
+    }
+   ],
+   "calls": [
+    {
+     "callee": "ModelManager",
+     "line": 322,
+     "requires": [
+      [
+       "br:2f19fdb911a4",
+       true
+      ]
+     ],
+     "arg_origins": [
+      [
+       "param:config"
+      ]
+     ]
+    }
+   ],
+   "stores": [
+    {
+     "path": "ModelManager._instance",
+     "line": 322,
+     "requires": [
+      [
+       "br:2f19fdb911a4",
+       true
+      ]
+     ],
+     "origins": [
+      "call:ModelManager"
+     ]
+    }
+   ],
+   "returns": [
+    {
+     "line": 323,
+     "requires": [],
+     "origins": [
+      "global:ModelManager._instance"
+     ]
+    }
+   ],
+   "unknown": []
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "simplebank_go": {
+  "functions": 234,
+  "sites": 243,
+  "branch_observations": 547,
+  "mapped_to_static_site": 423,
+  "opaque_statements": 6,
+  "operands": 306,
+  "operands_with_unknown_origin": 11
+ },
+ "kokoro_python": {
+  "functions": 24,
+  "sites": 17,
+  "branch_observations": 84,
+  "mapped_to_static_site": 69,
+  "opaque_statements": 0,
+  "operands": 25,
+  "operands_with_unknown_origin": 0
+ }
+}

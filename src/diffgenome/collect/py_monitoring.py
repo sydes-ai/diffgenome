@@ -17,8 +17,10 @@ restored on stop).
 
 from __future__ import annotations
 
+import ast
 import dataclasses
 import hashlib
+import io
 import sys
 import threading
 from dataclasses import dataclass, field
@@ -29,6 +31,7 @@ from unittest import mock
 
 from diffgenome.model import (
     ArgShapes,
+    BranchObs,
     CallNode,
     Collector,
     Fidelity,
@@ -52,6 +55,9 @@ by a runtime hook rather than by the kernel; the collector name says so."""
 _TOOL_ID = 4  # sys.monitoring tool slot; coverage.py uses 2/3 by convention
 _MISSING = sys.monitoring.MISSING
 _DISABLE = sys.monitoring.DISABLE
+# Captured at import: targets patch builtins.open (mock_open) during tests, and site maps
+# are built lazily on the capture path.
+_READ_SOURCE = io.open
 _MAX_ARGS = 8
 # Never repository code even when located under a source root: installed dependencies and
 # hidden tool directories (.venv, .tox, .git...). "What counts as the repository" is a
@@ -190,6 +196,18 @@ def state_facts(
                     continue
                 if callable(value):
                     continue
+                own = getattr(value, "__dict__", None)
+                if isinstance(own, dict) and not isinstance(value, mock.NonCallableMock):
+                    # a global object (settings, config): the attributes this code reads
+                    # through it, from its own instance dict only (no descriptors run)
+                    for attr in names:
+                        if attr != name and attr in own:
+                            inner = own[attr]
+                            if isinstance(inner, type | ModuleType) or callable(inner):
+                                continue
+                            b = bucket(inner)
+                            if b is not None:
+                                facts.append((f"global.{name}.{attr}", b[0], b[1]))
                 b = bucket(value)
                 if b is not None:
                     facts.append((f"global.{name}", b[0], b[1]))
@@ -211,6 +229,44 @@ class _Scope:
     location: SourceLocation
 
 
+Pos = tuple[int, int]  # (line, 1-based byte column)
+
+
+@dataclass(frozen=True)
+class _IfSite:
+    site: str
+    test: tuple[Pos, Pos]  # [start, end) of the condition
+    body: tuple[Pos, Pos]  # [start, end) of the then-block
+
+
+def if_sites(source: str, rel_path: str) -> list[_IfSite]:
+    """Every `if` statement's condition and then-block span in original source."""
+    from diffgenome.sites import site_id
+
+    out: list[_IfSite] = []
+    for node in ast.walk(ast.parse(source)):
+        if not isinstance(node, ast.If) or node.test.end_lineno is None:
+            continue
+        t = node.test
+        span = (t.lineno, t.col_offset + 1, t.end_lineno or t.lineno, (t.end_col_offset or 0) + 1)
+        first, last = node.body[0], node.body[-1]
+        out.append(
+            _IfSite(
+                site_id(rel_path, span),
+                ((span[0], span[1]), (span[2], span[3])),
+                (
+                    (first.lineno, first.col_offset + 1),
+                    (last.end_lineno or last.lineno, (last.end_col_offset or 0) + 1),
+                ),
+            )
+        )
+    return out
+
+
+def _inside(p: Pos, span: tuple[Pos, Pos]) -> bool:
+    return span[0] <= p < span[1]
+
+
 @dataclass
 class TraceResult:
     symbols: tuple[Symbol, ...]
@@ -219,6 +275,7 @@ class TraceResult:
     attribution_disagreements: int = (
         0  # calls where a shadow stack would have chosen another parent
     )
+    branches: tuple[BranchObs, ...] = ()
 
 
 @dataclass
@@ -246,6 +303,9 @@ class Tracer:
     _orig_patch_enter: Any = None
     _orig_patch_exit: Any = None
     _egress_guard_installed: bool = False
+    _branches: list[BranchObs] = field(default_factory=list, repr=False)
+    _file_sites: dict[str, list[_IfSite]] = field(default_factory=dict, repr=False)
+    _positions: dict[CodeType, list[Any]] = field(default_factory=dict, repr=False)
 
     # ------------------------------------------------------------------ symbol naming
 
@@ -637,6 +697,18 @@ class Tracer:
         node_id = self._frame_nodes.pop(id(frame), None)
         if node_id:
             self._set_outcome(node_id, outcome, result)
+            node = self._nodes[node_id]
+            if isinstance(node, CallNode):
+                receiver = (
+                    frame.f_locals.get("self")
+                    if code.co_argcount and code.co_varnames[0] == "self"
+                    else None
+                )
+                # the same bounded, value-free view as on entry: an observed delta, not a
+                # complete write set (nested mutations can be invisible to it)
+                self._nodes[node_id] = dataclasses.replace(
+                    node, state_after=state_facts(receiver, code, frame.f_globals)
+                )
             wrapper = self._fake_wrappers.pop(node_id, None)
             if wrapper is not None:
                 self._set_outcome(wrapper, outcome, result)
@@ -693,6 +765,55 @@ class Tracer:
         if node_id is not None:
             self._set_outcome(node_id, "returned", digest_value(result))
         return result
+
+    def _sites_for(self, filename: str) -> list[_IfSite]:
+        sites = self._file_sites.get(filename)
+        if sites is None:
+            try:
+                with _READ_SOURCE(filename, encoding="utf-8") as fh:
+                    sites = if_sites(fh.read(), self._relative(filename))
+            except (OSError, SyntaxError, ValueError):
+                sites = []
+            self._file_sites[filename] = sites
+        return sites
+
+    def _on_branch(self, code: CodeType, offset: int, destination: int) -> Any:
+        """A conditional jump in production code. Mapped to the `if` whose condition
+        contains the jump instruction; the outcome is whether control goes into that
+        if's then-block. Jumps that stay inside the condition (short-circuit operands)
+        are not decisions and are ignored; jumps of anything that is not an `if`
+        condition are disabled at that location."""
+        scope = self.scope_for(code)
+        if scope is None or scope.origin is not Origin.REPO:
+            return _DISABLE
+        positions = self._positions.get(code)
+        if positions is None:
+            positions = self._positions[code] = list(code.co_positions())
+        try:
+            line, _eline, col, _ecol = positions[offset // 2]
+            dline, _deline, dcol, _decol = positions[destination // 2]
+        except IndexError:
+            return None
+        if line is None or col is None:
+            return None
+        here = (line, col + 1)
+        match = None
+        for site in self._sites_for(code.co_filename):
+            if _inside(here, site.test) and (
+                match is None or site.test[0] >= match.test[0]  # innermost
+            ):
+                match = site
+        if match is None:
+            return _DISABLE
+        if dline is None or dcol is None:
+            return None
+        there = (dline, dcol + 1)
+        if _inside(there, match.test):
+            return None  # short-circuit inside the condition
+        outcome = _inside(there, match.body)
+        node = self._frame_nodes.get(id(sys._getframe(1)), 0)
+        self._branches.append(BranchObs(match.site, outcome, node, len(self._nodes)))
+        return None
 
     def _on_call(self, code: CodeType, _offset: int, callable_: object, arg0: object) -> Any:
         if self.scope_for(code) is None:
@@ -802,6 +923,8 @@ class Tracer:
         m.register_callback(_TOOL_ID, m.events.PY_RETURN, self._on_return)
         m.register_callback(_TOOL_ID, m.events.PY_UNWIND, self._on_unwind)
         m.register_callback(_TOOL_ID, m.events.CALL, self._on_call)
+        m.register_callback(_TOOL_ID, m.events.BRANCH, self._on_branch)
+        self._branches.clear()
         mixin: Any = mock.CallableMixin  # private attribute, absent from typeshed
         self._orig_mock_call = mixin._mock_call
         tracer = self
@@ -812,13 +935,24 @@ class Tracer:
         mixin._mock_call = _traced_mock_call
         m.restart_events()
         m.set_events(
-            _TOOL_ID, m.events.PY_START | m.events.PY_RETURN | m.events.PY_UNWIND | m.events.CALL
+            _TOOL_ID,
+            m.events.PY_START
+            | m.events.PY_RETURN
+            | m.events.PY_UNWIND
+            | m.events.CALL
+            | m.events.BRANCH,
         )
 
     def stop(self) -> TraceResult:
         m = sys.monitoring
         m.set_events(_TOOL_ID, 0)
-        for ev in (m.events.PY_START, m.events.PY_RETURN, m.events.PY_UNWIND, m.events.CALL):
+        for ev in (
+            m.events.PY_START,
+            m.events.PY_RETURN,
+            m.events.PY_UNWIND,
+            m.events.CALL,
+            m.events.BRANCH,
+        ):
             m.register_callback(_TOOL_ID, ev, None)
         m.free_tool_id(_TOOL_ID)
         if self._orig_mock_call is not None:
@@ -830,6 +964,7 @@ class Tracer:
             nodes=tuple(self._nodes),
             stack_repairs=self._stack_repairs,
             attribution_disagreements=self._attribution_disagreements,
+            branches=tuple(self._branches),
         )
 
 

@@ -176,6 +176,7 @@ class GoTestRuntime:
             [
                 str(tool), "-root", str(ws.repo), "-module", self.module, "-src", self.source_root,
                 "-tests", ",".join(self.mock_dirs), "-index", str(index_file),
+                "-facts", str(ws.root / "mechanics-ir.json"),
             ],
             capture_output=True, text=True, check=True,
         )  # fmt: skip

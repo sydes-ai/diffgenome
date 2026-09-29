@@ -17,6 +17,7 @@ import shlex
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from diffgenome.ambiguity import render_ambiguity
 from diffgenome.change import ChangeSet, changes_from_diff, changes_from_symbols, git_diff
@@ -33,6 +34,41 @@ from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.sandbox import Workspace, host_supports_confinement
 from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
+
+
+def write_mechanics(
+    out: Path, ws: Workspace, repo: Path, runtime_name: str, seeds: list[str], index: SymbolIndex
+) -> None:
+    """Deterministic intra-procedural facts (decision sites, local def-use, control
+    requirements, field stores) for the files of the changed symbols, from the ORIGINAL
+    source. Go: the instrumenter's IR of every repo function; Python: lowered here."""
+    from diffgenome.dependence import analyze_all
+
+    functions: list[dict[str, Any]] = []
+    if runtime_name.startswith("go"):
+        ir = ws.root / "mechanics-ir.json"
+        if ir.is_file():
+            functions = json.loads(ir.read_text()).get("functions") or []
+    elif runtime_name.startswith("python"):
+        from diffgenome.frontends.python_ir import lower_functions
+
+        files = sorted({d.path for s in seeds if (d := index.find(s)) is not None})
+        for rel in files:
+            module = (
+                index.module_of(next(s for s in seeds if (d := index.find(s)) and d.path == rel))
+                or ""
+            )
+            try:
+                functions += lower_functions((repo / rel).read_text(encoding="utf-8"), rel, module)
+            except (OSError, SyntaxError):
+                continue
+    if functions:
+        (out / "mechanics.json").write_text(
+            json.dumps(
+                {"format": "diffgenome-mechanics/0", "functions": analyze_all(functions)}, indent=1
+            )
+            + "\n"
+        )
 
 
 def _write_status(out: Path, status: str, reason: str) -> None:
@@ -276,6 +312,7 @@ def main(argv: list[str] | None = None) -> int:
             graph_before=graph if graph_after else None,
         )
         (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
+        write_mechanics(out, ws, repo, runtime.name, seeds, index)
         (out / "behavioral-map.md").write_text(behavior_map)
         print(text)
         _log(f"report: {out / 'report.md'}  graph: {out / 'graph.json'}  map: {out / 'map.md'}")

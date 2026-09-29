@@ -184,6 +184,20 @@ class EvidenceRef:
     returns: dict[str, str] = field(default_factory=dict)
     caller: str | None = None
     callee: str | None = None
+    # mechanics / state kinds (see genome_state):
+    #   kind="branch":   site, test, outcome     (the site evaluated to outcome in that test)
+    #   kind="control":  site, outcome, callee   (static: callee is reached only under it)
+    #   kind="dataflow": site, origin            (static: an operand of site originates there)
+    #   kind="delta":    entity, fact, before, after, test (observed bucket change)
+    #   kind="store":    entity, path            (static: entity writes that field)
+    site: str | None = None
+    outcome: bool | None = None
+    origin: str | None = None
+    entity: str | None = None
+    fact: str | None = None
+    before: str | None = None
+    after: str | None = None
+    path: str | None = None
     # filled by the checker
     ok: bool | None = None
     why: str = ""
@@ -214,6 +228,9 @@ class Variable(Item):
     # machine-readable definition of a derived variable, in predicate syntax over other
     # variables (e.g. "from_account.balance >= request.amount"); None when not derived
     definition: str | None = None
+    # binding to an observed state fact, e.g. {"fact": "self._backend", "kind": "is_set"};
+    # kinds: is_set (bucket != none), bool (bool:true/false), sign (num:neg/zero/pos)
+    observed_as: dict[str, str] | None = None
 
 
 @dataclass
@@ -233,11 +250,15 @@ class Branch:
     absent: list[str] = field(default_factory=list)  # entities never reached
     stops: bool = False  # the enclosing entry returns after this branch
     effect: str = ""  # human description
+    # ordered steps for state-sequence prediction: "call:<entity>", "T:<transition id>",
+    # "D:<decision id>"; when empty, `calls` is used
+    steps: list[str] = field(default_factory=list)
 
 
 @dataclass
 class Decision(Item):
     entity: str = ""  # where the predicate lives
+    site: str | None = None  # decision-site id (diffgenome.sites) when known
     inputs: list[str] = field(default_factory=list)  # variable names
     predicate: str = (
         ""  # symbolic, over variable names, e.g. "request.amount > from_account.balance"
@@ -259,6 +280,19 @@ class Transition(Item):
     state_before: str = ""
     action: str = ""
     state_after: str = ""
+    # machine-readable form: when `entity` runs and `when` holds, variables become `sets`
+    # (expressions: literals, `var`, `!var`, `var + k`, `var - k`, `max(0, var - k)`)
+    entity: str = ""
+    when: str = "true"
+    sets: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class Procedure(Item):
+    """Ordered behavior of one entity: "call:<entity>", "T:<transition>", "D:<decision>"."""
+
+    entity: str = ""
+    steps: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -289,6 +323,7 @@ class Genome:
     decisions: list[Decision] = field(default_factory=list)
     effects: list[Effect] = field(default_factory=list)
     transitions: list[Transition] = field(default_factory=list)
+    procedures: list[Procedure] = field(default_factory=list)
     rules: list[Rule] = field(default_factory=list)
     regimes: list[Regime] = field(default_factory=list)
     unknowns: list[dict[str, Any]] = field(default_factory=list)
@@ -316,6 +351,7 @@ def _branch(d: dict[str, Any] | None, when: bool) -> Branch:
         absent=list(d.get("absent") or []),
         stops=bool(d.get("stops")),
         effect=str(d.get("effect") or ""),
+        steps=list(d.get("steps") or []),
     )
 
 
@@ -348,6 +384,8 @@ def genome_from_proposals(proposals: dict[str, Any], subject: dict[str, Any], mo
         g.effects.append(Effect(**_item_kwargs(d, Effect, by)))
     for d in proposals.get("transitions") or []:
         g.transitions.append(Transition(**_item_kwargs(d, Transition, by)))
+    for d in proposals.get("procedures") or []:
+        g.procedures.append(Procedure(**_item_kwargs(d, Procedure, by)))
     for d in proposals.get("rules") or []:
         g.rules.append(Rule(**_item_kwargs(d, Rule, by)))
     for d in proposals.get("regimes") or []:
@@ -590,6 +628,8 @@ def _eval_atom(atom: str, facts: dict[str, Any]) -> bool | None:
         return result
     neg = atom.startswith("!")
     name = atom[1:].strip() if neg else atom
+    if name in ("true", "True", "false", "False"):
+        return (name in ("true", "True")) != neg
     if name not in facts:
         return None
     return (not bool(facts[name])) if neg else bool(facts[name])
@@ -793,7 +833,12 @@ def render_markdown(g: Genome, evaluation: dict[str, Any] | None = None) -> str:
     L.append("")
     for v in g.variables:
         defn = f" := `{v.definition}`" if v.definition else ""
-        L.append(f"- `{v.name}` ({v.origin}){defn} — {_BADGE[v.status]}")
+        bound = (
+            f" ↔ observed `{v.observed_as.get('fact')}` ({v.observed_as.get('kind')})"
+            if v.observed_as
+            else ""
+        )
+        L.append(f"- `{v.name}` ({v.origin}){defn}{bound} — {_BADGE[v.status]}")
     L.append("")
     L.append("## Data dependencies")
     L.append("")
@@ -804,7 +849,10 @@ def render_markdown(g: Genome, evaluation: dict[str, Any] | None = None) -> str:
     L.append("## Decisions, in path order")
     L.append("")
     for dec in sorted(g.decisions, key=lambda x: x.order):
-        L.append(f"### {dec.id} · `{dec.predicate}` at `{dec.entity}` — {_BADGE[dec.status]}")
+        where = f" site `{dec.site}`" if dec.site else ""
+        L.append(
+            f"### {dec.id} · `{dec.predicate}` at `{dec.entity}`{where} — {_BADGE[dec.status]}"
+        )
         L.append("")
         for b in (dec.true_branch, dec.false_branch):
             ret = f" returns {b.returns};" if b.returns else ""
@@ -831,6 +879,22 @@ def render_markdown(g: Genome, evaluation: dict[str, Any] | None = None) -> str:
         members = ", ".join(m.split("/")[-1] for m in rg.members)
         L.append(f"- **{rg.name}** — {len(rg.members)} test(s): {members} — {_BADGE[rg.status]}")
     L.append("")
+    if g.transitions:
+        L.append("## State transitions")
+        L.append("")
+        for tr in g.transitions:
+            sets = ", ".join(f"`{k} := {v}`" for k, v in tr.sets.items())
+            when = f" when `{tr.when}`" if tr.when and tr.when != "true" else ""
+            L.append(
+                f"- **{tr.id}** `{tr.entity}`{when}: {sets or tr.action} — {_BADGE[tr.status]}"
+            )
+        L.append("")
+    if g.procedures:
+        L.append("## Procedures (composition)")
+        L.append("")
+        for pr in g.procedures:
+            L.append(f"- `{pr.entity}`: {' → '.join(pr.steps)} — {_BADGE[pr.status]}")
+        L.append("")
     if g.effects:
         L.append("## Effects")
         L.append("")

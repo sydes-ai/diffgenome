@@ -52,6 +52,7 @@ func main() {
 	srcFlag := flag.String("src", ".", "comma-separated source dirs (repo origin)")
 	testFlag := flag.String("tests", "", "comma-separated test dirs (test origin), e.g. db/mock")
 	indexFlag := flag.String("index", "", "definition index output")
+	factsFlag := flag.String("facts", "", "write the neutral IR of repo-origin functions to this file (from the original source)")
 	flag.Parse()
 	if *rootFlag == "" || *module == "" {
 		fmt.Fprintln(os.Stderr, "-root and -module are required")
@@ -94,7 +95,7 @@ func main() {
 			if strings.HasSuffix(name, "_test.go") {
 				origin = "test"
 			}
-			changed, defs, err := instrumentFile(absRoot, *module, path, origin, definers)
+			changed, defs, err := instrumentFile(absRoot, *module, path, origin, definers, *factsFlag != "")
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "diffgenome: %s: %v\n", path, err)
 				return nil
@@ -105,6 +106,10 @@ func main() {
 			}
 			return nil
 		})
+	}
+	if *factsFlag != "" {
+		data, _ := json.MarshalIndent(map[string]any{"functions": irFunctions}, "", " ")
+		_ = os.WriteFile(*factsFlag, append(data, '\n'), 0o644)
 	}
 	if *indexFlag != "" {
 		sort.Slice(index, func(i, j int) bool {
@@ -189,7 +194,9 @@ type fileCtx struct {
 	changed    bool
 }
 
-func instrumentFile(absRoot, module, path, origin string, definers map[string]map[string][]string) (bool, []definition, error) {
+var irFunctions []irFn
+
+func instrumentFile(absRoot, module, path, origin string, definers map[string]map[string][]string, facts bool) (bool, []definition, error) {
 	src, err := os.ReadFile(path)
 	if err != nil {
 		return false, nil, err
@@ -224,6 +231,13 @@ func instrumentFile(absRoot, module, path, origin string, definers map[string]ma
 	}
 	var defs []definition
 	fc.index = &defs
+	// facts and branch sites come from the ORIGINAL tree, before any rewriting
+	if origin == "repo" {
+		if facts {
+			irFunctions = append(irFunctions, fc.lowerFuncs(f)...)
+		}
+		fc.wrapBranches(f)
+	}
 	// type declarations for the index (enclosing "class" lookups)
 	for _, d := range f.Decls {
 		if gd, ok := d.(*ast.GenDecl); ok && gd.Tok == token.TYPE {
