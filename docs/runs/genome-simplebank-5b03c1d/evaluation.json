@@ -1,0 +1,552 @@
+{
+ "statuses": {
+  "variables": {
+   "supported": 12
+  },
+  "data_dependencies": {
+   "supported": 6
+  },
+  "decisions": {
+   "supported": 8,
+   "verified": 2
+  },
+  "effects": {
+   "supported": 6
+  },
+  "transitions": {
+   "supported": 1
+  },
+  "rules": {
+   "supported": 4,
+   "verified": 1
+  },
+  "regimes": {
+   "supported": 6
+  }
+ },
+ "per_test": [
+  {
+   "execution": "TestTransferAPI/FromAccountCurrencyMismatch",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D4",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/FromAccountNotFound",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D3",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/GetAccountError",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D3",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/InsufficientBalance",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "errorResponse"
+   ],
+   "stopped_at": "D8",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": true
+  },
+  {
+   "execution": "TestTransferAPI/InvalidCurrency",
+   "predicted_path": [
+    "<anon>@8",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "validAccount",
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "errorResponse"
+   ],
+   "stopped_at": "D1",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/NegativeAmount",
+   "predicted_path": [
+    "<anon>@8",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "validAccount",
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "errorResponse"
+   ],
+   "stopped_at": "D2",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/OK",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "predicted_absent": [
+    "errorResponse"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "stopped_at": "D9",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/ToAccountCurrencyMismatch",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D7",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": true
+  },
+  {
+   "execution": "TestTransferAPI/ToAccountNotFound",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D6",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": false
+  },
+  {
+   "execution": "TestTransferAPI/TransferTxError",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "TransferTx",
+    "errorResponse"
+   ],
+   "predicted_absent": [],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "TransferTx",
+    "errorResponse"
+   ],
+   "stopped_at": "D9",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": true
+  },
+  {
+   "execution": "TestTransferAPI/UnauthorizedUser",
+   "predicted_path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "predicted_absent": [
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "observed_calls": [
+    "<anon>@8",
+    "IsSupportedCurrency",
+    "validAccount",
+    "GetAccount",
+    "errorResponse"
+   ],
+   "stopped_at": "D5",
+   "indeterminate": null,
+   "missing": [],
+   "out_of_order": false,
+   "wrongly_present": [],
+   "unpredicted": [],
+   "count_mismatch": {},
+   "match": true,
+   "exact": true,
+   "withheld": true
+  }
+ ],
+ "scenarios": {
+  "A: amount > balance (decisions >= supported)": {
+   "facts": {
+    "auth.present": true,
+    "request.currency_supported": true,
+    "from_account.found": true,
+    "from_account.currency_match": true,
+    "from_account.owned_by_auth": true,
+    "to_account.found": true,
+    "to_account.currency_match": true,
+    "transfer_tx.ok": true,
+    "request.amount": 10,
+    "from_account.balance": 9
+   },
+   "fired": [
+    [
+     "D0",
+     false
+    ],
+    [
+     "D1",
+     false
+    ],
+    [
+     "D2",
+     false
+    ],
+    [
+     "D3",
+     false
+    ],
+    [
+     "D4",
+     false
+    ],
+    [
+     "D5",
+     false
+    ],
+    [
+     "D6",
+     false
+    ],
+    [
+     "D7",
+     false
+    ],
+    [
+     "D8",
+     true
+    ]
+   ],
+   "path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "errorResponse"
+   ],
+   "absent": [
+    "TransferTx"
+   ],
+   "stopped_at": "D8",
+   "indeterminate": null
+  },
+  "A: amount > balance (decisions >= verified)": {
+   "facts": {
+    "auth.present": true,
+    "request.currency_supported": true,
+    "from_account.found": true,
+    "from_account.currency_match": true,
+    "from_account.owned_by_auth": true,
+    "to_account.found": true,
+    "to_account.currency_match": true,
+    "transfer_tx.ok": true,
+    "request.amount": 10,
+    "from_account.balance": 9
+   },
+   "fired": [],
+   "path": [],
+   "absent": [],
+   "stopped_at": null,
+   "indeterminate": "D0 is supported: its semantics are not established at >= verified"
+  },
+  "B: amount <= balance (decisions >= supported)": {
+   "facts": {
+    "auth.present": true,
+    "request.currency_supported": true,
+    "from_account.found": true,
+    "from_account.currency_match": true,
+    "from_account.owned_by_auth": true,
+    "to_account.found": true,
+    "to_account.currency_match": true,
+    "transfer_tx.ok": true,
+    "request.amount": 10,
+    "from_account.balance": 10
+   },
+   "fired": [
+    [
+     "D0",
+     false
+    ],
+    [
+     "D1",
+     false
+    ],
+    [
+     "D2",
+     false
+    ],
+    [
+     "D3",
+     false
+    ],
+    [
+     "D4",
+     false
+    ],
+    [
+     "D5",
+     false
+    ],
+    [
+     "D6",
+     false
+    ],
+    [
+     "D7",
+     false
+    ],
+    [
+     "D8",
+     false
+    ],
+    [
+     "D9",
+     false
+    ]
+   ],
+   "path": [
+    "<anon>@8",
+    "validAccount",
+    "GetAccount",
+    "validAccount",
+    "GetAccount",
+    "checkSufficientBalance",
+    "TransferTx"
+   ],
+   "absent": [
+    "errorResponse"
+   ],
+   "stopped_at": "D9",
+   "indeterminate": null
+  },
+  "B: amount <= balance (decisions >= verified)": {
+   "facts": {
+    "auth.present": true,
+    "request.currency_supported": true,
+    "from_account.found": true,
+    "from_account.currency_match": true,
+    "from_account.owned_by_auth": true,
+    "to_account.found": true,
+    "to_account.currency_match": true,
+    "transfer_tx.ok": true,
+    "request.amount": 10,
+    "from_account.balance": 10
+   },
+   "fired": [],
+   "path": [],
+   "absent": [],
+   "stopped_at": null,
+   "indeterminate": "D0 is supported: its semantics are not established at >= verified"
+  }
+ }
+}

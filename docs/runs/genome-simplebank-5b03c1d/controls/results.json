@@ -1,0 +1,68 @@
+{
+ "c1-inverted-consequence": {
+  "D8": [
+   "rejected",
+   "branch consequence contradicted in TestTransferAPI/InsufficientBalance"
+  ],
+  "D5": [
+   "supported",
+   "every cited reference checks out (source); not verified: true/false branch not observed wi"
+  ],
+  "exact_predictions": "8/11",
+  "misses": [
+   "TestTransferAPI/InsufficientBalance",
+   "TestTransferAPI/OK",
+   "TestTransferAPI/TransferTxError"
+  ],
+  "case_A": "D8 is rejected: its semantics are not established at >= supported"
+ },
+ "c2-fabricated-citation": {
+  "D8": [
+   "hypothesis",
+   "evidence does not check out: text not found near api/transfer.go:85"
+  ],
+  "D5": [
+   "supported",
+   "every cited reference checks out (source); not verified: true/false branch not observed wi"
+  ],
+  "exact_predictions": "8/11",
+  "misses": [
+   "TestTransferAPI/InsufficientBalance",
+   "TestTransferAPI/OK",
+   "TestTransferAPI/TransferTxError"
+  ],
+  "case_A": "D8 is hypothesis: its semantics are not established at >= supported"
+ },
+ "c3-false-execution-claim": {
+  "D8": [
+   "rejected",
+   "contradicted by execution: TestTransferAPI/OK: calls ['checkSufficientBalance', 'errorResponse'] not observed in order"
+  ],
+  "D5": [
+   "supported",
+   "every cited reference checks out (source); not verified: true/false branch not observed wi"
+  ],
+  "exact_predictions": "8/11",
+  "misses": [
+   "TestTransferAPI/InsufficientBalance",
+   "TestTransferAPI/OK",
+   "TestTransferAPI/TransferTxError"
+  ],
+  "case_A": "D8 is rejected: its semantics are not established at >= supported"
+ },
+ "c4-swapped-order": {
+  "D8": [
+   "verified",
+   "cites an `if` site; true branch observed in 1 execution(s), false branch in 2; no contradiction"
+  ],
+  "D5": [
+   "supported",
+   "every cited reference checks out (source); not verified: true/false branch not observed wi"
+  ],
+  "exact_predictions": "10/11",
+  "misses": [
+   "TestTransferAPI/UnauthorizedUser"
+  ],
+  "case_A": "path <anon>@8 \u2192 validAccount \u2192 GetAccount \u2192 validAccount \u2192 GetAccount \u2192 checkSufficientBalance \u2192 errorResponse"
+ }
+}

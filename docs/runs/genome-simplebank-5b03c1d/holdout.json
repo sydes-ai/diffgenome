@@ -1,0 +1,17 @@
+{
+ "holdout": [
+  "TestTransferAPI/InsufficientBalance",
+  "TestTransferAPI/ToAccountCurrencyMismatch",
+  "TestTransferAPI/TransferTxError",
+  "TestTransferAPI/UnauthorizedUser"
+ ],
+ "shown": [
+  "TestTransferAPI/FromAccountCurrencyMismatch",
+  "TestTransferAPI/FromAccountNotFound",
+  "TestTransferAPI/GetAccountError",
+  "TestTransferAPI/InvalidCurrency",
+  "TestTransferAPI/NegativeAmount",
+  "TestTransferAPI/OK",
+  "TestTransferAPI/ToAccountNotFound"
+ ]
+}

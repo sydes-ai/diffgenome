@@ -1,0 +1,277 @@
+{
+  "variables": [
+    {"id": "V1", "name": "auth.present", "origin": "environment", "description": "A valid bearer access token was supplied; authMiddleware sets the authorization payload and only then calls the handler.",
+     "evidence": [
+       {"kind": "source", "file": "api/middleware.go", "line": 24, "text": "if len(authorizationHeader) == 0 {"},
+       {"kind": "source", "file": "api/middleware.go", "line": 51, "text": "ctx.Set(authorizationPayloadKey, payload)"}
+     ]},
+    {"id": "V2", "name": "request.currency_supported", "origin": "request", "description": "request.currency is one of USD, EUR, CAD (the `currency` binding validator).",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 17, "text": "Currency      string `json:\"currency\" binding:\"required,currency\"`"},
+       {"kind": "source", "file": "api/validator.go", "line": 10, "text": "return util.IsSupportedCurrency(currency)"},
+       {"kind": "source", "file": "util/currency.go", "line": 13, "text": "case USD, EUR, CAD:"}
+     ]},
+    {"id": "V3", "name": "request.amount", "origin": "request", "description": "Transfer amount; binding requires gt=0; compared against the source balance and passed to TransferTx.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 16, "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`"},
+       {"kind": "source", "file": "api/transfer.go", "line": 44, "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {"}
+     ]},
+    {"id": "V4", "name": "from_account.found", "origin": "state", "description": "store.GetAccount(from_account_id) returned without error. False covers both not-found (404) and other store errors (500).",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 64, "text": "account, err := server.store.GetAccount(ctx, accountID)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 27, "text": "fromAccount, valid := server.validAccount(ctx, req.FromAccountID, req.Currency)"}
+     ]},
+    {"id": "V5", "name": "from_account.not_found_error", "origin": "state", "description": "When the from lookup fails, whether the error is db.ErrRecordNotFound (404) rather than a generic store error (500). Only affects status, not path shape.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 66, "text": "if errors.Is(err, db.ErrRecordNotFound) {"}
+     ]},
+    {"id": "V6", "name": "from_account.currency_match", "origin": "derived", "description": "from_account.currency == request.currency.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 75, "text": "if account.Currency != currency {"}
+     ]},
+    {"id": "V7", "name": "from_account.owned_by_auth", "origin": "derived", "description": "from_account.owner == auth.username (authenticated token payload).",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 32, "text": "authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 33, "text": "if fromAccount.Owner != authPayload.Username {"}
+     ]},
+    {"id": "V8", "name": "to_account.found", "origin": "state", "description": "store.GetAccount(to_account_id) returned without error.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 39, "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)"}
+     ]},
+    {"id": "V9", "name": "to_account.currency_match", "origin": "derived", "description": "to_account.currency == request.currency.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 75, "text": "if account.Currency != currency {"}
+     ]},
+    {"id": "V10", "name": "from_account.balance", "origin": "state", "description": "Balance of the source account as returned by GetAccount (the fetched snapshot, not re-read).",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"}
+     ]},
+    {"id": "V11", "name": "from_account.balance_sufficient", "origin": "derived", "description": "from_account.balance >= request.amount (negation of the new guard). Boolean form used because test balances are random except in InsufficientBalance.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"},
+       {"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["checkSufficientBalance"], "returns": {"checkSufficientBalance": "true"}}
+     ]},
+    {"id": "V12", "name": "transfer_tx.ok", "origin": "state", "description": "store.TransferTx returned no error.",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 54, "text": "result, err := server.store.TransferTx(ctx, arg)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 55, "text": "if err != nil {"}
+     ]}
+  ],
+  "data_dependencies": [
+    {"id": "DD1", "source": "request.currency_supported", "sink": "D1", "transform": "IsSupportedCurrency(request.currency) via binding validator <anon>@8",
+     "evidence": [
+       {"kind": "source", "file": "api/validator.go", "line": 10, "text": "return util.IsSupportedCurrency(currency)"},
+       {"kind": "execution", "test": "TestTransferAPI/InvalidCurrency", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount"], "returns": {"<anon>@8": "false"}}
+     ]},
+    {"id": "DD2", "source": "request.amount", "sink": "D2", "transform": "binding rule gt=0",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 16, "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`"},
+       {"kind": "execution", "test": "TestTransferAPI/NegativeAmount", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount"], "returns": {"<anon>@8": "true"}}
+     ]},
+    {"id": "DD3", "source": "request.currency", "sink": "Server.validAccount", "transform": "compared to account.Currency for both from and to accounts",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 27, "text": "fromAccount, valid := server.validAccount(ctx, req.FromAccountID, req.Currency)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 39, "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)"}
+     ]},
+    {"id": "DD4", "source": "from_account.balance", "sink": "D8", "transform": "compared with request.amount (balance < amount)",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 44, "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"},
+       {"kind": "edge", "caller": "Server.createTransfer", "callee": "Server.checkSufficientBalance"}
+     ]},
+    {"id": "DD5", "source": "request.amount", "sink": "TransferTx", "transform": "copied into TransferTxParams with from/to ids",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 51, "text": "Amount:        req.Amount,"}
+     ]},
+    {"id": "DD6", "source": "auth.username", "sink": "D5", "transform": "compared with from_account.owner",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 33, "text": "if fromAccount.Owner != authPayload.Username {"}
+     ]}
+  ],
+  "decisions": [
+    {"id": "D0", "entity": "authMiddleware", "inputs": ["auth.present"], "predicate": "!auth.present", "order": 0,
+     "true_branch": {"returns": null, "calls": [], "absent": ["<anon>@8", "validAccount", "checkSufficientBalance", "TransferTx"], "stops": true, "effect": "middleware aborts with 401; createTransfer never runs"},
+     "false_branch": {"returns": null, "calls": [], "absent": [], "stops": false, "effect": "payload set, handler invoked"},
+     "evidence": [
+       {"kind": "source", "file": "api/middleware.go", "line": 24, "text": "if len(authorizationHeader) == 0 {"},
+       {"kind": "source", "file": "api/middleware.go", "line": 51, "text": "ctx.Set(authorizationPayloadKey, payload)"}
+     ]},
+    {"id": "D1", "entity": "<anon>@8", "inputs": ["request.currency_supported"], "predicate": "!request.currency_supported", "order": 1,
+     "true_branch": {"returns": "false", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount", "checkSufficientBalance", "TransferTx"], "stops": true, "effect": "binding fails: 400 Bad Request"},
+     "false_branch": {"returns": "true", "calls": ["<anon>@8"], "absent": [], "stops": false, "effect": "currency accepted"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 22, "text": "if err := ctx.ShouldBindJSON(&req); err != nil {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 23, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"},
+       {"kind": "execution", "test": "TestTransferAPI/InvalidCurrency", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount", "TransferTx"], "returns": {"<anon>@8": "false"}}
+     ]},
+    {"id": "D2", "entity": "createTransfer", "inputs": ["request.amount"], "predicate": "request.amount <= 0", "order": 2,
+     "true_branch": {"returns": null, "calls": ["errorResponse"], "absent": ["validAccount", "checkSufficientBalance", "TransferTx"], "stops": true, "effect": "binding fails (gt=0): 400 Bad Request"},
+     "false_branch": {"returns": null, "calls": [], "absent": [], "stops": false, "effect": "request bound"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 16, "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`"},
+       {"kind": "source", "file": "api/transfer.go", "line": 22, "text": "if err := ctx.ShouldBindJSON(&req); err != nil {"},
+       {"kind": "execution", "test": "TestTransferAPI/NegativeAmount", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount", "TransferTx"], "returns": {"<anon>@8": "true"}}
+     ]},
+    {"id": "D3", "entity": "validAccount", "inputs": ["from_account.found"], "predicate": "!from_account.found", "order": 3,
+     "true_branch": {"returns": "false", "calls": ["validAccount", "GetAccount", "errorResponse"], "absent": ["checkSufficientBalance", "TransferTx"], "stops": true, "effect": "404 if ErrRecordNotFound else 500"},
+     "false_branch": {"returns": null, "calls": ["validAccount", "GetAccount"], "absent": [], "stops": false, "effect": "from account loaded"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 66, "text": "if errors.Is(err, db.ErrRecordNotFound) {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 67, "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 71, "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))"},
+       {"kind": "execution", "test": "TestTransferAPI/FromAccountNotFound", "calls": ["<anon>@8", "validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]},
+       {"kind": "execution", "test": "TestTransferAPI/GetAccountError", "calls": ["<anon>@8", "validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]}
+     ]},
+    {"id": "D4", "entity": "validAccount", "inputs": ["from_account.currency_match"], "predicate": "!from_account.currency_match", "order": 4,
+     "true_branch": {"returns": "false", "calls": ["errorResponse"], "absent": ["checkSufficientBalance", "TransferTx"], "stops": true, "effect": "400 currency mismatch"},
+     "false_branch": {"returns": "true", "calls": [], "absent": [], "stops": false, "effect": "from account valid"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 75, "text": "if account.Currency != currency {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 77, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"},
+       {"kind": "execution", "test": "TestTransferAPI/FromAccountCurrencyMismatch", "calls": ["<anon>@8", "validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]}
+     ]},
+    {"id": "D5", "entity": "createTransfer", "inputs": ["from_account.owned_by_auth"], "predicate": "!from_account.owned_by_auth", "order": 5,
+     "true_branch": {"returns": null, "calls": ["errorResponse"], "absent": ["checkSufficientBalance", "TransferTx"], "stops": true, "effect": "401 Unauthorized; to account never looked up"},
+     "false_branch": {"returns": null, "calls": [], "absent": [], "stops": false, "effect": "ownership confirmed"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 33, "text": "if fromAccount.Owner != authPayload.Username {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 35, "text": "ctx.JSON(http.StatusUnauthorized, errorResponse(err))"}
+     ]},
+    {"id": "D6", "entity": "validAccount", "inputs": ["to_account.found"], "predicate": "!to_account.found", "order": 6,
+     "true_branch": {"returns": "false", "calls": ["validAccount", "GetAccount", "errorResponse"], "absent": ["checkSufficientBalance", "TransferTx"], "stops": true, "effect": "404 if ErrRecordNotFound else 500"},
+     "false_branch": {"returns": null, "calls": ["validAccount", "GetAccount"], "absent": [], "stops": false, "effect": "to account loaded"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 39, "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 67, "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))"},
+       {"kind": "execution", "test": "TestTransferAPI/ToAccountNotFound", "calls": ["<anon>@8", "validAccount", "validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]}
+     ]},
+    {"id": "D7", "entity": "validAccount", "inputs": ["to_account.currency_match"], "predicate": "!to_account.currency_match", "order": 7,
+     "true_branch": {"returns": "false", "calls": ["errorResponse"], "absent": ["checkSufficientBalance", "TransferTx"], "stops": true, "effect": "400 currency mismatch"},
+     "false_branch": {"returns": "true", "calls": [], "absent": [], "stops": false, "effect": "to account valid"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 75, "text": "if account.Currency != currency {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 40, "text": "if !valid {"}
+     ]},
+    {"id": "D8", "entity": "checkSufficientBalance", "inputs": ["from_account.balance", "request.amount", "from_account.balance_sufficient"], "predicate": "!from_account.balance_sufficient", "order": 8,
+     "true_branch": {"returns": "false", "calls": ["checkSufficientBalance", "errorResponse"], "absent": ["TransferTx"], "stops": true, "effect": "400 insufficient balance; no transfer persisted (the change)"},
+     "false_branch": {"returns": "true", "calls": ["checkSufficientBalance"], "absent": [], "stops": false, "effect": "proceed to TransferTx"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 44, "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 87, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 88, "text": "return false"},
+       {"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["validAccount", "validAccount", "checkSufficientBalance", "TransferTx"], "absent": ["errorResponse"], "returns": {"checkSufficientBalance": "true"}}
+     ]},
+    {"id": "D9", "entity": "createTransfer", "inputs": ["transfer_tx.ok"], "predicate": "!transfer_tx.ok", "order": 9,
+     "true_branch": {"returns": null, "calls": ["TransferTx", "errorResponse"], "absent": [], "stops": true, "effect": "500 Internal Server Error"},
+     "false_branch": {"returns": null, "calls": ["TransferTx"], "absent": ["errorResponse"], "stops": true, "effect": "200 OK with TransferTxResult"},
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 55, "text": "if err != nil {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 56, "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 60, "text": "ctx.JSON(http.StatusOK, result)"},
+       {"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["checkSufficientBalance", "TransferTx"], "absent": ["errorResponse"], "returns": {"checkSufficientBalance": "true"}}
+     ]}
+  ],
+  "effects": [
+    {"id": "E1", "kind": "response", "target": "HTTP 400 Bad Request", "condition": "D1 true | D2 true | D4 true | D7 true | D8 true",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 23, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 77, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 87, "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))"}
+     ]},
+    {"id": "E2", "kind": "response", "target": "HTTP 404 Not Found", "condition": "D3 true or D6 true with ErrRecordNotFound",
+     "evidence": [{"kind": "source", "file": "api/transfer.go", "line": 67, "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))"}]},
+    {"id": "E3", "kind": "response", "target": "HTTP 500 Internal Server Error", "condition": "D3/D6 true with a non-not-found error | D9 true",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 71, "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))"},
+       {"kind": "source", "file": "api/transfer.go", "line": 56, "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))"}
+     ]},
+    {"id": "E4", "kind": "response", "target": "HTTP 401 Unauthorized", "condition": "D0 true | D5 true",
+     "evidence": [{"kind": "source", "file": "api/transfer.go", "line": 35, "text": "ctx.JSON(http.StatusUnauthorized, errorResponse(err))"}]},
+    {"id": "E5", "kind": "persistence", "target": "store.TransferTx (transfer + two entries + two balance updates)", "condition": "R5 (all gates pass)",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 54, "text": "result, err := server.store.TransferTx(ctx, arg)"},
+       {"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["checkSufficientBalance", "TransferTx"], "absent": ["errorResponse"]}
+     ]},
+    {"id": "E6", "kind": "response", "target": "HTTP 200 OK with TransferTxResult", "condition": "D9 false",
+     "evidence": [{"kind": "source", "file": "api/transfer.go", "line": 60, "text": "ctx.JSON(http.StatusOK, result)"}]}
+  ],
+  "transitions": [
+    {"id": "T1", "state_before": "from.balance = B1, to.balance = B2, B1 >= amount", "action": "TransferTx(from_id, to_id, amount)", "state_after": "from.balance = B1 - amount, to.balance = B2 + amount, one transfer row and two entry rows created",
+     "evidence": [
+       {"kind": "source", "file": "db/sqlc/tx_transfer.go", "line": 40, "text": "Amount:    -arg.Amount,"},
+       {"kind": "source", "file": "db/sqlc/tx_transfer.go", "line": 55, "text": "result.FromAccount, result.ToAccount, err = addMoney(ctx, q, arg.FromAccountID, -arg.Amount, arg.ToAccountID, arg.Amount)"}
+     ]}
+  ],
+  "rules": [
+    {"id": "R1", "name": "Request shape gate", "inputs": ["request.currency_supported", "request.amount"], "relevant_state": [], "condition": "!request.currency_supported || request.amount <= 0",
+     "consequences": ["400", "no store access (no validAccount, no TransferTx)"], "decision": "D1",
+     "evidence": [
+       {"kind": "execution", "test": "TestTransferAPI/InvalidCurrency", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount", "TransferTx"], "returns": {"<anon>@8": "false"}},
+       {"kind": "execution", "test": "TestTransferAPI/NegativeAmount", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount", "TransferTx"], "returns": {"<anon>@8": "true"}}
+     ]},
+    {"id": "R2", "name": "Account eligibility (applied to from, then to)", "inputs": ["request.currency"], "relevant_state": ["from_account.found", "from_account.currency_match", "to_account.found", "to_account.currency_match"],
+     "condition": "an account must exist (else 404 / 500 on store error) and have the request currency (else 400); first failing account stops the handler",
+     "consequences": ["validAccount returns false", "error response inside validAccount", "no checkSufficientBalance, no TransferTx"], "decision": null,
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 64, "text": "account, err := server.store.GetAccount(ctx, accountID)"},
+       {"kind": "source", "file": "api/transfer.go", "line": 75, "text": "if account.Currency != currency {"},
+       {"kind": "execution", "test": "TestTransferAPI/FromAccountCurrencyMismatch", "calls": ["validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]},
+       {"kind": "execution", "test": "TestTransferAPI/ToAccountNotFound", "calls": ["validAccount", "validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]}
+     ]},
+    {"id": "R3", "name": "Ownership of source account", "inputs": ["auth.username"], "relevant_state": ["from_account.owner"], "condition": "!from_account.owned_by_auth (checked after from is valid, before to is looked up)",
+     "consequences": ["401", "second validAccount not called", "no TransferTx"], "decision": "D5",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 33, "text": "if fromAccount.Owner != authPayload.Username {"}
+     ]},
+    {"id": "R4", "name": "Sufficient balance guard (the change)", "inputs": ["request.amount"], "relevant_state": ["from_account.balance"], "condition": "from_account.balance < request.amount",
+     "consequences": ["checkSufficientBalance returns false", "400", "TransferTx not called"], "decision": "D8",
+     "evidence": [
+       {"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"},
+       {"kind": "source", "file": "api/transfer.go", "line": 44, "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {"},
+       {"kind": "edge", "caller": "Server.createTransfer", "callee": "Server.checkSufficientBalance"}
+     ]},
+    {"id": "R5", "name": "Persist transfer when all gates pass", "inputs": ["request.amount"], "relevant_state": ["transfer_tx.ok"], "condition": "all of R1-R4 pass",
+     "consequences": ["TransferTx called", "200 if transfer_tx.ok else 500"], "decision": "D9",
+     "evidence": [
+       {"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["validAccount", "validAccount", "checkSufficientBalance", "TransferTx"], "absent": ["errorResponse"], "returns": {"checkSufficientBalance": "true"}},
+       {"kind": "source", "file": "api/transfer.go", "line": 56, "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))"}
+     ]}
+  ],
+  "regimes": [
+    {"id": "G1", "name": "unauthenticated (handler not reached)", "facts": {"auth.present": false}, "members": ["TestTransferAPI/NoAuthorization"],
+     "evidence": [{"kind": "source", "file": "api/middleware.go", "line": 24, "text": "if len(authorizationHeader) == 0 {"}]},
+    {"id": "G2", "name": "rejected at binding", "facts": {"auth.present": true, "request.currency_supported|request.amount": "invalid"}, "members": ["TestTransferAPI/InvalidCurrency", "TestTransferAPI/NegativeAmount"],
+     "evidence": [{"kind": "execution", "test": "TestTransferAPI/InvalidCurrency", "calls": ["<anon>@8", "errorResponse"], "absent": ["validAccount"]}]},
+    {"id": "G3", "name": "rejected at account eligibility", "facts": {"request.currency_supported": true, "any_account_ineligible": true}, "members": ["TestTransferAPI/FromAccountNotFound", "TestTransferAPI/GetAccountError", "TestTransferAPI/FromAccountCurrencyMismatch", "TestTransferAPI/ToAccountNotFound", "TestTransferAPI/ToAccountCurrencyMismatch"],
+     "evidence": [{"kind": "execution", "test": "TestTransferAPI/FromAccountNotFound", "calls": ["validAccount"], "absent": ["checkSufficientBalance", "TransferTx"]}]},
+    {"id": "G4", "name": "rejected on ownership", "facts": {"from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": false}, "members": ["TestTransferAPI/UnauthorizedUser"],
+     "evidence": [{"kind": "source", "file": "api/transfer.go", "line": 33, "text": "if fromAccount.Owner != authPayload.Username {"}]},
+    {"id": "G5", "name": "rejected on insufficient balance", "facts": {"from_account.balance_sufficient": false}, "members": ["TestTransferAPI/InsufficientBalance"],
+     "evidence": [{"kind": "source", "file": "api/transfer.go", "line": 85, "text": "if account.Balance < amount {"}]},
+    {"id": "G6", "name": "transfer attempted", "facts": {"from_account.balance_sufficient": true}, "members": ["TestTransferAPI/OK", "TestTransferAPI/TransferTxError"],
+     "evidence": [{"kind": "execution", "test": "TestTransferAPI/OK", "calls": ["checkSufficientBalance", "TransferTx"], "returns": {"checkSufficientBalance": "true"}}]}
+  ],
+  "test_facts": {
+    "TestTransferAPI/OK": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": true, "to_account.found": true, "to_account.currency_match": true, "from_account.balance_sufficient": true, "transfer_tx.ok": true},
+    "TestTransferAPI/UnauthorizedUser": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": false},
+    "TestTransferAPI/NoAuthorization": {"auth.present": false, "request.currency_supported": true, "request.amount": 10},
+    "TestTransferAPI/FromAccountNotFound": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": false, "from_account.not_found_error": true},
+    "TestTransferAPI/ToAccountNotFound": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": true, "to_account.found": false},
+    "TestTransferAPI/FromAccountCurrencyMismatch": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": false},
+    "TestTransferAPI/ToAccountCurrencyMismatch": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": true, "to_account.found": true, "to_account.currency_match": false},
+    "TestTransferAPI/InvalidCurrency": {"auth.present": true, "request.currency_supported": false, "request.amount": 10},
+    "TestTransferAPI/NegativeAmount": {"auth.present": true, "request.currency_supported": true, "request.amount": -10},
+    "TestTransferAPI/InsufficientBalance": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": true, "to_account.found": true, "to_account.currency_match": true, "from_account.balance": 9, "from_account.balance_sufficient": false},
+    "TestTransferAPI/GetAccountError": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": false, "from_account.not_found_error": false},
+    "TestTransferAPI/TransferTxError": {"auth.present": true, "request.currency_supported": true, "request.amount": 10, "from_account.found": true, "from_account.currency_match": true, "from_account.owned_by_auth": true, "to_account.found": true, "to_account.currency_match": true, "from_account.balance_sufficient": true, "transfer_tx.ok": false}
+  },
+  "unknowns": [
+    {"what": "Exact from_account.balance in OK / TransferTxError", "why": "randomAccount's balance generator is not in the bundle; only InsufficientBalance pins it (amount - 1 = 9). OK's observed checkSufficientBalance=true implies balance >= 10 there; TransferTxError is withheld, so its sufficiency is inferred, not observed. Hence the boolean from_account.balance_sufficient in the decision predicate."},
+    {"what": "Whether NoAuthorization reaches createTransfer at all", "why": "It is not listed among the 11 executions reaching createTransfer; middleware source shows an abort on empty header, so D0 predicts no handler entry, but no path is shown."},
+    {"what": "Order of binding checks when both currency and amount are invalid", "why": "D1 (currency) is modeled before D2 (amount), but NegativeAmount shows the currency validator runs even when amount fails; the validator library's field order/aggregation is outside the evidence. No test has both invalid."},
+    {"what": "Race between balance check and TransferTx", "why": "The guard reads the balance snapshot from GetAccount; TransferTx does not re-check balance (addMoney just adds). Concurrent transfers could still overdraw; tests use a mock store, so this is unobservable here."},
+    {"what": "Behaviour of real TransferTx / GetAccount", "why": "Store is a gomock in every test; T1 is from source only and never executed."},
+    {"what": "Whether 'calls' matching flattens nested callees (e.g. GetAccount, errorResponse inside validAccount)", "why": "Decision branches list nested entities (GetAccount, errorResponse inside validAccount) in the order they appear in the rendered path; execution refs were restricted to top-level callees to avoid ambiguity."}
+  ]
+}

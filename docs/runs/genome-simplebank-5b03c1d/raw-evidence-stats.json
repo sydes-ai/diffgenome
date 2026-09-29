@@ -1,0 +1,13 @@
+{
+ "executions_total": 50,
+ "executions_through_entry": 11,
+ "nodes_in_those": 350,
+ "call_nodes": 334,
+ "stand_in_calls": 16,
+ "distinct_path_shapes": 6,
+ "graph_edges_total": 379,
+ "change_artifact_edges": 8,
+ "change_artifact_boundaries": 2,
+ "state_facts_in_those": 536,
+ "path_steps_under_entry": 65
+}

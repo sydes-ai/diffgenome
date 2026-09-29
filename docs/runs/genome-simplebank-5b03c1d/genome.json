@@ -1,0 +1,2540 @@
+{
+ "format": "diffgenome-genome/0",
+ "subject": {
+  "repo": "simplebank",
+  "change": "5b03c1d",
+  "entry": "go:api.Server.createTransfer"
+ },
+ "entities": [
+  {
+   "id": "go:api.<anon>@8",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 14 existing execution(s)",
+   "symbol": "go:api.<anon>@8",
+   "role": "executed"
+  },
+  {
+   "id": "go:api.Server.checkSufficientBalance",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 3 existing execution(s)",
+   "symbol": "go:api.Server.checkSufficientBalance",
+   "role": "changed"
+  },
+  {
+   "id": "go:api.Server.createTransfer",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 11 existing execution(s)",
+   "symbol": "go:api.Server.createTransfer",
+   "role": "changed"
+  },
+  {
+   "id": "go:api.Server.validAccount",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 9 existing execution(s)",
+   "symbol": "go:api.Server.validAccount",
+   "role": "executed"
+  },
+  {
+   "id": "go:api.authMiddleware.<anon>@21",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 32 existing execution(s)",
+   "symbol": "go:api.authMiddleware.<anon>@21",
+   "role": "executed"
+  },
+  {
+   "id": "go:api.errorResponse",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 36 existing execution(s)",
+   "symbol": "go:api.errorResponse",
+   "role": "executed"
+  },
+  {
+   "id": "go:util.IsSupportedCurrency",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "executed by 14 existing execution(s)",
+   "symbol": "go:util.IsSupportedCurrency",
+   "role": "executed"
+  },
+  {
+   "id": "go:db/sqlc.SQLStore.TransferTx",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "gap via rule claim-member",
+   "symbol": "go:db/sqlc.SQLStore.TransferTx",
+   "role": "boundary:gap"
+  },
+  {
+   "id": "go:db/sqlc.Queries.GetAccount",
+   "derived_by": "collector",
+   "evidence": [],
+   "status": "observed_fact",
+   "status_reason": "gap via rule claim-member",
+   "symbol": "go:db/sqlc.Queries.GetAccount",
+   "role": "boundary:gap"
+  }
+ ],
+ "variables": [
+  {
+   "id": "V1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 24,
+     "text": "if len(authorizationHeader) == 0 {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 51,
+     "text": "ctx.Set(authorizationPayloadKey, payload)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "auth.present",
+   "origin": "environment",
+   "description": "A valid bearer access token was supplied; authMiddleware sets the authorization payload and only then calls the handler.",
+   "definition": null
+  },
+  {
+   "id": "V2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 17,
+     "text": "Currency      string `json:\"currency\" binding:\"required,currency\"`",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/validator.go",
+     "line": 10,
+     "text": "return util.IsSupportedCurrency(currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "util/currency.go",
+     "line": 13,
+     "text": "case USD, EUR, CAD:",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "request.currency_supported",
+   "origin": "request",
+   "description": "request.currency is one of USD, EUR, CAD (the `currency` binding validator).",
+   "definition": null
+  },
+  {
+   "id": "V3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 16,
+     "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 44,
+     "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "request.amount",
+   "origin": "request",
+   "description": "Transfer amount; binding requires gt=0; compared against the source balance and passed to TransferTx.",
+   "definition": null
+  },
+  {
+   "id": "V4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 64,
+     "text": "account, err := server.store.GetAccount(ctx, accountID)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 27,
+     "text": "fromAccount, valid := server.validAccount(ctx, req.FromAccountID, req.Currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "from_account.found",
+   "origin": "state",
+   "description": "store.GetAccount(from_account_id) returned without error. False covers both not-found (404) and other store errors (500).",
+   "definition": null
+  },
+  {
+   "id": "V5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 66,
+     "text": "if errors.Is(err, db.ErrRecordNotFound) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "from_account.not_found_error",
+   "origin": "state",
+   "description": "When the from lookup fails, whether the error is db.ErrRecordNotFound (404) rather than a generic store error (500). Only affects status, not path shape.",
+   "definition": null
+  },
+  {
+   "id": "V6",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 75,
+     "text": "if account.Currency != currency {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "from_account.currency_match",
+   "origin": "derived",
+   "description": "from_account.currency == request.currency.",
+   "definition": null
+  },
+  {
+   "id": "V7",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 32,
+     "text": "authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 33,
+     "text": "if fromAccount.Owner != authPayload.Username {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "from_account.owned_by_auth",
+   "origin": "derived",
+   "description": "from_account.owner == auth.username (authenticated token payload).",
+   "definition": null
+  },
+  {
+   "id": "V8",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 39,
+     "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "to_account.found",
+   "origin": "state",
+   "description": "store.GetAccount(to_account_id) returned without error.",
+   "definition": null
+  },
+  {
+   "id": "V9",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 75,
+     "text": "if account.Currency != currency {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "to_account.currency_match",
+   "origin": "derived",
+   "description": "to_account.currency == request.currency.",
+   "definition": null
+  },
+  {
+   "id": "V10",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "from_account.balance",
+   "origin": "state",
+   "description": "Balance of the source account as returned by GetAccount (the fetched snapshot, not re-read).",
+   "definition": null
+  },
+  {
+   "id": "V11",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "checkSufficientBalance"
+     ],
+     "absent": [],
+     "returns": {
+      "checkSufficientBalance": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "name": "from_account.balance_sufficient",
+   "origin": "derived",
+   "description": "from_account.balance >= request.amount (negation of the new guard). Boolean form used because test balances are random except in InsufficientBalance.",
+   "definition": "from_account.balance >= request.amount"
+  },
+  {
+   "id": "V12",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 54,
+     "text": "result, err := server.store.TransferTx(ctx, arg)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 55,
+     "text": "if err != nil {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "transfer_tx.ok",
+   "origin": "state",
+   "description": "store.TransferTx returned no error.",
+   "definition": null
+  }
+ ],
+ "data_dependencies": [
+  {
+   "id": "DD1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/validator.go",
+     "line": 10,
+     "text": "return util.IsSupportedCurrency(currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/InvalidCurrency",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount"
+     ],
+     "returns": {
+      "<anon>@8": "false"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "source": "request.currency_supported",
+   "sink": "D1",
+   "transform": "IsSupportedCurrency(request.currency) via binding validator <anon>@8"
+  },
+  {
+   "id": "DD2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 16,
+     "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/NegativeAmount",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount"
+     ],
+     "returns": {
+      "<anon>@8": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "source": "request.amount",
+   "sink": "D2",
+   "transform": "binding rule gt=0"
+  },
+  {
+   "id": "DD3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 27,
+     "text": "fromAccount, valid := server.validAccount(ctx, req.FromAccountID, req.Currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 39,
+     "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "source": "request.currency",
+   "sink": "Server.validAccount",
+   "transform": "compared to account.Currency for both from and to accounts"
+  },
+  {
+   "id": "DD4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 44,
+     "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "edge",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": "Server.createTransfer",
+     "callee": "Server.checkSufficientBalance",
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (edge, source)",
+   "source": "from_account.balance",
+   "sink": "D8",
+   "transform": "compared with request.amount (balance < amount)"
+  },
+  {
+   "id": "DD5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 51,
+     "text": "Amount:        req.Amount,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "source": "request.amount",
+   "sink": "TransferTx",
+   "transform": "copied into TransferTxParams with from/to ids"
+  },
+  {
+   "id": "DD6",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 33,
+     "text": "if fromAccount.Owner != authPayload.Username {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "source": "auth.username",
+   "sink": "D5",
+   "transform": "compared with from_account.owner"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D0",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 24,
+     "text": "if len(authorizationHeader) == 0 {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 51,
+     "text": "ctx.Set(authorizationPayloadKey, payload)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "authMiddleware",
+   "inputs": [
+    "auth.present"
+   ],
+   "predicate": "!auth.present",
+   "order": 0,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [],
+    "absent": [
+     "<anon>@8",
+     "validAccount",
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "middleware aborts with 401; createTransfer never runs"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "payload set, handler invoked"
+   }
+  },
+  {
+   "id": "D1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 22,
+     "text": "if err := ctx.ShouldBindJSON(&req); err != nil {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 23,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/InvalidCurrency",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount",
+      "TransferTx"
+     ],
+     "returns": {
+      "<anon>@8": "false"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "verified",
+   "status_reason": "cites an `if` site; true branch observed in 1 execution(s), false branch in 10; no contradiction",
+   "entity": "<anon>@8",
+   "inputs": [
+    "request.currency_supported"
+   ],
+   "predicate": "!request.currency_supported",
+   "order": 1,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "<anon>@8",
+     "errorResponse"
+    ],
+    "absent": [
+     "validAccount",
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "binding fails: 400 Bad Request"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": "true",
+    "calls": [
+     "<anon>@8"
+    ],
+    "absent": [],
+    "stops": false,
+    "effect": "currency accepted"
+   }
+  },
+  {
+   "id": "D2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 16,
+     "text": "Amount        int64  `json:\"amount\" binding:\"required,gt=0\"`",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 22,
+     "text": "if err := ctx.ShouldBindJSON(&req); err != nil {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/NegativeAmount",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount",
+      "TransferTx"
+     ],
+     "returns": {
+      "<anon>@8": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "createTransfer",
+   "inputs": [
+    "request.amount"
+   ],
+   "predicate": "request.amount <= 0",
+   "order": 2,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [
+     "errorResponse"
+    ],
+    "absent": [
+     "validAccount",
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "binding fails (gt=0): 400 Bad Request"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "request bound"
+   }
+  },
+  {
+   "id": "D3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 66,
+     "text": "if errors.Is(err, db.ErrRecordNotFound) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 67,
+     "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 71,
+     "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/FromAccountNotFound",
+     "calls": [
+      "<anon>@8",
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/GetAccountError",
+     "calls": [
+      "<anon>@8",
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source); not verified: true branch not observed with a decodable outcome",
+   "entity": "validAccount",
+   "inputs": [
+    "from_account.found"
+   ],
+   "predicate": "!from_account.found",
+   "order": 3,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "validAccount",
+     "GetAccount",
+     "errorResponse"
+    ],
+    "absent": [
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "404 if ErrRecordNotFound else 500"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [
+     "validAccount",
+     "GetAccount"
+    ],
+    "absent": [],
+    "stops": false,
+    "effect": "from account loaded"
+   }
+  },
+  {
+   "id": "D4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 75,
+     "text": "if account.Currency != currency {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 77,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/FromAccountCurrencyMismatch",
+     "calls": [
+      "<anon>@8",
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "validAccount",
+   "inputs": [
+    "from_account.currency_match"
+   ],
+   "predicate": "!from_account.currency_match",
+   "order": 4,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "errorResponse"
+    ],
+    "absent": [
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "400 currency mismatch"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": "true",
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "from account valid"
+   }
+  },
+  {
+   "id": "D5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 33,
+     "text": "if fromAccount.Owner != authPayload.Username {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 35,
+     "text": "ctx.JSON(http.StatusUnauthorized, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "createTransfer",
+   "inputs": [
+    "from_account.owned_by_auth"
+   ],
+   "predicate": "!from_account.owned_by_auth",
+   "order": 5,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [
+     "errorResponse"
+    ],
+    "absent": [
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "401 Unauthorized; to account never looked up"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "ownership confirmed"
+   }
+  },
+  {
+   "id": "D6",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 39,
+     "text": "_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 67,
+     "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/ToAccountNotFound",
+     "calls": [
+      "<anon>@8",
+      "validAccount",
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source); not verified: no cited `if` site anchors the predicate",
+   "entity": "validAccount",
+   "inputs": [
+    "to_account.found"
+   ],
+   "predicate": "!to_account.found",
+   "order": 6,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "validAccount",
+     "GetAccount",
+     "errorResponse"
+    ],
+    "absent": [
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "404 if ErrRecordNotFound else 500"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [
+     "validAccount",
+     "GetAccount"
+    ],
+    "absent": [],
+    "stops": false,
+    "effect": "to account loaded"
+   }
+  },
+  {
+   "id": "D7",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 75,
+     "text": "if account.Currency != currency {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 40,
+     "text": "if !valid {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "validAccount",
+   "inputs": [
+    "to_account.currency_match"
+   ],
+   "predicate": "!to_account.currency_match",
+   "order": 7,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "errorResponse"
+    ],
+    "absent": [
+     "checkSufficientBalance",
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "400 currency mismatch"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": "true",
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "effect": "to account valid"
+   }
+  },
+  {
+   "id": "D8",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 44,
+     "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 87,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 88,
+     "text": "return false",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "validAccount",
+      "validAccount",
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "absent": [
+      "errorResponse"
+     ],
+     "returns": {
+      "checkSufficientBalance": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "verified",
+   "status_reason": "cites an `if` site; true branch observed in 1 execution(s), false branch in 2; no contradiction",
+   "entity": "checkSufficientBalance",
+   "inputs": [
+    "from_account.balance",
+    "request.amount",
+    "from_account.balance_sufficient"
+   ],
+   "predicate": "!from_account.balance_sufficient",
+   "order": 8,
+   "true_branch": {
+    "when": true,
+    "returns": "false",
+    "calls": [
+     "checkSufficientBalance",
+     "errorResponse"
+    ],
+    "absent": [
+     "TransferTx"
+    ],
+    "stops": true,
+    "effect": "400 insufficient balance; no transfer persisted (the change)"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": "true",
+    "calls": [
+     "checkSufficientBalance"
+    ],
+    "absent": [],
+    "stops": false,
+    "effect": "proceed to TransferTx"
+   }
+  },
+  {
+   "id": "D9",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 55,
+     "text": "if err != nil {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 56,
+     "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 60,
+     "text": "ctx.JSON(http.StatusOK, result)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "absent": [
+      "errorResponse"
+     ],
+     "returns": {
+      "checkSufficientBalance": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source); not verified: true/false branch not observed with a decodable outcome",
+   "entity": "createTransfer",
+   "inputs": [
+    "transfer_tx.ok"
+   ],
+   "predicate": "!transfer_tx.ok",
+   "order": 9,
+   "true_branch": {
+    "when": true,
+    "returns": null,
+    "calls": [
+     "TransferTx",
+     "errorResponse"
+    ],
+    "absent": [],
+    "stops": true,
+    "effect": "500 Internal Server Error"
+   },
+   "false_branch": {
+    "when": false,
+    "returns": null,
+    "calls": [
+     "TransferTx"
+    ],
+    "absent": [
+     "errorResponse"
+    ],
+    "stops": true,
+    "effect": "200 OK with TransferTxResult"
+   }
+  }
+ ],
+ "effects": [
+  {
+   "id": "E1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 23,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 77,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 87,
+     "text": "ctx.JSON(http.StatusBadRequest, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "kind": "response",
+   "target": "HTTP 400 Bad Request",
+   "condition": "D1 true | D2 true | D4 true | D7 true | D8 true"
+  },
+  {
+   "id": "E2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 67,
+     "text": "ctx.JSON(http.StatusNotFound, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "kind": "response",
+   "target": "HTTP 404 Not Found",
+   "condition": "D3 true or D6 true with ErrRecordNotFound"
+  },
+  {
+   "id": "E3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 71,
+     "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 56,
+     "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "kind": "response",
+   "target": "HTTP 500 Internal Server Error",
+   "condition": "D3/D6 true with a non-not-found error | D9 true"
+  },
+  {
+   "id": "E4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 35,
+     "text": "ctx.JSON(http.StatusUnauthorized, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "kind": "response",
+   "target": "HTTP 401 Unauthorized",
+   "condition": "D0 true | D5 true"
+  },
+  {
+   "id": "E5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 54,
+     "text": "result, err := server.store.TransferTx(ctx, arg)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "absent": [
+      "errorResponse"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "kind": "persistence",
+   "target": "store.TransferTx (transfer + two entries + two balance updates)",
+   "condition": "R5 (all gates pass)"
+  },
+  {
+   "id": "E6",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 60,
+     "text": "ctx.JSON(http.StatusOK, result)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "kind": "response",
+   "target": "HTTP 200 OK with TransferTxResult",
+   "condition": "D9 false"
+  }
+ ],
+ "transitions": [
+  {
+   "id": "T1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "db/sqlc/tx_transfer.go",
+     "line": 40,
+     "text": "Amount:    -arg.Amount,",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "db/sqlc/tx_transfer.go",
+     "line": 55,
+     "text": "result.FromAccount, result.ToAccount, err = addMoney(ctx, q, arg.FromAccountID, -arg.Amount, arg.ToAccountID, arg.Amount)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "state_before": "from.balance = B1, to.balance = B2, B1 >= amount",
+   "action": "TransferTx(from_id, to_id, amount)",
+   "state_after": "from.balance = B1 - amount, to.balance = B2 + amount, one transfer row and two entry rows created"
+  }
+ ],
+ "rules": [
+  {
+   "id": "R1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/InvalidCurrency",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount",
+      "TransferTx"
+     ],
+     "returns": {
+      "<anon>@8": "false"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/NegativeAmount",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount",
+      "TransferTx"
+     ],
+     "returns": {
+      "<anon>@8": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "summarizes verified decision D1, but its condition also uses request.amount, which that decision does not decide",
+   "name": "Request shape gate",
+   "inputs": [
+    "request.currency_supported",
+    "request.amount"
+   ],
+   "relevant_state": [],
+   "condition": "!request.currency_supported || request.amount <= 0",
+   "consequences": [
+    "400",
+    "no store access (no validAccount, no TransferTx)"
+   ],
+   "decision": "D1"
+  },
+  {
+   "id": "R2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 64,
+     "text": "account, err := server.store.GetAccount(ctx, accountID)",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 75,
+     "text": "if account.Currency != currency {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/FromAccountCurrencyMismatch",
+     "calls": [
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/ToAccountNotFound",
+     "calls": [
+      "validAccount",
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "name": "Account eligibility (applied to from, then to)",
+   "inputs": [
+    "request.currency"
+   ],
+   "relevant_state": [
+    "from_account.found",
+    "from_account.currency_match",
+    "to_account.found",
+    "to_account.currency_match"
+   ],
+   "condition": "an account must exist (else 404 / 500 on store error) and have the request currency (else 400); first failing account stops the handler",
+   "consequences": [
+    "validAccount returns false",
+    "error response inside validAccount",
+    "no checkSufficientBalance, no TransferTx"
+   ],
+   "decision": null
+  },
+  {
+   "id": "R3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 33,
+     "text": "if fromAccount.Owner != authPayload.Username {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "Ownership of source account",
+   "inputs": [
+    "auth.username"
+   ],
+   "relevant_state": [
+    "from_account.owner"
+   ],
+   "condition": "!from_account.owned_by_auth (checked after from is valid, before to is looked up)",
+   "consequences": [
+    "401",
+    "second validAccount not called",
+    "no TransferTx"
+   ],
+   "decision": "D5"
+  },
+  {
+   "id": "R4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 44,
+     "text": "if !server.checkSufficientBalance(ctx, fromAccount, req.Amount) {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "edge",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": "Server.createTransfer",
+     "callee": "Server.checkSufficientBalance",
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "verified",
+   "status_reason": "summarizes verified decision D8",
+   "name": "Sufficient balance guard (the change)",
+   "inputs": [
+    "request.amount"
+   ],
+   "relevant_state": [
+    "from_account.balance"
+   ],
+   "condition": "from_account.balance < request.amount",
+   "consequences": [
+    "checkSufficientBalance returns false",
+    "400",
+    "TransferTx not called"
+   ],
+   "decision": "D8"
+  },
+  {
+   "id": "R5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "validAccount",
+      "validAccount",
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "absent": [
+      "errorResponse"
+     ],
+     "returns": {
+      "checkSufficientBalance": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    },
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 56,
+     "text": "ctx.JSON(http.StatusInternalServerError, errorResponse(err))",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution, source)",
+   "name": "Persist transfer when all gates pass",
+   "inputs": [
+    "request.amount"
+   ],
+   "relevant_state": [
+    "transfer_tx.ok"
+   ],
+   "condition": "all of R1-R4 pass",
+   "consequences": [
+    "TransferTx called",
+    "200 if transfer_tx.ok else 500"
+   ],
+   "decision": "D9"
+  }
+ ],
+ "regimes": [
+  {
+   "id": "G1",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 24,
+     "text": "if len(authorizationHeader) == 0 {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "unauthenticated (handler not reached)",
+   "facts": {
+    "auth.present": false
+   },
+   "members": [
+    "TestTransferAPI/NoAuthorization"
+   ]
+  },
+  {
+   "id": "G2",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/InvalidCurrency",
+     "calls": [
+      "<anon>@8",
+      "errorResponse"
+     ],
+     "absent": [
+      "validAccount"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution)",
+   "name": "rejected at binding",
+   "facts": {
+    "auth.present": true,
+    "request.currency_supported|request.amount": "invalid"
+   },
+   "members": [
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount"
+   ]
+  },
+  {
+   "id": "G3",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/FromAccountNotFound",
+     "calls": [
+      "validAccount"
+     ],
+     "absent": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution)",
+   "name": "rejected at account eligibility",
+   "facts": {
+    "request.currency_supported": true,
+    "any_account_ineligible": true
+   },
+   "members": [
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/ToAccountCurrencyMismatch"
+   ]
+  },
+  {
+   "id": "G4",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 33,
+     "text": "if fromAccount.Owner != authPayload.Username {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "rejected on ownership",
+   "facts": {
+    "from_account.found": true,
+    "from_account.currency_match": true,
+    "from_account.owned_by_auth": false
+   },
+   "members": [
+    "TestTransferAPI/UnauthorizedUser"
+   ]
+  },
+  {
+   "id": "G5",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/transfer.go",
+     "line": 85,
+     "text": "if account.Balance < amount {",
+     "test": null,
+     "calls": [],
+     "absent": [],
+     "returns": {},
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (source)",
+   "name": "rejected on insufficient balance",
+   "facts": {
+    "from_account.balance_sufficient": false
+   },
+   "members": [
+    "TestTransferAPI/InsufficientBalance"
+   ]
+  },
+  {
+   "id": "G6",
+   "derived_by": "llm:claude-opus-5-5",
+   "evidence": [
+    {
+     "kind": "execution",
+     "file": null,
+     "line": null,
+     "text": null,
+     "test": "TestTransferAPI/OK",
+     "calls": [
+      "checkSufficientBalance",
+      "TransferTx"
+     ],
+     "absent": [],
+     "returns": {
+      "checkSufficientBalance": "true"
+     },
+     "caller": null,
+     "callee": null,
+     "ok": true,
+     "why": ""
+    }
+   ],
+   "status": "supported",
+   "status_reason": "every cited reference checks out (execution)",
+   "name": "transfer attempted",
+   "facts": {
+    "from_account.balance_sufficient": true
+   },
+   "members": [
+    "TestTransferAPI/OK",
+    "TestTransferAPI/TransferTxError"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "what": "Exact from_account.balance in OK / TransferTxError",
+   "why": "randomAccount's balance generator is not in the bundle; only InsufficientBalance pins it (amount - 1 = 9). OK's observed checkSufficientBalance=true implies balance >= 10 there; TransferTxError is withheld, so its sufficiency is inferred, not observed. Hence the boolean from_account.balance_sufficient in the decision predicate."
+  },
+  {
+   "what": "Whether NoAuthorization reaches createTransfer at all",
+   "why": "It is not listed among the 11 executions reaching createTransfer; middleware source shows an abort on empty header, so D0 predicts no handler entry, but no path is shown."
+  },
+  {
+   "what": "Order of binding checks when both currency and amount are invalid",
+   "why": "D1 (currency) is modeled before D2 (amount), but NegativeAmount shows the currency validator runs even when amount fails; the validator library's field order/aggregation is outside the evidence. No test has both invalid."
+  },
+  {
+   "what": "Race between balance check and TransferTx",
+   "why": "The guard reads the balance snapshot from GetAccount; TransferTx does not re-check balance (addMoney just adds). Concurrent transfers could still overdraw; tests use a mock store, so this is unobservable here."
+  },
+  {
+   "what": "Behaviour of real TransferTx / GetAccount",
+   "why": "Store is a gomock in every test; T1 is from source only and never executed."
+  },
+  {
+   "what": "Whether 'calls' matching flattens nested callees (e.g. GetAccount, errorResponse inside validAccount)",
+   "why": "Decision branches list nested entities (GetAccount, errorResponse inside validAccount) in the order they appear in the rendered path; execution refs were restricted to top-level callees to avoid ambiguity."
+  }
+ ],
+ "provenance": {
+  "model": "claude-opus-5-5",
+  "context_bundle_sha": "a0fd457517e27822",
+  "checker": "genome-check/0",
+  "substrate": {
+   "executions": 50,
+   "paths_under_entry": 11,
+   "observed_edges": 370
+  },
+  "withheld_from_model": [
+   "TestTransferAPI/InsufficientBalance",
+   "TestTransferAPI/ToAccountCurrencyMismatch",
+   "TestTransferAPI/TransferTxError",
+   "TestTransferAPI/UnauthorizedUser"
+  ],
+  "static_decision_sites": [
+   {
+    "file": "api/transfer.go",
+    "line": 22,
+    "condition": "err := ctx.ShouldBindJSON(&req); err != nil",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 28,
+    "condition": "!valid",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 33,
+    "condition": "fromAccount.Owner != authPayload.Username",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 40,
+    "condition": "!valid",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 44,
+    "condition": "!server.checkSufficientBalance(ctx, fromAccount, req.Amount)",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 55,
+    "condition": "err != nil",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 65,
+    "condition": "err != nil",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 66,
+    "condition": "errors.Is(err, db.ErrRecordNotFound)",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 75,
+    "condition": "account.Currency != currency",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/transfer.go",
+    "line": 85,
+    "condition": "account.Balance < amount",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/validator.go",
+    "line": 9,
+    "condition": "currency, ok := fieldLevel.Field().Interface().(string); ok",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/middleware.go",
+    "line": 24,
+    "condition": "len(authorizationHeader) == 0",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/middleware.go",
+    "line": 31,
+    "condition": "len(fields) < 2",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/middleware.go",
+    "line": 38,
+    "condition": "authorizationType != authorizationTypeBearer",
+    "status": "static_fact"
+   },
+   {
+    "file": "api/middleware.go",
+    "line": 46,
+    "condition": "err != nil",
+    "status": "static_fact"
+   }
+  ]
+ }
+}
