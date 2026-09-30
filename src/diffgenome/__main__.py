@@ -222,6 +222,10 @@ def main(argv: list[str] | None = None) -> int:
             # a probe is only worth its cost when the gap sits next to the change
             rest = ["--probe-max-distance", "1", *rest]
         return mvp.main(rest)
+    if argv and argv[0] == "genome":
+        from diffgenome import genome_pipeline
+
+        return genome_pipeline.main(argv[1:])
     if argv and argv[0] == "mvp":
         argv = argv[1:]
     return mvp.main(argv)
