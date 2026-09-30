@@ -119,3 +119,22 @@ Not published. Everything was tested and verified locally:
 - The live Sydes runs used the local editable installs.
 
 Per the instruction, publishing was needed only if local verification was impossible.
+
+## 5. Follow-up: checked evidence fed into Sydes' review reasoning (A/B)
+
+The checked genome summary was given to Sydes' code-review and PR semantic-analysis prompts
+before they read the change: an opt-in, advisory, status-labelled contract. This was tested
+on the same recorded artifacts, with gpt-4.1 and 3 repetitions per arm. The record is in
+`sydes/docs/integration/diffgenome-review-context/comparison.md`.
+
+| case | result |
+|---|---|
+| B #103 | The ownership rule is now stated in 2 of 3 runs (was 0 of 3), but 2 of 3 runs also added speculative P0 risks. |
+| C #136 | No change. |
+| Baserow #6069 | No change. |
+
+In every run: the evidence was never cited as evidence, the code review found 0 issues, and the
+verdict did not change.
+
+**Verdict: NO-GO.** The genome contains useful information, but Sydes does not reason
+materially better because of it.
