@@ -1,0 +1,86 @@
+{
+ "tests": 5,
+ "scenarios": 5,
+ "unresolved_scenarios": [],
+ "consistent": 0,
+ "indeterminate": 5,
+ "contradicted": 0,
+ "per_test": [
+  {
+   "test": "tests/baserow/contrib/database/field/dependencies/test_field_dependency_handler.py::test_can_import_database_with_formula_dependencies",
+   "match": false,
+   "indeterminate": "decision d_link_outside is supported, contradicted on a shown execution"
+  },
+  {
+   "test": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_duplicate_application_with_implicit_array_primary_dependency",
+   "match": false,
+   "indeterminate": "decision d_link_outside is supported, contradicted on a shown execution"
+  },
+  {
+   "test": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_explicit_array_primary_dependency",
+   "match": false,
+   "indeterminate": "decision d_link_outside is supported, contradicted on a shown execution"
+  },
+  {
+   "test": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency",
+   "match": false,
+   "indeterminate": "decision d_link_outside is supported, contradicted on a shown execution"
+  },
+  {
+   "test": "tests/baserow/core/snapshots/test_snapshot_array_formula_import.py::test_snapshot_with_implicit_array_primary_dependency_two_links_deep",
+   "match": false,
+   "indeterminate": "decision d_link_outside is supported, contradicted on a shown execution"
+  }
+ ],
+ "site_agreement": {
+  "d_primary": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_expand_empty": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_link_outside": [
+   false,
+   true,
+   false,
+   true,
+   true
+  ],
+  "d_primary_missing": [
+   false,
+   true,
+   false,
+   true,
+   true
+  ],
+  "d_defer": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_first_field": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_refresh": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ]
+ }
+}

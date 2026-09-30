@@ -1,0 +1,606 @@
+{
+ "format": "diffgenome-genome-summary/1",
+ "proposed_by": "recorded:proposals.json",
+ "bundle_digest": "e1e14f372a48b748",
+ "established_from": "51 executions of existing tests",
+ "consistency": {
+  "scenarios": 20,
+  "consistent": 20,
+  "indeterminate": 0,
+  "contradicted": 0
+ },
+ "decision_rules": [
+  {
+   "id": "d_valid_type",
+   "status": "verified",
+   "entity": "token.Payload.Valid",
+   "site": "br:8d10f2f9b136",
+   "file": "token/payload.go",
+   "line": 54,
+   "source": "payload.Type != tokenType",
+   "meaning": "issued_type != expected_type",
+   "inputs": [
+    "issued_type",
+    "expected_type"
+   ],
+   "when_true": "ErrInvalidToken: wrong token type",
+   "when_false": "type accepted; expiry checked next",
+   "outcome_true": "token.Payload.Valid returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "icate agrees with the observed outcome 36 time(s) from observed state and in 14 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 14,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_jv_valid",
+   "status": "verified",
+   "entity": "token.JWTMaker.VerifyToken",
+   "site": "br:8a21855c007e",
+   "file": "token/jwt_maker.go",
+   "line": 62,
+   "source": "err != nil",
+   "meaning": "!payload_valid",
+   "inputs": [
+    "payload_valid"
+   ],
+   "when_true": "Valid's error (wrong type) propagated",
+   "when_false": "payload returned",
+   "outcome_true": "token.JWTMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 2 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 2,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_valid_exp",
+   "status": "verified",
+   "entity": "token.Payload.Valid",
+   "site": "br:bdb0acf90853",
+   "file": "token/payload.go",
+   "line": 57,
+   "source": "time.Now().After(payload.ExpiredAt)",
+   "meaning": "token_expired",
+   "inputs": [
+    "token_expired"
+   ],
+   "when_true": "ErrExpiredToken",
+   "when_false": "payload valid",
+   "outcome_true": "token.Payload.Valid returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "dicate agrees with the observed outcome 0 time(s) from observed state and in 11 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 11,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_pv_valid",
+   "status": "verified",
+   "entity": "token.PasetoMaker.VerifyToken",
+   "site": "br:c7d403dfabc3",
+   "file": "token/paseto_maker.go",
+   "line": 52,
+   "source": "err != nil",
+   "meaning": "!payload_valid",
+   "inputs": [
+    "payload_valid"
+   ],
+   "when_true": "Valid's error propagated",
+   "when_false": "payload returned",
+   "outcome_true": "token.PasetoMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "dicate agrees with the observed outcome 2 time(s) from observed state and in 12 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 12,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_jv_parse",
+   "status": "verified",
+   "entity": "token.JWTMaker.VerifyToken",
+   "site": "br:b95a526c7153",
+   "file": "token/jwt_maker.go",
+   "line": 49,
+   "source": "err != nil",
+   "meaning": "token_expired || !token_authentic",
+   "inputs": [
+    "token_expired",
+    "token_authentic"
+   ],
+   "when_true": "jwt library rejects (expiry checked by the library, before Valid)",
+   "when_false": "claims parsed",
+   "outcome_true": "token.JWTMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 4 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 4,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_jv_expired",
+   "status": "verified",
+   "entity": "token.JWTMaker.VerifyToken",
+   "site": "br:184d2ca72d5b",
+   "file": "token/jwt_maker.go",
+   "line": 50,
+   "source": "errors.Is(err, jwt.ErrTokenExpired)",
+   "meaning": "token_expired",
+   "inputs": [
+    "token_expired"
+   ],
+   "when_true": "ErrExpiredToken",
+   "when_false": "ErrInvalidToken",
+   "outcome_true": "token.JWTMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": "token.JWTMaker.VerifyToken returned-error:go:*errors.errorString",
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 2 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 2,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_md",
+   "status": "verified",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:e3505bc4c4b9",
+   "file": "gapi/authorization.go",
+   "line": 19,
+   "source": "!ok",
+   "meaning": "!has_metadata",
+   "inputs": [
+    "has_metadata"
+   ],
+   "when_true": "missing metadata",
+   "when_false": null,
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 8 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 8,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_verify",
+   "status": "verified",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:c71158777bce",
+   "file": "gapi/authorization.go",
+   "line": 41,
+   "source": "err != nil",
+   "meaning": "!verify_ok",
+   "inputs": [
+    "verify_ok"
+   ],
+   "when_true": "invalid access token (expired, undecryptable, or not an access token)",
+   "when_false": null,
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 7 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_auth",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:0746154f1c47",
+   "file": "gapi/rpc_update_user.go",
+   "line": 20,
+   "source": "err != nil",
+   "meaning": "!authz_ok",
+   "inputs": [
+    "authz_ok"
+   ],
+   "when_true": "Unauthenticated",
+   "when_false": null,
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 8 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 8,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_viol",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:af0e24f4367b",
+   "file": "gapi/rpc_update_user.go",
+   "line": 25,
+   "source": "violations != nil",
+   "meaning": "has_violations",
+   "inputs": [
+    "has_violations"
+   ],
+   "when_true": "InvalidArgument",
+   "when_false": null,
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_owner",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:01807a7b80a2",
+   "file": "gapi/rpc_update_user.go",
+   "line": 29,
+   "source": "authPayload.Role != util.BankerRole && authPayload.Username != req.GetUsername()",
+   "meaning": "!caller_is_banker && !caller_is_target",
+   "inputs": [
+    "caller_is_banker",
+    "caller_is_target"
+   ],
+   "when_true": "PermissionDenied",
+   "when_false": null,
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 4 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 4,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_dberr",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:17f2bce25a0f",
+   "file": "gapi/rpc_update_user.go",
+   "line": 63,
+   "source": "err != nil",
+   "meaning": "db_update_failed",
+   "inputs": [
+    "db_update_failed"
+   ],
+   "when_true": "store error",
+   "when_false": null,
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 3 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_np_rng",
+   "status": "supported",
+   "entity": "token.NewPayload",
+   "site": "br:ecd8b89da8b7",
+   "file": "token/payload.go",
+   "line": 37,
+   "source": "err != nil",
+   "meaning": "rng_fails",
+   "inputs": [
+    "rng_fails"
+   ],
+   "when_true": "no payload",
+   "when_false": "payload built with Type = tokenType",
+   "outcome_true": "token.NewPayload returned-error",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:ecd8b89da8b7 (given); not verified: outcome true never observed at br:ecd8b89da8b7",
+   "agreeing_tests": 18,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_pc_err",
+   "status": "supported",
+   "entity": "token.PasetoMaker.CreateToken",
+   "site": "br:0713394c9923",
+   "file": "token/paseto_maker.go",
+   "line": 34,
+   "source": "err != nil",
+   "meaning": "rng_fails",
+   "inputs": [
+    "rng_fails"
+   ],
+   "when_true": "creation fails",
+   "when_false": "token encrypted with typed payload",
+   "outcome_true": "token.PasetoMaker.CreateToken returned-error",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:0713394c9923 (given); not verified: outcome true never observed at br:0713394c9923",
+   "agreeing_tests": 14,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_jc_err",
+   "status": "supported",
+   "entity": "token.JWTMaker.CreateToken",
+   "site": "br:d9f1e0c214f9",
+   "file": "token/jwt_maker.go",
+   "line": 29,
+   "source": "err != nil",
+   "meaning": "rng_fails",
+   "inputs": [
+    "rng_fails"
+   ],
+   "when_true": "creation fails",
+   "when_false": "token signed with typed payload",
+   "outcome_true": "token.JWTMaker.CreateToken returned-error",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:d9f1e0c214f9 (given); not verified: outcome true never observed at br:d9f1e0c214f9",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_pv_decrypt",
+   "status": "supported",
+   "entity": "token.PasetoMaker.VerifyToken",
+   "site": "br:0607e4d952f6",
+   "file": "token/paseto_maker.go",
+   "line": 47,
+   "source": "err != nil",
+   "meaning": "!token_authentic",
+   "inputs": [
+    "token_authentic"
+   ],
+   "when_true": "ErrInvalidToken: undecryptable",
+   "when_false": "payload decoded, validated against expected type",
+   "outcome_true": "token.PasetoMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:0607e4d952f6 (given); not verified: outcome true never observed at br:0607e4d952f6",
+   "agreeing_tests": 12,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_jv_claims",
+   "status": "supported",
+   "entity": "token.JWTMaker.VerifyToken",
+   "site": "br:46e44adad2e4",
+   "file": "token/jwt_maker.go",
+   "line": 57,
+   "source": "!ok",
+   "meaning": "false",
+   "inputs": [],
+   "when_true": "claims not a *Payload",
+   "when_false": "claims are a *Payload",
+   "outcome_true": "token.JWTMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:46e44adad2e4 (given); not verified: outcome true never observed at br:46e44adad2e4",
+   "agreeing_tests": 2,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_hdr",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:a572eeb6a4c8",
+   "file": "gapi/authorization.go",
+   "line": 24,
+   "source": "len(values) == 0",
+   "meaning": "!has_auth_header",
+   "inputs": [
+    "has_auth_header"
+   ],
+   "when_true": "missing authorization header",
+   "when_false": null,
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:a572eeb6a4c8 (given); not verified: outcome true never observed at br:a572eeb6a4c8",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_fields",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:4393757b65d7",
+   "file": "gapi/authorization.go",
+   "line": 30,
+   "source": "len(fields) < 2",
+   "meaning": "!header_has_two_fields",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "when_true": "invalid header format",
+   "when_false": null,
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:4393757b65d7 (given); not verified: outcome true never observed at br:4393757b65d7",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_bearer",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:2e2f712d6301",
+   "file": "gapi/authorization.go",
+   "line": 35,
+   "source": "authType != authorizationBearer",
+   "meaning": "!scheme_is_bearer",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "when_true": "unsupported authorization type",
+   "when_false": "verify as ACCESS token",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:2e2f712d6301 (given); not verified: outcome true never observed at br:2e2f712d6301",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_perm",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:c1bc39962889",
+   "file": "gapi/authorization.go",
+   "line": 45,
+   "source": "!hasPermission(payload.Role, accessibleRoles)",
+   "meaning": "!role_permitted",
+   "inputs": [
+    "role_permitted"
+   ],
+   "when_true": "permission denied",
+   "when_false": "payload returned",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch, outcome); site: br:c1bc39962889 (given); not verified: outcome true never observed at br:c1bc39962889",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_mw_hdr",
+   "status": "supported",
+   "entity": "api.authMiddleware.<anon>@21",
+   "site": "br:3efaa90434e1",
+   "meaning": "!has_auth_header",
+   "inputs": [
+    "has_auth_header"
+   ],
+   "when_true": "401 header not provided",
+   "when_false": null,
+   "outcome_true": "api.authMiddleware.<anon>@21 returned",
+   "outcome_false": null,
+   "basis": "t runtime, no static facts); not verified: site br:3efaa90434e1 is observed both ways and the predicate agrees 5 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_mw_fields",
+   "status": "supported",
+   "entity": "api.authMiddleware.<anon>@21",
+   "site": "br:4ede9085ac0b",
+   "meaning": "!header_has_two_fields",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "when_true": "401 invalid format",
+   "when_false": null,
+   "outcome_true": "api.authMiddleware.<anon>@21 returned",
+   "outcome_false": null,
+   "basis": "t runtime, no static facts); not verified: site br:4ede9085ac0b is observed both ways and the predicate agrees 4 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "agreeing_tests": 4,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_mw_bearer",
+   "status": "supported",
+   "entity": "api.authMiddleware.<anon>@21",
+   "site": "br:96c4e761344c",
+   "meaning": "!scheme_is_bearer",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "when_true": "401 unsupported type",
+   "when_false": "verify as ACCESS token",
+   "outcome_true": "api.authMiddleware.<anon>@21 returned",
+   "outcome_false": null,
+   "basis": "t runtime, no static facts); not verified: site br:96c4e761344c is observed both ways and the predicate agrees 3 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_mw_verify",
+   "status": "supported",
+   "entity": "api.authMiddleware.<anon>@21",
+   "site": "br:052de203d9d4",
+   "meaning": "!verify_ok",
+   "inputs": [
+    "verify_ok"
+   ],
+   "when_true": "401 invalid/expired/wrong-type token",
+   "when_false": "payload stored, next handler runs",
+   "outcome_true": "api.authMiddleware.<anon>@21 returned",
+   "outcome_false": null,
+   "basis": "t runtime, no static facts); not verified: site br:052de203d9d4 is observed both ways and the predicate agrees 2 time(s), but it has no static facts (unanchored), so its consequences cannot be checked",
+   "agreeing_tests": 2,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_pw",
+   "status": "supported",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:815be3bfb43a",
+   "file": "gapi/rpc_update_user.go",
+   "line": 45,
+   "source": "req.Password != nil",
+   "meaning": "password_given",
+   "inputs": [
+    "password_given"
+   ],
+   "when_true": "password hashed into params",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:815be3bfb43a (given); not verified: outcome true never observed at br:815be3bfb43a",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_uu_nf",
+   "status": "supported",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:fb1ba40798cf",
+   "file": "gapi/rpc_update_user.go",
+   "line": 64,
+   "source": "errors.Is(err, db.ErrRecordNotFound)",
+   "meaning": "db_not_found",
+   "inputs": [
+    "db_not_found"
+   ],
+   "when_true": "NotFound",
+   "when_false": "Internal",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "basis": "every cited reference checks out (branch, outcome); site: br:fb1ba40798cf (given); not verified: outcome false never observed at br:fb1ba40798cf",
+   "agreeing_tests": 1,
+   "at_changed_line": false
+  }
+ ],
+ "identities": [
+  {
+   "name": "expected_type",
+   "status": "verified",
+   "same_value_at": [
+    "token.PasetoMaker.VerifyToken arg:tokenType",
+    "token.Payload.Valid arg:tokenType"
+   ],
+   "basis": "identity verified: equal in 34 execution(s) carrying 2 distinct values"
+  }
+ ],
+ "literals": [
+  {
+   "name": "expected_is_access",
+   "at": "token.Payload.Valid arg:tokenType",
+   "equals": 1,
+   "written_at": "token/payload.go:20"
+  },
+  {
+   "name": "expected_is_refresh",
+   "at": "token.Payload.Valid arg:tokenType",
+   "equals": 2,
+   "written_at": "token/payload.go:21"
+  }
+ ],
+ "transitions": [],
+ "statuses": {
+  "verified": 13,
+  "supported": 60,
+  "hypothesis": 0,
+  "rejected": 0,
+  "contradicted_not_exported": 0
+ },
+ "unknowns": [
+  {
+   "what": "Flow of the type through the token string",
+   "why": "issued_type is bound to NewPayload's argument with execution scope and compared by identity with Valid's argument; the genome cannot state that the decrypted payload.Type IS the value encoded at creation (no flow, only equality), and with two tokens created in one execution (login issues access + refresh, renew issues a new access token) the execution-scoped identity is no longer unique, so it would be unknown."
+  },
+  {
+   "what": "Which Maker implementation a server uses",
+   "why": "Procedures call PasetoMaker.VerifyToken directly because that is what executed; interface dispatch (JWT vs PASETO maker behind token.Maker) is not expressible."
+  },
+  {
+   "what": "loginUser, renewAccessToken, gapi LoginUser, gapi CreateUser sites",
+   "why": "Not evaluated by any shown or withheld test; not modeled beyond rule r_refresh_gate. renewAccessToken's refresh-typed VerifyToken and session checks would need store/session variables and a relation between the session's stored refresh token and the request token."
+  },
+  {
+   "what": "hasPermission role membership",
+   "why": "It iterates over accessibleRoles; iteration/membership is not available, so role_permitted is an input bound to hasPermission's bool result."
+  },
+  {
+   "what": "JWT expiry location",
+   "why": "For JWT, expiry is enforced inside jwt.ParseWithClaims (library), so Valid's expiry branch is effectively unreachable for JWT; modeled by making the parse decision depend on token_expired."
+  },
+  {
+   "what": "Literal type of TokenType constants",
+   "why": "TokenTypeAccessToken/RefreshToken are untyped constants converted to TokenType (byte); the literal bindings assume the observed value is uint8 1/2."
+  }
+ ],
+ "cost": {
+  "seconds": 0.0
+ },
+ "note": "Only verified claims, and supported claims no execution contradicted, are listed. Meanings are the model's words; statuses come from the traces."
+}

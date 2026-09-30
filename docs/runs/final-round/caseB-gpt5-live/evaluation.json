@@ -1,0 +1,118 @@
+{
+ "tests": 7,
+ "scenarios": 7,
+ "unresolved_scenarios": [],
+ "consistent": 0,
+ "indeterminate": 7,
+ "contradicted": 0,
+ "per_test": [
+  {
+   "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/ExpiredToken",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/InvalidEmail",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/NoAuthorization",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/OK",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  },
+  {
+   "test": "TestUpdateUserAPI/UserNotFound",
+   "match": false,
+   "indeterminate": "procedure P_authz (go:gapi.Server.authorizeUser) is hypothesis"
+  }
+ ],
+ "site_agreement": {
+  "D_auth_missing_metadata": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_auth_header_empty": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_auth_header_format": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_auth_type": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_auth_verify_err": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_perm_eq_first": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_perm_eq_second": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_np_uuid_err": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "D_pm_create_err": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ]
+ }
+}

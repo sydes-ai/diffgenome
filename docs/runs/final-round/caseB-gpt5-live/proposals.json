@@ -1,0 +1,1665 @@
+{
+ "variables": [
+  {
+   "id": "v_has_metadata",
+   "name": "context has metadata",
+   "origin": "input",
+   "description": "Whether metadata.FromIncomingContext(ctx) returns ok",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 18,
+     "text": "md, ok := metadata.FromIncomingContext(ctx)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_auth_header_present",
+   "name": "authorization header present",
+   "origin": "input",
+   "description": "Whether metadata contains a non-empty Authorization header",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 23,
+     "text": "values := md.Get(authorizationHeader)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:a572eeb6a4c8",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_auth_header_format_valid",
+   "name": "authorization header has at least 2 fields",
+   "origin": "input",
+   "description": "True when strings.Fields(authHeader) has length >= 2",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 29,
+     "text": "fields := strings.Fields(authHeader)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:4393757b65d7",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_auth_type_bearer",
+   "name": "authorization type is bearer",
+   "origin": "input",
+   "description": "True when the auth scheme equals 'bearer'",
+   "observed_as": {
+    "at": {
+     "entity": "gapi.Server.authorizeUser",
+     "point": "arg:accessibleRoles"
+    },
+    "kind": "is_set"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 35,
+     "text": "if authType != authorizationBearer {"
+    },
+    {
+     "kind": "branch",
+     "site": "br:2e2f712d6301",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_token_valid",
+   "name": "access token is valid",
+   "origin": "input",
+   "description": "True if tokenMaker.VerifyToken returns no error",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 40,
+     "text": "payload, err := server.tokenMaker.VerifyToken(accessToken)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_role_eq_first",
+   "name": "userRole equals first accessible role",
+   "origin": "input",
+   "description": "First comparison userRole == accessibleRoles[0] inside hasPermission loop",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 53,
+     "text": "for _, role := range accessibleRoles {"
+    },
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_role_eq_second",
+   "name": "userRole equals second accessible role",
+   "origin": "input",
+   "description": "Second comparison userRole == accessibleRoles[1] inside hasPermission loop",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_has_access",
+   "name": "role is permitted",
+   "origin": "derived",
+   "description": "User role is in the accessibleRoles list",
+   "observed_as": null,
+   "definition": "v_role_eq_first || v_role_eq_second",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c1bc39962889",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_auth_error",
+   "name": "authorization failed",
+   "origin": "derived",
+   "description": "Any failure in metadata/header/type/token/permission",
+   "observed_as": null,
+   "definition": "!v_has_metadata || !v_auth_header_present || !v_auth_header_format_valid || !v_auth_type_bearer || !v_token_valid || !v_has_access",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_violations_present",
+   "name": "request validation violations present",
+   "origin": "input",
+   "description": "Whether validateUpdateUserRequest returned non-nil violations",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_update_user.go",
+     "line": 24,
+     "text": "violations := validateUpdateUserRequest(req)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_is_banker",
+   "name": "caller is banker",
+   "origin": "input",
+   "description": "Auth payload role equals util.BankerRole",
+   "observed_as": {
+    "at": {
+     "entity": "gapi.Server.authorizeUser",
+     "point": "result"
+    },
+    "kind": "bool"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_update_user.go",
+     "line": 29,
+     "text": "if authPayload.Role != util.BankerRole && ..."
+    }
+   ]
+  },
+  {
+   "id": "v_is_self_user",
+   "name": "caller updates self",
+   "origin": "input",
+   "description": "Auth payload username equals req.GetUsername()",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_update_user.go",
+     "line": 29,
+     "text": "... && authPayload.Username != req.GetUsername()"
+    }
+   ]
+  },
+  {
+   "id": "v_password_provided",
+   "name": "password provided in request",
+   "origin": "input",
+   "description": "req.Password != nil",
+   "observed_as": {
+    "at": {
+     "entity": "gapi.Server.UpdateUser",
+     "point": "arg:req"
+    },
+    "kind": "is_set"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:815be3bfb43a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_db_update_error",
+   "name": "UpdateUser store call returned error",
+   "origin": "input",
+   "description": "server.store.UpdateUser returned non-nil error",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_not_found_error",
+   "name": "error is record not found",
+   "origin": "input",
+   "description": "errors.Is(err, db.ErrRecordNotFound)",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_uuid_error",
+   "name": "uuid.NewRandom failed",
+   "origin": "input",
+   "description": "Controls NewPayload error branch",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:b4114c26b15a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_paseto_create_error",
+   "name": "paseto.Encrypt failed",
+   "origin": "input",
+   "description": "Controls PasetoMaker.CreateToken error branch",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0713394c9923",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D_auth_missing_metadata",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:e3505bc4c4b9",
+   "inputs": [
+    "v_has_metadata"
+   ],
+   "predicate": "!v_has_metadata",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "missing metadata"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "metadata present"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/NoAuthorization"
+    }
+   ]
+  },
+  {
+   "id": "D_auth_header_empty",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:a572eeb6a4c8",
+   "inputs": [
+    "v_auth_header_present"
+   ],
+   "predicate": "!v_auth_header_present",
+   "order": 2,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "missing authorization header"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "authorization header present"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:a572eeb6a4c8",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_auth_header_format",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:4393757b65d7",
+   "inputs": [
+    "v_auth_header_format_valid"
+   ],
+   "predicate": "!v_auth_header_format_valid",
+   "order": 3,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "invalid authorization header format"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "header format ok"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:4393757b65d7",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_auth_type",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:2e2f712d6301",
+   "inputs": [
+    "v_auth_type_bearer"
+   ],
+   "predicate": "!v_auth_type_bearer",
+   "order": 4,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "unsupported authorization type"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "bearer type ok"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:2e2f712d6301",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_auth_verify_err",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c71158777bce",
+   "inputs": [
+    "v_token_valid"
+   ],
+   "predicate": "!v_token_valid",
+   "order": 5,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "invalid or expired access token"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "token valid"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "D_perm_eq_first",
+   "entity": "go:gapi.hasPermission",
+   "site": "br:92f48828a554",
+   "inputs": [
+    "v_role_eq_first"
+   ],
+   "predicate": "v_role_eq_first",
+   "order": 6,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.hasPermission",
+     "is": "returned"
+    },
+    "effect": "permission granted (first match)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "no match yet"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.hasPermission",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo"
+    }
+   ]
+  },
+  {
+   "id": "D_perm_eq_second",
+   "entity": "go:gapi.hasPermission",
+   "site": "br:92f48828a554",
+   "inputs": [
+    "v_role_eq_second"
+   ],
+   "predicate": "v_role_eq_second",
+   "order": 7,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.hasPermission",
+     "is": "returned"
+    },
+    "effect": "permission granted (second match)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.hasPermission",
+     "is": "returned"
+    },
+    "effect": "permission denied (no matches)"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "D_auth_permission",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c1bc39962889",
+   "inputs": [
+    "v_has_access"
+   ],
+   "predicate": "!v_has_access",
+   "order": 8,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "permission denied"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "permission ok"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c1bc39962889",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_update_auth_err",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:0746154f1c47",
+   "inputs": [
+    "v_auth_error"
+   ],
+   "predicate": "v_auth_error",
+   "order": 9,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "unauthenticated"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "authorized"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/NoAuthorization"
+    }
+   ]
+  },
+  {
+   "id": "D_update_violations",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:af0e24f4367b",
+   "inputs": [
+    "v_violations_present"
+   ],
+   "predicate": "v_violations_present",
+   "order": 10,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "invalid argument"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "no validation errors"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/InvalidEmail"
+    }
+   ]
+  },
+  {
+   "id": "D_update_perm_denied",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:01807a7b80a2",
+   "inputs": [
+    "v_is_banker",
+    "v_is_self_user"
+   ],
+   "predicate": "!v_is_banker && !v_is_self_user",
+   "order": 11,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "permission denied (cannot update other user's info)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "allowed to update"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_update_pwd_present",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:815be3bfb43a",
+   "inputs": [
+    "v_password_provided"
+   ],
+   "predicate": "v_password_provided",
+   "order": 12,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "would hash password (not exercised)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "no password change"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:815be3bfb43a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_update_db_err",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:17f2bce25a0f",
+   "inputs": [
+    "v_db_update_error"
+   ],
+   "predicate": "v_db_update_error",
+   "order": 13,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "db update returned error"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "db update ok"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_update_not_found",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:fb1ba40798cf",
+   "inputs": [
+    "v_not_found_error"
+   ],
+   "predicate": "v_not_found_error",
+   "order": 14,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "user not found"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "internal update error"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/UserNotFound"
+    }
+   ]
+  },
+  {
+   "id": "D_np_uuid_err",
+   "entity": "go:token.NewPayload",
+   "site": "br:b4114c26b15a",
+   "inputs": [
+    "v_uuid_error"
+   ],
+   "predicate": "v_uuid_error",
+   "order": 15,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.NewPayload",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "uuid generation failed"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload created"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:b4114c26b15a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "D_pm_create_err",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "site": "br:0713394c9923",
+   "inputs": [
+    "v_paseto_create_error"
+   ],
+   "predicate": "v_paseto_create_error",
+   "order": 16,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "encrypt failed"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "token created"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0713394c9923",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  }
+ ],
+ "transitions": [],
+ "regions": [],
+ "procedures": [
+  {
+   "id": "P_authz",
+   "entity": "go:gapi.Server.authorizeUser",
+   "steps": [
+    "D:D_auth_missing_metadata",
+    "D:D_auth_header_empty",
+    "D:D_auth_header_format",
+    "D:D_auth_type",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:D_auth_verify_err",
+    "call:go:gapi.hasPermission",
+    "D:D_auth_permission"
+   ],
+   "outcome": null,
+   "evidence": [
+    {
+     "kind": "control",
+     "site": "br:c71158777bce",
+     "outcome": false,
+     "callee": "server.tokenMaker.VerifyToken"
+    },
+    {
+     "kind": "control",
+     "site": "br:c1bc39962889",
+     "outcome": false,
+     "callee": "hasPermission"
+    }
+   ]
+  },
+  {
+   "id": "P_hasperm",
+   "entity": "go:gapi.hasPermission",
+   "steps": [
+    "D:D_perm_eq_first",
+    "D:D_perm_eq_second"
+   ],
+   "outcome": {
+    "entity": "go:gapi.hasPermission",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:92f48828a554",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "P_update",
+   "entity": "go:gapi.Server.UpdateUser",
+   "steps": [
+    "call:go:gapi.Server.authorizeUser",
+    "D:D_update_auth_err",
+    "call:go:gapi.validateUpdateUserRequest",
+    "D:D_update_violations",
+    "D:D_update_perm_denied",
+    "D:D_update_pwd_present",
+    "D:D_update_db_err",
+    "D:D_update_not_found",
+    "call:go:gapi.convertUser"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.UpdateUser",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/rpc_update_user.go",
+     "line": 19,
+     "text": "authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})"
+    }
+   ]
+  },
+  {
+   "id": "P_np",
+   "entity": "go:token.NewPayload",
+   "steps": [
+    "D:D_np_uuid_err"
+   ],
+   "outcome": {
+    "entity": "go:token.NewPayload",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 26,
+     "text": "func NewPayload(username string, role string, duration time.Duration) (*Payload, error) {"
+    }
+   ]
+  },
+  {
+   "id": "P_pm_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "steps": [
+    "call:go:token.NewPayload",
+    "D:D_pm_create_err"
+   ],
+   "outcome": {
+    "entity": "go:token.PasetoMaker.CreateToken",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/paseto_maker.go",
+     "line": 31,
+     "text": "func (maker *PasetoMaker) CreateToken(username string, role string, duration time.Duration) (string, *Payload, error) {"
+    }
+   ]
+  }
+ ],
+ "rules": [
+  {
+   "id": "R1",
+   "name": "Authorization required and role-permitted",
+   "inputs": [
+    "v_has_metadata",
+    "v_auth_header_present",
+    "v_auth_header_format_valid",
+    "v_auth_type_bearer",
+    "v_token_valid",
+    "v_has_access"
+   ],
+   "relevant_state": {},
+   "condition": "!v_has_metadata || !v_auth_header_present || !v_auth_header_format_valid || !v_auth_type_bearer || !v_token_valid || !v_has_access",
+   "consequences": [
+    "D_update_auth_err:true -> unauthenticated"
+   ],
+   "decision": "D_update_auth_err",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "R2",
+   "name": "Validation guards update",
+   "inputs": [
+    "v_violations_present"
+   ],
+   "relevant_state": {},
+   "condition": "v_violations_present",
+   "consequences": [
+    "D_update_violations:true -> invalid argument error"
+   ],
+   "decision": "D_update_violations",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "R3",
+   "name": "Only banker or self can update",
+   "inputs": [
+    "v_is_banker",
+    "v_is_self_user"
+   ],
+   "relevant_state": {},
+   "condition": "!v_is_banker && !v_is_self_user",
+   "consequences": [
+    "D_update_perm_denied:true -> permission denied"
+   ],
+   "decision": "D_update_perm_denied",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "R4",
+   "name": "DB error classification",
+   "inputs": [
+    "v_db_update_error",
+    "v_not_found_error"
+   ],
+   "relevant_state": {},
+   "condition": "v_db_update_error",
+   "consequences": [
+    "if v_not_found_error then NotFound else Internal"
+   ],
+   "decision": "D_update_db_err",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "R5",
+   "name": "Token creation succeeds",
+   "inputs": [
+    "v_uuid_error",
+    "v_paseto_create_error"
+   ],
+   "relevant_state": {},
+   "condition": "!v_uuid_error && !v_paseto_create_error",
+   "consequences": [
+    "CreateToken returns"
+   ],
+   "decision": "D_pm_create_err",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:b4114c26b15a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:0713394c9923",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  }
+ ],
+ "regimes": [
+  {
+   "id": "G_ok",
+   "name": "Authorized and valid request",
+   "facts": {
+    "v_has_metadata": true,
+    "v_auth_header_present": true,
+    "v_auth_header_format_valid": true,
+    "v_auth_type_bearer": true,
+    "v_token_valid": true,
+    "v_violations_present": false
+   },
+   "members": [
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "G_noauth",
+   "name": "Missing authorization",
+   "facts": {
+    "v_has_metadata": false
+   },
+   "members": [
+    "TestUpdateUserAPI/NoAuthorization"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "G_expired",
+   "name": "Expired token",
+   "facts": {
+    "v_has_metadata": true,
+    "v_auth_header_present": true,
+    "v_auth_header_format_valid": true,
+    "v_auth_type_bearer": true,
+    "v_token_valid": false
+   },
+   "members": [
+    "TestUpdateUserAPI/ExpiredToken"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "G_invalid",
+   "name": "Invalid email",
+   "facts": {
+    "v_violations_present": true
+   },
+   "members": [
+    "TestUpdateUserAPI/InvalidEmail"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "G_notfound",
+   "name": "DB not found",
+   "facts": {
+    "v_db_update_error": true,
+    "v_not_found_error": true
+   },
+   "members": [
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    }
+   ]
+  }
+ ],
+ "scenarios": {
+  "TestUpdateUserAPI/BankerCanUpdateUserInfo": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": true,
+      "v_role_eq_first": true,
+      "v_role_eq_second": false,
+      "v_violations_present": false,
+      "v_is_banker": true,
+      "v_is_self_user": false,
+      "v_password_provided": false,
+      "v_db_update_error": false,
+      "v_not_found_error": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Authorized banker with valid request; DB update ok (R1,R2,R3,R4)"
+   }
+  },
+  "TestUpdateUserAPI/ExpiredToken": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": false,
+      "v_violations_present": false,
+      "v_is_banker": false,
+      "v_is_self_user": true,
+      "v_password_provided": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Authorization failed due to invalid/expired token (R1)"
+   }
+  },
+  "TestUpdateUserAPI/InvalidEmail": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": true,
+      "v_role_eq_first": false,
+      "v_role_eq_second": true,
+      "v_violations_present": true,
+      "v_is_banker": false,
+      "v_is_self_user": true,
+      "v_password_provided": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Validation violations cause invalid argument (R2)"
+   }
+  },
+  "TestUpdateUserAPI/NoAuthorization": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": false,
+      "v_auth_header_present": false,
+      "v_auth_header_format_valid": false,
+      "v_auth_type_bearer": false,
+      "v_token_valid": false,
+      "v_password_provided": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Missing metadata triggers unauthenticated (R1)"
+   }
+  },
+  "TestUpdateUserAPI/OK": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": true,
+      "v_role_eq_first": false,
+      "v_role_eq_second": true,
+      "v_violations_present": false,
+      "v_is_banker": false,
+      "v_is_self_user": true,
+      "v_password_provided": false,
+      "v_db_update_error": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Authorized depositor updating self with valid request (R1,R2,R3)"
+   }
+  },
+  "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": true,
+      "v_role_eq_first": false,
+      "v_role_eq_second": true,
+      "v_violations_present": false,
+      "v_is_banker": false,
+      "v_is_self_user": false,
+      "v_password_provided": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Non-banker cannot update other user's info (R3)"
+   }
+  },
+  "TestUpdateUserAPI/UserNotFound": {
+   "state": {},
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {
+      "v_uuid_error": false,
+      "v_paseto_create_error": false
+     }
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "v_has_metadata": true,
+      "v_auth_header_present": true,
+      "v_auth_header_format_valid": true,
+      "v_auth_type_bearer": true,
+      "v_token_valid": true,
+      "v_role_eq_first": false,
+      "v_role_eq_second": true,
+      "v_violations_present": false,
+      "v_is_banker": false,
+      "v_is_self_user": true,
+      "v_password_provided": false,
+      "v_db_update_error": true,
+      "v_not_found_error": true
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "DB update reports record not found (R4)"
+   }
+  }
+ },
+ "unknowns": [
+  {
+   "what": "Exact iteration over accessibleRoles inside hasPermission beyond two roles",
+   "why": "Observed tests pass at most two roles; loop length not modeled generically. We model two comparisons explicitly to match observed evaluations."
+  }
+ ]
+}

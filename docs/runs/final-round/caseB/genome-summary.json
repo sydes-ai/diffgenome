@@ -1,0 +1,550 @@
+{
+ "format": "diffgenome-genome-summary/1",
+ "proposed_by": "recorded:proposals.json",
+ "bundle_digest": "401583ee93aa8435",
+ "established_from": "7 executions of existing tests",
+ "consistency": {
+  "scenarios": 7,
+  "consistent": 7,
+  "indeterminate": 0,
+  "contradicted": 0
+ },
+ "decision_rules": [
+  {
+   "id": "d_hp_match",
+   "status": "verified",
+   "entity": "gapi.hasPermission",
+   "site": "br:92f48828a554",
+   "file": "gapi/authorization.go",
+   "line": 54,
+   "source": "userRole == role",
+   "meaning": "role_matches",
+   "inputs": [
+    "role_matches"
+   ],
+   "when_true": "return true",
+   "when_false": "try next accessible role",
+   "outcome_true": "gapi.hasPermission returned",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_upd_owner",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:01807a7b80a2",
+   "file": "gapi/rpc_update_user.go",
+   "line": 29,
+   "source": "authPayload.Role != util.BankerRole && authPayload.Username != req.GetUsername()",
+   "meaning": "!caller_is_banker && token_username != target_username",
+   "inputs": [
+    "caller_is_banker",
+    "token_username",
+    "target_username"
+   ],
+   "when_true": "PermissionDenied: cannot update other user's info",
+   "when_false": "build update params",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 1 time(s) from observed state and in 4 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 4,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_az_perm",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:c1bc39962889",
+   "file": "gapi/authorization.go",
+   "line": 45,
+   "source": "!hasPermission(payload.Role, accessibleRoles)",
+   "meaning": "!has_permission",
+   "inputs": [
+    "has_permission"
+   ],
+   "when_true": "permission denied",
+   "when_false": "payload returned",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch, outcome); site: br:c1bc39962889 (given); not verified: outcome true never observed at br:c1bc39962889",
+   "agreeing_tests": 5,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_valid_expired",
+   "status": "verified",
+   "entity": "token.Payload.Valid",
+   "site": "br:28f7c30a7189",
+   "file": "token/payload.go",
+   "line": 44,
+   "source": "time.Now().After(payload.ExpiredAt)",
+   "meaning": "token_expired",
+   "inputs": [
+    "token_expired"
+   ],
+   "when_true": "ErrExpiredToken",
+   "when_false": "nil error",
+   "outcome_true": "token.Payload.Valid returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 6 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vt_valid",
+   "status": "verified",
+   "entity": "token.PasetoMaker.VerifyToken",
+   "site": "br:c7d403dfabc3",
+   "file": "token/paseto_maker.go",
+   "line": 52,
+   "source": "err != nil",
+   "meaning": "token_expired",
+   "inputs": [
+    "token_expired"
+   ],
+   "when_true": "expired token rejected",
+   "when_false": "payload returned",
+   "outcome_true": "token.PasetoMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 6 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_md",
+   "status": "verified",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:e3505bc4c4b9",
+   "file": "gapi/authorization.go",
+   "line": 19,
+   "source": "!ok",
+   "meaning": "!has_metadata",
+   "inputs": [
+    "has_metadata"
+   ],
+   "when_true": "missing metadata",
+   "when_false": "read authorization header",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 7 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_verify",
+   "status": "verified",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:c71158777bce",
+   "file": "gapi/authorization.go",
+   "line": 41,
+   "source": "err != nil",
+   "meaning": "!token_decrypts || token_expired",
+   "inputs": [
+    "token_decrypts",
+    "token_expired"
+   ],
+   "when_true": "invalid access token",
+   "when_false": "role check next",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 6 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_email_err",
+   "status": "verified",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:f63e639d4185",
+   "file": "gapi/rpc_update_user.go",
+   "line": 94,
+   "source": "err != nil",
+   "meaning": "email_invalid",
+   "inputs": [
+    "email_invalid"
+   ],
+   "when_true": "email violation",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_upd_auth",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:0746154f1c47",
+   "file": "gapi/rpc_update_user.go",
+   "line": 20,
+   "source": "err != nil",
+   "meaning": "auth_failed",
+   "inputs": [
+    "auth_failed"
+   ],
+   "when_true": "Unauthenticated",
+   "when_false": "validate request",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 7 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 7,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_upd_violations",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:af0e24f4367b",
+   "file": "gapi/rpc_update_user.go",
+   "line": 25,
+   "source": "violations != nil",
+   "meaning": "request_invalid",
+   "inputs": [
+    "request_invalid"
+   ],
+   "when_true": "InvalidArgument",
+   "when_false": "ownership check",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_upd_store",
+   "status": "verified",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:17f2bce25a0f",
+   "file": "gapi/rpc_update_user.go",
+   "line": 63,
+   "source": "err != nil",
+   "meaning": "store_failed",
+   "inputs": [
+    "store_failed"
+   ],
+   "when_true": "store error mapped to status",
+   "when_false": "response built",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 3 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_np_uuid",
+   "status": "supported",
+   "entity": "token.NewPayload",
+   "site": "br:b4114c26b15a",
+   "file": "token/payload.go",
+   "line": 28,
+   "source": "err != nil",
+   "meaning": "uuid_failed",
+   "inputs": [
+    "uuid_failed"
+   ],
+   "when_true": "no payload",
+   "when_false": "payload built with username and role",
+   "outcome_true": "token.NewPayload returned-error",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:b4114c26b15a (given); not verified: outcome true never observed at br:b4114c26b15a",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_ct_err",
+   "status": "supported",
+   "entity": "token.PasetoMaker.CreateToken",
+   "site": "br:0713394c9923",
+   "file": "token/paseto_maker.go",
+   "line": 34,
+   "source": "err != nil",
+   "meaning": "uuid_failed",
+   "inputs": [
+    "uuid_failed"
+   ],
+   "when_true": "token not created",
+   "when_false": "payload encrypted into token",
+   "outcome_true": "token.PasetoMaker.CreateToken returned-error",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch, control); site: br:0713394c9923 (given); not verified: outcome true never observed at br:0713394c9923",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vt_decrypt",
+   "status": "supported",
+   "entity": "token.PasetoMaker.VerifyToken",
+   "site": "br:0607e4d952f6",
+   "file": "token/paseto_maker.go",
+   "line": 47,
+   "source": "err != nil",
+   "meaning": "!token_decrypts",
+   "inputs": [
+    "token_decrypts"
+   ],
+   "when_true": "ErrInvalidToken",
+   "when_false": "payload decoded",
+   "outcome_true": "token.PasetoMaker.VerifyToken returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch, control); site: br:0607e4d952f6 (given); not verified: outcome true never observed at br:0607e4d952f6",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_header",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:a572eeb6a4c8",
+   "file": "gapi/authorization.go",
+   "line": 24,
+   "source": "len(values) == 0",
+   "meaning": "!has_auth_header",
+   "inputs": [
+    "has_auth_header"
+   ],
+   "when_true": "missing authorization header",
+   "when_false": "split header",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:a572eeb6a4c8 (given); not verified: outcome true never observed at br:a572eeb6a4c8",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_fields",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:4393757b65d7",
+   "file": "gapi/authorization.go",
+   "line": 30,
+   "source": "len(fields) < 2",
+   "meaning": "!header_well_formed",
+   "inputs": [
+    "header_well_formed"
+   ],
+   "when_true": "invalid header format",
+   "when_false": "auth type extracted",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:4393757b65d7 (given); not verified: outcome true never observed at br:4393757b65d7",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_az_type",
+   "status": "supported",
+   "entity": "gapi.Server.authorizeUser",
+   "site": "br:2e2f712d6301",
+   "file": "gapi/authorization.go",
+   "line": 35,
+   "source": "authType != authorizationBearer",
+   "meaning": "!auth_type_bearer",
+   "inputs": [
+    "auth_type_bearer"
+   ],
+   "when_true": "unsupported authorization type",
+   "when_false": "token verified next",
+   "outcome_true": "gapi.Server.authorizeUser returned-error:go:*errors.errorString",
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch, control); site: br:2e2f712d6301 (given); not verified: outcome true never observed at br:2e2f712d6301",
+   "agreeing_tests": 6,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_username",
+   "status": "supported",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:57793335771a",
+   "file": "gapi/rpc_update_user.go",
+   "line": 77,
+   "source": "err != nil",
+   "meaning": "username_invalid",
+   "inputs": [
+    "username_invalid"
+   ],
+   "when_true": "username violation",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:57793335771a (given); not verified: outcome true never observed at br:57793335771a",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_password",
+   "status": "supported",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:444b7eee95f8",
+   "file": "gapi/rpc_update_user.go",
+   "line": 81,
+   "source": "req.Password != nil",
+   "meaning": "password_set",
+   "inputs": [
+    "password_set"
+   ],
+   "when_true": "validate password",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:444b7eee95f8 (given); not verified: outcome true never observed at br:444b7eee95f8",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_fullname",
+   "status": "supported",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:578b58ceb4d3",
+   "file": "gapi/rpc_update_user.go",
+   "line": 87,
+   "source": "req.FullName != nil",
+   "meaning": "fullname_set",
+   "inputs": [
+    "fullname_set"
+   ],
+   "when_true": "validate full name",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:578b58ceb4d3 (given); not verified: outcome false never observed at br:578b58ceb4d3",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_fullname_err",
+   "status": "supported",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:864c3600c3d5",
+   "file": "gapi/rpc_update_user.go",
+   "line": 88,
+   "source": "err != nil",
+   "meaning": "fullname_invalid",
+   "inputs": [
+    "fullname_invalid"
+   ],
+   "when_true": "full name violation",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:864c3600c3d5 (given); not verified: outcome true never observed at br:864c3600c3d5",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_vu_email",
+   "status": "supported",
+   "entity": "gapi.validateUpdateUserRequest",
+   "site": "br:9558e38bf1ec",
+   "file": "gapi/rpc_update_user.go",
+   "line": 93,
+   "source": "req.Email != nil",
+   "meaning": "email_set",
+   "inputs": [
+    "email_set"
+   ],
+   "when_true": "validate email",
+   "when_false": null,
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:9558e38bf1ec (given); not verified: outcome false never observed at br:9558e38bf1ec",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_upd_password",
+   "status": "supported",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:815be3bfb43a",
+   "file": "gapi/rpc_update_user.go",
+   "line": 45,
+   "source": "req.Password != nil",
+   "meaning": "password_set",
+   "inputs": [
+    "password_set"
+   ],
+   "when_true": "hash new password",
+   "when_false": "password unchanged",
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:815be3bfb43a (given); not verified: outcome true never observed at br:815be3bfb43a",
+   "agreeing_tests": 3,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_upd_notfound",
+   "status": "supported",
+   "entity": "gapi.Server.UpdateUser",
+   "site": "br:fb1ba40798cf",
+   "file": "gapi/rpc_update_user.go",
+   "line": 64,
+   "source": "errors.Is(err, db.ErrRecordNotFound)",
+   "meaning": "store_not_found",
+   "inputs": [
+    "store_not_found"
+   ],
+   "when_true": "NotFound",
+   "when_false": "Internal",
+   "outcome_true": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "outcome_false": "gapi.Server.UpdateUser returned-error:go:*status.Error",
+   "basis": "every cited reference checks out (branch, outcome); site: br:fb1ba40798cf (given); not verified: outcome false never observed at br:fb1ba40798cf",
+   "agreeing_tests": 1,
+   "at_changed_line": false
+  }
+ ],
+ "identities": [
+  {
+   "name": "token_username",
+   "status": "verified",
+   "same_value_at": [
+    "token.PasetoMaker.CreateToken arg:username",
+    "token.NewPayload arg:username"
+   ],
+   "basis": "identity verified: equal in 6 execution(s) carrying 3 distinct values"
+  }
+ ],
+ "literals": [
+  {
+   "name": "caller_is_banker",
+   "at": "token.PasetoMaker.CreateToken arg:role",
+   "equals": "banker",
+   "written_at": "util/role.go:5"
+  }
+ ],
+ "transitions": [],
+ "statuses": {
+  "verified": 11,
+  "supported": 63,
+  "hypothesis": 0,
+  "rejected": 0,
+  "contradicted_not_exported": 0
+ },
+ "unknowns": [
+  {
+   "what": "occurrence facts for rg_roles (role_matches per accessible role)",
+   "why": "hasPermission iterates accessibleRoles ([banker, depositor] from UpdateUser); whether each entry matches depends on the token role vs the k-th list element, a relation over a collection the format cannot express; the mechanics also printed no explicit repeated-region block for hasPermission, so the region is declared from the two observed evaluations of br:92f48828a554 per call"
+  },
+  {
+   "what": "target_username vs token_username",
+   "why": "req.Username is only visible inside the UpdateUserRequest digest, so the request side of the ownership comparison cannot be bound; only the token side (CreateToken/NewPayload arg:username) is bound as an identity"
+  },
+  {
+   "what": "role identity through the token",
+   "why": "the role passed to CreateToken, stored in the payload and read back as hasPermission's userRole is plausibly one value, but the shown tests carry only the depositor role, so an identity list across those boundaries could not be confirmed (needs two distinct values)"
+  },
+  {
+   "what": "sites in api.Server.loginUser, api.Server.renewAccessToken, gapi.Server.LoginUser, token.JWTMaker.CreateToken",
+   "why": "not evaluated by any shown test and not reached by the UpdateUser tests; no decisions proposed for them"
+  },
+  {
+   "what": "store_failed/store_not_found and token_decrypts binding",
+   "why": "the store is a mock stand-in and Go multi-value results make result is_set bindings ambiguous; these remain scenario inputs"
+  }
+ ],
+ "cost": {
+  "seconds": 0.0
+ },
+ "note": "Only verified claims, and supported claims no execution contradicted, are listed. Meanings are the model's words; statuses come from the traces."
+}

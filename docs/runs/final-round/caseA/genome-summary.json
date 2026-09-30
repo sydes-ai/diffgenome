@@ -1,0 +1,154 @@
+{
+ "format": "diffgenome-genome-summary/1",
+ "proposed_by": "recorded:proposals.json",
+ "bundle_digest": "9c143bf6c4220467",
+ "established_from": "5 executions of existing tests",
+ "consistency": {
+  "scenarios": 5,
+  "consistent": 0,
+  "indeterminate": 5,
+  "contradicted": 0
+ },
+ "decision_rules": [
+  {
+   "id": "d_expand_empty",
+   "status": "verified",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies",
+   "site": "br:be7d3ee9e3b1",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "line": 497,
+   "source": "not field_deps",
+   "meaning": "!has_import_deps",
+   "inputs": [
+    "has_import_deps"
+   ],
+   "when_true": "returns the empty/None dependencies unchanged",
+   "when_false": "each same-table name reference is asked for the dependency it implies; the implied one replaces it",
+   "outcome_true": "DatabaseApplicationType._import_table_fields.<locals>._expand_implied_import_dependencies returned",
+   "outcome_false": null,
+   "basis": "dicate agrees with the observed outcome 43 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": true
+  },
+  {
+   "id": "d_defer",
+   "status": "verified",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:47a63ce03fc8",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "line": 532,
+   "source": "field_deps",
+   "meaning": "has_import_deps",
+   "inputs": [
+    "has_import_deps"
+   ],
+   "when_true": "field deferred with its (expanded) dependencies",
+   "when_false": "field imported immediately",
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_first_field",
+   "status": "verified",
+   "entity": "DatabaseApplicationType._import_table_fields.<locals>._import_field_serialized",
+   "site": "br:3f16965dcd1f",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "line": 480,
+   "source": "table_instance not in table_fields_by_name",
+   "meaning": "first_import_in_table",
+   "inputs": [
+    "first_import_in_table"
+   ],
+   "when_true": "creates the table's bucket in table_fields_by_name",
+   "when_false": "table bucket already exists",
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "edicate agrees with the observed outcome 0 time(s) from observed state and in 5 replayed/stated case(s), disagreeing in none; branch consequences consistent with static control facts; no contradiction",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_primary",
+   "status": "supported",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:34ec71ee29c9",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "line": 456,
+   "source": "serialized_field['primary']",
+   "meaning": "field_is_primary",
+   "inputs": [
+    "field_is_primary"
+   ],
+   "when_true": "primary_table_fields_map[table id] = primary field id",
+   "when_false": "field only recorded in database_fields_map",
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:34ec71ee29c9 (given); not verified: outcome false never observed at br:34ec71ee29c9; agrees with the observed outcome at 14 occurrence evaluation(s)",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  },
+  {
+   "id": "d_refresh",
+   "status": "supported",
+   "entity": "DatabaseApplicationType._import_table_fields",
+   "site": "br:09962e1ae1b2",
+   "file": "backend/src/baserow/contrib/database/application_types.py",
+   "line": 589,
+   "source": "field_type.needs_refresh_after_import_serialized",
+   "meaning": "needs_refresh",
+   "inputs": [
+    "needs_refresh"
+   ],
+   "when_true": "field_instance.refresh_from_db()",
+   "when_false": "no refresh",
+   "outcome_true": null,
+   "outcome_false": null,
+   "basis": "every cited reference checks out (branch); site: br:09962e1ae1b2 (given); not verified: outcome false never observed at br:09962e1ae1b2; agrees with the observed outcome at 11 occurrence evaluation(s)",
+   "agreeing_tests": 5,
+   "at_changed_line": false
+  }
+ ],
+ "identities": [],
+ "literals": [],
+ "transitions": [],
+ "statuses": {
+  "verified": 3,
+  "supported": 27,
+  "hypothesis": 0,
+  "rejected": 0,
+  "contradicted_not_exported": 2
+ },
+ "unknowns": [
+  {
+   "what": "Whether and which get_import_dependency_when_referenced is called inside _expand_implied_import_dependencies",
+   "why": "It depends on iterating the dependency set and, per element, on via being None and on the referenced field's type (link_row vs default FieldType). There is no decision site for that dispatch, and iterating collections is not expressible. So the model calls LinkRowFieldType whenever deps are non-empty. This over-predicts calls where no dependency is a same-table name reference (explicit test's ActiveChildren, the formula-dependency test), and predicts LinkRow where FieldType's default was called."
+  },
+  {
+   "what": "Dependency-level ordering in run_deferred_field_imports / group_dependencies_by_level",
+   "why": "The failure mechanism (consumer and producer in the same level, relative order within a level) is relation-valued over field identities and cannot be stated. The base DataError is claimed only as a phenotype."
+  },
+  {
+   "what": "Where the base failure surfaces",
+   "why": "DataError is raised in FormulaFieldType.after_rows_imported during _import_table_rows, outside the modeled entities. _import_table_fields itself returns at both revisions."
+  },
+  {
+   "what": "first_import_in_table",
+   "why": "This is table_fields_by_name membership per table identity (closure state across calls and tables). It is supplied as a per-occurrence fact, not derived by transitions."
+  },
+  {
+   "what": "Counts of br:34ec71ee29c9 and br:09962e1ae1b2 evaluations",
+   "why": "Only true evaluations were observed: one per table for the primary check and one per formula-like field for the refresh. Occurrence counts for withheld tests follow that pattern (3 tables; 2 formula fields) rather than the full field loop."
+  },
+  {
+   "what": "DeferredFieldImporter.get_all_fields_dependencies via-field branch (br:cbfe8c1c2b07)",
+   "why": "This is not a required site and it iterates each deferred field's dependency set. It is left unmodeled (the call is recorded and skipped)."
+  }
+ ],
+ "cost": {
+  "seconds": 0.0
+ },
+ "note": "Only verified claims, and supported claims no execution contradicted, are listed. Meanings are the model's words; statuses come from the traces."
+}

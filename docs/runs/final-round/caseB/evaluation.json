@@ -1,0 +1,219 @@
+{
+ "tests": 7,
+ "scenarios": 7,
+ "unresolved_scenarios": [],
+ "consistent": 7,
+ "indeterminate": 0,
+ "contradicted": 0,
+ "per_test": [
+  {
+   "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/ExpiredToken",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/InvalidEmail",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/NoAuthorization",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/OK",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+   "match": true,
+   "indeterminate": ""
+  },
+  {
+   "test": "TestUpdateUserAPI/UserNotFound",
+   "match": true,
+   "indeterminate": ""
+  }
+ ],
+ "site_agreement": {
+  "d_np_uuid": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_ct_err": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vt_decrypt": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_valid_expired": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vt_valid": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_md": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_header": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_fields": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_type": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_verify": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_hp_match": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_az_perm": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_username": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_password": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_fullname": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_fullname_err": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_email": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_vu_email_err": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_upd_auth": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_upd_violations": [
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_upd_owner": [
+   true,
+   true,
+   true,
+   true
+  ],
+  "d_upd_password": [
+   true,
+   true,
+   true
+  ],
+  "d_upd_store": [
+   true,
+   true,
+   true
+  ],
+  "d_upd_notfound": [
+   true
+  ]
+ }
+}
