@@ -420,6 +420,29 @@ def _resolve(key: str, refs: list[str]) -> str | None:
     return hits[0] if len(hits) == 1 else None
 
 
+def changed_lines(run: Any) -> dict[str, set[int]]:
+    """Head-side line numbers the change added or modified, per file."""
+    rng = run.spec.split()[-1] if getattr(run, "spec", "").startswith("git diff") else ""
+    out: dict[str, set[int]] = {}
+    if not rng:
+        return out
+    cur = ""
+    for ln in run.git("diff", "-U0", rng).splitlines():
+        if ln.startswith("+++ "):
+            cur = ln[6:] if ln.startswith("+++ b/") else ""
+        elif ln.startswith("@@") and cur:
+            new = ln.split("+", 1)[1].split(" ", 1)[0]
+            start, _, count = new.partition(",")
+            n = int(count) if count else 1
+            out.setdefault(cur, set()).update(range(int(start), int(start) + n))
+    return out
+
+
+def _site_changed(run: Any, site: str | None, touched: dict[str, set[int]]) -> bool:
+    s = run.mech.sites.get(site or "")
+    return bool(s) and s["line"] in touched.get(s.get("file", ""), set())
+
+
 def eligible(it: Item) -> bool:
     return it.status == VERIFIED or (it.status == SUPPORTED and not it.contradicted)
 
@@ -466,6 +489,7 @@ def establish(
         "indeterminate": sum(1 for r in per_test if r["indeterminate"]),
         "contradicted": sum(1 for r in per_test if not r["match"] and not r["indeterminate"]),
         "per_test": per_test,
+        "site_agreement": {k: [ok for _, ok in v] for k, v in agree.items()},
     }
     return g, ev
 
@@ -480,6 +504,7 @@ def summary(
     cost: dict[str, Any],
 ) -> dict[str, Any]:
     """The artifact's `genome` section: checked claims only."""
+
     def site_ref(site: str | None) -> dict[str, Any]:
         s = run.mech.sites.get(site or "")
         return {"file": s.get("file"), "line": s["line"], "source": s["pred"]} if s else {}
@@ -488,9 +513,14 @@ def summary(
         o = b.outcome or {}
         return f"{_short(o.get('entity', ''))} {o['is']}" if o.get("is") else None
 
+    agreement = ev.get("site_agreement") or {}
+    touched = changed_lines(run)
     rules = []
     for d in g.decisions:
-        if not eligible(d):
+        # a supported rule is shown only when its predicted outcomes matched the observed
+        # ones in every test that exercised it (a checked meaning, not only a cited source)
+        seen = agreement.get(d.id) or []
+        if not eligible(d) or (d.status != VERIFIED and not (seen and all(seen))):
             continue
         rules.append(
             {
@@ -506,8 +536,11 @@ def summary(
                 "outcome_true": outcome(d.true_branch),
                 "outcome_false": outcome(d.false_branch),
                 "basis": d.status_reason[-200:],
+                "agreeing_tests": sum(seen),
+                "at_changed_line": _site_changed(run, d.site, touched),
             }
         )
+    rules.sort(key=lambda r: (not r["at_changed_line"], r["status"] != VERIFIED))
     identities = []
     literals = []
     for v in g.variables:

@@ -53,10 +53,20 @@ def test_summary_exports_only_checked_claims() -> None:
     run = SimpleNamespace(
         mech=SimpleNamespace(sites={"br:1": {"file": "a.go", "line": 3, "pred": "x"}})
     )
-    ev = {"tests": 2, "scenarios": 2, "consistent": 2, "indeterminate": 0, "contradicted": 0}
+    ev = {
+        "tests": 2,
+        "scenarios": 2,
+        "consistent": 2,
+        "indeterminate": 0,
+        "contradicted": 0,
+        "site_agreement": {"D1": [True, True], "D4": []},
+    }
     s = summary(run, g, ev, "m", {"unknowns": [{"what": "w", "why": "y"}]}, "d", {})  # type: ignore[arg-type]
     assert s["format"] == "diffgenome-genome-summary/1"
     assert [r["id"] for r in s["decision_rules"]] == ["D0", "D1"]
+    ev["site_agreement"] = {"D1": [True, False]}  # a supported rule some test disagrees with
+    s2 = summary(run, g, ev, "m", {}, "d", {})  # type: ignore[arg-type]
+    assert [r["id"] for r in s2["decision_rules"]] == ["D0"]
     assert s["decision_rules"][0]["file"] == "a.go"
     assert s["statuses"]["contradicted_not_exported"] == 1
     assert s["statuses"]["rejected"] == 1
