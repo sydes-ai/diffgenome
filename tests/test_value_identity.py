@@ -268,3 +268,19 @@ def test_literal_identity_is_allowed_only_for_cited_source_literals(tmp_path: Pa
     assert _bind(g, {}, hp2, "entry", ob2) == {
         "role_is_banker": False
     }  # the wrong literal is false
+
+
+def test_identity_claim_is_judged_whatever_the_order_of_variables(tmp_path: Path) -> None:
+    """Regression (V-F1): the identity check counted bindings through a stale loop variable
+    and was skipped when the last binding checked was not an identity binding."""
+    proposals = _type_genome()
+    proposals["variables"].append(
+        {"id": "V_lit", "name": "is_access",
+         "observed_as": {"at": {"entity": "token.Payload.Valid", "point": "arg:tokenType"},
+                         "kind": "equals_literal",
+                         "literal": {"lang": "go", "type": "uint8", "value": 1,
+                                     "source": {"file": "token/payload.go", "line": 4}}}}
+    )  # fmt: skip
+    g = _establish(tmp_path, proposals)
+    issued = next(v for v in g.variables if v.name == "issued_type")
+    assert issued.status == VERIFIED and issued.status_reason.startswith("identity verified")

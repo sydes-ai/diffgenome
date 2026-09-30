@@ -1,24 +1,24 @@
 {
  "summary": {
-  "exact_all": "1/20",
+  "exact_all": "6/20",
   "exact_withheld": "0/3",
   "confidently_wrong": 0,
-  "indeterminate": 19,
-  "decisions_verified": "11/55",
-  "transitions_verified": "0/22",
-  "outcomes_verified": "16/73",
+  "indeterminate": 14,
+  "decisions_verified": "10/27",
+  "transitions_verified": "0/8",
+  "outcomes_verified": "15/37",
   "occurrence_facts": {
-   "confirmed": 5,
-   "contradicted": 0,
+   "confirmed": 36,
+   "contradicted": 1,
    "unobservable": 0
   },
   "regions": 0,
   "structure_claims": {
-   "verified": 50,
-   "supported": 40,
+   "verified": 51,
+   "supported": 16,
    "rejected": 0,
-   "not established": 4,
-   "unobserved": 28
+   "not established": 0,
+   "unobserved": 19
   },
   "required_sites_observed_uncovered": [],
   "unknown_dependence": {
@@ -27,84 +27,56 @@
    "call_args": 181,
    "unknown_call_args": 24
   },
-  "rejected": [],
-  "hypothesis": [
-   "v_hash_failed",
-   "v_request_malformed",
-   "v_user_lookup_failed",
-   "v_password_wrong",
-   "v_session_create_failed",
-   "v_session_lookup_failed",
-   "v_session_not_found",
-   "v_session_blocked",
-   "v_session_user_mismatch",
-   "v_session_token_mismatch",
-   "v_session_expired",
-   "v_create_failed",
-   "v_unique_violation",
-   "d_uu_hash",
-   "d_rn_bind",
-   "d_rn_session",
-   "d_rn_notfound",
-   "d_rn_blocked",
-   "d_rn_user",
-   "d_rn_token",
-   "d_rn_expired",
-   "d_rn_create",
-   "d_hl_bind",
-   "d_hl_user",
-   "d_hl_notfound",
-   "d_hl_pw",
-   "d_hl_session",
-   "d_gl_valid",
-   "d_gl_user",
-   "d_gl_notfound",
-   "d_gl_pw",
-   "d_gl_session",
-   "d_cu_valid",
-   "d_cu_hash",
-   "d_cu_create",
-   "d_cu_unique",
-   "t_pc_sealed",
-   "t_pc_failed",
-   "t_jc_sealed",
-   "t_jc_failed",
-   "t_valid_reject",
-   "t_valid_accept",
-   "t_pv_failed",
-   "t_pv_ok",
-   "t_jv_failed",
-   "t_jv_ok",
-   "t_az_failed",
-   "t_az_ok",
-   "p_new_payload",
-   "p_paseto_create",
-   "p_jwt_create",
-   "p_renew",
-   "p_http_login",
-   "p_grpc_login",
-   "p_create_user",
-   "g_valid_access",
-   "g_expired",
-   "g_forged",
-   "g_bad_header"
+  "rejected": [
+   "d_valid_type"
   ],
+  "hypothesis": [],
   "phenotype_claims_exact": "18/20",
-  "identity_claims": {},
-  "literal_bindings": {}
+  "identity_claims": {
+   "expected_type": "verified"
+  },
+  "literal_bindings": {
+   "expected_is_access": true,
+   "expected_is_refresh": true
+  }
  },
  "per_test": [
   {
    "execution": "TestAuthMiddleware/ExpiredToken",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
+    "confirmed": 3,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:3efaa90434e1",
+     false
+    ],
+    [
+     "br:4ede9085ac0b",
+     false
+    ],
+    [
+     "br:96c4e761344c",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -162,7 +134,7 @@
   },
   {
    "execution": "TestAuthMiddleware/InvalidAuthorizationFormat",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": null,
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -170,7 +142,24 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:3efaa90434e1",
+     false
+    ],
+    [
+     "br:4ede9085ac0b",
+     true
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -189,11 +178,11 @@
      true
     ]
    ],
-   "branches_exact": false,
+   "branches_exact": true,
    "state_checked": [],
    "state_diff": {},
    "outcome_diff": {},
-   "match": false,
+   "match": true,
    "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
    "withheld": false,
    "observed_entry_exits": [
@@ -239,7 +228,7 @@
   },
   {
    "execution": "TestAuthMiddleware/OK",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -247,7 +236,32 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:3efaa90434e1",
+     false
+    ],
+    [
+     "br:4ede9085ac0b",
+     false
+    ],
+    [
+     "br:96c4e761344c",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -305,7 +319,7 @@
   },
   {
    "execution": "TestAuthMiddleware/UnsupportedAuthorization",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": null,
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -313,7 +327,28 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:3efaa90434e1",
+     false
+    ],
+    [
+     "br:4ede9085ac0b",
+     false
+    ],
+    [
+     "br:96c4e761344c",
+     true
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -336,11 +371,11 @@
      true
     ]
    ],
-   "branches_exact": false,
+   "branches_exact": true,
    "state_checked": [],
    "state_diff": {},
    "outcome_diff": {},
-   "match": false,
+   "match": true,
    "test": "TestAuthMiddleware/UnsupportedAuthorization",
    "withheld": false,
    "observed_entry_exits": [
@@ -351,7 +386,7 @@
   },
   {
    "execution": "TestExpiredJWTToken",
-   "indeterminate": "procedure p_jwt_create (go:token.JWTMaker.CreateToken) is hypothesis",
+   "indeterminate": null,
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -359,7 +394,24 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:d9f1e0c214f9",
+     false
+    ],
+    [
+     "br:b95a526c7153",
+     true
+    ],
+    [
+     "br:184d2ca72d5b",
+     true
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -378,11 +430,11 @@
      true
     ]
    ],
-   "branches_exact": false,
+   "branches_exact": true,
    "state_checked": [],
    "state_diff": {},
    "outcome_diff": {},
-   "match": false,
+   "match": true,
    "test": "TestExpiredJWTToken",
    "withheld": false,
    "observed_entry_exits": [
@@ -394,15 +446,28 @@
   },
   {
    "execution": "TestExpiredPasetoToken",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
+    "confirmed": 3,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -444,7 +509,7 @@
   },
   {
    "execution": "TestInvalidJWTTokenAlgNone",
-   "indeterminate": "procedure p_new_payload (go:token.NewPayload) is hypothesis",
+   "indeterminate": null,
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -452,7 +517,20 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:b95a526c7153",
+     true
+    ],
+    [
+     "br:184d2ca72d5b",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -467,11 +545,11 @@
      false
     ]
    ],
-   "branches_exact": false,
+   "branches_exact": true,
    "state_checked": [],
    "state_diff": {},
    "outcome_diff": {},
-   "match": false,
+   "match": true,
    "test": "TestInvalidJWTTokenAlgNone",
    "withheld": false,
    "observed_entry_exits": [
@@ -483,15 +561,32 @@
   },
   {
    "execution": "TestJWTMaker",
-   "indeterminate": "procedure p_jwt_create (go:token.JWTMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
+    "confirmed": 2,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:d9f1e0c214f9",
+     false
+    ],
+    [
+     "br:b95a526c7153",
+     false
+    ],
+    [
+     "br:46e44adad2e4",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -538,7 +633,7 @@
   },
   {
    "execution": "TestJWTWrongTokenType",
-   "indeterminate": "procedure p_jwt_create (go:token.JWTMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -546,7 +641,24 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:d9f1e0c214f9",
+     false
+    ],
+    [
+     "br:b95a526c7153",
+     false
+    ],
+    [
+     "br:46e44adad2e4",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -589,15 +701,28 @@
   },
   {
    "execution": "TestPasetoMaker",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
+    "confirmed": 3,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -639,15 +764,28 @@
   },
   {
    "execution": "TestPasetoWrongTokenType",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
-    "contradicted": 0,
+    "confirmed": 2,
+    "contradicted": 1,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -685,15 +823,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 4,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -779,15 +946,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/ExpiredToken",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 0,
+    "confirmed": 3,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -853,15 +1049,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/InvalidEmail",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 4,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -935,7 +1160,7 @@
   },
   {
    "execution": "TestUpdateUserAPI/NoAuthorization",
-   "indeterminate": "transition t_az_failed is hypothesis",
+   "indeterminate": null,
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -946,6 +1171,10 @@
    "predicted_branches": [
     [
      "br:e3505bc4c4b9",
+     true
+    ],
+    [
+     "br:0746154f1c47",
      true
     ]
    ],
@@ -959,11 +1188,11 @@
      true
     ]
    ],
-   "branches_exact": false,
+   "branches_exact": true,
    "state_checked": [],
    "state_diff": {},
    "outcome_diff": {},
-   "match": false,
+   "match": true,
    "test": "TestUpdateUserAPI/NoAuthorization",
    "withheld": false,
    "observed_entry_exits": [
@@ -974,15 +1203,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/OK",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 4,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -1068,15 +1326,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 4,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -1154,15 +1441,44 @@
   },
   {
    "execution": "TestUpdateUserAPI/UserNotFound",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 4,
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -1252,7 +1568,7 @@
   },
   {
    "execution": "TestUpdateUserAPI/WrongTokenType",
-   "indeterminate": "procedure p_paseto_create (go:token.PasetoMaker.CreateToken) is hypothesis",
+   "indeterminate": "decision d_valid_type is rejected",
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
@@ -1260,7 +1576,36 @@
     "contradicted": 0,
     "unobservable": 0
    },
-   "predicted_branches": [],
+   "predicted_branches": [
+    [
+     "br:ecd8b89da8b7",
+     false
+    ],
+    [
+     "br:0713394c9923",
+     false
+    ],
+    [
+     "br:e3505bc4c4b9",
+     false
+    ],
+    [
+     "br:a572eeb6a4c8",
+     false
+    ],
+    [
+     "br:4393757b65d7",
+     false
+    ],
+    [
+     "br:2e2f712d6301",
+     false
+    ],
+    [
+     "br:0607e4d952f6",
+     false
+    ]
+   ],
    "observed_branches": [
     [
      "br:ecd8b89da8b7",
@@ -1323,7 +1668,15 @@
  ],
  "structure_claims": [
   {
-   "procedure": "p_new_payload",
+   "procedure": "p_newpayload",
+   "entity": "go:token.NewPayload",
+   "kind": "contains",
+   "claim": "time.Now during go:token.NewPayload",
+   "status": "unobserved",
+   "why": "time.Now never observed"
+  },
+  {
+   "procedure": "p_newpayload",
    "entity": "go:token.NewPayload",
    "kind": "evaluates",
    "claim": "d_np_rng (br:ecd8b89da8b7) evaluated during go:token.NewPayload",
@@ -1337,6 +1690,14 @@
    "claim": "go:token.NewPayload during go:token.PasetoMaker.CreateToken",
    "status": "supported",
    "why": "12 of 15 observed"
+  },
+  {
+   "procedure": "p_paseto_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "kind": "contains",
+   "claim": "maker.paseto.Encrypt during go:token.PasetoMaker.CreateToken",
+   "status": "unobserved",
+   "why": "maker.paseto.Encrypt never observed"
   },
   {
    "procedure": "p_paseto_create",
@@ -1365,6 +1726,22 @@
   {
    "procedure": "p_jwt_create",
    "entity": "go:token.JWTMaker.CreateToken",
+   "kind": "contains",
+   "claim": "jwt.NewWithClaims during go:token.JWTMaker.CreateToken",
+   "status": "unobserved",
+   "why": "jwt.NewWithClaims never observed"
+  },
+  {
+   "procedure": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "kind": "contains",
+   "claim": "jwtToken.SignedString during go:token.JWTMaker.CreateToken",
+   "status": "unobserved",
+   "why": "jwtToken.SignedString never observed"
+  },
+  {
+   "procedure": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
    "kind": "evaluates",
    "claim": "d_jc_err (br:d9f1e0c214f9) evaluated during go:token.JWTMaker.CreateToken",
    "status": "verified",
@@ -1381,6 +1758,14 @@
   {
    "procedure": "p_valid",
    "entity": "go:token.Payload.Valid",
+   "kind": "contains",
+   "claim": "time.Now during go:token.Payload.Valid",
+   "status": "unobserved",
+   "why": "time.Now never observed"
+  },
+  {
+   "procedure": "p_valid",
+   "entity": "go:token.Payload.Valid",
    "kind": "evaluates",
    "claim": "d_valid_type (br:8d10f2f9b136) evaluated during go:token.Payload.Valid",
    "status": "verified",
@@ -1390,7 +1775,7 @@
    "procedure": "p_valid",
    "entity": "go:token.Payload.Valid",
    "kind": "evaluates",
-   "claim": "d_valid_expiry (br:bdb0acf90853) evaluated during go:token.Payload.Valid",
+   "claim": "d_valid_exp (br:bdb0acf90853) evaluated during go:token.Payload.Valid",
    "status": "verified",
    "why": "all 10 evaluations"
   },
@@ -1409,6 +1794,14 @@
    "claim": "go:token.Payload.Valid during go:token.PasetoMaker.VerifyToken",
    "status": "supported",
    "why": "10 of 11 observed"
+  },
+  {
+   "procedure": "p_paseto_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "kind": "contains",
+   "claim": "payload.Valid during go:token.PasetoMaker.VerifyToken",
+   "status": "unobserved",
+   "why": "payload.Valid never observed"
   },
   {
    "procedure": "p_paseto_verify",
@@ -1449,6 +1842,14 @@
    "claim": "go:token.Payload.Valid during go:token.JWTMaker.VerifyToken",
    "status": "supported",
    "why": "1 of 11 observed"
+  },
+  {
+   "procedure": "p_jwt_verify",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "kind": "contains",
+   "claim": "payload.Valid during go:token.JWTMaker.VerifyToken",
+   "status": "unobserved",
+   "why": "payload.Valid never observed"
   },
   {
    "procedure": "p_jwt_verify",
@@ -1525,6 +1926,38 @@
   {
    "procedure": "p_authorize",
    "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "server.tokenMaker.VerifyToken during go:gapi.Server.authorizeUser",
+   "status": "unobserved",
+   "why": "server.tokenMaker.VerifyToken never observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "strings.ToLower during go:gapi.Server.authorizeUser",
+   "status": "unobserved",
+   "why": "strings.ToLower never observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "strings.Fields during go:gapi.Server.authorizeUser",
+   "status": "unobserved",
+   "why": "strings.Fields never observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "kind": "contains",
+   "claim": "md.Get during go:gapi.Server.authorizeUser",
+   "status": "unobserved",
+   "why": "md.Get never observed"
+  },
+  {
+   "procedure": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
    "kind": "evaluates",
    "claim": "d_az_md (br:e3505bc4c4b9) evaluated during go:gapi.Server.authorizeUser",
    "status": "verified",
@@ -1550,7 +1983,7 @@
    "procedure": "p_authorize",
    "entity": "go:gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_az_scheme (br:2e2f712d6301) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_bearer (br:2e2f712d6301) evaluated during go:gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 6 evaluations"
   },
@@ -1566,7 +1999,7 @@
    "procedure": "p_authorize",
    "entity": "go:gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_az_role (br:c1bc39962889) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_perm (br:c1bc39962889) evaluated during go:gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 5 evaluations"
   },
@@ -1627,6 +2060,126 @@
    "why": "all of x before all of y in 5 execution(s)"
   },
   {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "go:token.PasetoMaker.VerifyToken during go:api.authMiddleware.<anon>@21",
+   "status": "supported",
+   "why": "1 of 10 observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "ctx.Set during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "ctx.Set never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "ctx.Next during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "ctx.Next never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "ctx.AbortWithStatusJSON during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "ctx.AbortWithStatusJSON never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "server.tokenMaker.VerifyToken during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "server.tokenMaker.VerifyToken never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "strings.ToLower during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "strings.ToLower never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "contains",
+   "claim": "strings.Fields during go:api.authMiddleware.<anon>@21",
+   "status": "unobserved",
+   "why": "strings.Fields never observed"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "evaluates",
+   "claim": "d_mw_hdr (br:3efaa90434e1) evaluated during go:api.authMiddleware.<anon>@21",
+   "status": "verified",
+   "why": "all 4 evaluations"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "evaluates",
+   "claim": "d_mw_fields (br:4ede9085ac0b) evaluated during go:api.authMiddleware.<anon>@21",
+   "status": "verified",
+   "why": "all 3 evaluations"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "evaluates",
+   "claim": "d_mw_bearer (br:96c4e761344c) evaluated during go:api.authMiddleware.<anon>@21",
+   "status": "verified",
+   "why": "all 2 evaluations"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "evaluates",
+   "claim": "d_mw_verify (br:052de203d9d4) evaluated during go:api.authMiddleware.<anon>@21",
+   "status": "supported",
+   "why": "1 of 1 evaluations"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "order",
+   "claim": "site:br:3efaa90434e1 before site:br:4ede9085ac0b in go:api.authMiddleware.<anon>@21",
+   "status": "verified",
+   "why": "all of x before all of y in 3 execution(s)"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "order",
+   "claim": "site:br:4ede9085ac0b before site:br:96c4e761344c in go:api.authMiddleware.<anon>@21",
+   "status": "verified",
+   "why": "all of x before all of y in 2 execution(s)"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "order",
+   "claim": "site:br:96c4e761344c before go:token.PasetoMaker.VerifyToken in go:api.authMiddleware.<anon>@21",
+   "status": "supported",
+   "why": "all of x before all of y in 1 execution(s)"
+  },
+  {
+   "procedure": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "kind": "order",
+   "claim": "go:token.PasetoMaker.VerifyToken before site:br:052de203d9d4 in go:api.authMiddleware.<anon>@21",
+   "status": "supported",
+   "why": "all of x before all of y in 1 execution(s)"
+  },
+  {
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
    "kind": "contains",
@@ -1661,6 +2214,38 @@
   {
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "status.Errorf during go:gapi.Server.UpdateUser",
+   "status": "unobserved",
+   "why": "status.Errorf never observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "util.HashPassword during go:gapi.Server.UpdateUser",
+   "status": "unobserved",
+   "why": "util.HashPassword never observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "invalidArgumentError during go:gapi.Server.UpdateUser",
+   "status": "supported",
+   "why": "1 of 1 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "unauthenticatedError during go:gapi.Server.UpdateUser",
+   "status": "verified",
+   "why": "all 2 observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
    "kind": "evaluates",
    "claim": "d_uu_auth (br:0746154f1c47) evaluated during go:gapi.Server.UpdateUser",
    "status": "verified",
@@ -1670,7 +2255,7 @@
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_uu_valid (br:af0e24f4367b) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_uu_viol (br:af0e24f4367b) evaluated during go:gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 5 evaluations"
   },
@@ -1678,7 +2263,7 @@
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_uu_perm (br:01807a7b80a2) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_uu_owner (br:01807a7b80a2) evaluated during go:gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
@@ -1694,7 +2279,7 @@
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_uu_update (br:17f2bce25a0f) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_uu_dberr (br:17f2bce25a0f) evaluated during go:gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 3 evaluations"
   },
@@ -1702,17 +2287,9 @@
    "procedure": "p_update_user",
    "entity": "go:gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_uu_notfound (br:fb1ba40798cf) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_uu_nf (br:fb1ba40798cf) evaluated during go:gapi.Server.UpdateUser",
    "status": "supported",
    "why": "1 of 1 evaluations"
-  },
-  {
-   "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
-   "kind": "evaluates",
-   "claim": "d_uu_hash (br:5f17958f3d3f) evaluated during go:gapi.Server.UpdateUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
   },
   {
    "procedure": "p_update_user",
@@ -1777,526 +2354,6 @@
    "claim": "site:br:17f2bce25a0f before go:gapi.convertUser in go:gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 2 execution(s)"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "contains",
-   "claim": "go:token.PasetoMaker.VerifyToken during go:api.authMiddleware.<anon>@21",
-   "status": "supported",
-   "why": "1 of 10 observed"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "evaluates",
-   "claim": "d_mw_hdr (br:3efaa90434e1) evaluated during go:api.authMiddleware.<anon>@21",
-   "status": "verified",
-   "why": "all 4 evaluations"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "evaluates",
-   "claim": "d_mw_fields (br:4ede9085ac0b) evaluated during go:api.authMiddleware.<anon>@21",
-   "status": "verified",
-   "why": "all 3 evaluations"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "evaluates",
-   "claim": "d_mw_scheme (br:96c4e761344c) evaluated during go:api.authMiddleware.<anon>@21",
-   "status": "verified",
-   "why": "all 2 evaluations"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "evaluates",
-   "claim": "d_mw_verify (br:052de203d9d4) evaluated during go:api.authMiddleware.<anon>@21",
-   "status": "supported",
-   "why": "1 of 1 evaluations"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "order",
-   "claim": "site:br:3efaa90434e1 before site:br:4ede9085ac0b in go:api.authMiddleware.<anon>@21",
-   "status": "verified",
-   "why": "all of x before all of y in 3 execution(s)"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "order",
-   "claim": "site:br:4ede9085ac0b before site:br:96c4e761344c in go:api.authMiddleware.<anon>@21",
-   "status": "verified",
-   "why": "all of x before all of y in 2 execution(s)"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "order",
-   "claim": "site:br:96c4e761344c before go:token.PasetoMaker.VerifyToken in go:api.authMiddleware.<anon>@21",
-   "status": "supported",
-   "why": "all of x before all of y in 1 execution(s)"
-  },
-  {
-   "procedure": "p_auth_middleware",
-   "entity": "go:api.authMiddleware.<anon>@21",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.VerifyToken before site:br:052de203d9d4 in go:api.authMiddleware.<anon>@21",
-   "status": "supported",
-   "why": "all of x before all of y in 1 execution(s)"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "contains",
-   "claim": "go:token.PasetoMaker.VerifyToken during go:api.Server.renewAccessToken",
-   "status": "not established",
-   "why": "go:token.PasetoMaker.VerifyToken observed 10 time(s), never during go:api.Server.renewAccessToken"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "contains",
-   "claim": "go:token.PasetoMaker.CreateToken during go:api.Server.renewAccessToken",
-   "status": "not established",
-   "why": "go:token.PasetoMaker.CreateToken observed 12 time(s), never during go:api.Server.renewAccessToken"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_bind (br:51914597d4b2) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_verify (br:b98712eb46d4) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_session (br:d2add7aaa3bb) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_blocked (br:4c153bb03d9c) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_user (br:58d817da41f5) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_token (br:48d3578e9a44) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_expired (br:7b9ae91490eb) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_create (br:65b3034c3f05) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "evaluates",
-   "claim": "d_rn_notfound (br:c91282863028) evaluated during go:api.Server.renewAccessToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:51914597d4b2 before go:token.PasetoMaker.VerifyToken in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.VerifyToken before site:br:b98712eb46d4 in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:b98712eb46d4 before site:br:d2add7aaa3bb in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:d2add7aaa3bb before site:br:4c153bb03d9c in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:4c153bb03d9c before site:br:58d817da41f5 in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:58d817da41f5 before site:br:48d3578e9a44 in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:48d3578e9a44 before site:br:7b9ae91490eb in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "site:br:7b9ae91490eb before go:token.PasetoMaker.CreateToken in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_renew",
-   "entity": "go:api.Server.renewAccessToken",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.CreateToken before site:br:65b3034c3f05 in go:api.Server.renewAccessToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "contains",
-   "claim": "go:token.PasetoMaker.CreateToken during go:api.Server.loginUser",
-   "status": "not established",
-   "why": "go:token.PasetoMaker.CreateToken observed 12 time(s), never during go:api.Server.loginUser"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_bind (br:eb7b1a216152) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_user (br:84d886a24efe) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_pw (br:8ac57f80bf1d) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_access (br:b2bb97f7167b) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_refresh (br:81d23a5f3d1d) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_session (br:7fe5569cfdac) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "evaluates",
-   "claim": "d_hl_notfound (br:e540ee8e596a) evaluated during go:api.Server.loginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "site:br:eb7b1a216152 before site:br:84d886a24efe in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "site:br:84d886a24efe before site:br:8ac57f80bf1d in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "site:br:8ac57f80bf1d before go:token.PasetoMaker.CreateToken in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.CreateToken before site:br:b2bb97f7167b in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "site:br:b2bb97f7167b before go:token.PasetoMaker.CreateToken in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.CreateToken before site:br:81d23a5f3d1d in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_http_login",
-   "entity": "go:api.Server.loginUser",
-   "kind": "order",
-   "claim": "site:br:81d23a5f3d1d before site:br:7fe5569cfdac in go:api.Server.loginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "contains",
-   "claim": "go:token.PasetoMaker.CreateToken during go:gapi.Server.LoginUser",
-   "status": "not established",
-   "why": "go:token.PasetoMaker.CreateToken observed 12 time(s), never during go:gapi.Server.LoginUser"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_valid (br:76bc8d02ae40) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_user (br:bbafcfbd5eed) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_pw (br:7b2947a85e0c) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_access (br:85b863c14186) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_refresh (br:791afc927393) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_session (br:65d9ca0b3d0c) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "evaluates",
-   "claim": "d_gl_notfound (br:5524c0c4b7f1) evaluated during go:gapi.Server.LoginUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "site:br:76bc8d02ae40 before site:br:bbafcfbd5eed in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "site:br:bbafcfbd5eed before site:br:7b2947a85e0c in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "site:br:7b2947a85e0c before go:token.PasetoMaker.CreateToken in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.CreateToken before site:br:85b863c14186 in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "site:br:85b863c14186 before go:token.PasetoMaker.CreateToken in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "go:token.PasetoMaker.CreateToken before site:br:791afc927393 in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_grpc_login",
-   "entity": "go:gapi.Server.LoginUser",
-   "kind": "order",
-   "claim": "site:br:791afc927393 before site:br:65d9ca0b3d0c in go:gapi.Server.LoginUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "evaluates",
-   "claim": "d_cu_valid (br:bb32884fc4f0) evaluated during go:gapi.Server.CreateUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "evaluates",
-   "claim": "d_cu_hash (br:be27f218e30f) evaluated during go:gapi.Server.CreateUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "evaluates",
-   "claim": "d_cu_create (br:086cd7460869) evaluated during go:gapi.Server.CreateUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "evaluates",
-   "claim": "d_cu_unique (br:f9551788eb8d) evaluated during go:gapi.Server.CreateUser",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "order",
-   "claim": "site:br:bb32884fc4f0 before site:br:be27f218e30f in go:gapi.Server.CreateUser",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_create_user",
-   "entity": "go:gapi.Server.CreateUser",
-   "kind": "order",
-   "claim": "site:br:be27f218e30f before site:br:086cd7460869 in go:gapi.Server.CreateUser",
-   "status": "supported",
-   "why": "not established by observation"
   }
  ]
 }

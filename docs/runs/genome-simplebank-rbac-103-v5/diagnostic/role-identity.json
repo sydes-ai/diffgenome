@@ -1,0 +1,1 @@
+{"role identity CreateToken arg:role == hasPermission arg:userRole": {"shown tests only (the checker)": "supported: equal in 4 executions, 1 distinct value, no contrast", "including withheld (diagnostic only, never used by the checker)": "verified: equal in 5 executions, 2 distinct values"}}

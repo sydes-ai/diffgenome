@@ -1133,7 +1133,7 @@ def establish_state(
     # identity claims: a variable observed at >= 2 identity boundaries. The proposal names
     # the correspondence; the equality itself is observed (digests), never assumed.
     for v in g.variables:
-        if sum(1 for b in bindings_of(v) if bd.get("kind") == "identity") < 2:
+        if sum(1 for x in bindings_of(v) if x.get("kind") == "identity") < 2:
             continue
         status, why, _, _ = identity_claim(v, sub.obs)
         if v.status == REJECTED or (
@@ -1515,18 +1515,21 @@ def predict_sequence(
                     return True
                 for k, item in enumerate(items):
                     before = dict(env)
-                    env.update(item.get("facts") or {})
+                    local = item.get("facts") or {}
+                    env.update(local)
                     pred.events.append(("occurrence", ref, k))
                     ctx.append(item)
                     stopped = run_steps(r.steps, env, depth, occ)
                     ctx.pop()
-                    for var in list(env):
+                    # the occurrence's supplied facts are local to it; what the body's
+                    # transitions set (e.g. "a match was found") is its effect and persists
+                    for var in local:
                         if var in state_vars:
                             continue
                         if var in before:
                             env[var] = before[var]
                         else:
-                            del env[var]
+                            env.pop(var, None)
                     if stopped:  # `stops` ends the enclosing entity; there is no `continue`
                         return True
             elif kind == "D":
@@ -1780,6 +1783,35 @@ def _occurrence_values(
     return out
 
 
+def _subtree_values(g: Genome, ob: ExecObs, n: Any, names: set[str]) -> dict[str, Any]:
+    """Values of boundary-bound variables at calls running inside call `n`, when unique."""
+    out: dict[str, Any] = {}
+    if not names:
+        return out
+    for v in g.variables:
+        if v.name not in names:
+            continue
+        for bd in bindings_of(v):
+            at = bd.get("at")
+            if not isinstance(at, dict) or v.name in out:
+                continue
+            kind = str(bd.get("kind", "is_set"))
+            if kind == "equals_literal" and bd.get("_literal_ok") is not True:
+                continue
+            vals = [
+                boundary_fact(m, str(at.get("point", "")), kind, bd.get("literal"))
+                for m in ob.execution.nodes
+                if isinstance(m, CallNode)
+                and m.id != n.id
+                and _name_match(str(at.get("entity", "")), m.symbol)
+                and _is_ancestor(ob, n.id, m.id)
+            ]
+            vals = [x for x in vals if x is not None]
+            if vals and all(x == vals[0] for x in vals[1:]):
+                out[v.name] = vals[0]
+    return out
+
+
 def check_scenario_call_facts(
     g: Genome, scenario: dict[str, Any], ob: ExecObs
 ) -> list[dict[str, Any]]:
@@ -1811,6 +1843,10 @@ def check_scenario_call_facts(
             **_bind(g, {a: b for a, b, _ in n.state}, n, "entry", ob),
             **_bind(g, {a: b for a, b, _ in n.state_after}, n, "exit", ob),
         }
+        # a fact of this call may concern a boundary INSIDE it (a callee's argument or
+        # result); it is checked there when that boundary's value is unique within the call
+        inner = _subtree_values(g, ob, n, set(facts) - set(seen))
+        seen = {**inner, **seen}
         for var, val in facts.items():
             if var not in seen:
                 continue

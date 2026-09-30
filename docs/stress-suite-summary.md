@@ -1,4 +1,4 @@
-# Stress suite summary: Experiments 08 to 12
+# Stress suite summary: Experiments 08 to 13
 
 All runs are local. Nothing was pushed, Sydes was not modified or run, and the targets were not
 modified. Every proposal comes from a fresh isolated Opus instance that read only its bundle.
@@ -16,8 +16,13 @@ Statuses come from shown tests only.
 | Exp 10A v4 (occurrence binding) | | **2/2** (17/17 occurrences) | 3/5 | 2 (in-sample) | 0 | 3/7 | 0/0 | 4 | per-occurrence facts |
 | Exp 11 Case B RBAC (Go) | scalar, gRPC | 1/2 (diagnostic 2/2) | 2/7 (diagnostic 7/7) | 0 (5 before B-F5) | 5 | 5/28 | 0/0 | 0 | none |
 | Exp 12 Case C token type (Go) | scalar, 3 entry points | 0/3 (diagnostic 3/3) | 1/20 (diagnostic 20/20) | 0 | 19 | 11/55 | 0/22 | 0 | none |
+| Exp 13 Case B v5 (value identity) | scalar, gRPC | **2/2** | **7/7** | 0 | 0 | 7/26 | 0/6 | 1 | value identity (username verified; role only supported, no contrast) |
+| Exp 13 Case C v5 (value identity) | scalar, 3 entry points | **3/3** | **20/20** | 0 | 0 | 11/27 (type check verified from observed identities) | 0/8 | 0 | value identity and literal identity |
+| Exp 13 Baserow v4 under eligibility | relation and order | 0/2 | 0/5 | **0** (was 2) | 5 | 3/7 | 0/0 | 4 | — |
 
-The "diagnostic" figures are not scores. They are the same proposal with its one proposer or
+Experiment 13 rows are scored, not diagnostics. The Experiment 13 changes are: branch `calls`
+descriptive, prediction eligibility, value identity, literal identity, and checked scenario
+facts. The "diagnostic" figures are not scores. They are the same proposal with its one proposer or
 format failure neutralized: descriptive `calls` in B, missing evidence in C.
 
 ## Regression
@@ -26,7 +31,56 @@ After every generic fix in these passes, Experiment 09 (main genome and 4 contro
 differences: 13/13, withheld 4/4, stateless 3/13. Experiment 08 was identical. Baserow v2, v3
 and v4 with their controls were identical.
 
-## Answers
+## After Experiment 13 (value identity)
+
+**A. Value identity.** Yes. DiffGenome now establishes that the same value appears at two call
+boundaries from digest equality alone, without decoding it:
+- Case B: the username at token creation and in the payload, verified;
+- Case C: the expected token type at `VerifyToken` and `Valid`, verified.
+
+It rejects claims shown unequal (i1), refuses to verify without a contrast or when a side is
+missing (i4), and treats repeated differing occurrences as ambiguous.
+
+**B. Literal identity.** Yes, narrowly. A boundary value can be compared with a literal written
+on a cited source line: bool, nil, integers up to 64 bits, strings up to 64 printable
+characters with no quotes or backslashes. Only Go and Python canonical forms are supported. It
+distinguished `"banker"` from `"depositor"` and access `1` from refresh `2`; wrong literals
+were caught (i5). Status codes are not reachable: the code is inside an error value.
+
+The digest domain stays unsalted, so low-entropy values in existing artifacts are guessable.
+That risk predates this work. An analysis-local salt is the recommended hardening.
+
+**C. Case B.** Partly:
+- **Established from observation:** the username flow (verified), and the role at creation as
+  a literal ("not banker" in every shown test).
+- **Not established:** the role flow from creation to `hasPermission`. It is *supported*
+  only, because all shown tests carry one role. It is no longer an unchecked assumption, but
+  it is not verified without a banker among the shown tests.
+
+**D. Case C.** Yes:
+- the type check is verified from observed identities, 11 local agreements;
+- the expected-type identity is verified;
+- the scored result went from 1/20 to 20/20, with held-out 3/3.
+
+No evidence was attached mechanically. The old proposal still scores 1/20; the fresh proposal
+cites evidence.
+
+**E. Branch semantics.** Yes. Executable structure lives only in `steps` (procedures, regions,
+branches). `calls` are descriptive, and nothing executes them.
+
+**F. Prediction safety.** No. A supported item that a shown execution contradicted is not
+eligible to drive a prediction. On Baserow v4 this cost the 2/2 held-out and removed both
+in-sample errors.
+
+**G. Smallest remaining unsupported class** (from the completed cases only):
+1. **Values inside compound values.** The status code inside an error (B), the username inside
+   a request struct (B's `target_username`), and the session's refresh token (C's renewal).
+   The collector digests whole structs. A single field is reachable only when it crosses a
+   boundary on its own.
+2. **Ordering over a relation** remains Baserow's alone, still with one case.
+
+## Answers (after Experiment 12)
+
 
 **A. Repetition.** Deterministic structure plus per-occurrence binding is sufficient. On Baserow
 it predicted every withheld field occurrence (17/17) and both withheld tests. Neither B nor C
@@ -72,7 +126,5 @@ Everything else observed was tooling, and was fixed and tested:
 - one format ambiguity: descriptive vs executed branch `calls`;
 - two proposer failures: over-simplified dispatch in Baserow, missing evidence in C.
 
-**Open decisions for you:**
-- Should prediction use *supported* items whose shown-test replay disagreed (Baserow v4 policy)?
-- Should branch `calls` be descriptive, executed, or split into two fields (B-F4)?
-- Unsalted or salted digests, which decides how value identity and literal decoding can work?
+**Open decisions after Experiment 12:** the prediction policy and branch `calls` were decided
+in Experiment 13. Salted digests remain open.

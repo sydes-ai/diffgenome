@@ -1,0 +1,3237 @@
+{
+ "variables": [
+  {
+   "id": "v_issued_type",
+   "name": "issued_type",
+   "origin": "input",
+   "description": "The token type written into the payload when the token was created (NewPayload's tokenType, stored as payload.Type). Opaque identity, taken from the single NewPayload call earlier in the test.",
+   "observed_as": {
+    "at": {
+     "entity": "go:token.NewPayload",
+     "point": "arg:tokenType"
+    },
+    "kind": "identity",
+    "scope": "execution"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 43,
+     "text": "Type:      tokenType,"
+    },
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 54,
+     "text": "if payload.Type != tokenType {"
+    },
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_expected_type",
+   "name": "expected_type",
+   "origin": "input",
+   "description": "The token type the verifier demands (VerifyToken's tokenType, passed unchanged to Payload.Valid). Same opaque value at both boundaries.",
+   "observed_as": [
+    {
+     "at": {
+      "entity": "go:token.PasetoMaker.VerifyToken",
+      "point": "arg:tokenType"
+     },
+     "kind": "identity",
+     "scope": "call"
+    },
+    {
+     "at": {
+      "entity": "go:token.Payload.Valid",
+      "point": "arg:tokenType"
+     },
+     "kind": "identity",
+     "scope": "call"
+    }
+   ],
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/paseto_maker.go",
+     "line": 51,
+     "text": "err = payload.Valid(tokenType)"
+    }
+   ]
+  },
+  {
+   "id": "v_expected_is_access",
+   "name": "expected_is_access",
+   "origin": "input",
+   "description": "The expected type is TokenTypeAccessToken (literal 1).",
+   "observed_as": {
+    "at": {
+     "entity": "go:token.Payload.Valid",
+     "point": "arg:tokenType"
+    },
+    "kind": "equals_literal",
+    "scope": "call",
+    "literal": {
+     "lang": "go",
+     "type": "uint8",
+     "value": 1,
+     "source": {
+      "file": "token/payload.go",
+      "line": 20
+     }
+    }
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 20,
+     "text": "TokenTypeAccessToken  = 1"
+    }
+   ]
+  },
+  {
+   "id": "v_expected_is_refresh",
+   "name": "expected_is_refresh",
+   "origin": "input",
+   "description": "The expected type is TokenTypeRefreshToken (literal 2).",
+   "observed_as": {
+    "at": {
+     "entity": "go:token.Payload.Valid",
+     "point": "arg:tokenType"
+    },
+    "kind": "equals_literal",
+    "scope": "call",
+    "literal": {
+     "lang": "go",
+     "type": "uint8",
+     "value": 2,
+     "source": {
+      "file": "token/payload.go",
+      "line": 21
+     }
+    }
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 21,
+     "text": "TokenTypeRefreshToken = 2"
+    }
+   ]
+  },
+  {
+   "id": "v_token_expired",
+   "name": "token_expired",
+   "origin": "input",
+   "description": "The token was created with a non-positive duration, so its ExpiredAt is in the past.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 57,
+     "text": "if time.Now().After(payload.ExpiredAt) {"
+    },
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestExpiredPasetoToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:184d2ca72d5b",
+     "test": "TestExpiredJWTToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_token_authentic",
+   "name": "token_authentic",
+   "origin": "input",
+   "description": "The token string decrypts/parses with the maker's key and an accepted algorithm (false for an alg=none JWT).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0607e4d952f6",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:b95a526c7153",
+     "test": "TestInvalidJWTTokenAlgNone",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:184d2ca72d5b",
+     "test": "TestInvalidJWTTokenAlgNone",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_rng_fails",
+   "name": "rng_fails",
+   "origin": "setting",
+   "description": "uuid.NewRandom fails (never in tests).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:ecd8b89da8b7",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:0713394c9923",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:d9f1e0c214f9",
+     "test": "TestJWTMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_payload_valid",
+   "name": "payload_valid",
+   "origin": "derived",
+   "description": "Payload.Valid returned nil (type matches and not expired).",
+   "observed_as": null,
+   "definition": "issued_type == expected_type && !token_expired",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c7d403dfabc3",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:c7d403dfabc3",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_verify_ok",
+   "name": "verify_ok",
+   "origin": "derived",
+   "description": "VerifyToken returned a payload and no error.",
+   "observed_as": null,
+   "definition": "token_authentic && payload_valid",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:052de203d9d4",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_has_metadata",
+   "name": "has_metadata",
+   "origin": "input",
+   "description": "The gRPC context carries incoming metadata.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_has_auth_header",
+   "name": "has_auth_header",
+   "origin": "input",
+   "description": "An authorization header is present (HTTP header or gRPC metadata key).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:3efaa90434e1",
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:3efaa90434e1",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:a572eeb6a4c8",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_header_two_fields",
+   "name": "header_has_two_fields",
+   "origin": "input",
+   "description": "The authorization header splits into at least two whitespace-separated fields.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:4ede9085ac0b",
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:4ede9085ac0b",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:4393757b65d7",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_scheme_bearer",
+   "name": "scheme_is_bearer",
+   "origin": "input",
+   "description": "The first header field, lower-cased, is 'bearer'.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:96c4e761344c",
+     "test": "TestAuthMiddleware/UnsupportedAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:96c4e761344c",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:2e2f712d6301",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_role_permitted",
+   "name": "role_permitted",
+   "origin": "input",
+   "description": "The payload role is in accessibleRoles (hasPermission's result).",
+   "observed_as": {
+    "at": {
+     "entity": "go:gapi.hasPermission",
+     "point": "result"
+    },
+    "kind": "bool"
+   },
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c1bc39962889",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:c1bc39962889",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_authz_ok",
+   "name": "authz_ok",
+   "origin": "state",
+   "description": "authorizeUser returned a payload (no error) in the current UpdateUser call.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "v_has_violations",
+   "name": "has_violations",
+   "origin": "input",
+   "description": "validateUpdateUserRequest reports field violations (e.g. invalid email).",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_caller_is_banker",
+   "name": "caller_is_banker",
+   "origin": "input",
+   "description": "The authenticated role is util.BankerRole.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_caller_is_target",
+   "name": "caller_is_target",
+   "origin": "input",
+   "description": "The authenticated username equals the username being updated.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "v_password_given",
+   "name": "password_given",
+   "origin": "input",
+   "description": "The update request sets a new password.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:815be3bfb43a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_db_update_failed",
+   "name": "db_update_failed",
+   "origin": "input",
+   "description": "store.UpdateUser returns an error.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "v_db_not_found",
+   "name": "db_not_found",
+   "origin": "input",
+   "description": "The store error is db.ErrRecordNotFound.",
+   "observed_as": null,
+   "definition": null,
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "V_i1",
+   "name": "type_everywhere",
+   "evidence": [],
+   "observed_as": [
+    {
+     "at": {
+      "entity": "token.NewPayload",
+      "point": "arg:tokenType"
+     },
+     "kind": "identity",
+     "scope": "execution"
+    },
+    {
+     "at": {
+      "entity": "token.Payload.Valid",
+      "point": "arg:tokenType"
+     },
+     "kind": "identity",
+     "scope": "execution"
+    }
+   ]
+  }
+ ],
+ "decisions": [
+  {
+   "id": "d_np_rng",
+   "entity": "go:token.NewPayload",
+   "site": "br:ecd8b89da8b7",
+   "inputs": [
+    "rng_fails"
+   ],
+   "predicate": "rng_fails",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [
+     "time.Now"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.NewPayload",
+     "is": "returned-error"
+    },
+    "effect": "no payload"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "time.Now"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload built with Type = tokenType"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:ecd8b89da8b7",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:ecd8b89da8b7",
+     "test": "TestInvalidJWTTokenAlgNone",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_pc_err",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "site": "br:0713394c9923",
+   "inputs": [
+    "rng_fails"
+   ],
+   "predicate": "rng_fails",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [
+     "maker.paseto.Encrypt"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "is": "returned-error"
+    },
+    "effect": "creation fails"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "maker.paseto.Encrypt"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "token encrypted with typed payload"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0713394c9923",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_jc_err",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "site": "br:d9f1e0c214f9",
+   "inputs": [
+    "rng_fails"
+   ],
+   "predicate": "rng_fails",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [
+     "jwt.NewWithClaims"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.CreateToken",
+     "is": "returned-error"
+    },
+    "effect": "creation fails"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "jwt.NewWithClaims",
+     "jwtToken.SignedString"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "token signed with typed payload"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:d9f1e0c214f9",
+     "test": "TestJWTMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_valid_type",
+   "entity": "go:token.Payload.Valid",
+   "site": "br:8d10f2f9b136",
+   "inputs": [
+    "issued_type",
+    "expected_type"
+   ],
+   "predicate": "issued_type != expected_type",
+   "order": 1,
+   "true_branch": {
+    "steps": [
+     "T:t_valid_bad"
+    ],
+    "calls": [],
+    "absent": [
+     "time.Now"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.Payload.Valid",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "ErrInvalidToken: wrong token type"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "time.Now"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "type accepted; expiry checked next"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 54,
+     "text": "if payload.Type != tokenType {"
+    },
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestJWTMaker",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestPasetoWrongTokenType"
+    }
+   ]
+  },
+  {
+   "id": "d_valid_exp",
+   "entity": "go:token.Payload.Valid",
+   "site": "br:bdb0acf90853",
+   "inputs": [
+    "token_expired"
+   ],
+   "predicate": "token_expired",
+   "order": 2,
+   "true_branch": {
+    "steps": [
+     "T:t_valid_bad"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.Payload.Valid",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "ErrExpiredToken"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload valid"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestExpiredPasetoToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestExpiredPasetoToken"
+    }
+   ]
+  },
+  {
+   "id": "d_pv_decrypt",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "site": "br:0607e4d952f6",
+   "inputs": [
+    "token_authentic"
+   ],
+   "predicate": "!token_authentic",
+   "order": 1,
+   "true_branch": {
+    "steps": [
+     "T:t_pv_bad"
+    ],
+    "calls": [],
+    "absent": [
+     "payload.Valid"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "ErrInvalidToken: undecryptable"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "payload.Valid"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload decoded, validated against expected type"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0607e4d952f6",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "branch",
+     "site": "br:0607e4d952f6",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_pv_valid",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "site": "br:c7d403dfabc3",
+   "inputs": [
+    "payload_valid"
+   ],
+   "predicate": "!payload_valid",
+   "order": 2,
+   "true_branch": {
+    "steps": [
+     "T:t_pv_bad"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "Valid's error propagated"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload returned"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c7d403dfabc3",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:c7d403dfabc3",
+     "test": "TestExpiredPasetoToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:c7d403dfabc3",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestPasetoWrongTokenType"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    }
+   ]
+  },
+  {
+   "id": "d_jv_parse",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:b95a526c7153",
+   "inputs": [
+    "token_expired",
+    "token_authentic"
+   ],
+   "predicate": "token_expired || !token_authentic",
+   "order": 1,
+   "true_branch": {
+    "steps": [
+     "T:t_jv_bad",
+     "D:d_jv_expired"
+    ],
+    "calls": [
+     "errors.Is"
+    ],
+    "absent": [
+     "payload.Valid"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "jwt library rejects (expiry checked by the library, before Valid)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "claims parsed"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:b95a526c7153",
+     "test": "TestExpiredJWTToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:b95a526c7153",
+     "test": "TestInvalidJWTTokenAlgNone",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:b95a526c7153",
+     "test": "TestJWTMaker",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestExpiredJWTToken"
+    }
+   ]
+  },
+  {
+   "id": "d_jv_expired",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:184d2ca72d5b",
+   "inputs": [
+    "token_expired"
+   ],
+   "predicate": "token_expired",
+   "order": 2,
+   "true_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "ErrExpiredToken"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "ErrInvalidToken"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:184d2ca72d5b",
+     "test": "TestExpiredJWTToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:184d2ca72d5b",
+     "test": "TestInvalidJWTTokenAlgNone",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestInvalidJWTTokenAlgNone"
+    }
+   ]
+  },
+  {
+   "id": "d_jv_claims",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:46e44adad2e4",
+   "inputs": [],
+   "predicate": "false",
+   "order": 3,
+   "true_branch": {
+    "steps": [
+     "T:t_jv_bad"
+    ],
+    "calls": [],
+    "absent": [
+     "payload.Valid"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "claims not a *Payload"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "payload.Valid"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "claims are a *Payload"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:46e44adad2e4",
+     "test": "TestJWTMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_jv_valid",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "site": "br:8a21855c007e",
+   "inputs": [
+    "payload_valid"
+   ],
+   "predicate": "!payload_valid",
+   "order": 4,
+   "true_branch": {
+    "steps": [
+     "T:t_jv_bad"
+    ],
+    "calls": [],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "Valid's error (wrong type) propagated"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload returned"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:8a21855c007e",
+     "test": "TestJWTMaker",
+     "outcome": false
+    },
+    {
+     "kind": "source",
+     "file": "token/jwt_maker.go",
+     "line": 61,
+     "text": "err = payload.Valid(tokenType)"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestJWTMaker"
+    }
+   ]
+  },
+  {
+   "id": "d_az_md",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:e3505bc4c4b9",
+   "inputs": [
+    "has_metadata"
+   ],
+   "predicate": "!has_metadata",
+   "order": 1,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [
+     "server.tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "missing metadata"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "md.Get"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:e3505bc4c4b9",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/NoAuthorization"
+    }
+   ]
+  },
+  {
+   "id": "d_az_hdr",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:a572eeb6a4c8",
+   "inputs": [
+    "has_auth_header"
+   ],
+   "predicate": "!has_auth_header",
+   "order": 2,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [
+     "server.tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "missing authorization header"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "strings.Fields"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:a572eeb6a4c8",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_az_fields",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:4393757b65d7",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "predicate": "!header_has_two_fields",
+   "order": 3,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [
+     "server.tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "invalid header format"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "strings.ToLower"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:4393757b65d7",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_az_bearer",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:2e2f712d6301",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "predicate": "!scheme_is_bearer",
+   "order": 4,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [
+     "server.tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "unsupported authorization type"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "server.tokenMaker.VerifyToken"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "verify as ACCESS token"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:2e2f712d6301",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_az_verify",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c71158777bce",
+   "inputs": [
+    "verify_ok"
+   ],
+   "predicate": "!verify_ok",
+   "order": 5,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [
+     "hasPermission"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "invalid access token (expired, undecryptable, or not an access token)"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "hasPermission"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 40,
+     "text": "payload, err := server.tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "d_az_perm",
+   "entity": "go:gapi.Server.authorizeUser",
+   "site": "br:c1bc39962889",
+   "inputs": [
+    "role_permitted"
+   ],
+   "predicate": "!role_permitted",
+   "order": 6,
+   "true_branch": {
+    "steps": [
+     "T:t_authz_denied"
+    ],
+    "calls": [
+     "fmt.Errorf"
+    ],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.authorizeUser",
+     "is": "returned-error:go:*errors.errorString"
+    },
+    "effect": "permission denied"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload returned"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:c1bc39962889",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/OK"
+    }
+   ]
+  },
+  {
+   "id": "d_mw_hdr",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:3efaa90434e1",
+   "inputs": [
+    "has_auth_header"
+   ],
+   "predicate": "!has_auth_header",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "ctx.AbortWithStatusJSON"
+    ],
+    "absent": [
+     "tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    },
+    "effect": "401 header not provided"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "strings.Fields"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:3efaa90434e1",
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:3efaa90434e1",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "exit": "returned",
+     "test": "TestAuthMiddleware/NoAuthorization"
+    }
+   ]
+  },
+  {
+   "id": "d_mw_fields",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:4ede9085ac0b",
+   "inputs": [
+    "header_has_two_fields"
+   ],
+   "predicate": "!header_has_two_fields",
+   "order": 2,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "ctx.AbortWithStatusJSON"
+    ],
+    "absent": [
+     "tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    },
+    "effect": "401 invalid format"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "strings.ToLower"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:4ede9085ac0b",
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:4ede9085ac0b",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "exit": "returned",
+     "test": "TestAuthMiddleware/InvalidAuthorizationFormat"
+    }
+   ]
+  },
+  {
+   "id": "d_mw_bearer",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:96c4e761344c",
+   "inputs": [
+    "scheme_is_bearer"
+   ],
+   "predicate": "!scheme_is_bearer",
+   "order": 3,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "ctx.AbortWithStatusJSON"
+    ],
+    "absent": [
+     "tokenMaker.VerifyToken"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    },
+    "effect": "401 unsupported type"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "tokenMaker.VerifyToken"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "verify as ACCESS token"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:96c4e761344c",
+     "test": "TestAuthMiddleware/UnsupportedAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:96c4e761344c",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "exit": "returned",
+     "test": "TestAuthMiddleware/UnsupportedAuthorization"
+    }
+   ]
+  },
+  {
+   "id": "d_mw_verify",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "site": "br:052de203d9d4",
+   "inputs": [
+    "verify_ok"
+   ],
+   "predicate": "!verify_ok",
+   "order": 4,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "ctx.AbortWithStatusJSON"
+    ],
+    "absent": [
+     "ctx.Next"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "is": "returned"
+    },
+    "effect": "401 invalid/expired/wrong-type token"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "ctx.Set",
+     "ctx.Next"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "payload stored, next handler runs"
+   },
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 45,
+     "text": "payload, err := tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)"
+    },
+    {
+     "kind": "branch",
+     "site": "br:052de203d9d4",
+     "test": "TestAuthMiddleware/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "exit": "returned",
+     "test": "TestAuthMiddleware/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "d_uu_auth",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:0746154f1c47",
+   "inputs": [
+    "authz_ok"
+   ],
+   "predicate": "!authz_ok",
+   "order": 1,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "unauthenticatedError"
+    ],
+    "absent": [
+     "validateUpdateUserRequest"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "Unauthenticated"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "validateUpdateUserRequest"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/NoAuthorization",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "d_uu_viol",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:af0e24f4367b",
+   "inputs": [
+    "has_violations"
+   ],
+   "predicate": "has_violations",
+   "order": 2,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "invalidArgumentError"
+    ],
+    "absent": [
+     "server.store.UpdateUser"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "InvalidArgument"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/InvalidEmail",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:af0e24f4367b",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/InvalidEmail"
+    }
+   ]
+  },
+  {
+   "id": "d_uu_owner",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:01807a7b80a2",
+   "inputs": [
+    "caller_is_banker",
+    "caller_is_target"
+   ],
+   "predicate": "!caller_is_banker && !caller_is_target",
+   "order": 3,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "status.Errorf"
+    ],
+    "absent": [
+     "server.store.UpdateUser"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "PermissionDenied"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:01807a7b80a2",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+     "outcome": false
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo"
+    }
+   ]
+  },
+  {
+   "id": "d_uu_pw",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:815be3bfb43a",
+   "inputs": [
+    "password_given"
+   ],
+   "predicate": "password_given",
+   "order": 4,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "util.HashPassword"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": "password hashed into params"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [],
+    "absent": [
+     "util.HashPassword"
+    ],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:815be3bfb43a",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_uu_dberr",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:17f2bce25a0f",
+   "inputs": [
+    "db_update_failed"
+   ],
+   "predicate": "db_update_failed",
+   "order": 5,
+   "true_branch": {
+    "steps": [
+     "D:d_uu_nf"
+    ],
+    "calls": [
+     "errors.Is"
+    ],
+    "absent": [
+     "convertUser"
+    ],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "store error"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "convertUser"
+    ],
+    "absent": [],
+    "stops": false,
+    "outcome": null,
+    "effect": ""
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:17f2bce25a0f",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "d_uu_nf",
+   "entity": "go:gapi.Server.UpdateUser",
+   "site": "br:fb1ba40798cf",
+   "inputs": [
+    "db_not_found"
+   ],
+   "predicate": "db_not_found",
+   "order": 6,
+   "true_branch": {
+    "steps": [],
+    "calls": [
+     "status.Errorf"
+    ],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "NotFound"
+   },
+   "false_branch": {
+    "steps": [],
+    "calls": [
+     "status.Errorf"
+    ],
+    "absent": [],
+    "stops": true,
+    "outcome": {
+     "entity": "go:gapi.Server.UpdateUser",
+     "is": "returned-error:go:*status.Error"
+    },
+    "effect": "Internal"
+   },
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:fb1ba40798cf",
+     "test": "TestUpdateUserAPI/UserNotFound",
+     "outcome": true
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned-error:go:*status.Error",
+     "test": "TestUpdateUserAPI/UserNotFound"
+    }
+   ]
+  }
+ ],
+ "transitions": [
+  {
+   "id": "t_valid_ok",
+   "entity": "go:token.Payload.Valid",
+   "when": "issued_type == expected_type && !token_expired",
+   "sets": {
+    "payload_valid": "true"
+   },
+   "state_before": "unknown",
+   "action": "Valid returns nil",
+   "state_after": "payload_valid",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned",
+     "test": "TestJWTMaker"
+    }
+   ]
+  },
+  {
+   "id": "t_valid_bad",
+   "entity": "go:token.Payload.Valid",
+   "when": "issued_type != expected_type || token_expired",
+   "sets": {
+    "payload_valid": "false"
+   },
+   "state_before": "unknown",
+   "action": "Valid returns ErrInvalidToken or ErrExpiredToken",
+   "state_after": "!payload_valid",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestPasetoWrongTokenType"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestExpiredPasetoToken"
+    }
+   ]
+  },
+  {
+   "id": "t_pv_ok",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "when": "token_authentic && payload_valid",
+   "sets": {
+    "verify_ok": "true"
+   },
+   "state_before": "unknown",
+   "action": "VerifyToken returns payload",
+   "state_after": "verify_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/OK"
+    }
+   ]
+  },
+  {
+   "id": "t_pv_bad",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "when": "!token_authentic || !payload_valid",
+   "sets": {
+    "verify_ok": "false"
+   },
+   "state_before": "unknown",
+   "action": "VerifyToken returns error",
+   "state_after": "!verify_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestPasetoWrongTokenType"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestAuthMiddleware/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "t_jv_ok",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "when": "token_authentic && payload_valid",
+   "sets": {
+    "verify_ok": "true"
+   },
+   "state_before": "unknown",
+   "action": "VerifyToken returns payload",
+   "state_after": "verify_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestJWTMaker"
+    }
+   ]
+  },
+  {
+   "id": "t_jv_bad",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "when": "!token_authentic || token_expired || !payload_valid",
+   "sets": {
+    "verify_ok": "false"
+   },
+   "state_before": "unknown",
+   "action": "VerifyToken returns error",
+   "state_after": "!verify_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestExpiredJWTToken"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestInvalidJWTTokenAlgNone"
+    }
+   ]
+  },
+  {
+   "id": "t_authz_granted",
+   "entity": "go:gapi.Server.authorizeUser",
+   "when": "has_metadata && has_auth_header && header_has_two_fields && scheme_is_bearer && verify_ok && role_permitted",
+   "sets": {
+    "authz_ok": "true"
+   },
+   "state_before": "!authz_ok",
+   "action": "authorizeUser returns the access payload",
+   "state_after": "authz_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/OK"
+    },
+    {
+     "kind": "branch",
+     "site": "br:0746154f1c47",
+     "test": "TestUpdateUserAPI/OK",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "t_authz_denied",
+   "entity": "go:gapi.Server.authorizeUser",
+   "when": "!has_metadata || !has_auth_header || !header_has_two_fields || !scheme_is_bearer || !verify_ok || !role_permitted",
+   "sets": {
+    "authz_ok": "false"
+   },
+   "state_before": "unknown",
+   "action": "authorizeUser returns an error",
+   "state_after": "!authz_ok",
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/NoAuthorization"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned-error:go:*errors.errorString",
+     "test": "TestUpdateUserAPI/ExpiredToken"
+    }
+   ]
+  }
+ ],
+ "regions": [],
+ "procedures": [
+  {
+   "id": "p_newpayload",
+   "entity": "go:token.NewPayload",
+   "steps": [
+    "D:d_np_rng"
+   ],
+   "outcome": {
+    "entity": "go:token.NewPayload",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.NewPayload",
+     "exit": "returned",
+     "test": "TestInvalidJWTTokenAlgNone"
+    }
+   ]
+  },
+  {
+   "id": "p_paseto_create",
+   "entity": "go:token.PasetoMaker.CreateToken",
+   "steps": [
+    "call:go:token.NewPayload",
+    "D:d_pc_err"
+   ],
+   "outcome": {
+    "entity": "go:token.PasetoMaker.CreateToken",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    }
+   ]
+  },
+  {
+   "id": "p_jwt_create",
+   "entity": "go:token.JWTMaker.CreateToken",
+   "steps": [
+    "call:go:token.NewPayload",
+    "D:d_jc_err"
+   ],
+   "outcome": {
+    "entity": "go:token.JWTMaker.CreateToken",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.CreateToken",
+     "exit": "returned",
+     "test": "TestJWTMaker"
+    }
+   ]
+  },
+  {
+   "id": "p_valid",
+   "entity": "go:token.Payload.Valid",
+   "steps": [
+    "D:d_valid_type",
+    "D:d_valid_exp",
+    "T:t_valid_ok"
+   ],
+   "outcome": {
+    "entity": "go:token.Payload.Valid",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.Payload.Valid",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    }
+   ]
+  },
+  {
+   "id": "p_paseto_verify",
+   "entity": "go:token.PasetoMaker.VerifyToken",
+   "steps": [
+    "D:d_pv_decrypt",
+    "call:go:token.Payload.Valid",
+    "D:d_pv_valid",
+    "T:t_pv_ok"
+   ],
+   "outcome": {
+    "entity": "go:token.PasetoMaker.VerifyToken",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestPasetoMaker"
+    }
+   ]
+  },
+  {
+   "id": "p_jwt_verify",
+   "entity": "go:token.JWTMaker.VerifyToken",
+   "steps": [
+    "D:d_jv_parse",
+    "D:d_jv_claims",
+    "call:go:token.Payload.Valid",
+    "D:d_jv_valid",
+    "T:t_jv_ok"
+   ],
+   "outcome": {
+    "entity": "go:token.JWTMaker.VerifyToken",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "exit": "returned",
+     "test": "TestJWTMaker"
+    }
+   ]
+  },
+  {
+   "id": "p_authorize",
+   "entity": "go:gapi.Server.authorizeUser",
+   "steps": [
+    "D:d_az_md",
+    "D:d_az_hdr",
+    "D:d_az_fields",
+    "D:d_az_bearer",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:d_az_verify",
+    "call:go:gapi.hasPermission",
+    "D:d_az_perm",
+    "T:t_authz_granted"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.authorizeUser",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.authorizeUser",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/OK"
+    }
+   ]
+  },
+  {
+   "id": "p_middleware",
+   "entity": "go:api.authMiddleware.<anon>@21",
+   "steps": [
+    "D:d_mw_hdr",
+    "D:d_mw_fields",
+    "D:d_mw_bearer",
+    "call:go:token.PasetoMaker.VerifyToken",
+    "D:d_mw_verify"
+   ],
+   "outcome": {
+    "entity": "go:api.authMiddleware.<anon>@21",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "exit": "returned",
+     "test": "TestAuthMiddleware/ExpiredToken"
+    }
+   ]
+  },
+  {
+   "id": "p_update_user",
+   "entity": "go:gapi.Server.UpdateUser",
+   "steps": [
+    "call:go:gapi.Server.authorizeUser",
+    "D:d_uu_auth",
+    "call:go:gapi.validateUpdateUserRequest",
+    "D:d_uu_viol",
+    "D:d_uu_owner",
+    "D:d_uu_pw",
+    "call:go:db/sqlc.Queries.UpdateUser",
+    "D:d_uu_dberr",
+    "call:go:gapi.convertUser"
+   ],
+   "outcome": {
+    "entity": "go:gapi.Server.UpdateUser",
+    "is": "returned"
+   },
+   "evidence": [
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/OK"
+    },
+    {
+     "kind": "outcome",
+     "entity": "go:gapi.Server.UpdateUser",
+     "exit": "returned",
+     "test": "TestUpdateUserAPI/BankerCanUpdateUserInfo"
+    }
+   ]
+  }
+ ],
+ "rules": [
+  {
+   "id": "r_type_match",
+   "name": "A token is only accepted as the type it was issued as",
+   "inputs": [
+    "issued_type",
+    "expected_type"
+   ],
+   "relevant_state": [],
+   "condition": "issued_type != expected_type",
+   "consequences": [
+    "Payload.Valid returns ErrInvalidToken before checking expiry",
+    "VerifyToken (PASETO and JWT) returns that error and no payload",
+    "every caller that verifies fails: gRPC authorizeUser -> UpdateUser Unauthenticated; HTTP authMiddleware -> 401 abort"
+   ],
+   "decision": "d_valid_type",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    },
+    {
+     "kind": "source",
+     "file": "token/payload.go",
+     "line": 54,
+     "text": "if payload.Type != tokenType {"
+    }
+   ]
+  },
+  {
+   "id": "r_expiry",
+   "name": "An expired token of the right type is rejected (JWT: by the library at parse time; PASETO: by Valid)",
+   "inputs": [
+    "token_expired"
+   ],
+   "relevant_state": [],
+   "condition": "issued_type == expected_type && token_expired",
+   "consequences": [
+    "VerifyToken returns ErrExpiredToken",
+    "callers reject as for r_type_match"
+   ],
+   "decision": "d_valid_exp",
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestExpiredPasetoToken",
+     "outcome": true
+    },
+    {
+     "kind": "branch",
+     "site": "br:184d2ca72d5b",
+     "test": "TestExpiredJWTToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "r_access_gates",
+   "name": "Request gates (gRPC authorizeUser, HTTP authMiddleware) demand an ACCESS token",
+   "inputs": [
+    "has_auth_header",
+    "header_has_two_fields",
+    "scheme_is_bearer",
+    "verify_ok"
+   ],
+   "relevant_state": [],
+   "condition": "has_auth_header && header_has_two_fields && scheme_is_bearer",
+   "consequences": [
+    "VerifyToken is called with expected_type = TokenTypeAccessToken (literal 1)",
+    "a refresh token presented as bearer fails r_type_match",
+    "!verify_ok -> gate rejects"
+   ],
+   "decision": "d_az_verify",
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "gapi/authorization.go",
+     "line": 40,
+     "text": "token.TokenTypeAccessToken"
+    },
+    {
+     "kind": "source",
+     "file": "api/middleware.go",
+     "line": 45,
+     "text": "token.TokenTypeAccessToken"
+    },
+    {
+     "kind": "branch",
+     "site": "br:c71158777bce",
+     "test": "TestUpdateUserAPI/ExpiredToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "r_refresh_gate",
+   "name": "Renewing requires a REFRESH token; login issues one of each",
+   "inputs": [
+    "expected_type"
+   ],
+   "relevant_state": [],
+   "condition": "true",
+   "consequences": [
+    "renewAccessToken verifies req.RefreshToken with TokenTypeRefreshToken, so an access token is rejected with 401",
+    "renewAccessToken, loginUser and gapi LoginUser create access tokens with TokenTypeAccessToken and refresh tokens with TokenTypeRefreshToken"
+   ],
+   "decision": null,
+   "evidence": [
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 30,
+     "text": "token.TokenTypeRefreshToken"
+    },
+    {
+     "kind": "source",
+     "file": "api/token.go",
+     "line": 74,
+     "text": "token.TokenTypeAccessToken"
+    }
+   ]
+  }
+ ],
+ "regimes": [
+  {
+   "id": "rg_valid_access",
+   "name": "correctly-typed live access token",
+   "facts": {
+    "issued_type": "access",
+    "expected_type": "access",
+    "token_expired": false,
+    "token_authentic": true
+   },
+   "members": [
+    "TestPasetoMaker",
+    "TestJWTMaker",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound",
+    "TestAuthMiddleware/OK"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoMaker",
+     "outcome": false
+    }
+   ]
+  },
+  {
+   "id": "rg_wrong_type",
+   "name": "token presented as the other type",
+   "facts": {
+    "token_authentic": true,
+    "token_expired": false
+   },
+   "members": [
+    "TestPasetoWrongTokenType",
+    "TestJWTWrongTokenType",
+    "TestUpdateUserAPI/WrongTokenType"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:8d10f2f9b136",
+     "test": "TestPasetoWrongTokenType",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "rg_expired",
+   "name": "expired token",
+   "facts": {
+    "token_expired": true
+   },
+   "members": [
+    "TestExpiredPasetoToken",
+    "TestExpiredJWTToken",
+    "TestUpdateUserAPI/ExpiredToken",
+    "TestAuthMiddleware/ExpiredToken"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:bdb0acf90853",
+     "test": "TestExpiredPasetoToken",
+     "outcome": true
+    }
+   ]
+  },
+  {
+   "id": "rg_bad_header",
+   "name": "no or malformed credentials",
+   "facts": {},
+   "members": [
+    "TestAuthMiddleware/NoAuthorization",
+    "TestAuthMiddleware/InvalidAuthorizationFormat",
+    "TestAuthMiddleware/UnsupportedAuthorization",
+    "TestUpdateUserAPI/NoAuthorization",
+    "TestInvalidJWTTokenAlgNone"
+   ],
+   "evidence": [
+    {
+     "kind": "branch",
+     "site": "br:3efaa90434e1",
+     "test": "TestAuthMiddleware/NoAuthorization",
+     "outcome": true
+    }
+   ]
+  }
+ ],
+ "scenarios": {
+  "TestPasetoMaker": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Types match and the token is live, so Valid and VerifyToken succeed."
+   }
+  },
+  "TestExpiredPasetoToken": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": true,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*errors.errorString",
+    "why": "Type matches but the token is expired, so Valid returns ErrExpiredToken."
+   }
+  },
+  "TestPasetoWrongTokenType": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.PasetoMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "refresh",
+      "expected_is_access": false,
+      "expected_is_refresh": true
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*errors.errorString",
+    "why": "Access token verified as refresh: r_type_match, ErrInvalidToken."
+   }
+  },
+  "TestJWTMaker": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.JWTMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "JWT parses and Valid accepts the matching type."
+   }
+  },
+  "TestExpiredJWTToken": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.JWTMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": true,
+      "issued_type": "access",
+      "expected_type": "access"
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*errors.errorString",
+    "why": "The JWT library rejects expiry at parse time, returning ErrExpiredToken before Valid."
+   }
+  },
+  "TestInvalidJWTTokenAlgNone": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.NewPayload",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "facts": {
+      "token_authentic": false,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access"
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*errors.errorString",
+    "why": "alg=none fails parsing (not expiry), so ErrInvalidToken."
+   }
+  },
+  "TestJWTWrongTokenType": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.JWTMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:token.JWTMaker.VerifyToken",
+     "facts": {
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "refresh",
+      "expected_is_access": false,
+      "expected_is_refresh": true
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*errors.errorString",
+    "why": "JWT parses, then Valid rejects the type mismatch (r_type_match)."
+   }
+  },
+  "TestAuthMiddleware/NoAuthorization": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "facts": {
+      "has_auth_header": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "No header: middleware aborts 401 and returns."
+   }
+  },
+  "TestAuthMiddleware/InvalidAuthorizationFormat": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "facts": {
+      "has_auth_header": true,
+      "header_has_two_fields": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Single-field header: middleware aborts 401 and returns."
+   }
+  },
+  "TestAuthMiddleware/UnsupportedAuthorization": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "facts": {
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Non-bearer scheme: middleware aborts 401 and returns."
+   }
+  },
+  "TestAuthMiddleware/ExpiredToken": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "facts": {
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": true,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Access token of right type but expired: verify fails, middleware aborts 401 and returns."
+   }
+  },
+  "TestAuthMiddleware/OK": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:api.authMiddleware.<anon>@21",
+     "facts": {
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Live access token matches the demanded access type; payload set, next handler runs, middleware returns."
+   }
+  },
+  "TestUpdateUserAPI/OK": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false,
+      "role_permitted": true,
+      "has_violations": false,
+      "caller_is_banker": false,
+      "caller_is_target": true,
+      "password_given": false,
+      "db_update_failed": false,
+      "db_not_found": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Authorized with a live access token, own account, valid request, store succeeds."
+   }
+  },
+  "TestUpdateUserAPI/BankerCanUpdateUserInfo": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false,
+      "role_permitted": true,
+      "has_violations": false,
+      "caller_is_banker": true,
+      "caller_is_target": false,
+      "password_given": false,
+      "db_update_failed": false,
+      "db_not_found": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned",
+    "why": "Banker passes the ownership gate; update succeeds."
+   }
+  },
+  "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false,
+      "role_permitted": true,
+      "has_violations": false,
+      "caller_is_banker": false,
+      "caller_is_target": false,
+      "password_given": false,
+      "db_update_failed": false,
+      "db_not_found": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Authenticated depositor updating someone else: PermissionDenied."
+   }
+  },
+  "TestUpdateUserAPI/UserNotFound": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false,
+      "role_permitted": true,
+      "has_violations": false,
+      "caller_is_banker": false,
+      "caller_is_target": true,
+      "password_given": false,
+      "db_update_failed": true,
+      "db_not_found": true
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Store returns ErrRecordNotFound: NotFound."
+   }
+  },
+  "TestUpdateUserAPI/InvalidEmail": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false,
+      "role_permitted": true,
+      "has_violations": true
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Authorized, but the email violates validation: InvalidArgument."
+   }
+  },
+  "TestUpdateUserAPI/ExpiredToken": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": true,
+      "issued_type": "access",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "Expired access token fails verification, authorizeUser errors: Unauthenticated."
+   }
+  },
+  "TestUpdateUserAPI/WrongTokenType": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:token.PasetoMaker.CreateToken",
+     "facts": {}
+    },
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": true,
+      "has_auth_header": true,
+      "header_has_two_fields": true,
+      "scheme_is_bearer": true,
+      "token_authentic": true,
+      "token_expired": false,
+      "issued_type": "refresh",
+      "expected_type": "access",
+      "expected_is_access": true,
+      "expected_is_refresh": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "A refresh token used as bearer fails r_type_match in authorizeUser's access-typed VerifyToken: Unauthenticated."
+   }
+  },
+  "TestUpdateUserAPI/NoAuthorization": {
+   "state": {
+    "rng_fails": false,
+    "verify_ok": false,
+    "payload_valid": false,
+    "authz_ok": false
+   },
+   "calls": [
+    {
+     "entity": "go:gapi.Server.UpdateUser",
+     "facts": {
+      "has_metadata": false
+     }
+    }
+   ],
+   "phenotype": {
+    "head": "returned-error:go:*status.Error",
+    "why": "No metadata: authorizeUser errors, Unauthenticated."
+   }
+  }
+ },
+ "unknowns": [
+  {
+   "what": "Flow of the type through the token string",
+   "why": "issued_type is bound to NewPayload's argument with execution scope and compared by identity with Valid's argument; the genome cannot state that the decrypted payload.Type IS the value encoded at creation (no flow, only equality), and with two tokens created in one execution (login issues access + refresh, renew issues a new access token) the execution-scoped identity is no longer unique, so it would be unknown."
+  },
+  {
+   "what": "Which Maker implementation a server uses",
+   "why": "Procedures call PasetoMaker.VerifyToken directly because that is what executed; interface dispatch (JWT vs PASETO maker behind token.Maker) is not expressible."
+  },
+  {
+   "what": "loginUser, renewAccessToken, gapi LoginUser, gapi CreateUser sites",
+   "why": "Not evaluated by any shown or withheld test; not modeled beyond rule r_refresh_gate. renewAccessToken's refresh-typed VerifyToken and session checks would need store/session variables and a relation between the session's stored refresh token and the request token."
+  },
+  {
+   "what": "hasPermission role membership",
+   "why": "It iterates over accessibleRoles; iteration/membership is not available, so role_permitted is an input bound to hasPermission's bool result."
+  },
+  {
+   "what": "JWT expiry location",
+   "why": "For JWT, expiry is enforced inside jwt.ParseWithClaims (library), so Valid's expiry branch is effectively unreachable for JWT; modeled by making the parse decision depend on token_expired."
+  },
+  {
+   "what": "Literal type of TokenType constants",
+   "why": "TokenTypeAccessToken/RefreshToken are untyped constants converted to TokenType (byte); the literal bindings assume the observed value is uint8 1/2."
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "holdout": [
+  "BankerCanUpdateUserInfo",
+  "ExpiredToken"
+ ],
+ "shown": [
+  "InvalidEmail",
+  "NoAuthorization",
+  "OK",
+  "OtherDepositorCannotUpdateThisUserInfo",
+  "UserNotFound"
+ ],
+ "not_scored": []
+}

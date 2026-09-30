@@ -144,3 +144,18 @@ def test_inverted_predicate_is_contested_at_the_occurrences() -> None:
     assert d_defer.status == HYPOTHESIS and d_defer.status_reason.startswith("contested")
     d_scan = next(d for d in g.decisions if d.id == "d_scan")
     assert d_scan.status != HYPOTHESIS
+
+
+def test_a_transition_inside_a_region_body_persists_after_the_occurrence() -> None:
+    """Regression (V-F2): only the occurrence's supplied facts are local; what the body's
+    transitions set (a match found in one repetition) is its effect and persists."""
+    p = _proposals()
+    p["transitions"] = [{"id": "T_found", "entity": "m.importer", "when": "deferred",
+                         "sets": {"any_deferred": "true"}}]  # fmt: skip
+    p["regions"][0]["steps"] = ["call:m.expand", "D:d_defer", "T:T_found"]
+    g = genome_from_proposals(p, {}, "m")
+    for it in (*g.decisions, *g.procedures, *g.regions, *g.transitions):
+        it.status = SUPPORTED
+    pred = predict_sequence(g, _scenario(CORRECT))
+    assert pred.state.get("any_deferred") is True
+    assert "deferred" not in pred.state  # the supplied fact itself stays local

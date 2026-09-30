@@ -4,21 +4,21 @@
   "exact_withheld": "2/2",
   "confidently_wrong": 0,
   "indeterminate": 0,
-  "decisions_verified": "6/28",
-  "transitions_verified": "0/0",
-  "outcomes_verified": "11/30",
+  "decisions_verified": "7/26",
+  "transitions_verified": "0/6",
+  "outcomes_verified": "11/27",
   "occurrence_facts": {
-   "confirmed": 4,
+   "confirmed": 24,
    "contradicted": 0,
    "unobservable": 0
   },
-  "regions": 0,
+  "regions": 1,
   "structure_claims": {
    "verified": 51,
-   "supported": 7,
+   "supported": 5,
    "rejected": 0,
-   "not established": 1,
-   "unobserved": 11
+   "not established": 0,
+   "unobserved": 12
   },
   "required_sites_observed_uncovered": [],
   "unknown_dependence": {
@@ -30,8 +30,12 @@
   "rejected": [],
   "hypothesis": [],
   "phenotype_claims_exact": "7/7",
-  "identity_claims": {},
-  "literal_bindings": {}
+  "identity_claims": {
+   "token_username": "verified"
+  },
+  "literal_bindings": {
+   "caller_is_banker": true
+  }
  },
  "per_test": [
   {
@@ -366,7 +370,7 @@
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 6,
     "contradicted": 0,
     "unobservable": 0
    },
@@ -604,7 +608,7 @@
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 6,
     "contradicted": 0,
     "unobservable": 0
    },
@@ -823,7 +827,7 @@
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 6,
     "contradicted": 0,
     "unobservable": 0
    },
@@ -1026,7 +1030,7 @@
    "uncovered_sites": [],
    "placement_problems": [],
    "occurrence_checks": {
-    "confirmed": 1,
+    "confirmed": 6,
     "contradicted": 0,
     "unobservable": 0
    },
@@ -1251,563 +1255,547 @@
  "structure_claims": [
   {
    "procedure": "p_new_payload",
-   "entity": "go:token.NewPayload",
+   "entity": "token.NewPayload",
+   "kind": "contains",
+   "claim": "time.Now during token.NewPayload",
+   "status": "unobserved",
+   "why": "time.Now never observed"
+  },
+  {
+   "procedure": "p_new_payload",
+   "entity": "token.NewPayload",
    "kind": "evaluates",
-   "claim": "d_uuid (br:b4114c26b15a) evaluated during go:token.NewPayload",
+   "claim": "d_np_uuid (br:b4114c26b15a) evaluated during token.NewPayload",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
-   "procedure": "p_paseto_create",
-   "entity": "go:token.PasetoMaker.CreateToken",
+   "procedure": "p_create_token",
+   "entity": "token.PasetoMaker.CreateToken",
    "kind": "contains",
-   "claim": "go:token.NewPayload during go:token.PasetoMaker.CreateToken",
+   "claim": "token.NewPayload during token.PasetoMaker.CreateToken",
    "status": "verified",
    "why": "all 4 observed"
   },
   {
-   "procedure": "p_paseto_create",
-   "entity": "go:token.PasetoMaker.CreateToken",
+   "procedure": "p_create_token",
+   "entity": "token.PasetoMaker.CreateToken",
    "kind": "contains",
-   "claim": "maker.paseto.Encrypt during go:token.PasetoMaker.CreateToken",
+   "claim": "maker.paseto.Encrypt during token.PasetoMaker.CreateToken",
    "status": "unobserved",
    "why": "maker.paseto.Encrypt never observed"
   },
   {
-   "procedure": "p_paseto_create",
-   "entity": "go:token.PasetoMaker.CreateToken",
+   "procedure": "p_create_token",
+   "entity": "token.PasetoMaker.CreateToken",
    "kind": "evaluates",
-   "claim": "d_paseto_payload_err (br:0713394c9923) evaluated during go:token.PasetoMaker.CreateToken",
+   "claim": "d_ct_err (br:0713394c9923) evaluated during token.PasetoMaker.CreateToken",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
-   "procedure": "p_paseto_create",
-   "entity": "go:token.PasetoMaker.CreateToken",
+   "procedure": "p_create_token",
+   "entity": "token.PasetoMaker.CreateToken",
    "kind": "order",
-   "claim": "go:token.NewPayload before site:br:0713394c9923 in go:token.PasetoMaker.CreateToken",
+   "claim": "token.NewPayload before site:br:0713394c9923 in token.PasetoMaker.CreateToken",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
-   "procedure": "p_jwt_create",
-   "entity": "go:token.JWTMaker.CreateToken",
-   "kind": "contains",
-   "claim": "go:token.NewPayload during go:token.JWTMaker.CreateToken",
-   "status": "not established",
-   "why": "go:token.NewPayload observed 4 time(s), never during go:token.JWTMaker.CreateToken"
-  },
-  {
-   "procedure": "p_jwt_create",
-   "entity": "go:token.JWTMaker.CreateToken",
+   "procedure": "p_valid",
+   "entity": "token.Payload.Valid",
    "kind": "evaluates",
-   "claim": "d_jwt_payload_err (br:d9f1e0c214f9) evaluated during go:token.JWTMaker.CreateToken",
-   "status": "unobserved",
-   "why": "site never evaluated"
-  },
-  {
-   "procedure": "p_jwt_create",
-   "entity": "go:token.JWTMaker.CreateToken",
-   "kind": "order",
-   "claim": "go:token.NewPayload before site:br:d9f1e0c214f9 in go:token.JWTMaker.CreateToken",
-   "status": "supported",
-   "why": "not established by observation"
-  },
-  {
-   "procedure": "p_payload_valid",
-   "entity": "go:token.Payload.Valid",
-   "kind": "evaluates",
-   "claim": "d_valid_expired (br:28f7c30a7189) evaluated during go:token.Payload.Valid",
+   "claim": "d_valid_expired (br:28f7c30a7189) evaluated during token.Payload.Valid",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_verify",
-   "entity": "go:token.PasetoMaker.VerifyToken",
+   "entity": "token.PasetoMaker.VerifyToken",
    "kind": "contains",
-   "claim": "go:token.Payload.Valid during go:token.PasetoMaker.VerifyToken",
+   "claim": "token.Payload.Valid during token.PasetoMaker.VerifyToken",
    "status": "verified",
    "why": "all 4 observed"
   },
   {
    "procedure": "p_verify",
-   "entity": "go:token.PasetoMaker.VerifyToken",
+   "entity": "token.PasetoMaker.VerifyToken",
+   "kind": "contains",
+   "claim": "payload.Valid during token.PasetoMaker.VerifyToken",
+   "status": "unobserved",
+   "why": "payload.Valid never observed"
+  },
+  {
+   "procedure": "p_verify",
+   "entity": "token.PasetoMaker.VerifyToken",
    "kind": "evaluates",
-   "claim": "d_decrypt (br:0607e4d952f6) evaluated during go:token.PasetoMaker.VerifyToken",
+   "claim": "d_vt_decrypt (br:0607e4d952f6) evaluated during token.PasetoMaker.VerifyToken",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_verify",
-   "entity": "go:token.PasetoMaker.VerifyToken",
+   "entity": "token.PasetoMaker.VerifyToken",
    "kind": "evaluates",
-   "claim": "d_verify_expired (br:c7d403dfabc3) evaluated during go:token.PasetoMaker.VerifyToken",
+   "claim": "d_vt_valid (br:c7d403dfabc3) evaluated during token.PasetoMaker.VerifyToken",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_verify",
-   "entity": "go:token.PasetoMaker.VerifyToken",
+   "entity": "token.PasetoMaker.VerifyToken",
    "kind": "order",
-   "claim": "site:br:0607e4d952f6 before go:token.Payload.Valid in go:token.PasetoMaker.VerifyToken",
+   "claim": "site:br:0607e4d952f6 before token.Payload.Valid in token.PasetoMaker.VerifyToken",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_verify",
-   "entity": "go:token.PasetoMaker.VerifyToken",
+   "entity": "token.PasetoMaker.VerifyToken",
    "kind": "order",
-   "claim": "go:token.Payload.Valid before site:br:c7d403dfabc3 in go:token.PasetoMaker.VerifyToken",
+   "claim": "token.Payload.Valid before site:br:c7d403dfabc3 in token.PasetoMaker.VerifyToken",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_has_permission",
-   "entity": "go:gapi.hasPermission",
+   "entity": "gapi.hasPermission",
    "kind": "evaluates",
-   "claim": "d_hp_matches_banker (br:92f48828a554) evaluated during go:gapi.hasPermission",
-   "status": "verified",
-   "why": "all 8 evaluations"
-  },
-  {
-   "procedure": "p_has_permission",
-   "entity": "go:gapi.hasPermission",
-   "kind": "evaluates",
-   "claim": "d_hp_matches_depositor (br:92f48828a554) evaluated during go:gapi.hasPermission",
+   "claim": "d_hp_match (br:92f48828a554) evaluated during gapi.hasPermission",
    "status": "verified",
    "why": "all 8 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "go:token.PasetoMaker.VerifyToken during go:gapi.Server.authorizeUser",
+   "claim": "token.PasetoMaker.VerifyToken during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "go:gapi.hasPermission during go:gapi.Server.authorizeUser",
+   "claim": "gapi.hasPermission during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "fmt.Errorf during go:gapi.Server.authorizeUser",
-   "status": "unobserved",
-   "why": "fmt.Errorf never observed"
-  },
-  {
-   "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
-   "kind": "contains",
-   "claim": "server.tokenMaker.VerifyToken during go:gapi.Server.authorizeUser",
+   "claim": "server.tokenMaker.VerifyToken during gapi.Server.authorizeUser",
    "status": "unobserved",
    "why": "server.tokenMaker.VerifyToken never observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "strings.ToLower during go:gapi.Server.authorizeUser",
+   "claim": "strings.ToLower during gapi.Server.authorizeUser",
    "status": "unobserved",
    "why": "strings.ToLower never observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "strings.Fields during go:gapi.Server.authorizeUser",
+   "claim": "strings.Fields during gapi.Server.authorizeUser",
    "status": "unobserved",
    "why": "strings.Fields never observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "contains",
-   "claim": "md.Get during go:gapi.Server.authorizeUser",
+   "claim": "md.Get during gapi.Server.authorizeUser",
    "status": "unobserved",
    "why": "md.Get never observed"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_no_metadata (br:e3505bc4c4b9) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_md (br:e3505bc4c4b9) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 5 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_no_auth_header (br:a572eeb6a4c8) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_header (br:a572eeb6a4c8) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_bad_header_format (br:4393757b65d7) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_fields (br:4393757b65d7) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_not_bearer (br:2e2f712d6301) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_type (br:2e2f712d6301) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_token_rejected (br:c71158777bce) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_verify (br:c71158777bce) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "evaluates",
-   "claim": "d_role_not_permitted (br:c1bc39962889) evaluated during go:gapi.Server.authorizeUser",
+   "claim": "d_az_perm (br:c1bc39962889) evaluated during gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "site:br:e3505bc4c4b9 before site:br:a572eeb6a4c8 in go:gapi.Server.authorizeUser",
+   "claim": "site:br:e3505bc4c4b9 before site:br:a572eeb6a4c8 in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "site:br:a572eeb6a4c8 before site:br:4393757b65d7 in go:gapi.Server.authorizeUser",
+   "claim": "site:br:a572eeb6a4c8 before site:br:4393757b65d7 in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "site:br:4393757b65d7 before site:br:2e2f712d6301 in go:gapi.Server.authorizeUser",
+   "claim": "site:br:4393757b65d7 before site:br:2e2f712d6301 in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "site:br:2e2f712d6301 before go:token.PasetoMaker.VerifyToken in go:gapi.Server.authorizeUser",
+   "claim": "site:br:2e2f712d6301 before token.PasetoMaker.VerifyToken in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "go:token.PasetoMaker.VerifyToken before site:br:c71158777bce in go:gapi.Server.authorizeUser",
+   "claim": "token.PasetoMaker.VerifyToken before site:br:c71158777bce in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "site:br:c71158777bce before go:gapi.hasPermission in go:gapi.Server.authorizeUser",
+   "claim": "site:br:c71158777bce before gapi.hasPermission in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_authorize",
-   "entity": "go:gapi.Server.authorizeUser",
+   "entity": "gapi.Server.authorizeUser",
    "kind": "order",
-   "claim": "go:gapi.hasPermission before site:br:c1bc39962889 in go:gapi.Server.authorizeUser",
+   "claim": "gapi.hasPermission before site:br:c1bc39962889 in gapi.Server.authorizeUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
-   "kind": "contains",
-   "claim": "fieldViolation during go:gapi.validateUpdateUserRequest",
-   "status": "supported",
-   "why": "1 of 1 observed"
-  },
-  {
-   "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_username (br:57793335771a) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_username (br:57793335771a) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_password_set (br:444b7eee95f8) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_password (br:444b7eee95f8) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_fullname_set (br:578b58ceb4d3) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_fullname (br:578b58ceb4d3) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_email_set (br:9558e38bf1ec) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_email (br:9558e38bf1ec) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_email (br:f63e639d4185) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_email_err (br:f63e639d4185) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_fullname (br:864c3600c3d5) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_fullname_err (br:864c3600c3d5) evaluated during gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "evaluates",
-   "claim": "d_val_password (br:d827424c3b5f) evaluated during go:gapi.validateUpdateUserRequest",
+   "claim": "d_vu_password_err (br:d827424c3b5f) evaluated during gapi.validateUpdateUserRequest",
    "status": "unobserved",
    "why": "site never evaluated"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "order",
-   "claim": "site:br:57793335771a before site:br:444b7eee95f8 in go:gapi.validateUpdateUserRequest",
+   "claim": "site:br:57793335771a before site:br:444b7eee95f8 in gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "order",
-   "claim": "site:br:444b7eee95f8 before site:br:578b58ceb4d3 in go:gapi.validateUpdateUserRequest",
+   "claim": "site:br:444b7eee95f8 before site:br:578b58ceb4d3 in gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_validate",
-   "entity": "go:gapi.validateUpdateUserRequest",
+   "entity": "gapi.validateUpdateUserRequest",
    "kind": "order",
-   "claim": "site:br:578b58ceb4d3 before site:br:9558e38bf1ec in go:gapi.validateUpdateUserRequest",
+   "claim": "site:br:578b58ceb4d3 before site:br:9558e38bf1ec in gapi.validateUpdateUserRequest",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "go:gapi.Server.authorizeUser during go:gapi.Server.UpdateUser",
+   "claim": "gapi.Server.authorizeUser during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 5 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "go:gapi.validateUpdateUserRequest during go:gapi.Server.UpdateUser",
+   "claim": "gapi.validateUpdateUserRequest during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 4 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "go:db/sqlc.Queries.UpdateUser during go:gapi.Server.UpdateUser",
+   "claim": "db/sqlc.Queries.UpdateUser during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 2 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "go:gapi.convertUser during go:gapi.Server.UpdateUser",
+   "claim": "gapi.convertUser during gapi.Server.UpdateUser",
    "status": "supported",
    "why": "1 of 1 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "status.Errorf during go:gapi.Server.UpdateUser",
+   "claim": "status.Errorf during gapi.Server.UpdateUser",
    "status": "unobserved",
    "why": "status.Errorf never observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "time.Now during go:gapi.Server.UpdateUser",
+   "claim": "time.Now during gapi.Server.UpdateUser",
    "status": "unobserved",
    "why": "time.Now never observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "invalidArgumentError during go:gapi.Server.UpdateUser",
+   "claim": "server.store.UpdateUser during gapi.Server.UpdateUser",
+   "status": "unobserved",
+   "why": "server.store.UpdateUser never observed"
+  },
+  {
+   "procedure": "p_update_user",
+   "entity": "gapi.Server.UpdateUser",
+   "kind": "contains",
+   "claim": "invalidArgumentError during gapi.Server.UpdateUser",
    "status": "supported",
    "why": "1 of 1 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "contains",
-   "claim": "unauthenticatedError during go:gapi.Server.UpdateUser",
+   "claim": "unauthenticatedError during gapi.Server.UpdateUser",
    "status": "supported",
    "why": "1 of 1 observed"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_unauthenticated (br:0746154f1c47) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_auth (br:0746154f1c47) evaluated during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 5 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_invalid_argument (br:af0e24f4367b) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_violations (br:af0e24f4367b) evaluated during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 4 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_not_owner (br:01807a7b80a2) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_owner (br:01807a7b80a2) evaluated during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 3 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_password_update (br:815be3bfb43a) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_password (br:815be3bfb43a) evaluated during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 2 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_store_failed (br:17f2bce25a0f) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_store (br:17f2bce25a0f) evaluated during gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all 2 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_store_not_found (br:fb1ba40798cf) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_notfound (br:fb1ba40798cf) evaluated during gapi.Server.UpdateUser",
    "status": "supported",
    "why": "1 of 1 evaluations"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "evaluates",
-   "claim": "d_hash_fails (br:5f17958f3d3f) evaluated during go:gapi.Server.UpdateUser",
+   "claim": "d_upd_hash (br:5f17958f3d3f) evaluated during gapi.Server.UpdateUser",
    "status": "unobserved",
    "why": "site never evaluated"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "go:gapi.Server.authorizeUser before site:br:0746154f1c47 in go:gapi.Server.UpdateUser",
+   "claim": "gapi.Server.authorizeUser before site:br:0746154f1c47 in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 5 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "site:br:0746154f1c47 before go:gapi.validateUpdateUserRequest in go:gapi.Server.UpdateUser",
+   "claim": "site:br:0746154f1c47 before gapi.validateUpdateUserRequest in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "go:gapi.validateUpdateUserRequest before site:br:af0e24f4367b in go:gapi.Server.UpdateUser",
+   "claim": "gapi.validateUpdateUserRequest before site:br:af0e24f4367b in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 4 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "site:br:af0e24f4367b before site:br:01807a7b80a2 in go:gapi.Server.UpdateUser",
+   "claim": "site:br:af0e24f4367b before site:br:01807a7b80a2 in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 3 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "site:br:01807a7b80a2 before site:br:815be3bfb43a in go:gapi.Server.UpdateUser",
+   "claim": "site:br:01807a7b80a2 before site:br:815be3bfb43a in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 2 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "site:br:815be3bfb43a before go:db/sqlc.Queries.UpdateUser in go:gapi.Server.UpdateUser",
+   "claim": "site:br:815be3bfb43a before db/sqlc.Queries.UpdateUser in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 2 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "go:db/sqlc.Queries.UpdateUser before site:br:17f2bce25a0f in go:gapi.Server.UpdateUser",
+   "claim": "db/sqlc.Queries.UpdateUser before site:br:17f2bce25a0f in gapi.Server.UpdateUser",
    "status": "verified",
    "why": "all of x before all of y in 2 execution(s)"
   },
   {
    "procedure": "p_update_user",
-   "entity": "go:gapi.Server.UpdateUser",
+   "entity": "gapi.Server.UpdateUser",
    "kind": "order",
-   "claim": "site:br:17f2bce25a0f before go:gapi.convertUser in go:gapi.Server.UpdateUser",
+   "claim": "site:br:17f2bce25a0f before gapi.convertUser in gapi.Server.UpdateUser",
    "status": "supported",
    "why": "all of x before all of y in 1 execution(s)"
+  },
+  {
+   "procedure": "rg_roles",
+   "entity": "gapi.hasPermission",
+   "kind": "region",
+   "claim": "region rg_roles: repetitions of gapi.hasPermission start with site:br:92f48828a554",
+   "status": "verified",
+   "why": "observed repeated region ['site:br:92f48828a554']"
   }
  ]
 }
