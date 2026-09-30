@@ -587,6 +587,14 @@ def summary(
         "proposed_by": model,
         "bundle_digest": bundle_digest,
         "established_from": f"{ev['tests']} executions of existing tests",
+        # three different counts; a consumer must not report one as another
+        "accounting": {
+            "relevant_executions_checked": ev["tests"],
+            "scenario_predictions_checked": ev["scenarios"],
+            "executions_listed_in_artifact": len(
+                getattr(run, "artifact", {}).get("executions") or []
+            ),
+        },
         "consistency": {
             k: ev[k] for k in ("scenarios", "consistent", "indeterminate", "contradicted")
         },

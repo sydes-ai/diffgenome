@@ -70,3 +70,8 @@ def test_summary_exports_only_checked_claims() -> None:
     assert s["decision_rules"][0]["file"] == "a.go"
     assert s["statuses"]["contradicted_not_exported"] == 1
     assert s["statuses"]["rejected"] == 1
+    assert s["accounting"] == {
+        "relevant_executions_checked": 2,
+        "scenario_predictions_checked": 2,
+        "executions_listed_in_artifact": 0,
+    }
