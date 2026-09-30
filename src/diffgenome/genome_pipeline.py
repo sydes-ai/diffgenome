@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -386,10 +387,12 @@ def propose(bundle: str, writer: str) -> tuple[dict[str, Any], str, dict[str, An
         from diffgenome.llm import OpenAIProbeWriter
 
         model = writer.split(":", 1)[1] if ":" in writer else None
-        w = OpenAIProbeWriter(model=model, timeout=900)
+        w = OpenAIProbeWriter(model=model, timeout=3600)
+        effort = os.environ.get("DIFFGENOME_OPENAI_REASONING_EFFORT", "").strip()
         data = w._post(
             "/chat/completions",
             {
+                **({"reasoning_effort": effort} if effort else {}),
                 "model": w.model,
                 "messages": [
                     {
