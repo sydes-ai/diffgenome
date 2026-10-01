@@ -174,8 +174,8 @@ whole run.
 
 ```
 src/diffgenome/      the package: language-agnostic core, runtime adapters under collect/
-tools/node-collector the Node/TypeScript collector (instrumenter, runtime, Jest hook)
-tools/go-collector   the Go collector (AST instrumenter, dg runtime package)
+src/diffgenome/_collectors/node  the Node/TypeScript collector (instrumenter, runtime, Jest hook)
+src/diffgenome/_collectors/go    the Go collector (AST instrumenter, dg runtime package)
 tests/               diffgenome's own tests
 fixtures/            small stand-alone *target* repositories that experiments analyze
 docs/                architecture and experiment write-ups

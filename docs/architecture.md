@@ -426,7 +426,7 @@ repo + diff ─► existing tests traced (confined) ─► Corpus ─► Behavio
 | `sandbox.py` | workspace, scrubbed env, limits, OS confinement | platform (macOS Seatbelt today; Linux runner later) |
 | `report.py`, `mvp.py` | deterministic text/JSON report; one command | nothing |
 | `runtime.py` | `RuntimeAdapter` / `SymbolIndex` seam: prepare a workspace, run stimuli, place probes, state conventions | nothing |
-| `collect/py_runtime.py`, `collect/node_jest.py`, `collect/go_test.py`, `tools/node-collector/`, `tools/go-collector/` | the three runtime implementations | Python; Node; Go |
+| `collect/py_runtime.py`, `collect/node_jest.py`, `collect/go_test.py`, `_collectors/node/`, `_collectors/go/` | the three runtime implementations | Python; Node; Go |
 | `projection.py`, `ambiguity.py` | behavioral projection of the evidence graph; ambiguous and rejected compositions | nothing |
 | `static_types.py` | `factory().member` claims through declared return types (rule `static-return-type`) | nothing above `SymbolIndex.return_type_of` |
 | `evaluate.py` | edge precision/recall and seam-level join grading against hidden whole executions | nothing |
