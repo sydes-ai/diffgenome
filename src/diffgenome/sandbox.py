@@ -122,8 +122,29 @@ class BubblewrapBackend:
             pass
         return False, f"bwrap cannot create namespaces: {detail}{hint}"
 
+    _PRIVATE = ("/tmp", "/var/tmp", "/run")
+
+    @classmethod
+    def _reexposed(cls, ws: Workspace, inner: list[str]) -> list[str]:
+        """Top-level entries of the private directories that the command names (its interpreter's
+        virtualenv, say) or that the workspace lists as extra read paths: bound back read-only.
+        Everything else there (agent and service sockets, other users' temp files) stays hidden."""
+        out: set[str] = set()
+        for raw in [*inner, *(str(p) for p in ws.extra_read_paths)]:
+            if not raw.startswith("/"):
+                continue
+            for base in cls._PRIVATE:
+                for path in {raw, os.path.realpath(raw)}:
+                    rel = os.path.relpath(path, base)
+                    if not rel.startswith(".."):
+                        top = os.path.join(base, rel.split(os.sep)[0])
+                        if top != base and os.path.exists(top):
+                            out.add(top)
+        return sorted(out)
+
     def wrap(self, ws: Workspace, inner: list[str], allow_loopback: bool) -> list[str]:
         root = str(ws.root.resolve())
+        reexpose = [a for top in self._reexposed(ws, inner) for a in ("--ro-bind", top, top)]
         return [
             str(shutil.which("bwrap")),
             "--unshare-user", "--unshare-net", "--unshare-pid", "--unshare-ipc",
@@ -134,7 +155,8 @@ class BubblewrapBackend:
             "--proc", "/proc",
             # private, empty: host sockets (docker, dbus, agents) and temp files are not visible
             "--tmpfs", "/tmp", "--tmpfs", "/run", "--tmpfs", "/var/tmp",
-            "--bind", root, root,
+            *reexpose,
+            "--bind", root, root,  # last: the workspace stays writable even under a re-exposed dir
             "--chdir", str(ws.repo.resolve()),
             *inner,
         ]  # fmt: skip
@@ -209,22 +231,33 @@ class Workspace:
 
     # ------------------------------------------------------------------ confinement
 
-    def command(
-        self,
-        argv: list[str],
-        cpu_seconds: int = 600,
-        max_procs: int = 4096,  # macOS counts the whole user; 256 broke Jest's `find` spawn
-        allow_loopback: bool = False,
-    ) -> list[str] | None:
+    def command(self, argv: list[str], allow_loopback: bool = False) -> list[str] | None:
         """Wrap argv for confined execution, or None if the host has no supported sandbox.
         `allow_loopback` permits localhost sockets only (in-process test servers); every
-        other network access stays denied."""
+        other network access stays denied. Resource limits are applied by `run`."""
         backend, _ = select_backend()
         if backend is None:
             return None
-        limits = f'ulimit -t {cpu_seconds}; ulimit -u {max_procs}; ulimit -f 1048576; exec "$@"'
-        inner = ["/bin/sh", "-c", limits, "sh", *argv]
-        return backend.wrap(self, inner, allow_loopback)
+        return backend.wrap(self, list(argv), allow_loopback)
+
+    @staticmethod
+    def _limits(
+        cpu_seconds: int = 600,
+        max_procs: int = 4096,  # macOS counts the whole user; 256 broke Jest's `find` spawn
+        file_bytes: int = 1 << 30,
+    ) -> None:
+        """setrlimit in the child before exec: inherited by the sandbox and everything in it,
+        independent of the shell (dash has no `ulimit -u`)."""
+        import resource
+
+        for limit, value in (
+            (resource.RLIMIT_CPU, cpu_seconds),
+            (resource.RLIMIT_NPROC, max_procs),
+            (resource.RLIMIT_FSIZE, file_bytes),
+        ):
+            _soft, hard = resource.getrlimit(limit)
+            cap = value if hard == resource.RLIM_INFINITY else min(value, hard)
+            resource.setrlimit(limit, (cap, hard))
 
     def environment(self, extra: dict[str, str] | None = None) -> dict[str, str]:
         """No inherited variables: no credentials, no proxies, no shell state."""
@@ -255,6 +288,7 @@ class Workspace:
         try:
             proc = subprocess.run(
                 wrapped,
+                preexec_fn=self._limits,
                 cwd=cwd or self.repo,
                 env=self.environment(env),
                 capture_output=True,

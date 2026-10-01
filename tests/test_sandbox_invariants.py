@@ -240,3 +240,27 @@ def test_node_builtin_test_runner(tmp_path: Path) -> None:
     )})
     r = w.run([str(shutil.which("node")), "--test", "t.test.js"], timeout=120, allow_loopback=True)
     assert r.returncode == 0 and "pass 1" in r.stdout, r.stdout + r.stderr
+
+
+def test_resource_limits_apply_inside(ws: Workspace) -> None:
+    code = "import resource as r; print(r.getrlimit(r.RLIMIT_CPU)[0], r.getrlimit(r.RLIMIT_NPROC)[0])"  # noqa: E501
+    r = run_py(ws, code)
+    cpu, nproc = (int(x) for x in r.stdout.split())
+    assert 0 < cpu <= 600 and 0 < nproc <= 4096, r.stderr
+
+
+def test_tools_installed_under_tmp_are_usable(ws: Workspace) -> None:
+    """GitHub runners put virtualenvs under /tmp; the Linux backend's private /tmp must still
+    show the directories a command names (bound back read-only)."""
+    d = Path(tempfile.mkdtemp(dir="/tmp", prefix="dgtool"))
+    try:
+        tool = d / "bin" / "tool.py"
+        tool.parent.mkdir()
+        (d / "data.txt").write_text("from-tmp")
+        tool.write_text(f"print(open({str(d / 'data.txt')!r}).read())\n")
+        r = ws.run([PY, str(tool)], timeout=60)
+        assert r.stdout.strip() == "from-tmp", r.stderr
+        r = ws.run([PY, "-c", f"open({str(d / 'x')!r}, 'w')"], timeout=60)
+        assert not (d / "x").exists()  # visible, never writable
+    finally:
+        shutil.rmtree(d)
