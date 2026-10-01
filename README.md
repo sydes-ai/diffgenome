@@ -25,17 +25,20 @@ place an observed outcome on a changed line.
 pip install diffgenome
 ```
 
-Python 3.12+ (the Python tracer uses `sys.monitoring`). No runtime dependencies. Language
+Python 3.12+ (the Python tracer uses `sys.monitoring`; the target's own interpreter too). No runtime dependencies. Language
 support:
 
 | target | tests run with | needs |
 |---|---|---|
 | Python | pytest | the target's virtualenv (`--python`) |
-| Go | `go test` | a Go toolchain with the module's dependencies available offline |
+| Go | `go test` | a Go 1.22+ toolchain (it also builds the instrumenter; older modules are fine) with the module's dependencies downloaded (`go mod download`); tests run offline |
 | Node / TypeScript | Jest | the target's `node_modules` (TypeScript is taken from there, or from `DIFFGENOME_NODE_PATH`) |
 
 Tests run inside a disposable copy of the repository (never the checkout itself), under a
 sandbox with no network unless `--allow-loopback` is given for local test services.
+The sandbox in 0.1.0 is macOS `sandbox-exec`: on hosts without a supported sandbox (Linux
+today, including Linux CI runners) diffgenome refuses to run target tests and says so, so in
+CI use a macOS runner.
 
 ## Use
 
