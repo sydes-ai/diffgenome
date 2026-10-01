@@ -31,6 +31,7 @@ from diffgenome.probe import ProbeAttempt, ProbeRunner, run_probe_loop
 from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.runtime import RuntimeAdapter, SymbolIndex
+from diffgenome.runtime_evidence import build_runtime_evidence
 from diffgenome.sandbox import Workspace, host_supports_confinement
 from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
@@ -371,8 +372,19 @@ def main(argv: list[str] | None = None) -> int:
             notes=notes,
             graph_before=graph if graph_after else None,
         )
-        (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
         write_mechanics(out, ws, repo, runtime.name, seeds, index, executions)
+        # the runtime-evidence contract (diffgenome-runtime/1): observed facts only
+        mech_path = out / "mechanics.json"
+        mech_fns = json.loads(mech_path.read_text())["functions"] if mech_path.is_file() else []
+        artifact["runtime"] = build_runtime_evidence(
+            executions,
+            change,
+            index,
+            mech_fns,
+            artifact.get("boundaries"),
+            test_scope=" ".join([args.tests or args.test_root, *pytest_args]).strip()[:500],
+        )
+        (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
         (out / "behavioral-map.md").write_text(behavior_map)
         print(text)
         _log(f"report: {out / 'report.md'}  graph: {out / 'graph.json'}  map: {out / 'map.md'}")

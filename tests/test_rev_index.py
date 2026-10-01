@@ -10,7 +10,9 @@ from diffgenome.sandbox import Workspace
 
 
 def _git(root: Path, *args: str) -> str:
-    return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout
+    return subprocess.run(
+        ["git", *args], cwd=root, check=True, capture_output=True, text=True
+    ).stdout
 
 
 def test_index_follows_rev_not_checkout(tmp_path: Path) -> None:
