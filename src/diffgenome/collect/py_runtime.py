@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import shutil
 from pathlib import Path
 
 from diffgenome.collect.py_symbols import PythonSymbolIndex
@@ -12,7 +13,23 @@ from diffgenome.runtime import SymbolIndex
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
 
-DIFFGENOME_SRC = Path(__file__).resolve().parents[2]
+DIFFGENOME_PACKAGE = Path(__file__).resolve().parents[1]
+
+
+def isolated_import_root(ws_root: Path) -> Path:
+    """A directory holding only the `diffgenome` package, for the target's PYTHONPATH.
+
+    The package's parent is `src/` in a checkout but the whole host `site-packages` when
+    installed; putting that on the target's PYTHONPATH would shadow the target's own
+    packages (pytest, pydantic, ...) with the host's, built for another interpreter.
+    """
+    root = ws_root / "diffgenome-import"
+    if not (root / "diffgenome").is_dir():
+        shutil.copytree(
+            DIFFGENOME_PACKAGE, root / "diffgenome",
+            ignore=shutil.ignore_patterns("__pycache__", "_collectors", "node_modules"),
+        )
+    return root
 
 
 class PytestRuntime:
@@ -69,7 +86,8 @@ class PytestRuntime:
             *(only if only else [self.tests]),
         ]  # fmt: skip
         roots = [str(ws.repo / p) for p in self.pythonpath]
-        env = {**self.test_env, "PYTHONPATH": ":".join([*roots, str(DIFFGENOME_SRC)])}
+        roots.append(str(isolated_import_root(ws.root)))
+        env = {**self.test_env, "PYTHONPATH": ":".join(roots)}
         result = ws.run(argv, env=env, timeout=1800, allow_loopback=self.allow_loopback)
         out_dir.mkdir(parents=True, exist_ok=True)
         copy_probe_traces(traces_ws, out_dir)
