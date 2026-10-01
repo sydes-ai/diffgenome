@@ -1,0 +1,369 @@
+{
+ "universe": {
+  "executions": 62,
+  "passed": 62,
+  "failed": 0
+ },
+ "boundaries": [
+  {
+   "kind": "gap",
+   "caller": "go:api.Server.createUser",
+   "target": "go:db/sqlc.Queries.CreateUser"
+  },
+  {
+   "kind": "gap",
+   "caller": "go:api.Server.loginUser",
+   "target": "go:db/sqlc.Queries.CreateSession"
+  },
+  {
+   "kind": "gap",
+   "caller": "go:api.Server.loginUser",
+   "target": "go:db/sqlc.Queries.GetUser"
+  }
+ ],
+ "functions": [
+  {
+   "symbol": "go:api.Server.loginUser",
+   "file": "api/user.go",
+   "executed_calls": 5,
+   "tests": [
+    "TestLoginUserAPI/IncorrectPassword",
+    "TestLoginUserAPI/InternalError",
+    "TestLoginUserAPI/InvalidUsername",
+    "TestLoginUserAPI/OK",
+    "TestLoginUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 5
+   },
+   "raised_inside": {
+    "returned-error:go:*errors.errorString": 1
+   },
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:api.Server.renewAccessToken",
+   "file": "api/token.go",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:db/sqlc.Queries.CreateUser",
+   "file": "db/sqlc/user.sql.go",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:db/sqlc.Queries.GetUser",
+   "file": "db/sqlc/user.sql.go",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:db/sqlc.Queries.UpdateUser",
+   "file": "db/sqlc/user.sql.go",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:db/sqlc.User",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:gapi.Server.LoginUser",
+   "file": "gapi/rpc_login_user.go",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:gapi.Server.UpdateUser",
+   "file": "gapi/rpc_update_user.go",
+   "executed_calls": 7,
+   "tests": [
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/ExpiredToken",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/NoAuthorization",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 2,
+    "returned-error:go:*status.Error": 5
+   },
+   "raised_inside": {
+    "returned-error:go:*errors.errorString": 2,
+    "returned-error:go:*status.Error": 3
+   },
+   "changed_sites": [
+    {
+     "site": "br:01807a7b80a2",
+     "line": 29,
+     "pred": "authPayload.Role != util.BankerRole && authPayload.Username != req.GetUsername()",
+     "true": 1,
+     "false": 3
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 19,
+     "callee": "server.authorizeUser",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 29,
+     "callee": "req.GetUsername",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "go:gapi.Server.authorizeUser",
+   "file": "gapi/authorization.go",
+   "executed_calls": 7,
+   "tests": [
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/ExpiredToken",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/NoAuthorization",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 5,
+    "returned-error:go:*errors.errorString": 2
+   },
+   "raised_inside": {
+    "returned-error:go:*errors.errorString": 1
+   },
+   "changed_sites": [
+    {
+     "site": "br:c1bc39962889",
+     "line": 45,
+     "pred": "!hasPermission(payload.Role, accessibleRoles)",
+     "true": 0,
+     "false": 5
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 45,
+     "callee": "hasPermission",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 46,
+     "callee": "fmt.Errorf",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "go:gapi.hasPermission",
+   "file": "gapi/authorization.go",
+   "executed_calls": 5,
+   "tests": [
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 5
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:92f48828a554",
+     "line": 54,
+     "pred": "userRole == role",
+     "true": 5,
+     "false": 4
+    }
+   ],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:token.JWTMaker.CreateToken",
+   "file": "token/jwt_maker.go",
+   "executed_calls": 2,
+   "tests": [
+    "TestExpiredJWTToken",
+    "TestJWTMaker"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 28,
+     "callee": "NewPayload",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "go:token.Maker",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:token.NewPayload",
+   "file": "token/payload.go",
+   "executed_calls": 39,
+   "tests": [
+    "TestAuthMiddleware/ExpiredToken",
+    "TestAuthMiddleware/InvalidAuthorizationFormat",
+    "TestAuthMiddleware/OK",
+    "TestAuthMiddleware/UnsupportedAuthorization",
+    "TestCreateAccountAPI/InternalError",
+    "TestCreateAccountAPI/InvalidCurrency",
+    "TestCreateAccountAPI/OK",
+    "TestExpiredJWTToken",
+    "TestExpiredPasetoToken",
+    "TestGetAccountAPI/InternalError",
+    "TestGetAccountAPI/InvalidID",
+    "TestGetAccountAPI/NotFound",
+    "TestGetAccountAPI/OK",
+    "TestGetAccountAPI/UnauthorizedUser",
+    "TestInvalidJWTTokenAlgNone",
+    "TestJWTMaker",
+    "TestListAccountsAPI/InternalError",
+    "TestListAccountsAPI/InvalidPageID",
+    "TestListAccountsAPI/InvalidPageSize",
+    "TestListAccountsAPI/OK",
+    "TestLoginUserAPI/OK",
+    "TestPasetoMaker",
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser",
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/ExpiredToken",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 39
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "go:token.PasetoMaker.CreateToken",
+   "file": "token/paseto_maker.go",
+   "executed_calls": 36,
+   "tests": [
+    "TestAuthMiddleware/ExpiredToken",
+    "TestAuthMiddleware/InvalidAuthorizationFormat",
+    "TestAuthMiddleware/OK",
+    "TestAuthMiddleware/UnsupportedAuthorization",
+    "TestCreateAccountAPI/InternalError",
+    "TestCreateAccountAPI/InvalidCurrency",
+    "TestCreateAccountAPI/OK",
+    "TestExpiredPasetoToken",
+    "TestGetAccountAPI/InternalError",
+    "TestGetAccountAPI/InvalidID",
+    "TestGetAccountAPI/NotFound",
+    "TestGetAccountAPI/OK",
+    "TestGetAccountAPI/UnauthorizedUser",
+    "TestListAccountsAPI/InternalError",
+    "TestListAccountsAPI/InvalidPageID",
+    "TestListAccountsAPI/InvalidPageSize",
+    "TestListAccountsAPI/OK",
+    "TestLoginUserAPI/OK",
+    "TestPasetoMaker",
+    "TestTransferAPI/FromAccountCurrencyMismatch",
+    "TestTransferAPI/FromAccountNotFound",
+    "TestTransferAPI/GetAccountError",
+    "TestTransferAPI/InvalidCurrency",
+    "TestTransferAPI/NegativeAmount",
+    "TestTransferAPI/OK",
+    "TestTransferAPI/ToAccountCurrencyMismatch",
+    "TestTransferAPI/ToAccountNotFound",
+    "TestTransferAPI/TransferTxError",
+    "TestTransferAPI/UnauthorizedUser",
+    "TestUpdateUserAPI/BankerCanUpdateUserInfo",
+    "TestUpdateUserAPI/ExpiredToken",
+    "TestUpdateUserAPI/InvalidEmail",
+    "TestUpdateUserAPI/OK",
+    "TestUpdateUserAPI/OtherDepositorCannotUpdateThisUserInfo",
+    "TestUpdateUserAPI/UserNotFound"
+   ],
+   "exits": {
+    "returned": 36
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 33,
+     "callee": "NewPayload",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "go:token.Payload",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  }
+ ]
+}

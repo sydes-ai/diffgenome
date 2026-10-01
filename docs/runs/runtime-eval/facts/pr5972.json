@@ -1,0 +1,797 @@
+{
+ "universe": {
+  "executions": 180,
+  "passed": 178,
+  "failed": 2
+ },
+ "boundaries": [
+  {
+   "kind": "external",
+   "caller": "py:baserow.contrib.database.db.schema.optional_atomic",
+   "target": "py:django.db.transaction.atomic"
+  },
+  {
+   "kind": "external",
+   "caller": "py:baserow.contrib.database.db.schema.optional_atomic",
+   "target": "py:django.db.transaction.atomic.().__enter__"
+  },
+  {
+   "kind": "external",
+   "caller": "py:baserow.contrib.database.db.schema.optional_atomic",
+   "target": "py:django.db.transaction.atomic.().__exit__"
+  },
+  {
+   "kind": "unresolved",
+   "caller": "py:baserow.core.utils.Progress.set_progress",
+   "target": "stand-in:py:unittest.mock.MagicMock"
+  },
+  {
+   "kind": "external",
+   "caller": "py:baserow.core.utils.atomic_if_not_already",
+   "target": "py:django.db.transaction.get_autocommit"
+  }
+ ],
+ "functions": [
+  {
+   "symbol": "py:baserow.contrib.database.api.data_sync.views.DataSyncTypePropertiesView",
+   "file": null,
+   "executed_calls": 1,
+   "tests": [
+    "tests/baserow/contrib/database/api/data_sync/test_data_sync_views.py::test_create_data_sync_no_permissions"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.api.data_sync.views.DataSyncTypePropertiesView.post",
+   "file": "backend/src/baserow/contrib/database/api/data_sync/views.py",
+   "executed_calls": 3,
+   "tests": [
+    "::test_get_properties_with_table_view_id_none",
+    "::test_get_properties_with_view_provided_only_public_fields",
+    "::test_viewer_role_denied_data_sync_properties_no_external_call"
+   ],
+   "exits": {
+    "returned": 2,
+    "raised:py:baserow.core.exceptions.PermissionDenied": 1
+   },
+   "raised_inside": {
+    "raised:py:baserow.core.exceptions.PermissionDenied": 3
+   },
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 374,
+     "callee": "DatabaseHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 374,
+     "callee": "DatabaseHandler().get_database",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 376,
+     "callee": "CoreHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 376,
+     "callee": "CoreHandler().check_permissions",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.data_sync.postgresql_data_sync_type.PostgreSQLDataSyncType",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.data_sync.postgresql_data_sync_type.PostgreSQLDataSyncType._check_host_not_blocked",
+   "file": "backend/src/baserow/contrib/database/data_sync/postgresql_data_sync_type.py",
+   "executed_calls": 7,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_bypass",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_connection_error",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_does_not_exist"
+   ],
+   "exits": {
+    "raised:py:baserow.contrib.database.data_sync.exceptions.SyncError": 5,
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:06f33e2aa59c",
+     "line": 203,
+     "pred": "settings.BASEROW_PREVENT_POSTGRESQL_DATA_SYNC_CONNECTION_TO_DATABASE",
+     "true": 3,
+     "false": 4
+    },
+    {
+     "site": "br:397ae72bcdb4",
+     "line": 204,
+     "pred": "_overlaps(settings.DATABASES[DEFAULT_DB_ALIAS]['HOST'])",
+     "true": 3,
+     "false": 0
+    },
+    {
+     "site": "br:945906f34cbe",
+     "line": 208,
+     "pred": "_overlaps(blacklisted)",
+     "true": 2,
+     "false": 0
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 192,
+     "callee": "normalize",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 192,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 204,
+     "callee": "_overlaps",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 205,
+     "callee": "SyncError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 208,
+     "callee": "_overlaps",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 209,
+     "callee": "SyncError",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.data_sync.postgresql_data_sync_type.PostgreSQLDataSyncType._check_host_not_blocked.<locals>._overlaps",
+   "file": "backend/src/baserow/contrib/database/data_sync/postgresql_data_sync_type.py",
+   "executed_calls": 5,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_bypass",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database"
+   ],
+   "exits": {
+    "returned": 5
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:4a183adeeca1",
+     "line": 196,
+     "pred": "validated_set is not None",
+     "true": 3,
+     "false": 2
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 199,
+     "callee": "normalize",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 199,
+     "callee": "get_all_ips",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 199,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 197,
+     "callee": "bool",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 201,
+     "callee": "are_hostnames_same",
+     "observable": true,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.data_sync.postgresql_data_sync_type.PostgreSQLDataSyncType._connection",
+   "file": "backend/src/baserow/contrib/database/data_sync/postgresql_data_sync_type.py",
+   "executed_calls": 4,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_connection_error",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_does_not_exist"
+   ],
+   "exits": {
+    "raised:py:baserow.contrib.database.data_sync.exceptions.SyncError": 4
+   },
+   "raised_inside": {
+    "raised:py:baserow.contrib.database.data_sync.exceptions.SyncError": 2
+   },
+   "changed_sites": [
+    {
+     "site": "br:d96cb5590ce9",
+     "line": 217,
+     "pred": "not settings.TESTS",
+     "true": 0,
+     "false": 4
+    },
+    {
+     "site": "br:0203e0d0e70e",
+     "line": 238,
+     "pred": "validated_ips",
+     "true": 0,
+     "false": 2
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 219,
+     "callee": "resolve_and_validate_hostname",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 224,
+     "callee": "SyncError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 226,
+     "callee": "self._check_host_not_blocked",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 229,
+     "callee": "dict",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 244,
+     "callee": "len",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 243,
+     "callee": "','.join",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 246,
+     "callee": "','.join",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 250,
+     "callee": "psycopg.connect",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 258,
+     "callee": "str",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 256,
+     "callee": "cursor.execute",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 262,
+     "callee": "logger.warning",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 263,
+     "callee": "SyncError",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.data_sync.postgresql_data_sync_type.PostgreSQLDataSyncType._normalize_ip",
+   "file": "backend/src/baserow/contrib/database/data_sync/postgresql_data_sync_type.py",
+   "executed_calls": 9,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_bypass",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_normalize_ip"
+   ],
+   "exits": {
+    "returned": 9
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:d1f8e0d748b0",
+     "line": 173,
+     "pred": "isinstance(ip_obj, ipaddress.IPv6Address) and ip_obj.ipv4_mapped",
+     "true": 3,
+     "false": 6
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 172,
+     "callee": "ipaddress.ip_address",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 173,
+     "callee": "isinstance",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 174,
+     "callee": "str",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils._get_local_addresses",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 45,
+   "tests": [
+    "tests/baserow/core/test_core_utils.py::test_is_hostname_safe",
+    "tests/baserow/core/test_core_utils.py::test_resolve_and_validate_hostname"
+   ],
+   "exits": {
+    "returned": 45
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:995f73a999a2",
+     "line": 1324,
+     "pred": "not raw",
+     "true": 0,
+     "false": 585
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 1316,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1318,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1319,
+     "callee": "netifaces.interfaces",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1320,
+     "callee": "netifaces.ifaddresses",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1322,
+     "callee": "families.get",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 1323,
+     "callee": "addr_info.get",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 1327,
+     "callee": "raw.split",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1329,
+     "callee": "ipaddress.ip_address",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1329,
+     "callee": "local.add",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils._is_ip_unsafe",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 62,
+   "tests": [
+    "tests/baserow/core/test_core_utils.py::test_is_hostname_safe",
+    "tests/baserow/core/test_core_utils.py::test_resolve_and_validate_hostname"
+   ],
+   "exits": {
+    "returned": 62
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:e2716457d616",
+     "line": 1277,
+     "pred": "ip_obj.is_unspecified or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_multicast or ip_obj.is_reserved",
+     "true": 20,
+     "false": 42
+    },
+    {
+     "site": "br:74b379dd41c9",
+     "line": 1286,
+     "pred": "isinstance(ip_obj, ipaddress.IPv6Address)",
+     "true": 13,
+     "false": 29
+    },
+    {
+     "site": "br:88510072afce",
+     "line": 1288,
+     "pred": "ip_obj.is_site_local",
+     "true": 2,
+     "false": 11
+    },
+    {
+     "site": "br:e68dc34c184e",
+     "line": 1291,
+     "pred": "ip_obj.ipv4_mapped and _is_ip_unsafe(ip_obj.ipv4_mapped)",
+     "true": 0,
+     "false": 11
+    },
+    {
+     "site": "br:89283e135dd3",
+     "line": 1295,
+     "pred": "packed[:2] == b' \\x02'",
+     "true": 4,
+     "false": 7
+    },
+    {
+     "site": "br:52656056533f",
+     "line": 1297,
+     "pred": "_is_ip_unsafe(embedded)",
+     "true": 2,
+     "false": 2
+    },
+    {
+     "site": "br:71b5ca44323b",
+     "line": 1301,
+     "pred": "packed[:4] == b' \\x01\\x00\\x00'",
+     "true": 4,
+     "false": 5
+    },
+    {
+     "site": "br:e37d1fa5d79b",
+     "line": 1304,
+     "pred": "_is_ip_unsafe(server) or _is_ip_unsafe(client)",
+     "true": 4,
+     "false": 0
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 1286,
+     "callee": "isinstance",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1291,
+     "callee": "_is_ip_unsafe",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1296,
+     "callee": "ipaddress.IPv4Address",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1297,
+     "callee": "_is_ip_unsafe",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1302,
+     "callee": "ipaddress.IPv4Address",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1303,
+     "callee": "bytes",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1303,
+     "callee": "ipaddress.IPv4Address",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1304,
+     "callee": "_is_ip_unsafe",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1304,
+     "callee": "_is_ip_unsafe",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils.are_hostnames_same",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 4,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database",
+    "tests/baserow/core/test_core_utils.py::test_are_hostnames_same"
+   ],
+   "exits": {
+    "returned": 4
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 1425,
+     "callee": "get_all_ips",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1425,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1426,
+     "callee": "get_all_ips",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1426,
+     "callee": "set",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1427,
+     "callee": "bool",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1427,
+     "callee": "ips1.isdisjoint",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils.get_all_ips",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 45,
+   "tests": [
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_bypass",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+    "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database",
+    "tests/baserow/core/test_core_utils.py::test_are_hostnames_same",
+    "tests/baserow/core/test_core_utils.py::test_get_all_ips",
+    "tests/baserow/core/test_core_utils.py::test_is_hostname_safe",
+    "tests/baserow/core/test_core_utils.py::test_resolve_and_validate_hostname"
+   ],
+   "exits": {
+    "returned": 45
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 1269,
+     "callee": "dict.fromkeys",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1269,
+     "callee": "list",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils.is_hostname_safe",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 39,
+   "tests": [
+    "tests/baserow/core/test_core_utils.py::test_is_hostname_safe"
+   ],
+   "exits": {
+    "returned": 39
+   },
+   "raised_inside": {
+    "raised:py:builtins.ValueError": 29
+   },
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 1408,
+     "callee": "resolve_and_validate_hostname",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.utils.resolve_and_validate_hostname",
+   "file": "backend/src/baserow/core/utils.py",
+   "executed_calls": 48,
+   "tests": [
+    "tests/baserow/core/test_core_utils.py::test_is_hostname_safe",
+    "tests/baserow/core/test_core_utils.py::test_resolve_and_validate_hostname"
+   ],
+   "exits": {
+    "returned": 14,
+    "raised:py:builtins.ValueError": 34
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:c25c5e24c899",
+     "line": 1365,
+     "pred": "_is_ip_unsafe(ip_obj)",
+     "true": 22,
+     "false": 27
+    },
+    {
+     "site": "br:5e3441b3ef2f",
+     "line": 1368,
+     "pred": "ip_obj in local_addresses",
+     "true": 1,
+     "false": 26
+    },
+    {
+     "site": "br:0e6337381550",
+     "line": 1371,
+     "pred": "not allow_private and (not ip_obj.is_global)",
+     "true": 10,
+     "false": 16
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 1355,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1357,
+     "callee": "_get_local_addresses",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1363,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1365,
+     "callee": "_is_ip_unsafe",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1366,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1369,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1372,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1376,
+     "callee": "isinstance",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1380,
+     "callee": "ValueError",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  }
+ ]
+}

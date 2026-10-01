@@ -72,7 +72,10 @@ def main() -> int:
                 continue
             calls[n.symbol].append((ex.stimulus_ref, n.outcome))
             tests_of[n.symbol].add(ex.stimulus_ref)
+            # nearest real caller: look through wrapper frames (closures, lambdas, decorators)
             p = nodes.get(n.parent) if n.parent is not None else None
+            while isinstance(p, CallNode) and any(w in p.symbol for w in ("<locals>", "<lambda>", "<anon>")):
+                p = nodes.get(p.parent) if p.parent is not None else None
             if isinstance(p, CallNode):
                 child_seen[p.symbol].add(n.symbol)
                 if str(n.outcome).startswith(("raised", "panic", "returned-error")):
@@ -80,6 +83,9 @@ def main() -> int:
         for b in ex.branches:
             site_out[b.site][b.outcome] += 1
 
+    # names of repository functions (what the collector records); other callees are builtins
+    # or third-party code, which the call tree cannot show
+    repo_names = {x["symbol"].rsplit(".", 1)[-1] for x in mech} | {s.rsplit(".", 1)[-1] for s in calls}
     report = {"universe": {"executions": len(universe), "passed": sum(o == "passed" for _, o in universe),
                            "failed": sum(o != "passed" for _, o in universe)},
               "boundaries": [{k: b.get(k) for k in ("kind", "caller", "target")} for b in art.get("boundaries") or []],
@@ -100,7 +106,8 @@ def main() -> int:
             ],
             "changed_calls": [
                 {"line": c["line"], "callee": c["callee"],
-                 "observed": any(x.split(":")[-1].endswith("." + c["callee"].split(".")[-1]) or x.endswith(":" + c["callee"]) for x in child_seen.get(sym, set()))}
+                 "observable": c["callee"].split(".")[-1].split("(")[0] in repo_names,
+                 "observed": any(x.split(":")[-1].split(".")[-1] == c["callee"].split(".")[-1].split("(")[0] for x in child_seen.get(sym, set()))}
                 for c in (f["calls"] if f else []) if c["line"] in cl
             ],
         }
@@ -113,7 +120,7 @@ def main() -> int:
         for s in x["changed_sites"]:
             part.append(f"      site L{s['line']} `{s['pred'][:60]}` T={s['true']} F={s['false']}")
         for c in x["changed_calls"]:
-            if not c["observed"]:
+            if c["observable"] and not c["observed"]:
                 part.append(f"      call L{c['line']} {c['callee'][:60]} NOT observed")
         print("\n".join(part))
     return 0

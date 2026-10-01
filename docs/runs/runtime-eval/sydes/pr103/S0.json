@@ -1,0 +1,78 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "3 obligation(s) across 3 flow(s): 0 passed, 0 failed, 3 unverified, 0 unknown",
+  "counts": {
+   "changed_files": 32,
+   "changed_source_files": 19,
+   "changed_test_files": 8,
+   "changed_symbols": 33,
+   "affected_flows": 3,
+   "flows_partially_analyzed": 2,
+   "code_findings": 0,
+   "obligations": 3,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 3,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 60,
+   "tests_exercising_flows": 20,
+   "tests_supporting_behavior": 20,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 13,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 2,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 3,
+   "impacts_inferred": 0,
+   "impacts_not_modeled": 0,
+   "unresolved_changed_symbols": 30
+  },
+  "risk_reasons": [
+   "3 obligation(s) have no verifying test",
+   "2 flow(s) only partially analyzed \u2014 absence of downstream effects is not established"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "POST /tokens/renew_access",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "renewAccessToken"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "POST /users",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "createUser"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "POST /users/login",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "loginUser"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [
+  "flow:POST:/tokens/renew_access",
+  "flow:POST:/users",
+  "flow:POST:/users/login"
+ ],
+ "tests_on_behavioral_path": null,
+ "diagnostics": [],
+ "llm_calls": [],
+ "seconds": 8
+}

@@ -1,0 +1,263 @@
+{
+  "path_recovery": {
+    "status": "established",
+    "paths": [
+      {
+        "entrypoint": "CLI: python manage.py run_periodic_fields_updates",
+        "target_node": "run_periodic_fields_updates",
+        "status": "established",
+        "root_boundary_status": "candidate_boundary",
+        "nodes": [
+          {
+            "symbol": "Command.handle",
+            "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+            "qualified_name": null
+          },
+          {
+            "symbol": "run_periodic_fields_updates",
+            "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+            "qualified_name": "baserow.contrib.database.fields.tasks.run_periodic_fields_updates"
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "symbol": "Command.handle",
+              "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+              "qualified_name": "baserow.contrib.database.management.commands.run_periodic_fields_updates.Command.handle"
+            },
+            "to": {
+              "symbol": "run_periodic_fields_updates",
+              "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+              "qualified_name": "baserow.contrib.database.fields.tasks.run_periodic_fields_updates"
+            },
+            "relationship": "Command.handle directly invokes run_periodic_fields_updates synchronously, passing the workspace_id option, the negated dont_update_now option, and dispatch=False.",
+            "evidence": [
+              {
+                "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+                "line_start": 3,
+                "line_end": 3,
+                "fact": "Imports run_periodic_fields_updates specifically from baserow.contrib.database.fields.tasks."
+              },
+              {
+                "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+                "line_start": 23,
+                "line_end": 30,
+                "fact": "Command.handle calls the imported task with options[\"workspace_id\"], not options[\"dont_update_now\"], and dispatch=False."
+              },
+              {
+                "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+                "line_start": 70,
+                "line_end": 94,
+                "fact": "Declares the Celery task run_periodic_fields_updates with workspace_id, update_now, and dispatch parameters; dispatch=False selects its inline update branch."
+              }
+            ],
+            "status": "established",
+            "provenance": "ai_recovery",
+            "rejection_reason": null,
+            "from_decomposition": false
+          }
+        ],
+        "unresolved_suffix": []
+      }
+    ],
+    "corrected_first_pass_claims": [],
+    "unresolved": []
+  },
+  "test_recovery": {
+    "status": "established",
+    "tests": [
+      {
+        "file": "backend/tests/baserow/contrib/database/field/test_field_tasks.py",
+        "test": "test_run_periodic_fields_updates_command_runs_inline",
+        "covers": "The test invokes the management command, which calls the target run_periodic_fields_updates with dispatch=False, and asserts that the inline workspace updater is called once with the workspace ID and True.",
+        "target": {
+          "symbol": "run_periodic_fields_updates",
+          "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+          "qualified_name": null
+        },
+        "evidence": [
+          {
+            "file": "backend/tests/baserow/contrib/database/field/test_field_tasks.py",
+            "line_start": 817,
+            "line_end": 829,
+            "fact": "The named test patches fields.tasks._update_workspace_periodic_fields, invokes call_command(\"run_periodic_fields_updates\", workspace_id=workspace.id), and asserts the patched updater was called once with (workspace.id, True)."
+          },
+          {
+            "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+            "line_start": 3,
+            "line_end": 3,
+            "fact": "The command imports run_periodic_fields_updates specifically from baserow.contrib.database.fields.tasks, establishing the target's identity."
+          },
+          {
+            "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+            "line_start": 23,
+            "line_end": 30,
+            "fact": "Command.handle calls that imported function with the workspace ID, the update-now flag, and dispatch=False, explicitly selecting inline execution."
+          }
+        ],
+        "status": "accepted",
+        "rejection_reason": null
+      },
+      {
+        "file": "backend/tests/baserow/contrib/database/field/test_field_tasks.py",
+        "test": "test_run_periodic_fields_updates_dispatch_false_runs_inline",
+        "covers": "Directly calls run_periodic_fields_updates with dispatch=False and verifies that the inline update helper receives the workspace ID and default update_now=True, while no asynchronous chord is dispatched. The helper is mocked, so this covers inline routing rather than actual field updates.",
+        "target": {
+          "symbol": "run_periodic_fields_updates",
+          "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+          "qualified_name": null
+        },
+        "evidence": [
+          {
+            "file": "backend/tests/baserow/contrib/database/field/test_field_tasks.py",
+            "line_start": 16,
+            "line_end": 24,
+            "fact": "Imports run_periodic_fields_updates from baserow.contrib.database.fields.tasks, matching the target production module."
+          },
+          {
+            "file": "backend/tests/baserow/contrib/database/field/test_field_tasks.py",
+            "line_start": 94,
+            "line_end": 108,
+            "fact": "The named test patches the production module's chord and _update_workspace_periodic_fields, calls run_periodic_fields_updates(workspace_id=workspace.id, dispatch=False), then asserts chord was not called and the inline helper was called exactly once with (workspace.id, True)."
+          },
+          {
+            "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+            "line_start": 76,
+            "line_end": 94,
+            "fact": "The target function defaults update_now to True. Its dispatch=False branch collects workspace IDs, directly calls _update_workspace_periodic_fields(wid, update_now), and returns before asynchronous dispatch."
+          }
+        ],
+        "status": "accepted",
+        "rejection_reason": null
+      },
+      {
+        "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+        "test": "test_acquire_is_atomic_and_stores_token",
+        "covers": "Checks atomic acquisition and storage of the ownership token.",
+        "target": {
+          "symbol": "SingletonAutoRescheduleFlag.acquire",
+          "file": "backend/src/baserow/celery_singleton_backend.py",
+          "qualified_name": null
+        },
+        "evidence": [],
+        "status": "rejected",
+        "rejection_reason": "no evidence cited at all"
+      },
+      {
+        "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+        "test": "test_clear_if_only_deletes_on_matching_token",
+        "covers": "The test directly calls SingletonAutoRescheduleFlag.clear_if with incorrect and matching ownership tokens, asserting that only the matching token deletes the flag.",
+        "target": {
+          "symbol": "SingletonAutoRescheduleFlag.clear_if",
+          "file": "backend/src/baserow/celery_singleton_backend.py",
+          "qualified_name": null
+        },
+        "evidence": [
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 5,
+            "line_end": 5,
+            "fact": "Imports SingletonAutoRescheduleFlag from baserow.celery_singleton_backend, linking the tested class to the target production module."
+          },
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 19,
+            "line_end": 27,
+            "fact": "Constructs the flag and acquires it with token-a. Asserts clear_if('wrong-token') returns False and preserves token-a, then asserts clear_if('token-a') returns True and removes the cached flag."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 71,
+            "line_end": 74,
+            "fact": "The target clear_if method invokes _eval_if with _CLEAR_IF_SCRIPT and the supplied token."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 28,
+            "line_end": 33,
+            "fact": "The clear script deletes the flag only when its stored value matches the supplied token; otherwise it returns 0."
+          }
+        ],
+        "status": "rejected",
+        "rejection_reason": "cited lines in 'backend/src/baserow/celery_singleton_backend.py' do not mention any of the claimed symbols or the stated fact -- evidence appears unrelated"
+      },
+      {
+        "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+        "test": "test_extend_if_extends_only_for_matching_token",
+        "covers": "The test directly calls SingletonAutoRescheduleFlag.extend_if and asserts False for an absent lock and a mismatched token, then True for the owning token while preserving the stored value. It exercises ownership-gated expiry extension, but does not directly measure TTL changes.",
+        "target": {
+          "symbol": "SingletonAutoRescheduleFlag.extend_if",
+          "file": "backend/src/baserow/celery_singleton_backend.py",
+          "qualified_name": null
+        },
+        "evidence": [
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 5,
+            "line_end": 5,
+            "fact": "Imports SingletonAutoRescheduleFlag from baserow.celery_singleton_backend, identifying the production class used by the test."
+          },
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 31,
+            "line_end": 42,
+            "fact": "Constructs the production flag, calls extend_if before acquisition and with mismatched and matching ownership tokens, and asserts the corresponding False/False/True results and preserved token."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 61,
+            "line_end": 69,
+            "fact": "The target extend_if method executes _EXTEND_IF_SCRIPT through _eval_if with the supplied token and configured timeout."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 21,
+            "line_end": 26,
+            "fact": "The extension script calls Redis expire only when the stored value matches the supplied token; otherwise it returns zero."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 76,
+            "line_end": 88,
+            "fact": "_eval_if encodes the token and cache key and executes the supplied script on the cache's Redis client."
+          }
+        ],
+        "status": "accepted",
+        "rejection_reason": null
+      },
+      {
+        "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+        "test": "test_default_timeout_follows_overridden_setting",
+        "covers": "The test directly constructs SingletonAutoRescheduleFlag without an explicit timeout after overriding AUTO_INDEX_LOCK_EXPIRY to 7, then asserts the constructor resolved the default timeout to 14.",
+        "target": {
+          "symbol": "SingletonAutoRescheduleFlag.__init__",
+          "file": "backend/src/baserow/celery_singleton_backend.py",
+          "qualified_name": null
+        },
+        "evidence": [
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 5,
+            "line_end": 5,
+            "fact": "Imports SingletonAutoRescheduleFlag from baserow.celery_singleton_backend, tying the constructed class to the target production module."
+          },
+          {
+            "file": "backend/tests/baserow/test_celery_singleton_backend.py",
+            "line_start": 52,
+            "line_end": 57,
+            "fact": "The named test overrides settings.AUTO_INDEX_LOCK_EXPIRY to 7, constructs SingletonAutoRescheduleFlag(\"test_lock\") without a timeout argument, and asserts flag.timeout == 14."
+          },
+          {
+            "file": "backend/src/baserow/celery_singleton_backend.py",
+            "line_start": 45,
+            "line_end": 51,
+            "fact": "The target constructor defaults timeout to None and resolves self.timeout from settings.AUTO_INDEX_LOCK_EXPIRY * 2 during construction when no explicit timeout is supplied."
+          }
+        ],
+        "status": "accepted",
+        "rejection_reason": null
+      }
+    ]
+  }
+}

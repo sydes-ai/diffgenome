@@ -1,0 +1,903 @@
+{
+ "universe": {
+  "executions": 38,
+  "passed": 38,
+  "failed": 0
+ },
+ "boundaries": [
+  {
+   "kind": "external",
+   "caller": "py:baserow.contrib.database.fields.tasks.run_periodic_fields_updates",
+   "target": "py:celery.canvas._chord.()"
+  },
+  {
+   "kind": "external",
+   "caller": "py:baserow.contrib.database.fields.tasks.run_periodic_fields_updates",
+   "target": "py:celery.canvas._chord.__init__"
+  },
+  {
+   "kind": "unresolved",
+   "caller": "py:baserow.contrib.database.fields.tasks.update_workspaces_periodic_fields",
+   "target": "stand-in:py:backend.tests.baserow.contrib.database.field.test_field_tasks.test_update_workspaces_periodic_fields_continues_after_workspace_error.<locals>.side_effect"
+  },
+  {
+   "kind": "unresolved",
+   "caller": "py:baserow.contrib.database.fields.tasks.update_workspaces_periodic_fields",
+   "target": "stand-in:py:backend.tests.baserow.contrib.database.field.test_field_tasks.test_update_workspaces_periodic_fields_stops_on_soft_time_limit.<locals>.side_effect"
+  }
+ ],
+ "functions": [
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.__init__",
+   "file": null,
+   "executed_calls": 55,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_skips_when_cycle_running",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+    "tests/baserow/test_celery_singleton_backend.py::test_acquire_is_atomic_and_stores_token",
+    "tests/baserow/test_celery_singleton_backend.py::test_clear_if_only_deletes_on_matching_token",
+    "tests/baserow/test_celery_singleton_backend.py::test_default_timeout_follows_overridden_setting",
+    "tests/baserow/test_celery_singleton_backend.py::test_default_timeout_is_backwards_compatible",
+    "tests/baserow/test_celery_singleton_backend.py::test_extend_if_extends_only_for_matching_token"
+   ],
+   "exits": {
+    "returned": 55
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag._eval_if",
+   "file": "backend/src/baserow/celery_singleton_backend.py",
+   "executed_calls": 40,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+    "tests/baserow/test_celery_singleton_backend.py::test_clear_if_only_deletes_on_matching_token",
+    "tests/baserow/test_celery_singleton_backend.py::test_extend_if_extends_only_for_matching_token"
+   ],
+   "exits": {
+    "returned": 40
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 84,
+     "callee": "client.make_key",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 85,
+     "callee": "client.encode",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 86,
+     "callee": "client.get_client",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 86,
+     "callee": "client.get_client(write=True).eval",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.acquire",
+   "file": "backend/src/baserow/celery_singleton_backend.py",
+   "executed_calls": 30,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_skips_when_cycle_running",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+    "tests/baserow/test_celery_singleton_backend.py::test_acquire_is_atomic_and_stores_token",
+    "tests/baserow/test_celery_singleton_backend.py::test_clear_if_only_deletes_on_matching_token",
+    "tests/baserow/test_celery_singleton_backend.py::test_extend_if_extends_only_for_matching_token"
+   ],
+   "exits": {
+    "returned": 30
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 59,
+     "callee": "cache.add",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 59,
+     "callee": "bool",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.clear",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.clear_if",
+   "file": "backend/src/baserow/celery_singleton_backend.py",
+   "executed_calls": 19,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+    "tests/baserow/test_celery_singleton_backend.py::test_clear_if_only_deletes_on_matching_token"
+   ],
+   "exits": {
+    "returned": 19
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 74,
+     "callee": "self._eval_if",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 74,
+     "callee": "bool",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.extend_if",
+   "file": "backend/src/baserow/celery_singleton_backend.py",
+   "executed_calls": 21,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+    "tests/baserow/test_celery_singleton_backend.py::test_extend_if_extends_only_for_matching_token"
+   ],
+   "exits": {
+    "returned": 21
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 69,
+     "callee": "self._eval_if",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 69,
+     "callee": "bool",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.celery_singleton_backend.SingletonAutoRescheduleFlag.set",
+   "file": "backend/src/baserow/celery_singleton_backend.py",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 106,
+     "callee": "cache.set",
+     "observable": true,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks._collect_ordered_workspace_ids",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 21,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatch_false_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 21
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 190,
+     "callee": "_collect_workspace_ids_needing_update",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 192,
+     "callee": "Workspace.objects.filter",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 192,
+     "callee": "Workspace.objects.filter(id__in=workspace_ids).order_by",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 192,
+     "callee": "Workspace.objects.filter(id__in=workspace_ids).order_by('now').values_list",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 191,
+     "callee": "list",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks._collect_workspace_ids_needing_update",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 21,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatch_false_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 21
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 160,
+     "callee": "set",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 180,
+     "callee": "workspaces.values_list",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 180,
+     "callee": "workspace_ids.update",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks._run_periodic_field_type_update_per_workspace",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 439,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_reraises_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_updates_now_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_warns_when_slow",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 438,
+    "raised:py:billiard.exceptions.SoftTimeLimitExceeded": 1
+   },
+   "raised_inside": {
+    "raised:py:baserow.core.formula.parser.exceptions.BaserowFormulaSyntaxError": 1
+   },
+   "changed_sites": [
+    {
+     "site": "br:9449b5a166df",
+     "line": 217,
+     "pred": "not fields",
+     "true": 0,
+     "false": 16
+    },
+    {
+     "site": "br:795f409bef7b",
+     "line": 220,
+     "pred": "update_now",
+     "true": 14,
+     "false": 2
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 206,
+     "callee": "list",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 221,
+     "callee": "workspace.refresh_now",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 222,
+     "callee": "add_baserow_trace_attrs",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks._update_workspace_periodic_fields",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 17,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_reraises_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_skips_missing_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_updates_now_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_warns_when_slow",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 16,
+    "raised:py:billiard.exceptions.SoftTimeLimitExceeded": 1
+   },
+   "raised_inside": {
+    "raised:py:billiard.exceptions.SoftTimeLimitExceeded": 2
+   },
+   "changed_sites": [
+    {
+     "site": "br:b11fbc437632",
+     "line": 329,
+     "pred": "workspace is None",
+     "true": 1,
+     "false": 16
+    },
+    {
+     "site": "br:59159590f6d8",
+     "line": 341,
+     "pred": "elapsed >= SLOW_WORKSPACE_LOG_THRESHOLD_SECONDS",
+     "true": 1,
+     "false": 0
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 328,
+     "callee": "Workspace.objects.filter",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 328,
+     "callee": "Workspace.objects.filter(id=workspace_id, trashed=False).first",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 332,
+     "callee": "time.monotonic",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 333,
+     "callee": "field_type_registry.get_all",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 336,
+     "callee": "_run_periodic_field_type_update_per_workspace",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 340,
+     "callee": "time.monotonic",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 342,
+     "callee": "logger.warning",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks.filter_distinct_workspace_ids_per_fields",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 21,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatch_false_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 21
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 67,
+     "callee": "queryset.distinct",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 67,
+     "callee": "queryset.distinct().order_by",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks.finish_periodic_fields_update",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 11,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 11
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 322,
+     "callee": "SingletonAutoRescheduleFlag",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 322,
+     "callee": "SingletonAutoRescheduleFlag(RUN_LOCK_KEY, timeout=RUN_LOCK_TTL).clear_if",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks.run_periodic_fields_updates",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 22,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatch_false_runs_inline",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_skips_when_cycle_running",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 21,
+    "raised:py:builtins.RuntimeError": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:186cff4bccf2",
+     "line": 91,
+     "pred": "not dispatch",
+     "true": 2,
+     "false": 20
+    },
+    {
+     "site": "br:1d73e35e56e1",
+     "line": 102,
+     "pred": "not flag.acquire(token)",
+     "true": 1,
+     "false": 19
+    },
+    {
+     "site": "br:89574435ddcb",
+     "line": 119,
+     "pred": "not ordered_ids",
+     "true": 5,
+     "false": 14
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 92,
+     "callee": "_collect_ordered_workspace_ids",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 93,
+     "callee": "_update_workspace_periodic_fields",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 100,
+     "callee": "uuid4",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 101,
+     "callee": "SingletonAutoRescheduleFlag",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 102,
+     "callee": "flag.acquire",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 107,
+     "callee": "logger.error",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 118,
+     "callee": "_collect_ordered_workspace_ids",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 121,
+     "callee": "flag.clear_if",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 124,
+     "callee": "max",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 128,
+     "callee": "range",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 131,
+     "callee": "update_workspaces_periodic_fields.s",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 137,
+     "callee": "enumerate",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 130,
+     "callee": "group",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 139,
+     "callee": "finish_periodic_fields_update.si",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 139,
+     "callee": "chord(header)",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 141,
+     "callee": "flag.clear_if",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 147,
+     "callee": "len",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 148,
+     "callee": "len",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 144,
+     "callee": "logger.info",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.fields.tasks.update_workspaces_periodic_fields",
+   "file": "backend/src/baserow/contrib/database/fields/tasks.py",
+   "executed_calls": 13,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time"
+   ],
+   "exits": {
+    "returned": 13
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:a90ab2427521",
+     "line": 285,
+     "pred": "not flag.extend_if(run_token)",
+     "true": 1,
+     "false": 17
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 283,
+     "callee": "SingletonAutoRescheduleFlag",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 285,
+     "callee": "flag.extend_if",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 288,
+     "callee": "logger.warning",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 296,
+     "callee": "_update_workspace_periodic_fields",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 302,
+     "callee": "logger.warning",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 312,
+     "callee": "logger.exception",
+     "observable": false,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.management.commands.run_periodic_fields_updates.Command.handle",
+   "file": "backend/src/baserow/contrib/database/management/commands/run_periodic_fields_updates.py",
+   "executed_calls": 1,
+   "tests": [
+    "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  }
+ ]
+}

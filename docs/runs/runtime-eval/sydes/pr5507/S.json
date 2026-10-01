@@ -1,0 +1,482 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "37 changed symbol(s); no route flow resolved to them.",
+  "counts": {
+   "changed_files": 10,
+   "changed_source_files": 8,
+   "changed_test_files": 1,
+   "changed_symbols": 37,
+   "affected_flows": 0,
+   "flows_partially_analyzed": 0,
+   "code_findings": 0,
+   "obligations": 0,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 0,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 0,
+   "tests_exercising_flows": 0,
+   "tests_supporting_behavior": 0,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 12,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 8,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 37,
+   "impacts_inferred": 3,
+   "impacts_not_modeled": 40,
+   "unresolved_changed_symbols": 8
+  },
+  "risk_reasons": [
+   "change could not be tied to any verifiable behavior"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_restore_trash_entry",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_restore_trash_entry"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "force_restore_item",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "force_restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "restore_item",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo_redo",
+   "kind": "decorated",
+   "status": "inferred",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "Undoing row deletions with view-scoped access",
+   "kind": "unknown",
+   "status": "inferred",
+   "changed_symbols": [
+    "(whole change)"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "Undo and redo of row changes after view deletion",
+   "kind": "unknown",
+   "status": "inferred",
+   "changed_symbols": [
+    "get_view_or_none"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [],
+ "tests_on_behavioral_path": null,
+ "diagnostics": [],
+ "llm_calls": [
+  {
+   "stage": "pr_semantic_analysis",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "route_discovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "boundary_reasoning",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  }
+ ],
+ "seconds": 1675
+}

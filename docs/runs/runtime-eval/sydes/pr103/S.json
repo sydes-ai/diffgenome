@@ -1,0 +1,245 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "5 obligation(s) across 4 flow(s): 0 passed, 0 failed, 5 unverified, 0 unknown",
+  "counts": {
+   "changed_files": 32,
+   "changed_source_files": 19,
+   "changed_test_files": 8,
+   "changed_symbols": 33,
+   "affected_flows": 4,
+   "flows_partially_analyzed": 3,
+   "code_findings": 0,
+   "obligations": 5,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 5,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 100,
+   "tests_exercising_flows": 20,
+   "tests_supporting_behavior": 20,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 13,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 2,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 3,
+   "impacts_inferred": 1,
+   "impacts_not_modeled": 1,
+   "unresolved_changed_symbols": 30
+  },
+  "risk_reasons": [
+   "5 obligation(s) have no verifying test",
+   "3 flow(s) only partially analyzed \u2014 absence of downstream effects is not established"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "POST /tokens/renew_access",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "renewAccessToken"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "POST /users",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "createUser"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "POST /users/login",
+   "kind": "http_route",
+   "status": "proven",
+   "changed_symbols": [
+    "loginUser"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "Role-restricted user updates",
+   "kind": "unknown",
+   "status": "inferred",
+   "changed_symbols": [
+    "authorizeUser",
+    "hasPermission"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [
+  "flow:POST:/tokens/renew_access",
+  "flow:POST:/users",
+  "flow:POST:/users/login",
+  "flow:GRPC:None"
+ ],
+ "tests_on_behavioral_path": null,
+ "diagnostics": [],
+ "llm_calls": [
+  {
+   "stage": "pr_semantic_analysis",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "route_discovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "boundary_reasoning",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "flow_expansion",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "flow_expansion",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "flow_expansion",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "flow_expansion",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  }
+ ],
+ "seconds": 2540
+}

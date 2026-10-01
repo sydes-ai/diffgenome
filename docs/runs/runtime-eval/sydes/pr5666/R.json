@@ -1,0 +1,376 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "49 changed symbol(s); no route flow resolved to them.",
+  "counts": {
+   "changed_files": 12,
+   "changed_source_files": 4,
+   "changed_test_files": 2,
+   "changed_symbols": 49,
+   "affected_flows": 0,
+   "flows_partially_analyzed": 0,
+   "code_findings": 0,
+   "obligations": 0,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 0,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 0,
+   "tests_exercising_flows": 0,
+   "tests_supporting_behavior": 0,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 26,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 8,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 22,
+   "impacts_inferred": 1,
+   "impacts_not_modeled": 23,
+   "unresolved_changed_symbols": 1
+  },
+  "risk_reasons": [
+   "change could not be tied to any verifiable behavior"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "get_combined_theme_config_blocks_serializer_class",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "clear",
+    "set"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_run_periodic_field_type_update_per_workspace",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_run_periodic_field_type_update_per_workspace"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "finish_periodic_fields_update",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "RUN_LOCK_KEY",
+    "RUN_LOCK_TTL",
+    "_CLEAR_IF_SCRIPT",
+    "__init__",
+    "_eval_if",
+    "clear_if",
+    "finish_periodic_fields_update"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "run_periodic_fields_updates",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT",
+    "RUN_LOCK_KEY",
+    "RUN_LOCK_TTL",
+    "SLOW_WORKSPACE_LOG_THRESHOLD_SECONDS",
+    "_CLEAR_IF_SCRIPT",
+    "__init__",
+    "_collect_ordered_workspace_ids",
+    "_collect_workspace_ids_needing_update",
+    "_eval_if",
+    "_run_periodic_field_type_update_per_workspace",
+    "_update_workspace_periodic_fields",
+    "acquire",
+    "clear_if",
+    "filter_distinct_workspace_ids_per_fields",
+    "finish_periodic_fields_update",
+    "run_periodic_fields_updates",
+    "update_workspaces_periodic_fields"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "setup_periodic_tasks",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "run_periodic_fields_updates"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "update_workspaces_periodic_fields",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BATCH_UPDATE_HARD_TIME_LIMIT",
+    "BATCH_UPDATE_SOFT_TIME_LIMIT",
+    "RUN_LOCK_KEY",
+    "RUN_LOCK_TTL",
+    "SLOW_WORKSPACE_LOG_THRESHOLD_SECONDS",
+    "_EXTEND_IF_SCRIPT",
+    "__init__",
+    "_eval_if",
+    "_run_periodic_field_type_update_per_workspace",
+    "_update_workspace_periodic_fields",
+    "extend_if",
+    "update_workspaces_periodic_fields"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "periodic_check_pending_search_data",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "schedule_update_search_data",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "set"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "update_search_data",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT",
+    "clear"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "update_view_index",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "get_collation_name",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "clear",
+    "set"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "delete_marked_import_export_resources",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "singleton_send_instant_notifications_summary_by_email",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "sync_templates_task",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "run_calculate_storage",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "clean_up_audit_log_entries",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "check_data_scans_due",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "run_data_scan",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "generate_scheduled_ai_field_generation",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT",
+    "clear"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "periodic_reschedule_old_ai_field_generation",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "PERIODIC_FIELD_UPDATE_BATCH_COUNT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "get_formula_docs",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "clear",
+    "set"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "get_generate_formula_prompt",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "clear",
+    "set"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "Concurrent manual and scheduled workspace field refreshes",
+   "kind": "unknown",
+   "status": "inferred",
+   "changed_symbols": [
+    "handle"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [],
+ "tests_on_behavioral_path": [
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_cross_table_dependent_formulas_update_when_multiple_tables_have_now",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_finish_periodic_fields_update_releases_only_matching_token",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_link_row_fields_deps_are_excluded_from_periodic_updates",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_one_formula_failing_doesnt_block_others",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_field_type_updates_dependant_fields",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_database",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_table",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_doesnt_update_trashed_workspace",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_reraises_soft_time_limit",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_non_existing_workspace_does_nothing",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_field_type_update_per_workspace",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_clears_lock_after_completion",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_command_runs_inline",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatch_false_runs_inline",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_never_refreshed_workspace",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_only_eligible_workspaces",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_dispatches_stalest_first",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_empty_cycle_releases_lock",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_releases_lock_on_dispatch_failure",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_skips_when_cycle_running",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_run_periodic_fields_updates_splits_into_configured_batches",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_skips_missing_workspace",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_updates_now_fields",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspace_periodic_fields_warns_when_slow",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_aborts_when_lock_not_owned",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_continues_after_workspace_error",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_extends_run_lock",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_update_workspaces_periodic_fields_stops_on_soft_time_limit",
+  "tests/baserow/contrib/database/field/test_field_tasks.py::test_workspace_updated_last_will_be_updated_first_this_time",
+  "tests/baserow/test_celery_singleton_backend.py::test_clear_if_only_deletes_on_matching_token",
+  "tests/baserow/test_celery_singleton_backend.py::test_extend_if_extends_only_for_matching_token"
+ ],
+ "diagnostics": [
+  "behavioral_context=supplied evidence_chars=12154",
+  "behavioral_context_candidate_files_added=2",
+  "behavioral_context_observed_edges: added=8, already_static=11, observed_pairs=19, unresolved_frames=48",
+  "boundary_reasoning unavailable: OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+ ],
+ "llm_calls": [
+  {
+   "stage": "pr_semantic_analysis",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "route_discovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "boundary_reasoning",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": true,
+   "error": null
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  }
+ ],
+ "seconds": 1386
+}

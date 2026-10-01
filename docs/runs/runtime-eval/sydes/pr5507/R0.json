@@ -1,0 +1,450 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "37 changed symbol(s); no route flow resolved to them.",
+  "counts": {
+   "changed_files": 10,
+   "changed_source_files": 8,
+   "changed_test_files": 1,
+   "changed_symbols": 37,
+   "affected_flows": 0,
+   "flows_partially_analyzed": 0,
+   "code_findings": 0,
+   "obligations": 0,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 0,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 0,
+   "tests_exercising_flows": 0,
+   "tests_supporting_behavior": 0,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 12,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 8,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 39,
+   "impacts_inferred": 1,
+   "impacts_not_modeled": 40,
+   "unresolved_changed_symbols": 3
+  },
+  "risk_reasons": [
+   "change could not be tied to any verifiable behavior"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "force_restore_item",
+    "get_view_or_none",
+    "redo",
+    "restore_row"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "force_restore_item",
+    "get_view_or_none",
+    "redo",
+    "restore_rows"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "force_restore_item",
+    "get_view_or_none",
+    "restore_row",
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "force_restore_item",
+    "get_view_or_none",
+    "restore_rows",
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do",
+    "get_row_for_update"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_row_for_update",
+    "get_view_or_none",
+    "redo",
+    "update_row_by_id"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_row_for_update",
+    "get_view_or_none",
+    "undo",
+    "update_row_by_id"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "do",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "do"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "redo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "get_view_or_none",
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_redo_action",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "redo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_undo_action",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_restore_trash_entry",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_restore_trash_entry"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "force_restore_item",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_restore_trash_entry",
+    "force_restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "restore_item",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "restore_item"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "undo_redo",
+   "kind": "decorated",
+   "status": "inferred",
+   "changed_symbols": [
+    "undo"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [],
+ "tests_on_behavioral_path": [
+  "::test_editor_on_restricted_view_can_redo_create_row",
+  "::test_editor_on_restricted_view_can_redo_create_rows",
+  "::test_editor_on_restricted_view_can_redo_delete_row",
+  "::test_editor_on_restricted_view_can_redo_delete_rows",
+  "::test_editor_on_restricted_view_can_redo_update_row",
+  "::test_editor_on_restricted_view_can_redo_update_rows",
+  "::test_editor_on_restricted_view_can_undo_create_row",
+  "::test_editor_on_restricted_view_can_undo_create_rows",
+  "::test_editor_on_restricted_view_can_undo_delete_row",
+  "::test_editor_on_restricted_view_can_undo_delete_rows",
+  "::test_editor_on_restricted_view_can_undo_update_row",
+  "::test_editor_on_restricted_view_can_undo_update_rows",
+  "::test_realtime_row_updated_does_not_expose_hidden_field"
+ ],
+ "diagnostics": [
+  "behavioral_context=supplied evidence_chars=7907",
+  "behavioral_context_candidate_files_added=0",
+  "behavioral_context_observed_edges: added=37, observed_pairs=37, unresolved_frames=305"
+ ],
+ "llm_calls": [],
+ "seconds": 49
+}

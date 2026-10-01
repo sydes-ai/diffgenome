@@ -1,0 +1,300 @@
+{
+ "summary": {
+  "risk": "MEDIUM",
+  "verdict": "VERIFICATION INCOMPLETE",
+  "headline": "40 changed symbol(s); no route flow resolved to them.",
+  "counts": {
+   "changed_files": 21,
+   "changed_source_files": 7,
+   "changed_test_files": 9,
+   "changed_symbols": 40,
+   "affected_flows": 0,
+   "flows_partially_analyzed": 0,
+   "code_findings": 0,
+   "obligations": 0,
+   "obligations_introduced_by_change": 0,
+   "obligations_passed": 0,
+   "obligations_failed": 0,
+   "obligations_unverified": 0,
+   "obligations_unknown": 0,
+   "mapped_tests": 0,
+   "supporting_tests": 0,
+   "tests_exercising_flows": 0,
+   "tests_supporting_behavior": 0,
+   "tests_verifying_behavior": 0,
+   "changed_test_cases": 27,
+   "tests_executed": 0,
+   "verification_gaps": 0,
+   "runtime_dependencies": 8,
+   "cross_repo_impacts": 0,
+   "impacts_proven": 17,
+   "impacts_inferred": 0,
+   "impacts_not_modeled": 17,
+   "unresolved_changed_symbols": 9
+  },
+  "risk_reasons": [
+   "change could not be tied to any verifiable behavior"
+  ]
+ },
+ "accepted_impacts": [
+  {
+   "label": "post",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "post"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_check_host_not_blocked",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_check_host_not_blocked",
+    "_normalize_ip",
+    "are_hostnames_same",
+    "get_all_ips"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_connection",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT",
+    "_check_host_not_blocked",
+    "_connection",
+    "_get_local_addresses",
+    "_is_ip_unsafe",
+    "get_all_ips",
+    "resolve_and_validate_hostname"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "_normalize_ip",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "_normalize_ip"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "periodic_check_pending_search_data",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "update_search_data",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "update_view_index",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "delete_marked_import_export_resources",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "singleton_send_instant_notifications_summary_by_email",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "sync_templates_task",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "run_calculate_storage",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "clean_up_audit_log_entries",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "check_data_scans_due",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "run_data_scan",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "call_periodic_data_sync_syncs_that_are_due",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "generate_scheduled_ai_field_generation",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  },
+  {
+   "label": "periodic_reschedule_old_ai_field_generation",
+   "kind": "decorated",
+   "status": "proven",
+   "changed_symbols": [
+    "BASEROW_POSTGRESQL_DATA_SYNC_STATEMENT_TIMEOUT"
+   ],
+   "provenance": "structural"
+  }
+ ],
+ "affected_flows": [],
+ "tests_on_behavioral_path": [
+  "::test_get_properties_with_table_view_id_none",
+  "::test_get_properties_with_view_provided_only_public_fields",
+  "::test_viewer_role_denied_data_sync_properties_no_external_call",
+  "tests/baserow/contrib/database/api/data_sync/test_data_sync_views.py::test_create_data_sync_no_permissions",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_blacklist",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_check_host_not_blocked_ipv4_mapped_bypass",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_connection_error",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_blacklist",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_connect_to_same_database",
+  "tests/baserow/contrib/database/data_sync/test_data_sync_postgresql.py::test_postgresql_data_sync_table_does_not_exist",
+  "tests/baserow/core/test_core_utils.py::test_are_hostnames_same",
+  "tests/baserow/core/test_core_utils.py::test_get_all_ips",
+  "tests/baserow/core/test_core_utils.py::test_is_hostname_safe",
+  "tests/baserow/core/test_core_utils.py::test_resolve_and_validate_hostname"
+ ],
+ "diagnostics": [
+  "behavioral_context=supplied evidence_chars=7855",
+  "pr_semantic_analysis unavailable: OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}",
+  "behavioral_context_candidate_files_added=2",
+  "behavioral_context_observed_edges: added=11, already_static=7, observed_pairs=18, unresolved_frames=329",
+  "boundary_reasoning unavailable: OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+ ],
+ "llm_calls": [
+  {
+   "stage": "pr_semantic_analysis",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "route_discovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "impact_guide",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "boundary_reasoning",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  },
+  {
+   "stage": "ai_recovery",
+   "success": false,
+   "error": "OpenAI request failed for model 'gpt-6-astra': Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}"
+  }
+ ],
+ "seconds": 159
+}

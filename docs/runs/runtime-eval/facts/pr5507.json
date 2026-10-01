@@ -1,0 +1,860 @@
+{
+ "universe": {
+  "executions": 55,
+  "passed": 55,
+  "failed": 0
+ },
+ "boundaries": [
+  {
+   "kind": "external",
+   "caller": "py:baserow.ws.registries.PageType.broadcast",
+   "target": "py:celery.local.broadcast_to_channel_group.delay"
+  }
+ ],
+ "functions": [
+  {
+   "symbol": "py:baserow.contrib.database.apps.DatabaseConfig.ready",
+   "file": "backend/src/baserow/contrib/database/apps.py",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 917,
+     "callee": "RestoreViewRowOperationType",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 917,
+     "callee": "operation_type_registry.register",
+     "observable": true,
+     "observed": false
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.CreateRowActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 201,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 201,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 202,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 202,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 203,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 203,
+     "callee": "RowHandler().restore_row",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.CreateRowActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row",
+    "::test_editor_on_restricted_view_can_undo_create_row"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 191,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 191,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 194,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 194,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.CreateRowsActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_rows"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 327,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 327,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 328,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 328,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 329,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 329,
+     "callee": "RowHandler().restore_rows",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.CreateRowsActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_rows",
+    "::test_editor_on_restricted_view_can_undo_create_rows"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 315,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 315,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 318,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 318,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.DeleteRowActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_delete_row"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 530,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 530,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 533,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 533,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.DeleteRowActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_delete_row",
+    "::test_editor_on_restricted_view_can_undo_delete_row"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 524,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 524,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 525,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 525,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 526,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 526,
+     "callee": "RowHandler().restore_row",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.DeleteRowsActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_delete_rows"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 649,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 649,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 652,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 652,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.DeleteRowsActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_delete_rows",
+    "::test_editor_on_restricted_view_can_undo_delete_rows"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 637,
+     "callee": "TableHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 637,
+     "callee": "TableHandler().get_table",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 638,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 638,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 639,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 639,
+     "callee": "RowHandler().restore_rows",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.UpdateRowActionType.do",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_row",
+    "::test_editor_on_restricted_view_can_undo_update_row"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.UpdateRowActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_row"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 965,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 965,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.UpdateRowActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_row",
+    "::test_editor_on_restricted_view_can_undo_update_row"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 953,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 953,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.UpdateRowsActionType.redo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 1,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_rows"
+   ],
+   "exits": {
+    "returned": 1
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 1099,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1099,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1100,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1100,
+     "callee": "RowHandler().update_rows",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.actions.UpdateRowsActionType.undo",
+   "file": "backend/src/baserow/contrib/database/rows/actions.py",
+   "executed_calls": 2,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_rows",
+    "::test_editor_on_restricted_view_can_undo_update_rows"
+   ],
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 1092,
+     "callee": "ViewHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1092,
+     "callee": "ViewHandler().get_view_or_none",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 1094,
+     "callee": "RowHandler",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 1094,
+     "callee": "RowHandler().update_rows",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.handler.RowHandler",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.handler.RowHandler.get_row_for_update",
+   "file": "backend/src/baserow/contrib/database/rows/handler.py",
+   "executed_calls": 6,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_row",
+    "::test_editor_on_restricted_view_can_undo_update_row",
+    "::test_realtime_row_updated_does_not_expose_hidden_field"
+   ],
+   "exits": {
+    "returned": 6
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.handler.RowHandler.restore_row",
+   "file": "backend/src/baserow/contrib/database/rows/handler.py",
+   "executed_calls": 3,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row",
+    "::test_editor_on_restricted_view_can_redo_delete_row",
+    "::test_editor_on_restricted_view_can_undo_delete_row"
+   ],
+   "exits": {
+    "returned": 3
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 3240,
+     "callee": "self._check_permissions_with_view_fallback",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 3248,
+     "callee": "TrashHandler.force_restore_item",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.handler.RowHandler.restore_rows",
+   "file": "backend/src/baserow/contrib/database/rows/handler.py",
+   "executed_calls": 3,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_rows",
+    "::test_editor_on_restricted_view_can_redo_delete_rows",
+    "::test_editor_on_restricted_view_can_undo_delete_rows"
+   ],
+   "exits": {
+    "returned": 3
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 3272,
+     "callee": "self._check_permissions_with_view_fallback",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 3280,
+     "callee": "TrashHandler.force_restore_item",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.rows.handler.RowHandler.update_row_by_id",
+   "file": "backend/src/baserow/contrib/database/rows/handler.py",
+   "executed_calls": 4,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_update_row",
+    "::test_editor_on_restricted_view_can_undo_update_row",
+    "::test_realtime_row_updated_does_not_expose_hidden_field"
+   ],
+   "exits": {
+    "returned": 4
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.views.handler.ViewHandler",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.contrib.database.views.handler.ViewHandler.get_view_or_none",
+   "file": "backend/src/baserow/contrib/database/views/handler.py",
+   "executed_calls": 18,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row",
+    "::test_editor_on_restricted_view_can_redo_create_rows",
+    "::test_editor_on_restricted_view_can_redo_delete_row",
+    "::test_editor_on_restricted_view_can_redo_delete_rows",
+    "::test_editor_on_restricted_view_can_redo_update_row",
+    "::test_editor_on_restricted_view_can_redo_update_rows",
+    "::test_editor_on_restricted_view_can_undo_create_row",
+    "::test_editor_on_restricted_view_can_undo_create_rows",
+    "::test_editor_on_restricted_view_can_undo_delete_row",
+    "::test_editor_on_restricted_view_can_undo_delete_rows",
+    "::test_editor_on_restricted_view_can_undo_update_row",
+    "::test_editor_on_restricted_view_can_undo_update_rows"
+   ],
+   "exits": {
+    "returned": 18
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:258bc8ade984",
+     "line": 911,
+     "pred": "view_id is None",
+     "true": 0,
+     "false": 18
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 914,
+     "callee": "self.get_view",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.contrib.database.views.operations.RestoreViewRowOperationType",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.core.trash.handler.TrashHandler",
+   "file": null,
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": []
+  },
+  {
+   "symbol": "py:baserow.core.trash.handler.TrashHandler._restore_trash_entry",
+   "file": "backend/src/baserow/core/trash/handler.py",
+   "executed_calls": 6,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row",
+    "::test_editor_on_restricted_view_can_redo_create_rows",
+    "::test_editor_on_restricted_view_can_redo_delete_row",
+    "::test_editor_on_restricted_view_can_redo_delete_rows",
+    "::test_editor_on_restricted_view_can_undo_delete_row",
+    "::test_editor_on_restricted_view_can_undo_delete_rows"
+   ],
+   "exits": {
+    "returned": 6
+   },
+   "raised_inside": {},
+   "changed_sites": [
+    {
+     "site": "br:907a1cc8d212",
+     "line": 201,
+     "pred": "TrashHandler.item_has_a_trashed_parent(trash_item)",
+     "true": 0,
+     "false": 6
+    },
+    {
+     "site": "br:3202dc3f0840",
+     "line": 204,
+     "pred": "trash_entry.trash_item_owner is not None and trash_entry.trash_item_owner != user",
+     "true": 0,
+     "false": 6
+    }
+   ],
+   "changed_calls": [
+    {
+     "line": 201,
+     "callee": "TrashHandler.item_has_a_trashed_parent",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 202,
+     "callee": "CannotRestoreChildBeforeParent",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 208,
+     "callee": "CannotRestoreItemNotOwnedByUser",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 210,
+     "callee": "trash_entry.delete",
+     "observable": true,
+     "observed": false
+    },
+    {
+     "line": 212,
+     "callee": "trash_item_type_registry.get_by_model",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 213,
+     "callee": "restore_type.restore",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.trash.handler.TrashHandler.force_restore_item",
+   "file": "backend/src/baserow/core/trash/handler.py",
+   "executed_calls": 6,
+   "tests": [
+    "::test_editor_on_restricted_view_can_redo_create_row",
+    "::test_editor_on_restricted_view_can_redo_create_rows",
+    "::test_editor_on_restricted_view_can_redo_delete_row",
+    "::test_editor_on_restricted_view_can_redo_delete_rows",
+    "::test_editor_on_restricted_view_can_undo_delete_row",
+    "::test_editor_on_restricted_view_can_undo_delete_rows"
+   ],
+   "exits": {
+    "returned": 6
+   },
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 239,
+     "callee": "transaction.atomic",
+     "observable": false,
+     "observed": false
+    },
+    {
+     "line": 240,
+     "callee": "cls.get_trash_entry",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 243,
+     "callee": "trash_item_type_registry.get",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 244,
+     "callee": "trashable_item_type.lookup_trashed_item",
+     "observable": true,
+     "observed": true
+    },
+    {
+     "line": 246,
+     "callee": "cls._restore_trash_entry",
+     "observable": true,
+     "observed": true
+    }
+   ]
+  },
+  {
+   "symbol": "py:baserow.core.trash.handler.TrashHandler.restore_item",
+   "file": "backend/src/baserow/core/trash/handler.py",
+   "executed_calls": 0,
+   "tests": [],
+   "exits": {},
+   "raised_inside": {},
+   "changed_sites": [],
+   "changed_calls": [
+    {
+     "line": 180,
+     "callee": "cls._restore_trash_entry",
+     "observable": true,
+     "observed": false
+    }
+   ]
+  }
+ ]
+}
