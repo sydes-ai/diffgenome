@@ -9,6 +9,8 @@ description = "Runtime evidence for code changes: run a repository's existing te
 readme = "README.md"
 # 3.12+ is required: the Python tracer is built on sys.monitoring (PEP 669).
 requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 dependencies = []
 authors = [{ name = "karims" }]
 keywords = ["code review", "runtime evidence", "test mapping", "tracing", "change impact"]
@@ -44,7 +46,7 @@ packages = ["src/diffgenome"]
 exclude = ["src/diffgenome/_collectors/node/node_modules"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src/diffgenome", "/tests", "/fixtures", "/README.md", "/pyproject.toml"]
+include = ["/src/diffgenome", "/tests", "/fixtures", "/README.md", "/LICENSE", "/pyproject.toml"]
 exclude = ["src/diffgenome/_collectors/node/node_modules", "**/__pycache__"]
 
 [tool.pytest.ini_options]

@@ -112,3 +112,7 @@ uv sync
 uv run pytest
 uv run ruff check src tests && uv run mypy src
 ```
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
