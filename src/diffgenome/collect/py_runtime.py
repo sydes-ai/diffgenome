@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import json
 import shutil
 from pathlib import Path
 
@@ -60,6 +61,9 @@ class PytestRuntime:
         self.pythonpath = list(pythonpath or [])
         self.test_env = dict(test_env or {})
         self.allow_loopback = allow_loopback
+        #: changed symbols; when set, each test's trace keeps only what bears on them
+        self.focus: list[str] | None = None
+        self.focus_depth = 2  # calls kept below each changed call
 
     def prepare(self, ws: Workspace) -> SymbolIndex:
         # Index the workspace copy, i.e. the analyzed revision (`--rev` archives it there), not
@@ -82,6 +86,7 @@ class PytestRuntime:
             "--diffgenome-test-root", self.test_root,
             "--diffgenome-stimulus", stimulus.value,
             "--diffgenome-egress-guard",
+            *self._focus_args(ws),
             *self.pytest_args,
             *(only if only else [self.tests]),
         ]  # fmt: skip
@@ -93,6 +98,14 @@ class PytestRuntime:
         copy_probe_traces(traces_ws, out_dir)
         executions = [execution_from_json(f.read_text()) for f in sorted(out_dir.glob("*.json"))]
         return executions, result.stdout, result.stderr
+
+    def _focus_args(self, ws: Workspace) -> list[str]:
+        if self.focus is None:
+            return []
+        path = ws.root / "focus.json"
+        spec = {"symbols": sorted(self.focus), "depth": self.focus_depth}
+        path.write_text(json.dumps(spec), encoding="utf-8")
+        return ["--diffgenome-focus", str(path)]
 
     def probe_relpath(self, tag: str) -> str:
         return f"{self.test_root}/test_diffgenome_probe_{tag}.py"

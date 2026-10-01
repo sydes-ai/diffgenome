@@ -55,6 +55,11 @@ diffgenome change --runtime go --repo . --test-root api --tests ./api/ \
 diffgenome change ... --rev <head> --diff <base>..<head>
 ```
 
+Python traces keep only what bears on the change: calls to changed functions, every frame
+above them back to the test, and `--down` levels below them. Unrelated work in a test (fixture
+setup, bulk data) is dropped as the test finishes, so large suites stay affordable. Use
+`--full-traces` to keep every call.
+
 The result is `.diffgenome/run/diffgenome-change.json`. Its `runtime` section is the contract:
 
 ```jsonc

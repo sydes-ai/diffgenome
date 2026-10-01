@@ -127,6 +127,22 @@ def _canonical(value: Any, depth: int) -> str | None:
 _STATE_WIDTH = 16
 
 
+#: frames from a monitoring callback's body to the monitored frame: the callback itself, then
+#: the re-entrancy guard (`Tracer._guarded`) that sys.monitoring actually calls
+_MONITORED = 2
+
+
+def own_dict(obj: Any) -> dict[str, Any] | None:
+    """`obj.__dict__` without running target code: a plain `getattr` falls through to a
+    class's `__getattr__` when there is no instance dict (Baserow's lazy queryset proxy then
+    built a queryset, which the tracer inspected again, until RecursionError)."""
+    try:
+        d = object.__getattribute__(obj, "__dict__")
+    except Exception:
+        return None
+    return d if isinstance(d, dict) else None
+
+
 def bucket(value: Any) -> tuple[str, str] | None:
     """Language-neutral low-cardinality bucket of a value, or None when the value is not
     branch-relevant enough to summarize (free-form objects, callables). Returns
@@ -169,7 +185,7 @@ def state_facts(
                 digest_value(type(receiver).__qualname__),
             )
         )
-        d = getattr(receiver, "__dict__", None)
+        d = own_dict(receiver)
         if isinstance(d, dict):
             for name, value in list(d.items())[:_STATE_WIDTH]:
                 b = bucket(value)
@@ -196,7 +212,7 @@ def state_facts(
                     continue
                 if callable(value):
                     continue
-                own = getattr(value, "__dict__", None)
+                own = own_dict(value)
                 if isinstance(own, dict) and not isinstance(value, mock.NonCallableMock):
                     # a global object (settings, config): the attributes this code reads
                     # through it, from its own instance dict only (no descriptors run)
@@ -289,6 +305,7 @@ class Tracer:
     _symbols: dict[SymbolId, Symbol] = field(default_factory=dict, repr=False)
     _nodes: list[Node] = field(default_factory=list, repr=False)
     _stacks: dict[int, list[tuple[CodeType | None, int]]] = field(default_factory=dict, repr=False)
+    _busy: set[int] = field(default_factory=set, repr=False)  # threads inside a callback
     _threads: dict[int, int] = field(default_factory=dict, repr=False)
     _frame_nodes: dict[int, int] = field(default_factory=dict, repr=False)  # id(frame) -> node
     _fake_wrappers: dict[int, int] = field(
@@ -507,7 +524,7 @@ class Tracer:
         for obj in candidates:
             if isinstance(obj, mock.NonCallableMock | type(None) | int | str | float | bool):
                 continue
-            d = getattr(obj, "__dict__", None)
+            d = own_dict(obj)
             if not isinstance(d, dict):
                 continue
             for name, value in d.items():
@@ -532,7 +549,7 @@ class Tracer:
             if bound is not None:
                 obj = None
                 for cand in list(frame.f_locals.values())[: _MAX_ARGS + 2]:
-                    d = getattr(cand, "__dict__", None)
+                    d = own_dict(cand)
                     if isinstance(d, dict) and any(v is root for v in d.values()):
                         obj = cand
                         break
@@ -595,6 +612,24 @@ class Tracer:
 
     # ------------------------------------------------------------------ attribution
 
+    def _guarded(self, callback: Any) -> Any:
+        """Events raised by code the tracer itself runs while inspecting a frame (a property,
+        `__getattr__`, `__repr__` of a target object) are not the program's behavior: they are
+        ignored instead of being traced and inspected again."""
+        busy: set[int] = self._busy
+
+        def guarded(*args: Any) -> Any:
+            ident = threading.get_ident()
+            if ident in busy:
+                return None
+            busy.add(ident)
+            try:
+                return callback(*args)
+            finally:
+                busy.discard(ident)
+
+        return guarded
+
     def _thread(self) -> int:
         ident = threading.get_ident()
         if ident not in self._threads:
@@ -625,7 +660,7 @@ class Tracer:
         if scope is None:
             return _DISABLE
         ident = self._thread()
-        frame = sys._getframe(1)
+        frame = sys._getframe(_MONITORED)
         stack = self._stacks[ident]
         if (
             code is self._root_code
@@ -693,7 +728,7 @@ class Tracer:
         self._nodes[node_id] = dataclasses.replace(node, outcome=outcome, result=result)
 
     def _finish(self, code: CodeType, outcome: str, result: str = "") -> None:
-        frame = sys._getframe(2)
+        frame = sys._getframe(_MONITORED + 1)
         node_id = self._frame_nodes.pop(id(frame), None)
         if node_id:
             self._set_outcome(node_id, outcome, result)
@@ -811,7 +846,7 @@ class Tracer:
         if _inside(there, match.test):
             return None  # short-circuit inside the condition
         outcome = _inside(there, match.body)
-        node = self._frame_nodes.get(id(sys._getframe(1)), 0)
+        node = self._frame_nodes.get(id(sys._getframe(_MONITORED)), 0)
         self._branches.append(BranchObs(match.site, outcome, node, len(self._nodes)))
         return None
 
@@ -832,7 +867,7 @@ class Tracer:
                 () if arg0 is _MISSING else (("arg0", summarize_value(arg0), digest_value(arg0)),)
             )
             ident = self._thread()
-            frame = sys._getframe(1)
+            frame = sys._getframe(_MONITORED)
             parent = self._frame_nodes.get(id(frame), self._ancestor_node(frame))
             node_id = self._record_substitution(
                 parent, SubstitutionMechanism.MOCK_OBJECT, callable_, args, frame
@@ -919,11 +954,11 @@ class Tracer:
         self._nodes.append(CallNode(0, None, root_symbol, 0, (), 0))
         self._thread()
         m.use_tool_id(_TOOL_ID, "diffgenome")
-        m.register_callback(_TOOL_ID, m.events.PY_START, self._on_start)
-        m.register_callback(_TOOL_ID, m.events.PY_RETURN, self._on_return)
-        m.register_callback(_TOOL_ID, m.events.PY_UNWIND, self._on_unwind)
-        m.register_callback(_TOOL_ID, m.events.CALL, self._on_call)
-        m.register_callback(_TOOL_ID, m.events.BRANCH, self._on_branch)
+        m.register_callback(_TOOL_ID, m.events.PY_START, self._guarded(self._on_start))
+        m.register_callback(_TOOL_ID, m.events.PY_RETURN, self._guarded(self._on_return))
+        m.register_callback(_TOOL_ID, m.events.PY_UNWIND, self._guarded(self._on_unwind))
+        m.register_callback(_TOOL_ID, m.events.CALL, self._guarded(self._on_call))
+        m.register_callback(_TOOL_ID, m.events.BRANCH, self._guarded(self._on_branch))
         self._branches.clear()
         mixin: Any = mock.CallableMixin  # private attribute, absent from typeshed
         self._orig_mock_call = mixin._mock_call

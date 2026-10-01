@@ -297,3 +297,32 @@ def test_function_autospec_standins_are_visible(tmp_path: Path) -> None:
     assert sub.claimed_target == "py:pkg.svc.lookup" and sub.relation == "patch-target"
     assert sub.outcome == "returned" and sub.args[0][:2] == ("arg0", "str")
     assert sub.parent == calls(ex)["py:pkg.svc.run"][0].id
+
+
+def test_inspecting_a_receiver_never_runs_its_getattr(tmp_path: Path) -> None:
+    """Baserow's lazy queryset proxy: no instance __dict__, and `__getattr__` builds another
+    proxy and calls into it. Reading `self.__dict__` with plain getattr ran that code, which the
+    tracer inspected again, until RecursionError (the test passes untraced)."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "lazy.py").write_text(
+        "class Lazy:\n"
+        "    __slots__ = ('n',)\n"
+        "    def __init__(self, n):\n"
+        "        self.n = n\n"
+        "    def __getattr__(self, name):\n"
+        "        return Lazy(self.n + 1).total()\n"
+        "    def total(self):\n"
+        "        return self.n * 2\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_lazy.py").write_text(
+        "from pkg.lazy import Lazy\n"
+        "def test_total():\n"
+        "    assert Lazy(1).total() == 2\n"
+    )
+    ex = trace(tmp_path, tmp_path / "out")["test_total"]
+    assert ex.outcome == "passed"
+    assert [n.symbol for n in ex.nodes if isinstance(n, CallNode)][1:] == [
+        "py:pkg.lazy.Lazy.__init__", "py:pkg.lazy.Lazy.total"
+    ]

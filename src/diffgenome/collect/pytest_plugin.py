@@ -11,6 +11,7 @@ PYTHONDONTWRITEBYTECODE=1 when the target is mounted read-only.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import subprocess
 from collections.abc import Generator
@@ -18,6 +19,7 @@ from pathlib import Path
 
 import pytest
 
+from diffgenome.collect.prune import prune_to_focus
 from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer
 from diffgenome.model import Collector, Execution, Stimulus
 from diffgenome.serialize import execution_to_json
@@ -45,6 +47,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default="existing_test",
         choices=[s.value for s in Stimulus],
         help="how these executions were caused (generated probes must say so)",
+    )
+    group.addoption(
+        "--diffgenome-focus",
+        default=None,
+        help="JSON list of changed symbols: keep only the part of each trace that bears on them",
     )
     group.addoption(
         "--diffgenome-egress-guard",
@@ -85,6 +92,10 @@ class _Plugin:
             self.tracer.install_egress_guard()
             self.collectors = (COLLECTOR, EGRESS_GUARD)
         self.revision = _revision(roots[0])
+        focus = config.getoption("--diffgenome-focus")
+        spec = json.loads(Path(focus).read_text(encoding="utf-8")) if focus else None
+        self.focus: set[str] | None = set(spec["symbols"]) if spec else None
+        self.focus_depth: int = int(spec.get("depth", 2)) if spec else 2
 
     @pytest.hookimpl(wrapper=True)
     def pytest_runtest_call(self, item: pytest.Item) -> Generator[None, None, None]:
@@ -100,6 +111,11 @@ class _Plugin:
             raise
         finally:
             result = self.tracer.stop()
+            nodes, branches, dropped = result.nodes, result.branches, 0
+            if self.focus is not None:
+                nodes, branches, dropped = prune_to_focus(
+                    nodes, branches, self.focus, self.focus_depth
+                )
             execution = Execution(
                 id=f"{item.nodeid}@{self.revision or 'unknown'}",
                 stimulus=self.stimulus,
@@ -108,11 +124,12 @@ class _Plugin:
                 revision=self.revision,
                 collectors=self.collectors,
                 symbols=result.symbols,
-                nodes=result.nodes,
-                branches=result.branches,
+                nodes=nodes,
+                branches=branches,
                 diagnostics=(
                     ("stack_repairs", str(result.stack_repairs)),
                     ("attribution_disagreements", str(result.attribution_disagreements)),
+                    ("pruned_nodes", str(dropped)),
                 ),
             )
             # Sanitized ids can collide (parametrized ids differing only in punctuation)

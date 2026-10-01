@@ -201,6 +201,11 @@ def main(argv: list[str] | None = None) -> int:
         "--no-state", action="store_true", help="ignore state facts at seams (VALUE-only baseline)"
     )
     ap.add_argument(
+        "--full-traces",
+        action="store_true",
+        help="python: keep every call in each trace (default: only what bears on the change)",
+    )
+    ap.add_argument(
         "--probe-max-distance",
         type=int,
         default=None,
@@ -229,6 +234,21 @@ def main(argv: list[str] | None = None) -> int:
     _log(f"workspace {ws.root} (copy of {repo}; original never written) runtime={runtime.name}")
     try:
         index: SymbolIndex = runtime.prepare(ws)
+        # the change is known before any test runs: collectors that support it keep only the
+        # part of each trace that bears on it (a single test can record millions of calls)
+        change: ChangeSet
+        if args.diff:
+            change = changes_from_diff(git_diff(repo, args.diff), index, f"git diff {args.diff}")
+        elif args.symbol:
+            change = changes_from_symbols(args.symbol)
+        else:
+            ap.error("one of --diff or --symbol is required")
+        from diffgenome.collect.py_runtime import PytestRuntime
+
+        if not args.full_traces and isinstance(runtime, PytestRuntime):
+            runtime.focus = list(change.symbols)
+            # as deep below the change as the neighborhood looks (--down)
+            runtime.focus_depth = args.down
         # 1. existing executions
         if args.traces:
             executions = [
@@ -260,14 +280,7 @@ def main(argv: list[str] | None = None) -> int:
         corpus = build_corpus(executions)
         graph = build_graph(corpus, use_state=not args.no_state)
         _log(f"map: {len(graph.edges)} edges, {len(graph.symbols)} symbols, {len(graph.gaps)} gaps")
-        # 3. change
-        change: ChangeSet
-        if args.diff:
-            change = changes_from_diff(git_diff(repo, args.diff), index, f"git diff {args.diff}")
-        elif args.symbol:
-            change = changes_from_symbols(args.symbol)
-        else:
-            ap.error("one of --diff or --symbol is required")
+        # 3. change (computed above)
         seeds = [
             s
             for s in change.symbols
