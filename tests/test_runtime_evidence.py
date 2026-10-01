@@ -109,6 +109,13 @@ def test_contract_reports_execution_tests_exits_shapes_and_edges() -> None:
     assert svc["executed"] and svc["calls"] == 2 and svc["tests"] == ["t::a", "t::b"]
     assert svc["exits"] == {"returned": 1, "raised:py:ValueError": 1}
     assert svc["arg_shapes"] == [[["amount", "int"]]]
+    assert svc["origin"] == "repo"
+    assert (
+        next(e for e in r["edges"] if e["caller"]["symbol"] == "py:tests.test_x")["caller"][
+            "origin"
+        ]
+        == "test"
+    )
     # the decorator wrapper is looked through: handler is the real caller
     assert [c["symbol"] for c in svc["callers"]] == ["py:app.handler"]
     assert {(e["caller"]["symbol"], e["callee"]["symbol"]) for e in r["edges"]} == {

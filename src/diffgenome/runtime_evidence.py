@@ -85,11 +85,13 @@ def build_runtime_evidence(
     edges: dict[tuple[str, str], set[str]] = defaultdict(set)
     edge_count: Counter[tuple[str, str]] = Counter()
     locations: dict[str, tuple[str, int] | None] = {}
+    origins: dict[str, str] = {}
     universe = []
 
     for ex in execs:
         universe.append(ex.stimulus_ref)
         for symbol_rec in ex.symbols:
+            origins.setdefault(symbol_rec.id, symbol_rec.origin.value)
             if symbol_rec.location is not None:
                 locations.setdefault(
                     symbol_rec.id, (symbol_rec.location.path, symbol_rec.location.line)
@@ -144,14 +146,17 @@ def build_runtime_evidence(
     outcomes = {ex.stimulus_ref: ex.outcome for ex in execs}
 
     def loc(symbol: str) -> dict[str, Any]:
+        """Where a symbol is defined, and its origin (repo, test, ...) as observed."""
         where = locations.get(symbol)
         d = index.find(symbol)
+        origin = "test" if index.is_test(symbol) else origins.get(symbol, "unknown")
         if d is not None:
-            return {"symbol": symbol, "file": d.path, "line": d.start}
+            return {"symbol": symbol, "file": d.path, "line": d.start, "origin": origin}
         return {
             "symbol": symbol,
             "file": where[0] if where else None,
             "line": where[1] if where else None,
+            "origin": origin,
         }
 
     functions = []
