@@ -94,7 +94,11 @@ def write_mechanics(
         for rel in sorted(owner):
             module = index.module_of(owner[rel]) or ""
             try:
-                functions += lower_functions((repo / rel).read_text(encoding="utf-8"), rel, module)
+                # the analyzed revision's source (the workspace copy is not instrumented for
+                # Python; the checkout may be at another revision under --rev)
+                functions += lower_functions(
+                    (ws.repo / rel).read_text(encoding="utf-8"), rel, module
+                )
             except (OSError, SyntaxError):
                 continue
     if functions:

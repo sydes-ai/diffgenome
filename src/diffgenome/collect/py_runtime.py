@@ -45,9 +45,10 @@ class PytestRuntime:
         self.allow_loopback = allow_loopback
 
     def prepare(self, ws: Workspace) -> SymbolIndex:
-        return PythonSymbolIndex(
-            self.repo, [self.repo / self.source_root], [self.repo / self.test_root]
-        )
+        # Index the workspace copy, i.e. the analyzed revision (`--rev` archives it there), not
+        # the checkout: the checkout may sit at another revision, and the index maps the
+        # change's diff lines and the executed code's locations onto symbols.
+        return PythonSymbolIndex(ws.repo, [ws.repo / self.source_root], [ws.repo / self.test_root])
 
     def trace(
         self, ws: Workspace, out_dir: Path, stimulus: Stimulus, only: list[str] | None
