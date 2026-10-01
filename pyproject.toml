@@ -4,12 +4,32 @@ build-backend = "hatchling.build"
 
 [project]
 name = "diffgenome"
-version = "0.0.1"
-description = "Reconstruct system-level behavioral paths by stitching isolated unit-test executions across internal mock boundaries."
+version = "0.1.0"
+description = "Runtime evidence for code changes: run a repository's existing tests against a change and report what actually executed."
 readme = "README.md"
-# 3.12+ is required: the tracer is built on sys.monitoring (PEP 669).
+# 3.12+ is required: the Python tracer is built on sys.monitoring (PEP 669).
 requires-python = ">=3.12"
 dependencies = []
+authors = [{ name = "karims" }]
+keywords = ["code review", "runtime evidence", "test mapping", "tracing", "change impact"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+# The Behavioral Genome (model-proposed, test-checked behavioral rules; `diffgenome genome`) is
+# research code and optional: nothing in `diffgenome change` or the runtime-evidence contract
+# imports it. It needs no extra packages (an OpenAI key only for live proposals); the extra
+# exists to state that intent.
+genome = []
 
 [dependency-groups]
 dev = [
@@ -20,6 +40,12 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/diffgenome"]
+# the Go and Node collectors ship as package data; their node_modules never do
+exclude = ["src/diffgenome/_collectors/node/node_modules"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/diffgenome", "/tests", "/fixtures", "/README.md", "/pyproject.toml"]
+exclude = ["src/diffgenome/_collectors/node/node_modules", "**/__pycache__"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -202,6 +202,11 @@ def evaluate_main(argv: list[str]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv[:1] in (["--version"], ["-V"]):
+        from diffgenome import __version__
+
+        print(f"diffgenome {__version__}")
+        return 0
     if argv and argv[0] == "inspect":
         return inspect_main(argv[1:])
     if argv and argv[0] == "evaluate":

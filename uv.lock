@@ -81,7 +81,7 @@ wheels = [
 
 [[package]]
 name = "diffgenome"
-version = "0.0.1"
+version = "0.1.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
@@ -92,6 +92,7 @@ dev = [
 ]
 
 [package.metadata]
+provides-extras = ["genome"]
 
 [package.metadata.requires-dev]
 dev = [

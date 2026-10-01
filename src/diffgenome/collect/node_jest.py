@@ -1,6 +1,6 @@
 """Node/TypeScript runtime adapter: source instrumentation + Jest.
 
-Everything Node-specific lives here and in tools/node-collector. The workspace copy is
+Everything Node-specific lives here and in diffgenome/_collectors/node. The workspace copy is
 instrumented in place by `instrument.js` (our tool, our pinned TypeScript; no target code
 runs), a workspace-only Jest config loads `jest-setup.js`, and the instrumented tests run
 inside the sandbox with loopback allowed (test servers bind localhost; that is not egress).
@@ -23,7 +23,19 @@ from diffgenome.runtime import SymbolIndex
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
 
-TOOLS = Path(__file__).resolve().parents[3] / "tools" / "node-collector"
+TOOLS = Path(__file__).resolve().parent.parent / "_collectors" / "node"
+
+
+def _node_path(ws_repo: Path) -> str:
+    """Where the instrumenter finds `typescript`: an explicit DIFFGENOME_NODE_PATH, the
+    target's own node_modules (TypeScript projects carry it), then a node_modules next to the
+    collector (a development checkout). No dependency is bundled with the Python package."""
+    parts = [
+        os.environ.get("DIFFGENOME_NODE_PATH", ""),
+        str(ws_repo / "node_modules"),
+        str(TOOLS / "node_modules"),
+    ]
+    return os.pathsep.join(p for p in parts if p)
 
 
 @dataclass(frozen=True)
@@ -167,6 +179,7 @@ class NodeJestRuntime:
                 "--index",
                 str(index_file),
             ],
+            env={**os.environ, "NODE_PATH": _node_path(ws.repo)},
             capture_output=True,
             text=True,
             check=True,
@@ -174,8 +187,9 @@ class NodeJestRuntime:
         (ws.root / "instrument.log").write_text(result.stdout + result.stderr)
         self.index_file = index_file
         self._write_jest_config(ws)
+        # the analyzed revision's copy, not the checkout (which may be at another revision)
         return NodeSymbolIndex(
-            self.repo, [self.repo / self.source_root], [self.repo / self.test_root], index_file
+            ws.repo, [ws.repo / self.source_root], [ws.repo / self.test_root], index_file
         )
 
     def _jest_major(self) -> int:
@@ -202,7 +216,18 @@ class NodeJestRuntime:
                 f"  setupFilesAfterEnv: [{json.dumps(setup)}]"
                 ".concat(base.setupFilesAfterEnv || []),\n"
             )
-        shim = TOOLS / "node_modules" / "bcryptjs"
+        # optional: a pure-JS bcrypt when the target's native binding cannot build here
+        shim = next(
+            (
+                p
+                for p in (
+                    ws.repo / "node_modules" / "bcryptjs",
+                    TOOLS / "node_modules" / "bcryptjs",
+                )
+                if p.is_dir()
+            ),
+            TOOLS / "node_modules" / "bcryptjs",
+        )
         mapper = ""
         if shim.is_dir():
             # bcrypt's native binding does not build on this Node; the pure-JS port is an

@@ -1,6 +1,6 @@
 """Go runtime adapter: source instrumentation + `go test`.
 
-Everything Go-specific lives here and in tools/go-collector. The workspace copy gets the
+Everything Go-specific lives here and in diffgenome/_collectors/go. The workspace copy gets the
 `dg` runtime package copied to `<module>/internal/diffgenome/dg`, its sources rewritten in
 place by the instrumenter (built once with the host Go), and `go test` runs inside the
 sandbox with the module cache read-only and GOPROXY=off (no network). Generated mock
@@ -23,7 +23,7 @@ from diffgenome.runtime import SymbolIndex
 from diffgenome.sandbox import Workspace
 from diffgenome.serialize import execution_from_json
 
-TOOLS = Path(__file__).resolve().parents[3] / "tools" / "go-collector"
+TOOLS = Path(__file__).resolve().parent.parent / "_collectors" / "go"
 
 
 @dataclass(frozen=True)
@@ -166,9 +166,13 @@ class GoTestRuntime:
         dst.mkdir(parents=True, exist_ok=True)
         shutil.copy(TOOLS / "dg" / "dg.go", dst / "dg.go")
         tool = ws.root / "dg-instrument"
+        # build from a copy inside the workspace: the installed package may be read-only
+        build_dir = ws.root / "go-collector"
+        if not build_dir.exists():
+            shutil.copytree(TOOLS, build_dir)
         subprocess.run(
             [str(self.go), "build", "-o", str(tool), "./instrument"],
-            cwd=TOOLS, check=True, capture_output=True, text=True,
+            cwd=build_dir, check=True, capture_output=True, text=True,
             env={**os.environ, "GOFLAGS": "-mod=mod", "GOPROXY": "off"},
         )  # fmt: skip
         index_file = ws.root / "symbol-index.json"

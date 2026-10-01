@@ -1,3 +1,7 @@
-"""diffgenome: compositional reconstruction of behavioral paths from unit-test executions."""
+"""diffgenome: runtime evidence for code changes.
 
-__version__ = "0.0.1"
+Runs a repository's existing tests against a change and reports what actually executed, as the
+`runtime` section (`diffgenome-runtime/1`) of a `diffgenome-change/1` artifact.
+"""
+
+__version__ = "0.1.0"
