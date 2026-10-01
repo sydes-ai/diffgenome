@@ -34,11 +34,19 @@ support:
 | Go | `go test` | a Go 1.22+ toolchain (it also builds the instrumenter; older modules are fine) with the module's dependencies downloaded (`go mod download`); tests run offline |
 | Node / TypeScript | Jest | the target's `node_modules` (TypeScript is taken from there, or from `DIFFGENOME_NODE_PATH`) |
 
-Tests run inside a disposable copy of the repository (never the checkout itself), under a
-sandbox with no network unless `--allow-loopback` is given for local test services.
-The sandbox in 0.1.0 is macOS `sandbox-exec`: on hosts without a supported sandbox (Linux
-today, including Linux CI runners) diffgenome refuses to run target tests and says so, so in
-CI use a macOS runner.
+Tests run inside a disposable copy of the repository (never the checkout itself), under an
+OS sandbox chosen per platform:
+
+| host | sandbox | needs |
+|---|---|---|
+| macOS | `sandbox-exec` (Seatbelt) | nothing extra |
+| Linux | `bwrap` (bubblewrap: user, network, PID and mount namespaces) | `bubblewrap` installed and unprivileged user namespaces allowed. Ubuntu 24.04 restricts them: `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` (GitHub-hosted runners allow this) |
+
+Either way: no network beyond the sandbox, writes only inside the workspace, a scrubbed
+environment, and child processes stay confined. `--allow-loopback` lets tests use localhost
+servers they start themselves; on macOS it also reaches services on the host's loopback (a
+local database), on Linux it does not. Without a usable sandbox diffgenome refuses to run
+target tests and says why.
 
 ## Use
 

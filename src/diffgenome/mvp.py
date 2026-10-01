@@ -32,7 +32,7 @@ from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.runtime_evidence import build_runtime_evidence
-from diffgenome.sandbox import Workspace, host_supports_confinement
+from diffgenome.sandbox import Workspace, select_backend
 from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
 
@@ -216,16 +216,18 @@ def main(argv: list[str] | None = None) -> int:
     repo = args.repo.resolve()
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
-    if not host_supports_confinement():
+    backend, backend_note = select_backend()
+    if backend is None:
         # Invariant: target code never runs unconfined. Say so in one line an integrator
         # can show verbatim, instead of failing later with a traceback.
         reason = (
-            f"refusing to run: no supported OS sandbox on this host ({platform.system()}); "
-            "target tests are never executed unconfined"
+            f"refusing to run: no usable OS sandbox on this host ({platform.system()}: "
+            f"{backend_note}); target tests are never executed unconfined"
         )
         _log(reason)
         _write_status(out, "refused", reason)
         return 3
+    _log(f"sandbox: {backend.name}")
     pytest_args = [a for chunk in args.pytest_arg for a in shlex.split(chunk)]
     runtime = make_runtime(args, repo, pytest_args)
     notes: list[str] = []
