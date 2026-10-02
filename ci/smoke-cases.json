@@ -5,42 +5,192 @@
     "head": "29c759d1b7f500c0c0f357e54d9912017f5c46f8",
     "base": "6f06d177041406a02fdc58677fb9955ada2b3419",
     "sydes_yml": "runtime:\n  env:\n    EMAIL_HOST: example.org\n",
-    "expect": {"min_passed": 28, "executed": ["hc.accounts.models.Profile.send_report"],
-               "why": "Django per-app tests under pytest-django; transitive caller via management command"}
+    "expect": {
+      "min_passed": 28,
+      "executed": [
+        "hc.accounts.models.Profile.send_report"
+      ],
+      "why": "Django per-app tests under pytest-django; transitive caller via management command"
+    }
   },
   "requests": {
     "url": "https://github.com/psf/requests",
     "head": "f8bec2f7ca9d7c03981a12ff8866a9b3923f1699",
     "base": "70298332899f25826e35e42f8d83425124f755a5",
-    "expect": {"min_passed": 350, "executed": ["requests.help._implementation", "requests.auth._basic_auth_str"],
-               "why": "changed test files beyond the budget; transitive selection (test_help -> info -> _implementation); server threads (0.1.7)"}
+    "expect": {
+      "min_passed": 350,
+      "executed": [
+        "requests.help._implementation",
+        "requests.auth._basic_auth_str"
+      ],
+      "why": "changed test files beyond the budget; transitive selection (test_help -> info -> _implementation); server threads (0.1.7)"
+    }
   },
   "tomlkit": {
     "url": "https://github.com/python-poetry/tomlkit",
     "head": "40dd59cfdc5b724a8d1256f39f89534265ec1f99",
     "base": "4bec845b604f899a18da29cd3ea692e1b320354a",
-    "expect": {"min_passed": 100, "executed": ["tomlkit.items.DateTime.__sub__"], "why": "Poetry project"}
+    "expect": {
+      "min_passed": 100,
+      "executed": [
+        "tomlkit.items.DateTime.__sub__"
+      ],
+      "why": "Poetry project"
+    }
   },
   "itsdangerous": {
     "url": "https://github.com/pallets/itsdangerous",
     "head": "9a25d989cd65c4991c2c8ac46ef55e0e8dfe49ab",
     "base": "7c6286ed2125c87662eeb102b32fb3d68611a5d6",
-    "expect": {"min_passed": 140, "executed": ["itsdangerous.timed.TimestampSigner.unsign"],
-               "why": "Pallets requirements/ test deps; filterwarnings = error (0.1.5)"}
+    "expect": {
+      "min_passed": 140,
+      "executed": [
+        "itsdangerous.timed.TimestampSigner.unsign"
+      ],
+      "why": "Pallets requirements/ test deps; filterwarnings = error (0.1.5)"
+    }
   },
   "toolz": {
     "url": "https://github.com/pytoolz/toolz",
     "head": "a1e25cbd2c398b534f0736f5838e416202b0cb28",
     "base": "80ddcb3e104eda18838a2e7f7a10b9dc4e8086a8",
-    "expect": {"min_passed": 39, "executed": ["toolz.functoolz.Compose._combined_annotations"],
-               "ran_at_import": ["toolz.functoolz._InstanceAnnotations.__init__"],
-               "why": "tests inside the package (testpaths = the package); import-time execution; same-named closures"}
+    "expect": {
+      "min_passed": 39,
+      "executed": [
+        "toolz.functoolz.Compose._combined_annotations"
+      ],
+      "ran_at_import": [
+        "toolz.functoolz._InstanceAnnotations.__init__"
+      ],
+      "why": "tests inside the package (testpaths = the package); import-time execution; same-named closures"
+    }
   },
   "demo-orders-api": {
     "url": "https://github.com/sydes-examples/demo-orders-api",
     "head": "9ba8590a937d54c07be52569d6af896ce9a5b28f",
     "base": "1053bc97fb3fd9f3663c5124c3b0f1f347e7592a",
-    "expect": {"min_passed": 7, "executed": ["app.main.create_order", "app.service.create_order"],
-               "why": "package at the root; [dev] extra"}
+    "expect": {
+      "min_passed": 7,
+      "executed": [
+        "app.main.create_order",
+        "app.service.create_order"
+      ],
+      "why": "package at the root; [dev] extra"
+    }
+  },
+  "translate-6596": {
+    "url": "https://github.com/translate/translate",
+    "head": "628b2c6d9ca634ca6b3ceb53d92775e550fefb3a",
+    "base": "2ba1c6ee454e28429374058b92f816206c48a2ce",
+    "expect": {
+      "min_passed": 3,
+      "executed": [
+        "translate.filters.checks.checker.TranslationChecker.run_test"
+      ],
+      "why": "field study: property getter/setter shared an identity (IdentityMismatch crash)"
+    }
+  },
+  "translate-6595": {
+    "url": "https://github.com/translate/translate",
+    "head": "2ba1c6ee454e28429374058b92f816206c48a2ce",
+    "base": "a83b777c38a1cf2becd1ae94782f0de211c41ebb",
+    "expect": {
+      "min_passed": 49,
+      "executed": [
+        "translate.convert.po2tmx.po2tmx.convertfiles"
+      ],
+      "why": "field study: property getter/setter (TranslationStore.encoding) crash"
+    }
+  },
+  "datachain-2009": {
+    "url": "https://github.com/datachain-ai/datachain",
+    "head": "7b7ddb3aec89352207273c022f0b380d4d232e9f",
+    "base": "56499202aeb8dba1fd24b510e8340b95bcaaa62b",
+    "expect": {
+      "min_passed": 135,
+      "max_failed": 0,
+      "no_gap_at": [
+        "src/datachain/semver.py:30"
+      ],
+      "executed": [
+        "datachain.semver.validate"
+      ],
+      "why": "field study: false outcome continuing a loop was lost (wrong 'never false' gap); the tracer dropped a test module"
+    }
+  },
+  "datachain-2001": {
+    "url": "https://github.com/datachain-ai/datachain",
+    "head": "12c8b3440ee75a34a82cfccb0d28fb3b5773680b",
+    "base": "0509279ffd26a187ae9525bf039cc57d88090984",
+    "expect": {
+      "min_passed": 380,
+      "why": "field study: the tracer raised into the program (208 failures); setup errors were dropped. Remaining failures are mock remotes that need network"
+    }
+  },
+  "wemake-3810": {
+    "url": "https://github.com/wemake-services/wemake-python-styleguide",
+    "head": "f5e435ab82c8d1bafcf004bb847e99e4229a314d",
+    "base": "336341cedc2e2a38e5eb9f8e5ce4101108f77e89",
+    "expect": {
+      "min_passed": 250,
+      "no_gap_at": [
+        "wemake_python_styleguide/visitors/ast/statements.py:375"
+      ],
+      "why": "field study: Poetry dev group not installed by prepare; false outcome leaving the function was lost"
+    }
+  },
+  "pdm-3892": {
+    "url": "https://github.com/pdm-project/pdm",
+    "head": "59b04e53fa707fbcee12e1e171dc8dbc6a4681bc",
+    "base": "6171958f8e52f1287364a725ee018f2bab58c46c",
+    "expect": {
+      "min_passed": 283,
+      "max_failed": 0,
+      "executed": [
+        "pdm.utils.atomic_open_for_write"
+      ],
+      "why": "field study: PEP 735 test group not installed; source package named venv excluded (126 false failures)"
+    }
+  },
+  "pdm-3897": {
+    "url": "https://github.com/pdm-project/pdm",
+    "head": "e8ced850bc1be15501dc1c4139e96c4605f85f2b",
+    "base": "f5ec33d7894513fa131038a3ed02b69da22fe34d",
+    "expect": {
+      "min_passed": 100,
+      "why": "field study: @contextmanager wrapper got contextlib's line (IdentityMismatch crash)"
+    }
+  },
+  "pdm-3886": {
+    "url": "https://github.com/pdm-project/pdm",
+    "head": "924c6d185f5eabf864258b0eee685f8e164dfd62",
+    "base": "b4666ebefaa207e5a04abd22dc510e1d8447fe1f",
+    "expect": {
+      "min_passed": 96,
+      "why": "field study: property getter/setter (Project.environment) crash"
+    }
+  },
+  "falcon-2731": {
+    "url": "https://github.com/falconry/falcon",
+    "head": "2a47a7f3b01a301a6cad76cf24afdd9e7cb8e496",
+    "base": "3fa42c1dabb555189369e11c817d2e30ac8b7947",
+    "expect": {
+      "min_passed": 299,
+      "max_failed": 0,
+      "min_skipped": 90,
+      "executed": [
+        "falcon.request.Request.get_param"
+      ],
+      "why": "field study: skipped tests counted as failed; @overload stubs listed as changed functions"
+    }
+  },
+  "glances-3768": {
+    "url": "https://github.com/nicolargo/glances",
+    "head": "59a092cc91c8182781fda185c36da67c3bea3b81",
+    "base": "6f472f5a3a9aa31e56c45a252a37a3f2e530b510",
+    "expect": {
+      "min_passed": 4,
+      "why": "field study: workspace copy crashed on a dangling symlink in tests-data/"
+    }
   }
 }

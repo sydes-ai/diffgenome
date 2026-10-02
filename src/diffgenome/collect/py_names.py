@@ -6,6 +6,7 @@ getter and setter (translate #6595/#6596: `pounit.target`; pdm #3886:
 both branches of an `if`. Their code objects differ only by their first line. The tracer
 and the static index must name them alike, so the rule lives here, computed from source:
 
+- `@overload` stubs are not definitions (never executed): they are left out;
 - the first definition (by line) keeps the qualified name;
 - every later one is `qualname@<first line>`, where the first line is that of its first
   decorator, matching `code.co_firstlineno`.
@@ -18,6 +19,16 @@ import ast
 _COMPOUND = (
     ast.If, ast.Try, ast.TryStar, ast.With, ast.AsyncWith, ast.For, ast.AsyncFor, ast.While,
 )  # fmt: skip
+
+
+def is_overload(node: ast.AST) -> bool:
+    """A `@typing.overload` stub: a type declaration replaced at runtime, never executed.
+    It is not a definition of its own (falcon #2731 has 24 of them next to 11 functions)."""
+    return isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and any(
+        (isinstance(d, ast.Name) and d.id == "overload")
+        or (isinstance(d, ast.Attribute) and d.attr == "overload")
+        for d in node.decorator_list
+    )
 
 
 def first_line(node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef) -> int:
@@ -52,7 +63,8 @@ def redefined(tree: ast.Module) -> dict[str, list[int]]:
     """qualname -> sorted first lines, for qualnames defined more than once in the file."""
     lines: dict[str, list[int]] = {}
     for qual, node, _scope in walk_definitions(tree.body, []):
-        lines.setdefault(qual, []).append(first_line(node))
+        if not is_overload(node):  # the implementation keeps the plain name
+            lines.setdefault(qual, []).append(first_line(node))
     return {q: sorted(ls) for q, ls in lines.items() if len(ls) > 1}
 
 

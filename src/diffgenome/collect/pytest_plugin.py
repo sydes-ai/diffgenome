@@ -141,10 +141,12 @@ class _Plugin:
         if call.when == "call" and item.nodeid in self._pending:
             outcome = "passed" if report.passed else "skipped" if report.skipped else "failed"
             self._write(item, self._test_ref(item), self._pending.pop(item.nodeid), outcome)
-        elif call.when == "setup" and report.skipped:
-            # a skip marker or a skipping fixture: the test never reaches its call phase,
-            # but it is part of the run and must be counted as skipped, not dropped
-            self._write(item, self._test_ref(item), TraceResult((), ()), "skipped")
+        elif call.when == "setup" and not report.passed:
+            # a skip marker or skipping fixture, or a fixture that errors (datachain #2001:
+            # 202 tests whose mock-server fixtures could not start): the test never reaches
+            # its call phase, but it is part of the run and must be counted, not dropped
+            outcome = "skipped" if report.skipped else "failed"
+            self._write(item, self._test_ref(item), TraceResult((), ()), outcome)
         return report
 
     def _test_ref(self, item: pytest.Item) -> str:

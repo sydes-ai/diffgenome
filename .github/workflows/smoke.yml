@@ -11,7 +11,7 @@ on:
     inputs:
       sydes_ref:
         description: sydes-ai/sydes ref to run (its uv.lock; the diffgenome wheel is replaced)
-        default: integration/diffgenome-runtime-evidence
+        default: main
 
 permissions:
   contents: read
@@ -25,7 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-15]
-        case: [healthchecks, requests, tomlkit, itsdangerous, toolz, demo-orders-api]
+        case: [healthchecks, requests, tomlkit, itsdangerous, toolz, demo-orders-api,
+               translate-6596, translate-6595, datachain-2009, datachain-2001, wemake-3810,
+               pdm-3892, pdm-3897, pdm-3886, falcon-2731, glances-3768]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -41,7 +43,7 @@ jobs:
         run: uv build --wheel
       - name: Sydes (locked) with this DiffGenome
         env:
-          SYDES_REF: ${{ inputs.sydes_ref || 'integration/diffgenome-runtime-evidence' }}
+          SYDES_REF: ${{ inputs.sydes_ref || 'main' }}
         run: |
           git clone -q https://github.com/sydes-ai/sydes "$RUNNER_TEMP/sydes"
           git -C "$RUNNER_TEMP/sydes" checkout -q "$SYDES_REF"

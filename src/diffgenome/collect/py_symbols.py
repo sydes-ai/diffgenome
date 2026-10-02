@@ -12,7 +12,13 @@ import ast
 from dataclasses import dataclass
 from pathlib import Path
 
-from diffgenome.collect.py_names import disambiguate, first_line, redefined, walk_definitions
+from diffgenome.collect.py_names import (
+    disambiguate,
+    first_line,
+    is_overload,
+    redefined,
+    walk_definitions,
+)
 from diffgenome.model import SymbolId
 
 _EXCLUDED = {"site-packages", "dist-packages", "node_modules", "__pycache__"}
@@ -80,6 +86,8 @@ class PythonSymbolIndex:
     def _collect(self, tree: ast.Module, module: str, rel: str, out: list[Definition]) -> None:
         redefinitions = redefined(tree)
         for qual, node, _scope in walk_definitions(tree.body, []):
+            if is_overload(node):
+                continue
             name = disambiguate(qual, first_line(node), redefinitions)
             is_class = isinstance(node, ast.ClassDef)
             out.append(

@@ -14,6 +14,14 @@ if passed < case["min_passed"]:
 for name in case.get("executed", []):
     if not fns.get(name, {}).get("executed"):
         problems.append(f"{name} not executed")
+if "max_failed" in case and runtime["universe"]["failed"] > case["max_failed"]:
+    problems.append(f"{runtime['universe']['failed']} tests failed > {case['max_failed']}")
+if runtime["universe"].get("skipped", 0) < case.get("min_skipped", 0):
+    problems.append(f"{runtime['universe'].get('skipped', 0)} skipped < {case['min_skipped']}")
+for where in case.get("no_gap_at", []):  # "file:line": a gap DiffGenome must not report
+    path, line = where.rsplit(":", 1)
+    if any(g.get("file") == path and g.get("line") == int(line) for g in runtime["gaps"]):
+        problems.append(f"wrong gap reported at {where}")
 for name in case.get("ran_at_import", []):
     if not fns.get(name, {}).get("ran_at_import"):
         problems.append(f"{name} not seen at import")

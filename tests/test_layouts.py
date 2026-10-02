@@ -336,16 +336,17 @@ def test_the_tracer_never_raises_into_the_program(tmp_path: Path) -> None:
 
 
 def test_skipped_tests_are_not_failures(tmp_path: Path) -> None:
-    """falcon #2731: 90 skipped tests were counted as failed."""
+    """falcon #2731: 90 skipped tests were counted as failed. datachain #2001: 202 tests whose
+    fixtures errored at setup were missing from the run altogether."""
     rt = change(
         tmp_path,
         {"app/__init__.py": "", "app/svc.py": SVC,
-         "tests/test_svc.py": "import pytest\nfrom app.svc import total\n\ndef test_t():\n    assert total([1]) == 1\n\n@pytest.mark.skip(reason='optional dependency')\ndef test_s():\n    pass\n"},
+         "tests/test_svc.py": "import pytest\nfrom app.svc import total\n\ndef test_t():\n    assert total([1]) == 1\n\n@pytest.mark.skip(reason='optional dependency')\ndef test_s():\n    pass\n\n@pytest.fixture\ndef server():\n    raise RuntimeError('mock remote unavailable')\n\ndef test_e(server):\n    pass\n"},
         {"app/svc.py": SVC2},
         "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
     )  # fmt: skip
     u = rt["universe"]
-    assert (u["passed"], u["failed"], u["skipped"]) == (1, 0, 1)
+    assert (u["passed"], u["failed"], u["skipped"]) == (1, 1, 1)
 
 
 UNIT = '''import contextlib
@@ -385,3 +386,32 @@ def test_property_setters_and_decorated_functions_have_their_own_identity(tmp_pa
     setter = fn(rt, "app.unit.Unit.target@12")
     assert not setter["executed"], "only the getter ran; the changed setter did not"
     assert fn(rt, "app.unit.opened")["executed"]
+
+
+OVERLOADED = '''from typing import overload
+
+
+class Request:
+    @overload
+    def get_param(self, name: str, required: bool = ...) -> str: ...
+
+    @overload
+    def get_param(self, name: str, default: int) -> int: ...
+
+    def get_param(self, name, required=False, default=None):
+        return {body}
+'''
+
+
+def test_overload_stubs_are_not_changed_functions(tmp_path: Path) -> None:
+    """falcon #2731: typing.overload stubs never execute; with their own identities they were
+    listed as changed functions "not run" (24 of 35), and callers pointed at stub lines."""
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/req.py": OVERLOADED.format(body="name"),
+         "tests/test_req.py": "from app.req import Request\n\ndef test_p():\n    assert Request().get_param('a') == 'a'\n"},
+        {"app/req.py": OVERLOADED.format(body="str(name)")},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    assert [f["symbol"] for f in rt["changed_functions"]] == ["py:app.req.Request.get_param"]
+    assert rt["changed_functions"][0]["executed"] and rt["changed_functions"][0]["line"] == 11
