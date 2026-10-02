@@ -129,7 +129,8 @@ def _log(msg: str) -> None:
 
 
 def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -> RuntimeAdapter:
-    tests = args.tests or args.test_root
+    primary_test_root = args.test_root[0]
+    tests = args.tests or primary_test_root
     if args.runtime == "python":
         from diffgenome.collect.py_runtime import PytestRuntime
 
@@ -142,17 +143,17 @@ def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -
         )
         test_env = dict(kv.split("=", 1) for kv in args.test_env)
         return PytestRuntime(
-            repo, python, args.source_root, args.test_root, tests, pytest_args,
+            repo, python, args.source_root, args.test_root, tests, pytest_args,  # all roots
             pythonpath=args.pythonpath, test_env=test_env, allow_loopback=args.allow_loopback,
         )  # fmt: skip
     if args.runtime == "node":
         from diffgenome.collect.node_jest import NodeJestRuntime
 
-        return NodeJestRuntime(repo, args.source_root, args.test_root, tests)
+        return NodeJestRuntime(repo, args.source_root, primary_test_root, tests)
     if args.runtime == "go":
         from diffgenome.collect.go_test import GoTestRuntime
 
-        return GoTestRuntime(repo, args.source_root, args.test_root, tests, args.mock_dir)
+        return GoTestRuntime(repo, args.source_root, primary_test_root, tests, args.mock_dir)
     raise SystemExit(f"unknown runtime {args.runtime}")
 
 
@@ -168,7 +169,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo", required=True, type=Path)
     ap.add_argument("--python", type=Path, help="target interpreter (python runtime)")
     ap.add_argument("--source-root", default=".")
-    ap.add_argument("--test-root", required=True)
+    ap.add_argument(
+        "--test-root", action="append", required=True,
+        help="test root (repeatable: e.g. one tests/ per Django app); the first is where probes go",
+    )
     ap.add_argument("--tests", default=None, help="test target path (default: test root)")
     ap.add_argument("--pytest-arg", action="append", default=[])
     ap.add_argument(
@@ -266,8 +270,19 @@ def main(argv: list[str] | None = None) -> int:
             _log(f"existing tests: {tail} -> {len(executions)} executions")
         if not executions and not args.traces:
             _log("no executions captured; see existing-tests.log")
+            first_error = next(
+                (
+                    line.strip()
+                    for line in (stdout + "\n" + stderr).splitlines()
+                    if line.startswith(("E ", "ERROR ")) or "Error:" in line
+                ),
+                "",
+            )
             _write_status(
-                out, "failed", "no test executions captured (test command failed or found no tests)"
+                out,
+                "failed",
+                "no test executions captured (test command failed or found no tests)"
+                + (f": {first_error[:300]}" if first_error else ""),
             )
             return 2
         if not executions:
@@ -397,7 +412,7 @@ def main(argv: list[str] | None = None) -> int:
             index,
             mech_fns,
             artifact.get("boundaries"),
-            test_scope=" ".join([args.tests or args.test_root, *pytest_args]).strip()[:500],
+            test_scope=" ".join([args.tests or args.test_root[0], *pytest_args]).strip()[:500],
         )
         (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
         (out / "behavioral-map.md").write_text(behavior_map)

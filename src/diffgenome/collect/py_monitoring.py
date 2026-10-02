@@ -877,15 +877,32 @@ class Tracer:
 
     # ------------------------------------------------------------------ egress guard
 
-    def install_egress_guard(self) -> None:
+    def install_egress_guard(self, allow_loopback: bool = False) -> None:
         """Refuse outbound connections and record each attempt as an OS-plane event. The
         sandbox is the enforcement layer; this makes attempts *evidence* attributed to the
-        in-scope caller. Installed for the whole session."""
+        in-scope caller. With `allow_loopback` (the sandbox allows it too), connections to
+        loopback addresses go through: tests talking to servers they started themselves.
+        Installed for the whole session."""
+        import ipaddress
         import socket
 
         tracer = self
+        original = socket.socket.connect
+
+        def loopback(address: Any) -> bool:
+            if isinstance(address, str) or not address:
+                return False
+            host = str(address[0])
+            if host == "localhost":
+                return True
+            try:
+                return ipaddress.ip_address(host.split("%")[0]).is_loopback
+            except ValueError:
+                return False
 
         def connect(sock: Any, address: Any) -> Any:
+            if allow_loopback and loopback(address):
+                return original(sock, address)
             target = address if isinstance(address, str) else ":".join(str(a) for a in address[:2])
             if tracer._orig_mock_call is not None:  # tracing a stimulus
                 frame = sys._getframe(1)

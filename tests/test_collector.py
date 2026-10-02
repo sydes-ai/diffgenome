@@ -326,3 +326,56 @@ def test_inspecting_a_receiver_never_runs_its_getattr(tmp_path: Path) -> None:
     assert [n.symbol for n in ex.nodes if isinstance(n, CallNode)][1:] == [
         "py:pkg.lazy.Lazy.__init__", "py:pkg.lazy.Lazy.total"
     ]
+
+
+def test_unittest_testcase_outcomes_come_from_pytest_reports(tmp_path: Path) -> None:
+    """unittest.TestCase failures (Django tests) do not raise through pytest_runtest_call;
+    taking the outcome from there recorded failed tests as passed."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text("")
+    (tmp_path / "pkg" / "m.py").write_text("def double(x):\n    return x * 2\n")
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_m.py").write_text(
+        "import unittest\nfrom pkg.m import double\n"
+        "class T(unittest.TestCase):\n"
+        "    def test_ok(self):\n        self.assertEqual(double(2), 4)\n"
+        "    def test_bad(self):\n        self.assertEqual(double(2), 5)\n"
+    )
+    out = tmp_path / "out"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": str(REPO / "src")}
+    subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         "-p", "diffgenome.collect.pytest_plugin", "--diffgenome-out", str(out),
+         "--diffgenome-source-root", ".", "--diffgenome-test-root", "tests"],
+        cwd=tmp_path, env=env, capture_output=True, text=True,
+    )  # fmt: skip
+    outcomes = {
+        e.stimulus_ref.split("::")[-1]: e.outcome
+        for e in (execution_from_json(f.read_text()) for f in out.glob("*.json"))
+    }
+    assert outcomes == {"test_ok": "passed", "test_bad": "failed"}
+
+
+@pytest.mark.parametrize("allow", [True, False])
+def test_egress_guard_lets_loopback_through_only_when_allowed(tmp_path: Path, allow: bool) -> None:
+    """requests' suite talks to a pytest-httpbin server on 127.0.0.1: with loopback allowed
+    the guard must not refuse it (the sandbox still confines the network)."""
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_net.py").write_text(
+        "import socket, threading\n"
+        "def test_local_server():\n"
+        "    srv = socket.socket(); srv.bind(('127.0.0.1', 0)); srv.listen()\n"
+        "    threading.Thread(target=lambda: srv.accept()[0].sendall(b'ok'), daemon=True).start()\n"
+        "    assert socket.create_connection(srv.getsockname(), timeout=5).recv(2) == b'ok'\n"
+    )
+    out = tmp_path / "out"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": str(REPO / "src")}
+    subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         "-p", "diffgenome.collect.pytest_plugin", "--diffgenome-out", str(out),
+         "--diffgenome-source-root", ".", "--diffgenome-test-root", "tests",
+         "--diffgenome-egress-guard", *(["--diffgenome-allow-loopback"] if allow else [])],
+        cwd=tmp_path, env=env, capture_output=True, text=True,
+    )  # fmt: skip
+    [ex] = [execution_from_json(f.read_text()) for f in out.glob("*.json")]
+    assert ex.outcome == ("passed" if allow else "failed")

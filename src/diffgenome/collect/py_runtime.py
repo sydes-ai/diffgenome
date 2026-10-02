@@ -41,7 +41,7 @@ class PytestRuntime:
         repo: Path,
         python: Path,
         source_root: str,
-        test_root: str,
+        test_root: str | list[str],
         tests: str,
         pytest_args: list[str],
         pythonpath: list[str] | None = None,
@@ -51,7 +51,9 @@ class PytestRuntime:
         self.repo = repo
         self.python = python
         self.source_root = source_root
-        self.test_root = test_root
+        # several roots when tests live per package (Django apps); the first takes probes
+        self.test_roots = [test_root] if isinstance(test_root, str) else list(test_root)
+        self.test_root = self.test_roots[0]
         self.tests = tests
         self.pytest_args = pytest_args
         # Generic target-environment options (experiment 10, Baserow): repo-relative import
@@ -69,7 +71,9 @@ class PytestRuntime:
         # Index the workspace copy, i.e. the analyzed revision (`--rev` archives it there), not
         # the checkout: the checkout may sit at another revision, and the index maps the
         # change's diff lines and the executed code's locations onto symbols.
-        return PythonSymbolIndex(ws.repo, [ws.repo / self.source_root], [ws.repo / self.test_root])
+        return PythonSymbolIndex(
+            ws.repo, [ws.repo / self.source_root], [ws.repo / t for t in self.test_roots]
+        )
 
     def trace(
         self, ws: Workspace, out_dir: Path, stimulus: Stimulus, only: list[str] | None
@@ -78,14 +82,16 @@ class PytestRuntime:
         traces_ws = ws.root / f"traces-{tag}-{len(list(ws.root.glob('traces-*')))}"
         traces_ws.mkdir(parents=True, exist_ok=True)
         argv = [
-            str(self.python), "-m", "pytest", "-q", "-p", "no:cacheprovider",
+            # rootdir: test ids relative to the repository, whatever config pytest finds
+            str(self.python), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--rootdir", ".",
             "-p", "diffgenome.collect.pytest_plugin",
             "--diffgenome-out", str(traces_ws),
             "--diffgenome-repo-root", ".",
             "--diffgenome-source-root", self.source_root,
-            "--diffgenome-test-root", self.test_root,
+            *(a for t in self.test_roots for a in ("--diffgenome-test-root", t)),
             "--diffgenome-stimulus", stimulus.value,
             "--diffgenome-egress-guard",
+            *(["--diffgenome-allow-loopback"] if self.allow_loopback else []),
             *self._focus_args(ws),
             *self.pytest_args,
             *(only if only else [self.tests]),

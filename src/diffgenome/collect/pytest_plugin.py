@@ -16,6 +16,7 @@ import re
 import subprocess
 from collections.abc import Generator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -54,6 +55,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help="JSON list of changed symbols: keep only the part of each trace that bears on them",
     )
     group.addoption(
+        "--diffgenome-allow-loopback",
+        action="store_true",
+        help="with the egress guard: let connections to loopback addresses through",
+    )
+    group.addoption(
         "--diffgenome-egress-guard",
         action="store_true",
         help="refuse socket connects and record attempts as OS-plane evidence",
@@ -89,13 +95,14 @@ class _Plugin:
         self.stimulus = Stimulus(config.getoption("--diffgenome-stimulus"))
         self.collectors: tuple[Collector, ...] = (COLLECTOR,)
         if config.getoption("--diffgenome-egress-guard"):
-            self.tracer.install_egress_guard()
+            self.tracer.install_egress_guard(config.getoption("--diffgenome-allow-loopback"))
             self.collectors = (COLLECTOR, EGRESS_GUARD)
         self.revision = _revision(roots[0])
         focus = config.getoption("--diffgenome-focus")
         spec = json.loads(Path(focus).read_text(encoding="utf-8")) if focus else None
         self.focus: set[str] | None = set(spec["symbols"]) if spec else None
         self.focus_depth: int = int(spec.get("depth", 2)) if spec else 2
+        self._pending: dict[str, Any] = {}  # nodeid -> trace, until pytest reports the outcome
 
     @pytest.hookimpl(wrapper=True)
     def pytest_runtest_call(self, item: pytest.Item) -> Generator[None, None, None]:
@@ -103,44 +110,52 @@ class _Plugin:
         code = getattr(function, "__code__", None)
         root_symbol = (code and self.tracer.symbol_for_code(code)) or f"py:{item.nodeid}"
         self.tracer.start(root_symbol, code)
-        outcome = "passed"
         try:
             return (yield)
-        except BaseException:
-            outcome = "failed"
-            raise
         finally:
-            result = self.tracer.stop()
-            nodes, branches, dropped = result.nodes, result.branches, 0
-            if self.focus is not None:
-                nodes, branches, dropped = prune_to_focus(
-                    nodes, branches, self.focus, self.focus_depth
-                )
-            execution = Execution(
-                id=f"{item.nodeid}@{self.revision or 'unknown'}",
-                stimulus=self.stimulus,
-                stimulus_ref=item.nodeid,
-                outcome=outcome,
-                revision=self.revision,
-                collectors=self.collectors,
-                symbols=result.symbols,
-                nodes=nodes,
-                branches=branches,
-                diagnostics=(
-                    ("stack_repairs", str(result.stack_repairs)),
-                    ("attribution_disagreements", str(result.attribution_disagreements)),
-                    ("pruned_nodes", str(dropped)),
-                ),
+            self._pending[item.nodeid] = self.tracer.stop()
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_runtest_makereport(
+        self, item: pytest.Item, call: pytest.CallInfo[None]
+    ) -> Generator[None, pytest.TestReport, pytest.TestReport]:
+        # The outcome comes from pytest's report, not from whether the call hook raised:
+        # unittest.TestCase tests (Django) record failures without raising there.
+        report = yield
+        if call.when == "call" and item.nodeid in self._pending:
+            outcome = "passed" if report.passed else "skipped" if report.skipped else "failed"
+            self._write(item, self._pending.pop(item.nodeid), outcome)
+        return report
+
+    def _write(self, item: pytest.Item, result: Any, outcome: str) -> None:
+        nodes, branches, dropped = result.nodes, result.branches, 0
+        if self.focus is not None:
+            nodes, branches, dropped = prune_to_focus(
+                nodes, branches, self.focus, self.focus_depth
             )
-            # Sanitized ids can collide (parametrized ids differing only in punctuation)
-            # and can exceed filesystem limits; the digest keeps every execution distinct.
-            digest = hashlib.sha256(item.nodeid.encode()).hexdigest()[:12]
-            name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)[:100]
-            (self.out / f"{name}-{digest}.json").write_text(execution_to_json(execution))
-            if result.stack_repairs:
-                item.add_report_section(
-                    "call", "diffgenome", f"stack repairs: {result.stack_repairs}"
-                )
+        execution = Execution(
+            id=f"{item.nodeid}@{self.revision or 'unknown'}",
+            stimulus=self.stimulus,
+            stimulus_ref=item.nodeid,
+            outcome=outcome,
+            revision=self.revision,
+            collectors=self.collectors,
+            symbols=result.symbols,
+            nodes=nodes,
+            branches=branches,
+            diagnostics=(
+                ("stack_repairs", str(result.stack_repairs)),
+                ("attribution_disagreements", str(result.attribution_disagreements)),
+                ("pruned_nodes", str(dropped)),
+            ),
+        )
+        # Sanitized ids can collide (parametrized ids differing only in punctuation)
+        # and can exceed filesystem limits; the digest keeps every execution distinct.
+        digest = hashlib.sha256(item.nodeid.encode()).hexdigest()[:12]
+        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)[:100]
+        (self.out / f"{name}-{digest}.json").write_text(execution_to_json(execution))
+        if result.stack_repairs:
+            item.add_report_section("call", "diffgenome", f"stack repairs: {result.stack_repairs}")
 
 
 def pytest_configure(config: pytest.Config) -> None:

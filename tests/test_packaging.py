@@ -34,3 +34,22 @@ def test_target_pythonpath_exposes_only_the_diffgenome_package(tmp_path: Path) -
     assert (root / "diffgenome" / "collect" / "pytest_plugin.py").is_file()
     assert not (root / "diffgenome" / "_collectors").exists()
     assert root.resolve() != Path(diffgenome.__file__).resolve().parents[1]
+
+
+def test_several_test_roots_all_classify_as_tests(tmp_path: Path) -> None:
+    """Django keeps tests per app (hc/accounts/tests, hc/api/tests); one --test-root per app."""
+    from diffgenome.collect.py_runtime import PytestRuntime
+    from diffgenome.sandbox import Workspace
+
+    for rel in ("hc/accounts/models.py", "hc/accounts/tests/test_a.py", "hc/api/tests/test_b.py"):
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text("def f():\n    return 1\n")
+    rt = PytestRuntime(
+        tmp_path, Path("python"), ".", ["hc/accounts/tests", "hc/api/tests"], "hc", []
+    )
+    ws = Workspace(tmp_path, tmp_path, tmp_path, tmp_path)
+    index = rt.prepare(ws)
+    assert index.is_test("py:hc.accounts.tests.test_a.f")
+    assert index.is_test("py:hc.api.tests.test_b.f")
+    assert not index.is_test("py:hc.accounts.models.f")
+    assert rt.probe_relpath("x").startswith("hc/accounts/tests/")
