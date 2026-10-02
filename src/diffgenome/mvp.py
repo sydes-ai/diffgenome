@@ -268,7 +268,10 @@ def main(argv: list[str] | None = None) -> int:
             (out / "existing-tests.log").write_text(stdout + "\n" + stderr)
             tail = (stdout.strip() or stderr.strip()).splitlines()[-1:]
             _log(f"existing tests: {tail} -> {len(executions)} executions")
-        if not executions and not args.traces:
+        from diffgenome.collect.import_phase import IMPORT_REF
+
+        # the import/collection execution alone is not a test run
+        if not [e for e in executions if e.stimulus_ref != IMPORT_REF] and not args.traces:
             _log("no executions captured; see existing-tests.log")
             first_error = next(
                 (
@@ -276,7 +279,15 @@ def main(argv: list[str] | None = None) -> int:
                     for line in (stdout + "\n" + stderr).splitlines()
                     if line.startswith(("E ", "ERROR ")) or "Error:" in line
                 ),
-                "",
+                # e.g. a warning turned into an error at startup: the traceback's last line
+                next(
+                    (
+                        ln.strip()
+                        for ln in reversed((stdout + "\n" + stderr).splitlines())
+                        if ln.strip()
+                    ),
+                    "",
+                ),
             )
             _write_status(
                 out,

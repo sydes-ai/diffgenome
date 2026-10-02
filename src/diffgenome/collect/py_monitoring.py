@@ -339,6 +339,9 @@ class Tracer:
 
     def _module_for(self, filename: str) -> tuple[Origin, str] | None:
         for origin, prefix in self._root_prefixes:
+            if origin is Origin.TEST and prefix.endswith(".py/") and filename == prefix[:-1]:
+                # a test root that is one file (six: test_six.py at the repository root)
+                return origin, prefix[len(self._repo_prefix) : -4].replace("/", ".")
             if not filename.startswith(prefix):
                 continue
             rel = filename[len(prefix) :]

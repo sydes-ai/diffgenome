@@ -42,6 +42,11 @@ class PythonSymbolIndex:
             return None
         for roots, is_test in ((self.test_roots, True), (self.source_roots, False)):
             for root in roots:
+                if root.suffix == ".py":  # a test root that is one file (six: test_six.py)
+                    if path == root.resolve():
+                        rel_root = root.resolve().relative_to(self.repo_root)
+                        return ".".join(rel_root.with_suffix("").parts)
+                    continue
                 try:
                     rel = path.relative_to(root)
                 except ValueError:

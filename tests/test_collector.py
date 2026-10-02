@@ -423,3 +423,31 @@ def test_launcher_records_calls_made_at_import_time(tmp_path: Path) -> None:
     from diffgenome.compose import build_corpus
 
     build_corpus(list(executions.values()))  # raised IdentityMismatch on requests
+
+
+def test_launcher_works_with_warnings_as_errors(tmp_path: Path) -> None:
+    """itsdangerous/toolz: filterwarnings = error turned pytest's 'already imported, cannot be
+    rewritten' warning about the plugin (imported early by the launcher) into a fatal error."""
+    (tmp_path / "pytest.ini").write_text("[pytest]\nfilterwarnings =\n    error\n")
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_a.py").write_text("def test_a():\n    assert True\n")
+    out = tmp_path / "out"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": str(REPO / "src")}
+    r = subprocess.run(
+        [sys.executable, "-m", "diffgenome.collect.pytest_launch", "-q", "-p", "no:cacheprovider",
+         "-p", "diffgenome.collect.pytest_plugin", f"--diffgenome-out={out}",
+         "--diffgenome-source-root=.", "--diffgenome-test-root=tests", "tests"],
+        cwd=tmp_path, env=env, capture_output=True, text=True,
+    )  # fmt: skip
+    assert r.returncode == 0, r.stdout + r.stderr
+
+
+def test_a_single_test_file_can_be_the_test_root(tmp_path: Path) -> None:
+    """six: test_six.py next to six.py at the repository root."""
+    from diffgenome.collect.py_monitoring import Tracer
+
+    (tmp_path / "six.py").write_text("x = 1\n")
+    (tmp_path / "test_six.py").write_text("def test_x():\n    pass\n")
+    t = Tracer(repo_root=tmp_path, source_roots=(tmp_path,), test_roots=(tmp_path / "test_six.py",))
+    assert t._module_for(str(tmp_path / "test_six.py")) == (Origin.TEST, "test_six")
+    assert t._module_for(str(tmp_path / "six.py")) == (Origin.REPO, "six")

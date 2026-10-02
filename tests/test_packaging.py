@@ -87,3 +87,21 @@ def test_pytest_uses_the_config_it_would_use_in_the_repository(tmp_path: Path) -
     refs = [e.stimulus_ref for e in executions]
     assert "backend/tests/check_app.py::test_f" in refs, out + err  # repository-relative
     assert "py:<import>" in refs  # import and collection time traced by the launcher
+
+
+def test_same_named_closures_in_branches_share_an_identity() -> None:
+    """toolz memoize defines `key` in two branches; seen at import and in a test, the two
+    definitions must not abort the run."""
+    from diffgenome.compose import _merge_symbol
+    from diffgenome.model import IdentityMismatch, Origin, SourceLocation, Symbol
+
+    table: dict = {}
+    sid = "py:toolz.functoolz.memoize.<locals>.key"
+    _merge_symbol(table, Symbol(sid, Origin.REPO, SourceLocation("toolz/functoolz.py", 454)), "a")
+    _merge_symbol(table, Symbol(sid, Origin.REPO, SourceLocation("toolz/functoolz.py", 460)), "b")
+    assert table[sid].location.line == 454
+    import pytest as _pytest
+
+    with _pytest.raises(IdentityMismatch):
+        _merge_symbol(table, Symbol("py:a.f", Origin.REPO, SourceLocation("a.py", 1)), "c")
+        _merge_symbol(table, Symbol("py:a.f", Origin.REPO, SourceLocation("a.py", 9)), "d")

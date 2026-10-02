@@ -20,15 +20,12 @@ from typing import Any
 
 import pytest
 
+from diffgenome.collect import import_phase
+from diffgenome.collect.import_phase import IMPORT_REF
 from diffgenome.collect.prune import prune_to_focus
 from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer
 from diffgenome.model import Collector, Execution, Stimulus
 from diffgenome.serialize import execution_to_json
-
-#: stimulus_ref of the execution that records import and collection time (see pytest_launch)
-IMPORT_REF = "py:<import>"
-#: the session tracer pytest_launch started before pytest imported anything, if any
-IMPORT_TRACER: Tracer | None = None
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -95,8 +92,8 @@ class _Plugin:
         repo_root = Path(repo_opt).resolve() if repo_opt else roots[0]
         self.repo_root = repo_root
         # adopt the tracer pytest_launch started before conftests and collection imported code
-        self._import_phase = IMPORT_TRACER is not None
-        self.tracer = IMPORT_TRACER or Tracer(
+        self._import_phase = import_phase.TRACER is not None
+        self.tracer = import_phase.TRACER or Tracer(
             repo_root=repo_root, source_roots=tuple(roots), test_roots=tuple(tests)
         )
         self.tracer.install_patch_hook()

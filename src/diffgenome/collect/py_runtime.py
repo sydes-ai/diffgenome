@@ -89,7 +89,8 @@ class PytestRuntime:
             # only, pytest chooses rootdir and config exactly as in the repository's own runs
             # (Baserow: backend/pytest.ini with the Django settings).
             str(self.python), "-m", "diffgenome.collect.pytest_launch",
-            "-q", "-p", "no:cacheprovider",
+            # one unimportable selected file must not stop the others from running
+            "-q", "-p", "no:cacheprovider", "--continue-on-collection-errors",
             "-p", "diffgenome.collect.pytest_plugin",
             f"--diffgenome-out={traces_ws}",
             "--diffgenome-repo-root=.",

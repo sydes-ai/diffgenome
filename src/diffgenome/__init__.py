@@ -4,4 +4,4 @@ Runs a repository's existing tests against a change and reports what actually ex
 `runtime` section (`diffgenome-runtime/1`) of a `diffgenome-change/1` artifact.
 """
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"

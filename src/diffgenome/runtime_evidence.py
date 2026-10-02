@@ -30,8 +30,8 @@ from diffgenome.model import CallNode, Execution, SubstitutionNode
 from diffgenome.runtime import SymbolIndex
 
 FORMAT = "diffgenome-runtime/1"
-#: see diffgenome.collect.pytest_plugin.IMPORT_REF (kept here to avoid importing pytest)
-IMPORT_REF = "py:<import>"
+from diffgenome.collect.import_phase import IMPORT_REF  # noqa: E402  (no pytest import)
+
 MAX_TESTS = 200
 MAX_SHAPES = 5
 MAX_CALLERS = 12

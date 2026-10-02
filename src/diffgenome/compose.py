@@ -54,6 +54,10 @@ def _merge_symbol(table: dict[SymbolId, Symbol], sym: Symbol, execution: str) ->
             f"{sym.id}: origin {have.origin.value} vs {sym.origin.value} (in {execution})"
         )
     if have.location and sym.location and have.location != sym.location:
+        if "<locals>" in sym.id and have.location.path == sym.location.path:
+            # one function defining a same-named closure in two branches (toolz: memoize's
+            # `key`); names cannot tell them apart, so they share an identity: keep the first
+            return
         raise IdentityMismatch(f"{sym.id}: {have.location} vs {sym.location} (in {execution})")
     if (
         have.origin is Origin.UNKNOWN

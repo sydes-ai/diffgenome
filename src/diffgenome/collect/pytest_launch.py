@@ -25,12 +25,12 @@ def main(argv: list[str]) -> int:
     tests = [Path(p).resolve() for p in known.diffgenome_test_root]
     repo = Path(known.diffgenome_repo_root).resolve() if known.diffgenome_repo_root else roots[0]
 
-    from diffgenome.collect import pytest_plugin
+    from diffgenome.collect import import_phase
     from diffgenome.collect.py_monitoring import Tracer
 
     tracer = Tracer(repo_root=repo, source_roots=tuple(roots), test_roots=tuple(tests))
-    tracer.start(pytest_plugin.IMPORT_REF, None)
-    pytest_plugin.IMPORT_TRACER = tracer
+    tracer.start(import_phase.IMPORT_REF, None)
+    import_phase.TRACER = tracer  # never import pytest_plugin here (see import_phase)
 
     import pytest
 
