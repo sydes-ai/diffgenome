@@ -66,3 +66,19 @@ def test_runtime_evidence_is_identical_on_pruned_traces() -> None:
         pruned.append(replace(ex, nodes=nodes, branches=branches))
     expected = build_runtime_evidence(full, _change(), _Index(), MECH, [])
     assert build_runtime_evidence(pruned, _change(), _Index(), MECH, []) == expected
+
+
+def test_dangling_or_dropped_parents_reattach_to_the_nearest_kept_ancestor() -> None:
+    """requests test_lowlevel (server threads): a node can point at a parent id that is not in
+    the trace. Pruning must still return a valid tree instead of failing the test run."""
+    nodes = [
+        CallNode(0, None, "py:tests.test_x", 0),
+        CallNode(1, 0, "py:lib.noise", 0),
+        CallNode(2, 1, "py:lib.deeper", 0),
+        CallNode(3, 99, "py:app.service", 0),  # parent 99 does not exist
+        CallNode(4, 2, "py:app.service", 0),
+    ]
+    kept, _, _ = prune_to_focus(nodes, [], {"py:app.service"}, depth=0)
+    ids = {n.id for n in kept}
+    assert all(n.parent is None or n.parent in ids for n in kept)
+    assert [n.symbol for n in kept].count("py:app.service") == 2

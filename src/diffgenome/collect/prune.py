@@ -55,7 +55,8 @@ def prune_to_focus(
         p: int | None = n.id
         while p is not None and p not in keep:  # the chain back to the root
             keep.add(p)
-            p = by_id[p].parent
+            q = by_id.get(p)
+            p = q.parent if q is not None else None
         keep.add(n.id)
         # below the focus call: `depth` levels, and through wrappers to the first real level
         stack = [(c, 1, True) for c in children.get(n.id, ())]
@@ -68,13 +69,29 @@ def prune_to_focus(
             for g in children.get(c.id, ()):
                 stack.append((g, d + 1, via_wrappers and wrapper))
 
-    if len(keep) == len(by_id):
+    keep &= by_id.keys()  # a dangling parent id (a thread outliving its test) is not a node
+    intact = all(n.parent is None or n.parent in by_id for n in nodes)
+    if len(keep) == len(by_id) and intact:
         return tuple(nodes), tuple(branches), 0
     new_id = {old: i for i, old in enumerate(sorted(keep))}
+    first_root = min((i for i in keep if by_id[i].parent is None), default=None)
+
+    def kept_parent(n: Any) -> int | None:
+        """The nearest kept ancestor. Normally the direct parent; robust to trees where a
+        parent is missing or was not kept (seen with server threads in requests'
+        test_lowlevel), so pruning can never break the tree."""
+        if n.parent is None:
+            return None
+        p: int | None = n.parent
+        while p is not None and p not in keep:
+            q = by_id.get(p)
+            p = q.parent if q is not None else None
+        if p is not None:
+            return new_id[p]
+        return new_id[first_root] if first_root is not None else None
+
     kept_nodes = tuple(
-        replace(
-            n, id=new_id[n.id], parent=None if n.parent is None else new_id[n.parent]
-        )
+        replace(n, id=new_id[n.id], parent=kept_parent(n))
         for n in sorted((by_id[i] for i in keep), key=lambda n: n.id)
     )
     kept_branches = tuple(replace(b, node=new_id[b.node]) for b in branches if b.node in new_id)
