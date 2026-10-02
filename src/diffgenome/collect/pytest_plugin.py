@@ -12,8 +12,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import shlex
 import subprocess
+import sys
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any
@@ -109,6 +112,10 @@ class _Plugin:
         self.focus_depth: int = int(spec.get("depth", 2)) if spec else 2
         self._pending: dict[str, Any] = {}  # nodeid -> trace, until pytest reports the outcome
 
+    def _take_launches(self) -> int:
+        n, _PYTHON_LAUNCHES[0] = _PYTHON_LAUNCHES[0], 0
+        return n
+
     def _end_import_phase(self) -> None:
         if self._import_phase:
             self._import_phase = False
@@ -179,6 +186,7 @@ class _Plugin:
             diagnostics=(
                 ("stack_repairs", str(result.stack_repairs)),
                 ("tracer_errors", str(result.tracer_errors)),
+                ("python_subprocesses", str(self._take_launches())),
                 ("attribution_disagreements", str(result.attribution_disagreements)),
                 ("pruned_nodes", str(dropped)),
             ),
@@ -192,5 +200,28 @@ class _Plugin:
             item.add_report_section("call", "diffgenome", f"stack repairs: {result.stack_repairs}")
 
 
+_PYTHON_LAUNCHES = [0]  # Python child processes the tests started (never traced)
+
+
+def _count_python_launches() -> None:
+    """Tests that run the code under test in a child process (glances #3770: test_restful
+    starts `python -m glances -w` with subprocess.Popen) execute it where no tracer runs:
+    "not run" would be wrong there. The launches are counted so the evidence can say so."""
+    original = subprocess.Popen.__init__
+
+    def init(self: Any, args: Any, *rest: Any, **kwargs: Any) -> None:
+        try:
+            argv = shlex.split(args) if isinstance(args, str) else list(args)
+            exe = os.path.basename(str(kwargs.get("executable") or argv[0]))
+            if exe.startswith("python") or str(argv[0]) == sys.executable:
+                _PYTHON_LAUNCHES[0] += 1
+        except Exception:  # never change the program's behavior
+            pass
+        original(self, args, *rest, **kwargs)
+
+    subprocess.Popen.__init__ = init  # type: ignore[method-assign]
+
+
 def pytest_configure(config: pytest.Config) -> None:
+    _count_python_launches()
     config.pluginmanager.register(_Plugin(config), "diffgenome-collector")

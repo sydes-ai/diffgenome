@@ -433,3 +433,17 @@ def test_a_run_stopped_by_the_cpu_limit_says_so_in_the_contract(
     )  # fmt: skip
     assert rt["universe"]["stopped_early"].startswith("stopped by the sandbox CPU-time limit")
     assert fn(rt, "app.svc.total")["executed"]
+
+
+def test_tests_that_run_the_code_in_a_child_process_are_flagged(tmp_path: Path) -> None:
+    """glances #3770: test_restful starts the server with subprocess.Popen; the changed code
+    runs in that untraced child, and was reported as simply not run."""
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/svc.py": SVC,
+         "tests/test_child.py": "import subprocess, sys\n\ndef test_child():\n    out = subprocess.run([sys.executable, '-c', 'from app.svc import total; print(total([2]))'], capture_output=True, text=True, check=True)\n    assert out.stdout.strip() == '2'\n"},
+        {"app/svc.py": SVC2},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    assert rt["universe"]["untraced_python_subprocesses"] == 1
+    assert not fn(rt, "app.svc.total")["executed"]  # true of this process; the contract says why

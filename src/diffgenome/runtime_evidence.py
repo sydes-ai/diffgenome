@@ -251,6 +251,11 @@ def build_runtime_evidence(
             "tracer_errors": sum(
                 int(v) for ex in execs for k, v in ex.diagnostics if k == "tracer_errors"
             ),
+            # Python child processes the tests started: code they ran was not observed, so
+            # "not executed" may be wrong for it (glances #3770 starts its server this way)
+            "untraced_python_subprocesses": sum(
+                int(v) for ex in execs for k, v in ex.diagnostics if k == "python_subprocesses"
+            ),
             "tests": [{"id": t, "outcome": outcomes[t]} for t in sorted(outcomes)][:2000],
         },
         "changed_functions": functions,
