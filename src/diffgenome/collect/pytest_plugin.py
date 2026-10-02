@@ -23,7 +23,7 @@ import pytest
 from diffgenome.collect import import_phase
 from diffgenome.collect.import_phase import IMPORT_REF
 from diffgenome.collect.prune import prune_to_focus
-from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer
+from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer, TraceResult
 from diffgenome.model import Collector, Execution, Stimulus
 from diffgenome.serialize import execution_to_json
 
@@ -141,6 +141,10 @@ class _Plugin:
         if call.when == "call" and item.nodeid in self._pending:
             outcome = "passed" if report.passed else "skipped" if report.skipped else "failed"
             self._write(item, self._test_ref(item), self._pending.pop(item.nodeid), outcome)
+        elif call.when == "setup" and report.skipped:
+            # a skip marker or a skipping fixture: the test never reaches its call phase,
+            # but it is part of the run and must be counted as skipped, not dropped
+            self._write(item, self._test_ref(item), TraceResult((), ()), "skipped")
         return report
 
     def _test_ref(self, item: pytest.Item) -> str:
@@ -172,6 +176,7 @@ class _Plugin:
             branches=branches,
             diagnostics=(
                 ("stack_repairs", str(result.stack_repairs)),
+                ("tracer_errors", str(result.tracer_errors)),
                 ("attribution_disagreements", str(result.attribution_disagreements)),
                 ("pruned_nodes", str(dropped)),
             ),

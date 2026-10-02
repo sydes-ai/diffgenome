@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import ast
 import dataclasses
+import dis
 import hashlib
 import inspect
 import io
@@ -30,6 +31,7 @@ from types import CodeType, ModuleType
 from typing import Any
 from unittest import mock
 
+from diffgenome.collect.py_names import disambiguate, redefined
 from diffgenome.model import (
     ArgShapes,
     BranchObs,
@@ -67,7 +69,15 @@ _EXCLUDED_PARTS = {"site-packages", "dist-packages", "node_modules", "__pycache_
 
 
 def summarize_value(value: Any) -> str:
-    """Bounded, deterministic shape of a value for seam matching. Never repr()s user data."""
+    """Bounded, deterministic shape of a value for seam matching. Never repr()s user data,
+    and never raises: a value whose own code fails while inspected is "opaque"."""
+    try:
+        return _summarize_value(value)
+    except Exception:
+        return "opaque"
+
+
+def _summarize_value(value: Any) -> str:
     if value is None or isinstance(value, bool | int | float | str | bytes):
         return type(value).__name__
     if isinstance(value, mock.NonCallableMock):
@@ -235,7 +245,10 @@ def digest_value(value: Any) -> str:
     """Stable content digest of a value, or "" when unavailable. Uses sha256 (not hash())
     so digests agree across processes and runs. Short scalars are trivially reversible by
     brute force; the digest hides values from casual reading, not from an adversary."""
-    canonical = _canonical(value, _DIGEST_DEPTH)
+    try:
+        canonical = _canonical(value, _DIGEST_DEPTH)
+    except Exception:  # the value's own code failed while being inspected (datachain #2001)
+        return ""
     return "" if canonical is None else hashlib.sha256(canonical.encode()).hexdigest()[:16]
 
 
@@ -284,11 +297,43 @@ def _inside(p: Pos, span: tuple[Pos, Pos]) -> bool:
     return span[0] <= p < span[1]
 
 
+_EXITS = frozenset({"RETURN_VALUE", "RETURN_CONST"})
+_LOOP_BACK = frozenset({"JUMP_BACKWARD", "JUMP_BACKWARD_NO_INTERRUPT"})
+_FORWARD = frozenset({"JUMP_FORWARD", "JUMP", "JUMP_NO_INTERRUPT"})
+
+
+def _leaves_condition(
+    instructions: dict[int, dis.Instruction], positions: list[Any], destination: int
+) -> tuple[str, Pos | None]:
+    """Where a jump that lands on a compiler-placed instruction really goes. The
+    compiler gives the `return None` ending a function, the jump back to a loop header
+    and forward jumps the position of the `if` condition (or none), so by position
+    alone a decision looks like a short-circuit inside the condition (datachain #2009:
+    a false outcome continuing a loop; wemake #3810: one leaving the function).
+    ("exit", None) or ("loop", None): control leaves the if without entering its
+    body. ("at", pos): the position of the first instruction that does real work."""
+    for _ in range(8):
+        ins = instructions.get(destination)
+        if ins is None:
+            break
+        if ins.opname in _EXITS:
+            return "exit", None
+        if ins.opname in _LOOP_BACK:
+            return "loop", None
+        if ins.opname in _FORWARD and isinstance(ins.argval, int):
+            destination = ins.argval
+            continue
+        line, _eline, col, _ecol = positions[destination // 2]
+        return "at", (None if line is None or col is None else (line, col + 1))
+    return "at", None
+
+
 @dataclass
 class TraceResult:
     symbols: tuple[Symbol, ...]
     nodes: tuple[Node, ...]
     stack_repairs: int = 0  # returns that did not match the shadow-stack top
+    tracer_errors: int = 0  # tracer callbacks that failed and were contained
     attribution_disagreements: int = (
         0  # calls where a shadow stack would have chosen another parent
     )
@@ -315,6 +360,7 @@ class Tracer:
     _root_code: CodeType | None = None
     _import_phase: bool = False
     _stack_repairs: int = 0
+    _tracer_errors: int = 0
     _attribution_disagreements: int = 0
     _pending_mock_calls: dict[int, list[int]] = field(default_factory=dict, repr=False)
     _orig_mock_call: Any = None
@@ -324,7 +370,11 @@ class Tracer:
     _egress_guard_installed: bool = False
     _branches: list[BranchObs] = field(default_factory=list, repr=False)
     _file_sites: dict[str, list[_IfSite]] = field(default_factory=dict, repr=False)
+    _file_redefinitions: dict[str, dict[str, list[int]]] = field(default_factory=dict, repr=False)
     _positions: dict[CodeType, list[Any]] = field(default_factory=dict, repr=False)
+    _instructions: dict[CodeType, dict[int, dis.Instruction]] = field(
+        default_factory=dict, repr=False
+    )
 
     # ------------------------------------------------------------------ symbol naming
 
@@ -379,6 +429,12 @@ class Tracer:
                     # own: two lambdas in one function share a qualname. Its identity is
                     # its definition site. Found as an IdentityMismatch on Kokoro-FastAPI.
                     qualname = f"{qualname}@{code.co_firstlineno}"
+                else:
+                    # a property setter, an overload or a conditional redefinition shares
+                    # its qualname with an earlier definition (py_names)
+                    qualname = disambiguate(
+                        qualname, code.co_firstlineno, self._redefinitions_in(filename)
+                    )
                 scope = _Scope(
                     origin,
                     f"py:{module}.{qualname}",
@@ -400,6 +456,18 @@ class Tracer:
         code = getattr(obj, "__code__", None)
         if isinstance(code, CodeType) and (scope := self.scope_for(code)):
             return Symbol(scope.symbol, scope.origin, scope.location)
+        # A decorator's wrapper (contextlib.contextmanager, functools.wraps) carries the
+        # wrapped function's name but its own code, from another file (pdm #3897:
+        # atomic_open_for_write got contextlib.py's line 299). Read __wrapped__ from
+        # __dict__ only, so a mock cannot fabricate it.
+        wrapped = getattr(obj, "__dict__", {}).get("__wrapped__") if callable(obj) else None
+        for _ in range(4):
+            inner = getattr(wrapped, "__code__", None)
+            if isinstance(inner, CodeType) and (scope := self.scope_for(inner)):
+                return Symbol(scope.symbol, scope.origin, scope.location)
+            wrapped = getattr(wrapped, "__dict__", {}).get("__wrapped__")
+            if wrapped is None:
+                break
         if isinstance(obj, ModuleType):
             # A patched module attribute (patch("pkg.mod.torch")) claims the module itself.
             file = getattr(obj, "__file__", None)
@@ -415,8 +483,13 @@ class Tracer:
         if isinstance(file, str):
             named = self._module_for(file)
             if named:
-                line = code.co_firstlineno if isinstance(code, CodeType) else 0
-                loc = SourceLocation(self._relative(file), line)
+                # a line is only known from a code object of that same file
+                same_file = isinstance(code, CodeType) and code.co_filename == file
+                loc = (
+                    SourceLocation(self._relative(file), code.co_firstlineno)
+                    if same_file and isinstance(code, CodeType)
+                    else None
+                )
                 return Symbol(f"py:{named[1]}.{qualname}", named[0], loc)
         if module_name is None:
             return Symbol(f"py:{type(obj).__module__}.{qualname}", Origin.UNKNOWN, None)
@@ -630,6 +703,12 @@ class Tracer:
             busy.add(ident)
             try:
                 return callback(*args)
+            except Exception:
+                # The tracer must never change the program it observes: a failure while
+                # inspecting a value (datachain #2001: dataclasses.fields() on an object
+                # whose __getattr__ answers every name) is counted, never raised into it.
+                self._tracer_errors += 1
+                return None
             finally:
                 busy.discard(ident)
 
@@ -810,6 +889,17 @@ class Tracer:
             self._set_outcome(node_id, "returned", digest_value(result))
         return result
 
+    def _redefinitions_in(self, filename: str) -> dict[str, list[int]]:
+        found = self._file_redefinitions.get(filename)
+        if found is None:
+            try:
+                with _READ_SOURCE(filename, encoding="utf-8") as fh:
+                    found = redefined(ast.parse(fh.read()))
+            except (OSError, SyntaxError, ValueError):
+                found = {}
+            self._file_redefinitions[filename] = found
+        return found
+
     def _sites_for(self, filename: str) -> list[_IfSite]:
         sites = self._file_sites.get(filename)
         if sites is None:
@@ -849,12 +939,19 @@ class Tracer:
                 match = site
         if match is None:
             return _DISABLE
-        if dline is None or dcol is None:
-            return None
-        there = (dline, dcol + 1)
-        if _inside(there, match.test):
-            return None  # short-circuit inside the condition
-        outcome = _inside(there, match.body)
+        there = None if dline is None or dcol is None else (dline, dcol + 1)
+        if there is None or _inside(there, match.test):
+            instructions = self._instructions.get(code)
+            if instructions is None:
+                instructions = self._instructions[code] = {
+                    i.offset: i for i in dis.get_instructions(code)
+                }
+            kind, there = _leaves_condition(instructions, positions, destination)
+            if kind != "at":
+                there = None  # leaves the if without entering its body: the false outcome
+            elif there is None or _inside(there, match.test):
+                return None  # short-circuit inside the condition
+        outcome = there is not None and _inside(there, match.body)
         node = self._frame_nodes.get(id(sys._getframe(_MONITORED)), 0)
         self._branches.append(BranchObs(match.site, outcome, node, len(self._nodes)))
         return None
@@ -969,6 +1066,7 @@ class Tracer:
         self._frame_nodes.clear()
         self._fake_wrappers.clear()
         self._stack_repairs = 0
+        self._tracer_errors = 0
         self._attribution_disagreements = 0
         self._pending_mock_calls.clear()
         self._root_code = root_code
@@ -1025,6 +1123,7 @@ class Tracer:
             symbols=tuple(self._symbols[k] for k in sorted(self._symbols)),
             nodes=tuple(self._nodes),
             stack_repairs=self._stack_repairs,
+            tracer_errors=self._tracer_errors,
             attribution_disagreements=self._attribution_disagreements,
             branches=tuple(self._branches),
         )

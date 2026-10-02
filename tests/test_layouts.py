@@ -257,3 +257,131 @@ def test_one_unimportable_test_file_does_not_stop_the_others(tmp_path: Path) -> 
         "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
     )  # fmt: skip
     assert rt["universe"]["passed"] == 1 and fn(rt, "app.svc.total")["executed"]
+
+
+# ---- field study regressions (0.1.9): each reproduces the code shape of the PR that found it
+
+
+def _gaps(rt: dict[str, Any], suffix: str) -> list[dict[str, Any]]:
+    return [g for g in rt["gaps"] if g["symbol"].endswith(suffix)]
+
+
+def test_false_outcome_that_continues_a_loop(tmp_path: Path) -> None:
+    """datachain #2009, semver.validate: the false outcome of the last `if` in a loop body
+    jumps back to the loop header and was never recorded ("never false", wrongly)."""
+    validate = "def validate(parts):\n    for part in parts:\n        if not part.isdigit():\n            raise ValueError(part)\n        if int(part) > {n}:\n            raise ValueError(part)\n"
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/semver.py": validate.format(n=999),
+         "tests/test_semver.py": "import pytest\nfrom app.semver import validate\n\ndef test_ok():\n    validate(['1', '2', '3'])\n\ndef test_big():\n    with pytest.raises(ValueError):\n        validate(['1', '100000'])\n"},
+        {"app/semver.py": validate.format(n=9999)},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    [site] = fn(rt, "app.semver.validate")["changed_sites"]
+    assert site["true"] == 1 and site["false"] == 4  # 1, 2, 3, then 1 of ['1', '100000']
+    assert _gaps(rt, "validate") == []
+
+
+def test_false_outcome_that_leaves_the_function(tmp_path: Path) -> None:
+    """wemake #3810, _check_doc_string_place: `if A and not B: add(...)` ending a function;
+    the false outcome goes through the implicit `return None`."""
+    check = "def check(node, add):\n    if node > {n} and not node == 3:\n        add(node)\n"
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/check.py": check.format(n=1),
+         "tests/test_check.py": "from app.check import check\n\ndef test_both():\n    seen = []\n    for n in (0, 3, 5):\n        check(n, seen.append)\n    assert seen == [5]\n"},
+        {"app/check.py": check.format(n=2)},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    [site] = fn(rt, "app.check.check")["changed_sites"]
+    assert site["true"] == 1 and site["false"] == 2
+    assert _gaps(rt, "check") == []
+
+
+COLUMN = '''class _AnyName(type):
+    """The class answers every attribute name, so dataclasses.is_dataclass() says yes."""
+
+    def __getattr__(cls, name):
+        return Column(name)
+
+
+class Column(metaclass=_AnyName):
+    """SQLAlchemy-style (datachain query.schema.Column): every attribute is a Column."""
+
+    def __init__(self, name):
+        self.name = name
+
+    def __getattr__(self, name):
+        return Column(self.name + "." + name)
+
+
+def column(name):
+    return Column({expr})
+'''
+
+
+def test_the_tracer_never_raises_into_the_program(tmp_path: Path) -> None:
+    """datachain #2001: digesting a returned Column (dataclasses.fields() on an object whose
+    class and instances answer every name) raised inside the code under test, and 208
+    tests failed. The tracer may lose that digest, never the program's behavior."""
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/schema.py": COLUMN.format(expr="'c.' + name"),
+         "tests/test_schema.py": "from app.schema import column\n\ndef test_column():\n    assert column('x').name == 'c.x'\n\ndef test_attr():\n    assert column('x').y.name == 'c.x.y'\n"},
+        {"app/schema.py": COLUMN.format(expr="'c.' + str(name)")},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    assert rt["universe"]["failed"] == 0, rt["universe"]["tests"]
+    assert rt["universe"]["passed"] == 2 and fn(rt, "app.schema.column")["executed"]
+
+
+def test_skipped_tests_are_not_failures(tmp_path: Path) -> None:
+    """falcon #2731: 90 skipped tests were counted as failed."""
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/svc.py": SVC,
+         "tests/test_svc.py": "import pytest\nfrom app.svc import total\n\ndef test_t():\n    assert total([1]) == 1\n\n@pytest.mark.skip(reason='optional dependency')\ndef test_s():\n    pass\n"},
+        {"app/svc.py": SVC2},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    u = rt["universe"]
+    assert (u["passed"], u["failed"], u["skipped"]) == (1, 0, 1)
+
+
+UNIT = '''import contextlib
+
+
+class Unit:
+    def __init__(self):
+        self._target = ""
+
+    @property
+    def target(self):
+        return self._target
+
+    @target.setter
+    def target(self, value):
+        self._target = {setter}
+
+
+@contextlib.contextmanager
+def opened(path):
+    yield {opened}
+'''
+
+
+def test_property_setters_and_decorated_functions_have_their_own_identity(tmp_path: Path) -> None:
+    """translate #6595/#6596 (property getter and setter share `pounit.target`), pdm #3886
+    (`Project.environment`), pdm #3897 (`@contextmanager` wrapper reported with contextlib's
+    line): each crashed the run with IdentityMismatch. A changed setter is its own function:
+    reported executed only when the setter itself runs."""
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/unit.py": UNIT.format(setter="value", opened="path"),
+         "tests/test_unit.py": "from app.unit import Unit, opened\n\ndef test_get():\n    assert Unit().target == ''\n\ndef test_opened():\n    with opened('p') as v:\n        assert v.startswith('p')\n"},
+        {"app/unit.py": UNIT.format(setter="value.strip()", opened="path + '!'")},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    setter = fn(rt, "app.unit.Unit.target@12")
+    assert not setter["executed"], "only the getter ran; the changed setter did not"
+    assert fn(rt, "app.unit.opened")["executed"]

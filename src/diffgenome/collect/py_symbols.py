@@ -12,6 +12,7 @@ import ast
 from dataclasses import dataclass
 from pathlib import Path
 
+from diffgenome.collect.py_names import disambiguate, first_line, redefined, walk_definitions
 from diffgenome.model import SymbolId
 
 _EXCLUDED = {"site-packages", "dist-packages", "node_modules", "__pycache__"}
@@ -72,39 +73,25 @@ class PythonSymbolIndex:
             except (SyntaxError, OSError, UnicodeDecodeError):
                 tree = None
             if tree is not None:
-                self._collect(tree.body, module, [], rel_path, out)
+                self._collect(tree, module, rel_path, out)
         self._defs[rel_path] = out
         return out
 
-    def _collect(
-        self, body: list[ast.stmt], module: str, scope: list[str], rel: str, out: list[Definition]
-    ) -> None:
-        for node in body:
-            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
-                qual = ".".join([*scope, node.name])
-                out.append(
-                    Definition(
-                        f"py:{module}.{qual}",
-                        rel,
-                        node.lineno,
-                        node.end_lineno or node.lineno,
-                        "function",
-                        isinstance(node, ast.AsyncFunctionDef),
-                    )
+    def _collect(self, tree: ast.Module, module: str, rel: str, out: list[Definition]) -> None:
+        redefinitions = redefined(tree)
+        for qual, node, _scope in walk_definitions(tree.body, []):
+            name = disambiguate(qual, first_line(node), redefinitions)
+            is_class = isinstance(node, ast.ClassDef)
+            out.append(
+                Definition(
+                    f"py:{module}.{name}",
+                    rel,
+                    node.lineno,
+                    node.end_lineno or node.lineno,
+                    "class" if is_class else "function",
+                    isinstance(node, ast.AsyncFunctionDef),
                 )
-                self._collect(node.body, module, [*scope, node.name, "<locals>"], rel, out)
-            elif isinstance(node, ast.ClassDef):
-                qual = ".".join([*scope, node.name])
-                out.append(
-                    Definition(
-                        f"py:{module}.{qual}",
-                        rel,
-                        node.lineno,
-                        node.end_lineno or node.lineno,
-                        "class",
-                    )
-                )
-                self._collect(node.body, module, [*scope, node.name], rel, out)
+            )
 
     def symbols_at(self, rel_path: str, lines: set[int]) -> list[Definition]:
         """Innermost function definitions covering any of the lines (classes only when a

@@ -392,6 +392,8 @@ def build_graph(
     seen_gaps: set[tuple[NodeRef, SymbolId, str]] = set()
     seen_attempts: set[tuple[NodeRef, NodeRef]] = set()
     for ex_id in corpus.executions:
+        if not corpus.executions[ex_id].nodes:
+            continue  # an outcome without a trace (a test skipped at setup): nothing ran
         c = compose(corpus, ex_id, min_join=min_join, use_state=use_state)
         compositions[ex_id] = c
         for edge in c.edges():

@@ -240,7 +240,14 @@ def build_runtime_evidence(
             "test_scope": test_scope,
             "executions": len(universe),
             "passed": sum(1 for o in outcomes.values() if o == "passed"),
-            "failed": sum(1 for o in outcomes.values() if o != "passed"),
+            # skipped tests are not failures (falcon #2731 counted 90 skips as failed)
+            "failed": sum(1 for o in outcomes.values() if o not in ("passed", "skipped")),
+            "skipped": sum(1 for o in outcomes.values() if o == "skipped"),
+            # tracer callbacks that failed and were contained (the program was not affected,
+            # but the observation is incomplete where they happened)
+            "tracer_errors": sum(
+                int(v) for ex in execs for k, v in ex.diagnostics if k == "tracer_errors"
+            ),
             "tests": [{"id": t, "outcome": outcomes[t]} for t in sorted(outcomes)][:2000],
         },
         "changed_functions": functions,

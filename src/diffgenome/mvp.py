@@ -32,7 +32,7 @@ from diffgenome.projection import case_metrics, render_behavior_map, slice_json
 from diffgenome.report import render_map_slice, render_report, report_json
 from diffgenome.runtime import RuntimeAdapter, SymbolIndex
 from diffgenome.runtime_evidence import build_runtime_evidence
-from diffgenome.sandbox import Workspace, select_backend
+from diffgenome.sandbox import CPU_LIMIT_MARKER, Workspace, select_backend
 from diffgenome.serialize import execution_from_json
 from diffgenome.static_types import apply_static_return_types
 
@@ -271,6 +271,11 @@ def main(argv: list[str] | None = None) -> int:
                 ws, out / "traces-existing", Stimulus.EXISTING_TEST, None
             )
             (out / "existing-tests.log").write_text(stdout + "\n" + stderr)
+            if CPU_LIMIT_MARKER in stderr:
+                notes.append(
+                    f"the test run was {CPU_LIMIT_MARKER}: tests after that point did not run, "
+                    "so functions they would reach are reported as not executed"
+                )
             tail = (stdout.strip() or stderr.strip()).splitlines()[-1:]
             _log(f"existing tests: {tail} -> {len(executions)} executions")
         from diffgenome.collect.import_phase import IMPORT_REF
@@ -294,6 +299,8 @@ def main(argv: list[str] | None = None) -> int:
                     "",
                 ),
             )
+            if CPU_LIMIT_MARKER in stderr:
+                first_error = next(ln for ln in stderr.splitlines() if CPU_LIMIT_MARKER in ln)
             _write_status(
                 out,
                 "failed",

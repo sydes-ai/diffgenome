@@ -268,3 +268,55 @@ def test_tools_installed_under_tmp_are_usable(ws: Workspace) -> None:
         assert not (d / "x").exists()  # visible, never writable
     finally:
         shutil.rmtree(d)
+
+
+# -- the workspace copy (field study, 0.1.9) -------------------------------------------------
+
+
+def test_source_packages_named_venv_are_copied(tmp_path: Path) -> None:
+    """pdm #3892: `pdm/cli/commands/venv` is source; only real virtualenvs (pyvenv.cfg)
+    are left out of the workspace."""
+    target = tmp_path / "target"
+    (target / "pkg/venv").mkdir(parents=True)
+    (target / "pkg/venv/__init__.py").write_text("X = 1\n")
+    (target / ".venv/bin").mkdir(parents=True)
+    (target / ".venv/pyvenv.cfg").write_text("home = /usr\n")
+    (target / "env/bin").mkdir(parents=True)
+    (target / "env/pyvenv.cfg").write_text("home = /usr\n")
+    w = Workspace.create(target, tmp_path / "ws")
+    try:
+        assert (w.repo / "pkg/venv/__init__.py").is_file()
+        assert not (w.repo / ".venv").exists() and not (w.repo / "env").exists()
+    finally:
+        w.destroy()
+
+
+def test_symlinks_are_copied_as_links(tmp_path: Path) -> None:
+    """glances #3768: a dangling link in test data is not an error; the target of a link
+    leaving the repository is not copied into the workspace (reading through the link is
+    the documented read policy, as for any absolute path)."""
+    secret = tmp_path / "secret.txt"
+    secret.write_text("host secret")
+    target = tmp_path / "target"
+    (target / "tests-data").mkdir(parents=True)
+    (target / "tests-data/driver").symlink_to("../../no/such/driver")
+    (target / "tests-data/outside").symlink_to(secret)
+    (target / "inside.txt").write_text("in repo")
+    (target / "tests-data/inside").symlink_to("../inside.txt")
+    w = Workspace.create(target, tmp_path / "ws")
+    try:
+        assert (w.repo / "tests-data/driver").is_symlink()
+        assert (w.repo / "tests-data/outside").is_symlink()  # a link, not a copy of the secret
+        r = run_py(w, "print(open('tests-data/inside').read())")
+        assert r.returncode == 0 and "in repo" in r.stdout, r.stderr
+    finally:
+        w.destroy()
+
+
+def test_the_cpu_limit_is_reported(ws: Workspace) -> None:
+    """datachain #2001/#2009 on Linux: a run stopped by RLIMIT_CPU said only "no test
+    executions captured"."""
+    ws.cpu_seconds = 1
+    r = run_py(ws, "while True: pass")
+    assert r.returncode != 0
+    assert "stopped by the sandbox CPU-time limit" in r.stderr

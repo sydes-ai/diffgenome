@@ -27,16 +27,30 @@ import functools
 import os
 import platform
 import shutil
+import signal
 import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
-_IGNORE = shutil.ignore_patterns(
-    ".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache",
-    ".ruff_cache", ".diffgenome", "*.pyc",
-)  # fmt: skip
+_IGNORED_NAMES = frozenset({
+    ".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
+    ".diffgenome",
+})  # fmt: skip
+
+
+def _ignore(directory: str, names: list[str]) -> set[str]:
+    """What the workspace copy leaves out: VCS data, caches, and virtualenvs. A virtualenv
+    is recognized by its pyvenv.cfg, never by its name: pdm ships a source package
+    `pdm/cli/commands/venv`, and dropping it failed 126 of its tests (pdm #3892)."""
+    return {
+        n
+        for n in names
+        if n in _IGNORED_NAMES
+        or n.endswith(".pyc")
+        or os.path.isfile(os.path.join(directory, n, "pyvenv.cfg"))
+    }
 
 
 class SandboxBackend(Protocol):
@@ -182,6 +196,9 @@ def select_backend() -> tuple[SandboxBackend | None, str]:
     return None, "; ".join(reasons)
 
 
+CPU_LIMIT_MARKER = "stopped by the sandbox CPU-time limit"
+
+
 @dataclass
 class RunResult:
     returncode: int
@@ -220,7 +237,11 @@ class Workspace:
             )
             subprocess.run(["tar", "-x", "-C", str(repo)], input=archive.stdout, check=True)
         else:
-            shutil.copytree(target_repo, repo, ignore=_IGNORE, symlinks=False)
+            # Symlinks are copied as links, not followed: a dangling link (glances'
+            # tests-data/ sysfs fixtures) is not an error, and the target of a link that
+            # leaves the repository is not copied into the workspace. Following such a link
+            # inside the sandbox is subject to the same read policy as any absolute path.
+            shutil.copytree(target_repo, repo, ignore=_ignore, symlinks=True)
         home, tmp = root / "home", root / "tmp"
         home.mkdir()
         tmp.mkdir()
@@ -239,6 +260,8 @@ class Workspace:
         if backend is None:
             return None
         return backend.wrap(self, list(argv), allow_loopback)
+
+    cpu_seconds = 600  # RLIMIT_CPU for everything run in the workspace
 
     @staticmethod
     def _limits(
@@ -288,7 +311,7 @@ class Workspace:
         try:
             proc = subprocess.run(
                 wrapped,
-                preexec_fn=self._limits,
+                preexec_fn=functools.partial(self._limits, cpu_seconds=self.cpu_seconds),
                 cwd=cwd or self.repo,
                 env=self.environment(env),
                 capture_output=True,
@@ -296,9 +319,12 @@ class Workspace:
                 timeout=timeout,
                 stdin=subprocess.DEVNULL,
             )
-            return RunResult(
-                proc.returncode, proc.stdout, proc.stderr, time.monotonic() - start, True
-            )
+            stderr = proc.stderr
+            if proc.returncode in (-signal.SIGXCPU, 128 + signal.SIGXCPU):
+                # RLIMIT_CPU: say so, instead of leaving an empty log to be read as "the
+                # tests failed or found nothing" (datachain #2001, #2009 on Linux)
+                stderr += f"\n{CPU_LIMIT_MARKER} ({self.cpu_seconds} s of CPU time)"
+            return RunResult(proc.returncode, proc.stdout, stderr, time.monotonic() - start, True)
         except subprocess.TimeoutExpired as exc:
             out = exc.stdout.decode() if isinstance(exc.stdout, bytes) else (exc.stdout or "")
             err = exc.stderr.decode() if isinstance(exc.stderr, bytes) else (exc.stderr or "")

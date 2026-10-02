@@ -97,6 +97,9 @@ def test_python_branch_outcomes_and_state_deltas(exp07: dict[str, Execution]) ->
     strict = exp07["test_run_enabled_strict_audits"]
     assert [(sites[b.site], b.outcome) for b in strict.branches if b.site in sites] == [
         ("if not self.enabled:", False),
+        # the false outcome leaves validate() through its implicit `return None`, which the
+        # compiler places at the condition: it was dropped before 0.1.9 (wemake #3810)
+        ("if not item:", False),
         ("if settings.STRICT:", True),
     ]
     run = next(
