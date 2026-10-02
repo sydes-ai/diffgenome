@@ -44,10 +44,8 @@
     "base": "7c6286ed2125c87662eeb102b32fb3d68611a5d6",
     "expect": {
       "min_passed": 140,
-      "executed": [
-        "itsdangerous.timed.TimestampSigner.unsign"
-      ],
-      "why": "Pallets requirements/ test deps; filterwarnings = error (0.1.5)"
+      "executed": [],
+      "why": "Pallets requirements/ test deps; filterwarnings = error (0.1.5). The PR only reformats @overload stubs: no runtime function changed (0.1.8 wrongly attributed it to unsign)"
     }
   },
   "toolz": {
