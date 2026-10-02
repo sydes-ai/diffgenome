@@ -143,3 +143,29 @@ def test_no_executions_means_every_changed_function_not_executed() -> None:
     r = build_runtime_evidence([], _change(), _Index(), MECH, [])
     assert all(not f["executed"] for f in r["changed_functions"])
     assert {g["kind"] for g in r["gaps"]} == {"function_not_executed"}
+
+
+def test_import_time_calls_count_as_executed_but_credit_no_test() -> None:
+    """requests._check_cryptography runs when the package is imported (conftest, collection):
+    executed, flagged ran_at_import, and never attributed to a test."""
+    imp = Execution(
+        id="imp",
+        stimulus=Stimulus.EXISTING_TEST,
+        stimulus_ref="py:<import>",
+        outcome="passed",
+        revision=None,
+        collectors=(Collector("py", Plane.SYMBOL, Fidelity.COMPLETE),),
+        symbols=(),
+        nodes=(CallNode(0, None, "py:<import>", 0), CallNode(1, 0, "py:app.unused", 0)),
+        branches=(),
+    )
+    r = build_runtime_evidence(
+        [_ex("t::a", "returned", True, False), imp], _change(), _Index(), MECH, []
+    )
+    fns = {f["symbol"]: f for f in r["changed_functions"]}
+    assert fns["py:app.unused"]["executed"] and fns["py:app.unused"]["ran_at_import"]
+    assert fns["py:app.unused"]["tests"] == [] and fns["py:app.service"]["ran_at_import"] is False
+    assert r["universe"]["executions"] == 1 and [t["id"] for t in r["universe"]["tests"]] == [
+        "t::a"
+    ]
+    assert not any(g["kind"] == "function_not_executed" for g in r["gaps"])

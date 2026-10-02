@@ -53,3 +53,37 @@ def test_several_test_roots_all_classify_as_tests(tmp_path: Path) -> None:
     assert index.is_test("py:hc.api.tests.test_b.f")
     assert not index.is_test("py:hc.accounts.models.f")
     assert rt.probe_relpath("x").startswith("hc/accounts/tests/")
+
+
+def test_pytest_uses_the_config_it_would_use_in_the_repository(tmp_path: Path) -> None:
+    """0.1.4 passed --rootdir . and DiffGenome's option values as separate arguments; pytest
+    then missed backend/pytest.ini (Baserow: Django settings not configured). The config here
+    is only found if pytest looks where the test paths are."""
+    import shutil
+    import sys
+
+    import pytest as _pytest
+
+    from diffgenome.collect.py_runtime import PytestRuntime
+    from diffgenome.model import Stimulus
+    from diffgenome.sandbox import Workspace, select_backend
+
+    if select_backend()[0] is None or shutil.which("git") is None:
+        _pytest.skip("no sandbox backend")
+    target = tmp_path / "t"
+    (target / "backend" / "tests").mkdir(parents=True)
+    (target / "backend" / "pytest.ini").write_text("[pytest]\npython_files = check_*.py\n")
+    (target / "backend" / "app.py").write_text("def f():\n    return 1\n")
+    (target / "backend" / "tests" / "check_app.py").write_text(
+        "from app import f\n\ndef test_f():\n    assert f() == 1\n"
+    )
+    rt = PytestRuntime(
+        target, Path(sys.executable), "backend", "backend/tests", "backend/tests", [],
+        pythonpath=["backend"],
+    )
+    ws = Workspace.create(target, tmp_path / "ws")
+    rt.prepare(ws)
+    executions, out, err = rt.trace(ws, tmp_path / "out", Stimulus.EXISTING_TEST, None)
+    refs = [e.stimulus_ref for e in executions]
+    assert "backend/tests/check_app.py::test_f" in refs, out + err  # repository-relative
+    assert "py:<import>" in refs  # import and collection time traced by the launcher

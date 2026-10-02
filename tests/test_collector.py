@@ -317,14 +317,13 @@ def test_inspecting_a_receiver_never_runs_its_getattr(tmp_path: Path) -> None:
     )
     (tmp_path / "tests").mkdir()
     (tmp_path / "tests" / "test_lazy.py").write_text(
-        "from pkg.lazy import Lazy\n"
-        "def test_total():\n"
-        "    assert Lazy(1).total() == 2\n"
+        "from pkg.lazy import Lazy\ndef test_total():\n    assert Lazy(1).total() == 2\n"
     )
     ex = trace(tmp_path, tmp_path / "out")["test_total"]
     assert ex.outcome == "passed"
     assert [n.symbol for n in ex.nodes if isinstance(n, CallNode)][1:] == [
-        "py:pkg.lazy.Lazy.__init__", "py:pkg.lazy.Lazy.total"
+        "py:pkg.lazy.Lazy.__init__",
+        "py:pkg.lazy.Lazy.total",
     ]
 
 
@@ -379,3 +378,48 @@ def test_egress_guard_lets_loopback_through_only_when_allowed(tmp_path: Path, al
     )  # fmt: skip
     [ex] = [execution_from_json(f.read_text()) for f in out.glob("*.json")]
     assert ex.outcome == ("passed" if allow else "failed")
+
+
+def test_launcher_records_calls_made_at_import_time(tmp_path: Path) -> None:
+    """The package runs a check when imported, and conftest imports it before any test (as
+    requests' conftest does): the launcher's import execution observes the call."""
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "__init__.py").write_text(
+        "def _check(v):\n    return v > 1\n\nOK = _check(2)\n\n"
+        "class Broken(Exception):\n    pass\n\n"
+        "def api():\n    return OK\n\ndef fail():\n    raise Broken('x')\n"
+    )
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "conftest.py").write_text("import pkg  # noqa: F401\n")
+    (tmp_path / "tests" / "test_api.py").write_text(
+        "import pytest\nfrom pkg import Broken, api, fail\n\ndef test_api():\n    assert api()\n\n"
+        "def test_fail():\n    with pytest.raises(Broken):\n        fail()\n"
+    )
+    out = tmp_path / "out"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": f"{REPO / 'src'}:{tmp_path}"}
+    r = subprocess.run(
+        [sys.executable, "-m", "diffgenome.collect.pytest_launch", "-q", "-p", "no:cacheprovider",
+         "-p", "diffgenome.collect.pytest_plugin", "--diffgenome-out", str(out),
+         "--diffgenome-source-root", ".", "--diffgenome-test-root", "tests", "tests"],
+        cwd=tmp_path, env=env, capture_output=True, text=True,
+    )  # fmt: skip
+    assert r.returncode == 0, r.stdout + r.stderr
+    executions = {
+        e.stimulus_ref: e for e in (execution_from_json(f.read_text()) for f in out.glob("*.json"))
+    }
+    assert (
+        "py:<import>" in executions
+        and executions["tests/test_api.py::test_api"].outcome == "passed"
+    )
+    imported = {n.symbol for n in executions["py:<import>"].nodes if isinstance(n, CallNode)}
+    assert "py:pkg._check" in imported
+    tested = {
+        n.symbol for n in executions["tests/test_api.py::test_api"].nodes if isinstance(n, CallNode)
+    }
+    assert "py:pkg._check" not in tested and "py:pkg.api" in tested
+    # definition-time code (module and class bodies) is not recorded as calls at import, so a
+    # class seen at import and again when raised keeps one identity
+    assert "py:pkg.Broken" not in imported
+    from diffgenome.compose import build_corpus
+
+    build_corpus(list(executions.values()))  # raised IdentityMismatch on requests

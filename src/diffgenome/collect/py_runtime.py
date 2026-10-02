@@ -82,14 +82,20 @@ class PytestRuntime:
         traces_ws = ws.root / f"traces-{tag}-{len(list(ws.root.glob('traces-*')))}"
         traces_ws.mkdir(parents=True, exist_ok=True)
         argv = [
-            # rootdir: test ids relative to the repository, whatever config pytest finds
-            str(self.python), "-m", "pytest", "-q", "-p", "no:cacheprovider", "--rootdir", ".",
+            # the launcher traces import and collection time too (pytest_launch). DiffGenome's
+            # own options are single `--opt=value` tokens: pytest takes any bare argument
+            # naming an existing path (an option *value* like the output directory) into
+            # account when it picks rootdir and its config file. With them as plain test paths
+            # only, pytest chooses rootdir and config exactly as in the repository's own runs
+            # (Baserow: backend/pytest.ini with the Django settings).
+            str(self.python), "-m", "diffgenome.collect.pytest_launch",
+            "-q", "-p", "no:cacheprovider",
             "-p", "diffgenome.collect.pytest_plugin",
-            "--diffgenome-out", str(traces_ws),
-            "--diffgenome-repo-root", ".",
-            "--diffgenome-source-root", self.source_root,
-            *(a for t in self.test_roots for a in ("--diffgenome-test-root", t)),
-            "--diffgenome-stimulus", stimulus.value,
+            f"--diffgenome-out={traces_ws}",
+            "--diffgenome-repo-root=.",
+            f"--diffgenome-source-root={self.source_root}",
+            *(f"--diffgenome-test-root={t}" for t in self.test_roots),
+            f"--diffgenome-stimulus={stimulus.value}",
             "--diffgenome-egress-guard",
             *(["--diffgenome-allow-loopback"] if self.allow_loopback else []),
             *self._focus_args(ws),
@@ -111,7 +117,7 @@ class PytestRuntime:
         path = ws.root / "focus.json"
         spec = {"symbols": sorted(self.focus), "depth": self.focus_depth}
         path.write_text(json.dumps(spec), encoding="utf-8")
-        return ["--diffgenome-focus", str(path)]
+        return [f"--diffgenome-focus={path}"]
 
     def probe_relpath(self, tag: str) -> str:
         return f"{self.test_root}/test_diffgenome_probe_{tag}.py"

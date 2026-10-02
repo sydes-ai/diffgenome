@@ -20,6 +20,7 @@ from __future__ import annotations
 import ast
 import dataclasses
 import hashlib
+import inspect
 import io
 import sys
 import threading
@@ -312,6 +313,7 @@ class Tracer:
         default_factory=dict, repr=False
     )  # call node -> sub node
     _root_code: CodeType | None = None
+    _import_phase: bool = False
     _stack_repairs: int = 0
     _attribution_disagreements: int = 0
     _pending_mock_calls: dict[int, list[int]] = field(default_factory=dict, repr=False)
@@ -656,6 +658,10 @@ class Tracer:
     # ------------------------------------------------------------------ callbacks
 
     def _on_start(self, code: CodeType, _offset: int) -> Any:
+        if self._import_phase and not code.co_flags & inspect.CO_OPTIMIZED:
+            # import time (pytest_launch): module and class bodies define things, they are not
+            # calls; functions they call attach to the nearest traced frame, the import root
+            return _DISABLE
         scope = self.scope_for(code)
         if scope is None:
             return _DISABLE
@@ -963,6 +969,7 @@ class Tracer:
         self._attribution_disagreements = 0
         self._pending_mock_calls.clear()
         self._root_code = root_code
+        self._import_phase = root_code is None and root_symbol == "py:<import>"
         origin = Origin.TEST
         location = None
         if root_code is not None and (scope := self.scope_for(root_code)):

@@ -6,7 +6,8 @@ changed lines. No model and no genome are involved. A consumer (Sydes) reads thi
 change artifact; it never needs the trace files, the mechanics file or DiffGenome internals.
 
 Per changed function (a changed symbol whose definition is a function):
-  executed / not executed, number of calls, the exact tests (subtests included) that ran it,
+  executed / not executed (including at import or test collection: `ran_at_import`, which no
+  test is credited with), number of calls, the exact tests (subtests included) that ran it,
   exits observed (returned, returned-error, raised:<type>, ...), exceptions raised by calls made
   inside it, distinct argument type shapes, its nearest observed callers, the stand-ins (mocks,
   fakes) it reached, and the outcomes observed at every decision site on a changed line.
@@ -29,6 +30,8 @@ from diffgenome.model import CallNode, Execution, SubstitutionNode
 from diffgenome.runtime import SymbolIndex
 
 FORMAT = "diffgenome-runtime/1"
+#: see diffgenome.collect.pytest_plugin.IMPORT_REF (kept here to avoid importing pytest)
+IMPORT_REF = "py:<import>"
 MAX_TESTS = 200
 MAX_SHAPES = 5
 MAX_CALLERS = 12
@@ -88,7 +91,14 @@ def build_runtime_evidence(
     origins: dict[str, str] = {}
     universe = []
 
+    import_calls: Counter[str] = Counter()
     for ex in execs:
+        if ex.stimulus_ref == IMPORT_REF:
+            # import and collection time (pytest_launch): executed, but by no test
+            for n in ex.nodes:
+                if isinstance(n, CallNode) and n.symbol in changed:
+                    import_calls[n.symbol] += 1
+            continue
         universe.append(ex.stimulus_ref)
         for symbol_rec in ex.symbols:
             origins.setdefault(symbol_rec.id, symbol_rec.origin.value)
@@ -143,7 +153,7 @@ def build_runtime_evidence(
         for b in ex.branches:
             site_out[b.site][b.outcome] += 1
 
-    outcomes = {ex.stimulus_ref: ex.outcome for ex in execs}
+    outcomes = {ex.stimulus_ref: ex.outcome for ex in execs if ex.stimulus_ref != IMPORT_REF}
 
     def loc(symbol: str) -> dict[str, Any]:
         """Where a symbol is defined, and its origin (repo, test, ...) as observed."""
@@ -175,7 +185,7 @@ def build_runtime_evidence(
             for s in (f["sites"] if f else [])
             if s["line"] in cl
         ]
-        executed = calls[sym] > 0
+        executed = calls[sym] > 0 or import_calls[sym] > 0
         functions.append(
             {
                 **loc(sym),
@@ -183,6 +193,7 @@ def build_runtime_evidence(
                 "calls": calls[sym],
                 "tests": sorted(tests[sym])[:MAX_TESTS],
                 "tests_total": len(tests[sym]),
+                "ran_at_import": import_calls[sym] > 0,
                 "exits": dict(exits[sym]),
                 "raised_inside": dict(raised_inside[sym]),
                 "arg_shapes": [

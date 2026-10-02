@@ -25,6 +25,11 @@ from diffgenome.collect.py_monitoring import COLLECTOR, EGRESS_GUARD, Tracer
 from diffgenome.model import Collector, Execution, Stimulus
 from diffgenome.serialize import execution_to_json
 
+#: stimulus_ref of the execution that records import and collection time (see pytest_launch)
+IMPORT_REF = "py:<import>"
+#: the session tracer pytest_launch started before pytest imported anything, if any
+IMPORT_TRACER: Tracer | None = None
+
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("diffgenome")
@@ -88,7 +93,10 @@ class _Plugin:
         # repository root (Baserow: backend/src) must not become the base. Experiment 10, F2.
         repo_opt = config.getoption("--diffgenome-repo-root")
         repo_root = Path(repo_opt).resolve() if repo_opt else roots[0]
-        self.tracer = Tracer(
+        self.repo_root = repo_root
+        # adopt the tracer pytest_launch started before conftests and collection imported code
+        self._import_phase = IMPORT_TRACER is not None
+        self.tracer = IMPORT_TRACER or Tracer(
             repo_root=repo_root, source_roots=tuple(roots), test_roots=tuple(tests)
         )
         self.tracer.install_patch_hook()
@@ -103,6 +111,17 @@ class _Plugin:
         self.focus: set[str] | None = set(spec["symbols"]) if spec else None
         self.focus_depth: int = int(spec.get("depth", 2)) if spec else 2
         self._pending: dict[str, Any] = {}  # nodeid -> trace, until pytest reports the outcome
+
+    def _end_import_phase(self) -> None:
+        if self._import_phase:
+            self._import_phase = False
+            self._write(None, IMPORT_REF, self.tracer.stop(), "passed")
+
+    def pytest_collection_finish(self, session: pytest.Session) -> None:
+        self._end_import_phase()
+
+    def pytest_unconfigure(self, config: pytest.Config) -> None:
+        self._end_import_phase()  # collection never finished (interrupted)
 
     @pytest.hookimpl(wrapper=True)
     def pytest_runtest_call(self, item: pytest.Item) -> Generator[None, None, None]:
@@ -124,19 +143,30 @@ class _Plugin:
         report = yield
         if call.when == "call" and item.nodeid in self._pending:
             outcome = "passed" if report.passed else "skipped" if report.skipped else "failed"
-            self._write(item, self._pending.pop(item.nodeid), outcome)
+            self._write(item, self._test_ref(item), self._pending.pop(item.nodeid), outcome)
         return report
 
-    def _write(self, item: pytest.Item, result: Any, outcome: str) -> None:
+    def _test_ref(self, item: pytest.Item) -> str:
+        """The test's id relative to the repository root: pytest's nodeid is relative to its
+        rootdir and drops the path of files outside it (Baserow's enterprise tests under
+        backend/pytest.ini became '::test_x')."""
+        _, sep, rest = item.nodeid.partition("::")
+        try:
+            path = Path(item.path).resolve().relative_to(self.repo_root)
+        except (ValueError, AttributeError):
+            return item.nodeid
+        return f"{path.as_posix()}{sep}{rest}" if sep else path.as_posix()
+
+    def _write(self, item: pytest.Item | None, nodeid: str, result: Any, outcome: str) -> None:
         nodes, branches, dropped = result.nodes, result.branches, 0
         if self.focus is not None:
             nodes, branches, dropped = prune_to_focus(
                 nodes, branches, self.focus, self.focus_depth
             )
         execution = Execution(
-            id=f"{item.nodeid}@{self.revision or 'unknown'}",
+            id=f"{nodeid}@{self.revision or 'unknown'}",
             stimulus=self.stimulus,
-            stimulus_ref=item.nodeid,
+            stimulus_ref=nodeid,
             outcome=outcome,
             revision=self.revision,
             collectors=self.collectors,
@@ -151,10 +181,10 @@ class _Plugin:
         )
         # Sanitized ids can collide (parametrized ids differing only in punctuation)
         # and can exceed filesystem limits; the digest keeps every execution distinct.
-        digest = hashlib.sha256(item.nodeid.encode()).hexdigest()[:12]
-        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)[:100]
+        digest = hashlib.sha256(nodeid.encode()).hexdigest()[:12]
+        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", nodeid)[:100]
         (self.out / f"{name}-{digest}.json").write_text(execution_to_json(execution))
-        if result.stack_repairs:
+        if item is not None and result.stack_repairs:
             item.add_report_section("call", "diffgenome", f"stack repairs: {result.stack_repairs}")
 
 
