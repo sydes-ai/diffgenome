@@ -1,0 +1,83 @@
+name: Real-repository smoke
+
+# Zero-config runtime evidence through Sydes, on real repositories at pinned commits, with the
+# DiffGenome wheel built from this commit. Slower than CI (each case installs a project), so it
+# runs on main, on release tags and on demand, not on every pull request.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      sydes_ref:
+        description: sydes-ai/sydes ref to run (its uv.lock; the diffgenome wheel is replaced)
+        default: integration/diffgenome-runtime-evidence
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: ${{ matrix.case }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+        case: [healthchecks, requests, tomlkit, itsdangerous, toolz, demo-orders-api]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - name: Linux sandbox
+        if: runner.os == 'Linux'
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+      - name: Build this DiffGenome
+        run: uv build --wheel
+      - name: Sydes (locked) with this DiffGenome
+        env:
+          SYDES_REF: ${{ inputs.sydes_ref || 'integration/diffgenome-runtime-evidence' }}
+        run: |
+          git clone -q https://github.com/sydes-ai/sydes "$RUNNER_TEMP/sydes"
+          git -C "$RUNNER_TEMP/sydes" checkout -q "$SYDES_REF"
+          (cd "$RUNNER_TEMP/sydes" && uv sync -q --frozen --no-dev --python "$(command -v python)")
+          uv pip install -q --python "$RUNNER_TEMP/sydes/.venv/bin/python" --reinstall-package diffgenome dist/*.whl
+          echo "$RUNNER_TEMP/sydes/.venv/bin" >> "$GITHUB_PATH"
+      - name: Target at the pinned commit
+        run: |
+          read -r URL HEAD BASE YML < <(python3 -c "import json,sys; c=json.load(open('ci/smoke-cases.json'))['${{ matrix.case }}']; print(c['url'], c['head'], c['base'], json.dumps(c.get('sydes_yml','')))")
+          git clone -q --filter=blob:none "$URL" "$RUNNER_TEMP/target"
+          git -C "$RUNNER_TEMP/target" checkout -q "$HEAD"
+          python3 -c "import json,sys; y=json.loads(sys.argv[1]); y and open('$RUNNER_TEMP/target/.sydes.yml','w').write(y)" "$YML"
+          echo "BASE=$BASE" >> "$GITHUB_ENV"
+      - name: Detect and prepare (zero config)
+        working-directory: ${{ runner.temp }}/target
+        run: |
+          diffgenome --version
+          sydes runtime-detect --base "$BASE" --prepare "$RUNNER_TEMP/env" | tee "$RUNNER_TEMP/detect.txt"
+      - name: Runtime evidence
+        working-directory: ${{ runner.temp }}/target
+        env:
+          VIRTUAL_ENV: ${{ runner.temp }}/env
+        run: |
+          sydes verify-change --base "$BASE" --repo app=. --llm-policy never --impact-guide off \
+            --no-ai-recovery --no-run-tests --behavioral-map diffgenome --runtime-evidence auto \
+            --behavioral-out "$RUNNER_TEMP/dg" --json "$RUNNER_TEMP/result.json" > "$RUNNER_TEMP/terminal.txt"
+          tail -40 "$RUNNER_TEMP/terminal.txt"
+      - name: Expectations
+        run: python3 ci/smoke_assert.py ci/smoke-cases.json "${{ matrix.case }}" "$RUNNER_TEMP/dg/diffgenome-change.json"
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: smoke-${{ matrix.case }}-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/detect.txt
+            ${{ runner.temp }}/terminal.txt
+            ${{ runner.temp }}/dg/diffgenome-change.json
+            ${{ runner.temp }}/dg/existing-tests.log
+          if-no-files-found: warn

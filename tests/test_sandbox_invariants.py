@@ -23,7 +23,11 @@ from diffgenome import sandbox
 from diffgenome.sandbox import Workspace, select_backend
 
 BACKEND, WHY = select_backend()
-pytestmark = pytest.mark.skipif(BACKEND is None, reason=f"no sandbox backend: {WHY}")
+# CI sets DIFFGENOME_REQUIRE_SANDBOX: a missing backend fails these tests instead of skipping
+pytestmark = pytest.mark.skipif(
+    BACKEND is None and not os.environ.get("DIFFGENOME_REQUIRE_SANDBOX"),
+    reason=f"no sandbox backend: {WHY}",
+)
 PY = sys.executable
 
 

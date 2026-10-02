@@ -1,0 +1,46 @@
+{
+  "_comment": "Real-repository smoke matrix (.github/workflows/smoke.yml): zero-config Sydes runtime evidence at pinned commits. Each 'expect' is a regression we hit; minimums, not exact counts.",
+  "healthchecks": {
+    "url": "https://github.com/healthchecks/healthchecks",
+    "head": "29c759d1b7f500c0c0f357e54d9912017f5c46f8",
+    "base": "6f06d177041406a02fdc58677fb9955ada2b3419",
+    "sydes_yml": "runtime:\n  env:\n    EMAIL_HOST: example.org\n",
+    "expect": {"min_passed": 28, "executed": ["hc.accounts.models.Profile.send_report"],
+               "why": "Django per-app tests under pytest-django; transitive caller via management command"}
+  },
+  "requests": {
+    "url": "https://github.com/psf/requests",
+    "head": "f8bec2f7ca9d7c03981a12ff8866a9b3923f1699",
+    "base": "70298332899f25826e35e42f8d83425124f755a5",
+    "expect": {"min_passed": 350, "executed": ["requests.help._implementation", "requests.auth._basic_auth_str"],
+               "why": "changed test files beyond the budget; transitive selection (test_help -> info -> _implementation); server threads (0.1.7)"}
+  },
+  "tomlkit": {
+    "url": "https://github.com/python-poetry/tomlkit",
+    "head": "40dd59cfdc5b724a8d1256f39f89534265ec1f99",
+    "base": "4bec845b604f899a18da29cd3ea692e1b320354a",
+    "expect": {"min_passed": 100, "executed": ["tomlkit.items.DateTime.__sub__"], "why": "Poetry project"}
+  },
+  "itsdangerous": {
+    "url": "https://github.com/pallets/itsdangerous",
+    "head": "9a25d989cd65c4991c2c8ac46ef55e0e8dfe49ab",
+    "base": "7c6286ed2125c87662eeb102b32fb3d68611a5d6",
+    "expect": {"min_passed": 140, "executed": ["itsdangerous.timed.TimestampSigner.unsign"],
+               "why": "Pallets requirements/ test deps; filterwarnings = error (0.1.5)"}
+  },
+  "toolz": {
+    "url": "https://github.com/pytoolz/toolz",
+    "head": "a1e25cbd2c398b534f0736f5838e416202b0cb28",
+    "base": "80ddcb3e104eda18838a2e7f7a10b9dc4e8086a8",
+    "expect": {"min_passed": 39, "executed": ["toolz.functoolz.Compose._combined_annotations"],
+               "ran_at_import": ["toolz.functoolz._InstanceAnnotations.__init__"],
+               "why": "tests inside the package (testpaths = the package); import-time execution; same-named closures"}
+  },
+  "demo-orders-api": {
+    "url": "https://github.com/sydes-examples/demo-orders-api",
+    "head": "9ba8590a937d54c07be52569d6af896ce9a5b28f",
+    "base": "1053bc97fb3fd9f3663c5124c3b0f1f347e7592a",
+    "expect": {"min_passed": 7, "executed": ["app.main.create_order", "app.service.create_order"],
+               "why": "package at the root; [dev] extra"}
+  }
+}

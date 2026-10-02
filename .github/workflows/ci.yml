@@ -1,0 +1,64 @@
+name: CI
+
+# Every push and pull request: lint, types, the full test suite, and the synthetic layout
+# regressions (tests/test_layouts.py), on both sandbox backends. Sandbox tests must not skip
+# here (DIFFGENOME_REQUIRE_SANDBOX): a missing backend is a failure.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+        python: ["3.12", "3.13"]
+    env:
+      DIFFGENOME_REQUIRE_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+      # workloads in the sandbox suite: go test, node --test
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Linux sandbox (bubblewrap, unprivileged user namespaces)
+        if: runner.os == 'Linux'
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+          bwrap --version
+      - run: uv sync --frozen
+      - name: Sandbox backend
+        run: uv run --frozen python -c "from diffgenome.sandbox import select_backend; b, why = select_backend(); print(why); assert b"
+      - run: uv run --frozen ruff check src tests
+      - run: uv run --frozen mypy src
+      - name: Tests (sandbox invariants and layout regressions included)
+        run: uv run --frozen pytest -q -rs
+
+  package:
+    name: wheel builds and installs cleanly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build
+      - run: uvx twine check dist/*
+      - name: Install the wheel in a clean venv
+        run: |
+          python3 -m venv /tmp/clean
+          /tmp/clean/bin/pip install -q dist/*.whl
+          /tmp/clean/bin/diffgenome --version
+          /tmp/clean/bin/python -c "import diffgenome.collect.pytest_launch, diffgenome.collect.import_phase"

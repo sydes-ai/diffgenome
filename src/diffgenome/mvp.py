@@ -129,6 +129,8 @@ def _log(msg: str) -> None:
 
 
 def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -> RuntimeAdapter:
+    source_roots = args.source_root or ["."]
+    primary_source_root = source_roots[0]
     primary_test_root = args.test_root[0]
     tests = args.tests or primary_test_root
     if args.runtime == "python":
@@ -143,17 +145,17 @@ def make_runtime(args: argparse.Namespace, repo: Path, pytest_args: list[str]) -
         )
         test_env = dict(kv.split("=", 1) for kv in args.test_env)
         return PytestRuntime(
-            repo, python, args.source_root, args.test_root, tests, pytest_args,  # all roots
+            repo, python, source_roots, args.test_root, tests, pytest_args,  # all roots
             pythonpath=args.pythonpath, test_env=test_env, allow_loopback=args.allow_loopback,
         )  # fmt: skip
     if args.runtime == "node":
         from diffgenome.collect.node_jest import NodeJestRuntime
 
-        return NodeJestRuntime(repo, args.source_root, primary_test_root, tests)
+        return NodeJestRuntime(repo, primary_source_root, primary_test_root, tests)
     if args.runtime == "go":
         from diffgenome.collect.go_test import GoTestRuntime
 
-        return GoTestRuntime(repo, args.source_root, primary_test_root, tests, args.mock_dir)
+        return GoTestRuntime(repo, primary_source_root, primary_test_root, tests, args.mock_dir)
     raise SystemExit(f"unknown runtime {args.runtime}")
 
 
@@ -168,7 +170,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--repo", required=True, type=Path)
     ap.add_argument("--python", type=Path, help="target interpreter (python runtime)")
-    ap.add_argument("--source-root", default=".")
+    ap.add_argument(
+        "--source-root", action="append", default=None,
+        help="source root (repeatable: e.g. each uv workspace member); default: the repository",
+    )
     ap.add_argument(
         "--test-root", action="append", required=True,
         help="test root (repeatable: e.g. one tests/ per Django app); the first is where probes go",

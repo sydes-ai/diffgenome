@@ -40,7 +40,7 @@ class PytestRuntime:
         self,
         repo: Path,
         python: Path,
-        source_root: str,
+        source_root: str | list[str],
         test_root: str | list[str],
         tests: str,
         pytest_args: list[str],
@@ -50,7 +50,9 @@ class PytestRuntime:
     ) -> None:
         self.repo = repo
         self.python = python
-        self.source_root = source_root
+        # several roots for workspaces (uv members); the first is the primary
+        self.source_roots = [source_root] if isinstance(source_root, str) else list(source_root)
+        self.source_root = self.source_roots[0]
         # several roots when tests live per package (Django apps); the first takes probes
         self.test_roots = [test_root] if isinstance(test_root, str) else list(test_root)
         self.test_root = self.test_roots[0]
@@ -72,7 +74,9 @@ class PytestRuntime:
         # the checkout: the checkout may sit at another revision, and the index maps the
         # change's diff lines and the executed code's locations onto symbols.
         return PythonSymbolIndex(
-            ws.repo, [ws.repo / self.source_root], [ws.repo / t for t in self.test_roots]
+            ws.repo,
+            [ws.repo / r for r in self.source_roots],
+            [ws.repo / t for t in self.test_roots],
         )
 
     def trace(
@@ -94,7 +98,7 @@ class PytestRuntime:
             "-p", "diffgenome.collect.pytest_plugin",
             f"--diffgenome-out={traces_ws}",
             "--diffgenome-repo-root=.",
-            f"--diffgenome-source-root={self.source_root}",
+            *(f"--diffgenome-source-root={r}" for r in self.source_roots),
             *(f"--diffgenome-test-root={t}" for t in self.test_roots),
             f"--diffgenome-stimulus={stimulus.value}",
             "--diffgenome-egress-guard",

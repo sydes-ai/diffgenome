@@ -121,13 +121,44 @@ Install with `pip install "diffgenome[genome]"` to state the intent. See
 `docs/research-overview.md` and `docs/runtime-evaluation.md` for what has and has not been
 shown to work.
 
+## Versions
+
+Use **0.1.8 or later**. 0.1.4 and 0.1.5 are broken (0.1.4 skipped pytest configs in
+subdirectories; 0.1.5 failed every project with `filterwarnings = error`) and should be
+yanked. 0.1.6 crashed on tests whose threads outlive them. 0.1.7 reported and traced only
+the first `--source-root`, so changes in other packages of a workspace were silently
+missing. `--source-root`, `--test-root` and `--pythonpath` are repeatable.
+
 ## Development
 
 ```bash
 uv sync
 uv run pytest
-uv run ruff check src tests && uv run mypy src
+uv run ruff check src tests ci && uv run mypy src
 ```
+
+Without a usable sandbox the sandboxed tests skip locally. Set `DIFFGENOME_REQUIRE_SANDBOX=1`
+to make that a failure, as CI does.
+
+CI is layered:
+
+- `.github/workflows/ci.yml`, on every push and pull request: the full suite on
+  ubuntu-latest (bubblewrap) and macos-15 (Seatbelt) × Python 3.12 and 3.13, with the
+  sandbox required. That includes the sandbox invariants (`tests/test_sandbox_invariants.py`)
+  and the layout and regression fixtures (`tests/test_layouts.py`): package at the root, src
+  layout, per-app Django-style tests, uv workspace, tests inside the package, single module,
+  subdirectory pytest config, `filterwarnings = error`, threads outliving their test,
+  import-time execution, an unimportable test file. A `package` job builds the wheel and
+  installs it into a clean virtualenv.
+- `.github/workflows/smoke.yml`, on main, release tags and on demand: real repositories at
+  pinned commits (`ci/smoke-cases.json`: healthchecks, requests, tomlkit, itsdangerous,
+  toolz, demo-orders-api), run zero-config through Sydes with the wheel built from this
+  commit, on Linux and macOS. `ci/smoke_assert.py` checks minimum facts per case (tests
+  passed, named changed functions executed, import-time execution).
+
+Release: bump `version` in `pyproject.toml` and `__version__` in `src/diffgenome/__init__.py`,
+check that both workflows pass on main, then `uv build && uv publish`, then tag `vX.Y.Z` (that
+tag runs the smoke matrix once more).
 
 ## License
 
