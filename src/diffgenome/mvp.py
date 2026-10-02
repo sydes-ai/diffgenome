@@ -240,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
     pytest_args = [a for chunk in args.pytest_arg for a in shlex.split(chunk)]
     runtime = make_runtime(args, repo, pytest_args)
     notes: list[str] = []
+    stopped_early: str | None = None
 
     ws = Workspace.create(repo, args.workspaces or out / "workspaces", rev=args.rev)
     _log(f"workspace {ws.root} (copy of {repo}; original never written) runtime={runtime.name}")
@@ -272,8 +273,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             (out / "existing-tests.log").write_text(stdout + "\n" + stderr)
             if CPU_LIMIT_MARKER in stderr:
+                stopped_early = f"{CPU_LIMIT_MARKER} ({Workspace.cpu_seconds} s of CPU time)"
+            elif "\ntimeout after " in stderr:
+                seconds = stderr.rsplit("timeout after ", 1)[-1].strip().rstrip("s")
+                stopped_early = f"stopped by the wall-clock timeout ({seconds} s)"
+            if stopped_early:
                 notes.append(
-                    f"the test run was {CPU_LIMIT_MARKER}: tests after that point did not run, "
+                    f"the test run was {stopped_early}: tests after that point did not run, "
                     "so functions they would reach are reported as not executed"
                 )
             tail = (stdout.strip() or stderr.strip()).splitlines()[-1:]
@@ -436,6 +442,7 @@ def main(argv: list[str] | None = None) -> int:
             mech_fns,
             artifact.get("boundaries"),
             test_scope=" ".join([args.tests or args.test_root[0], *pytest_args]).strip()[:500],
+            stopped_early=stopped_early,
         )
         (out / "diffgenome-change.json").write_text(dump_artifact(artifact))
         (out / "behavioral-map.md").write_text(behavior_map)

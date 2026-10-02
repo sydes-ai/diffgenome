@@ -68,9 +68,11 @@ def build_runtime_evidence(
     mechanics_functions: list[dict[str, Any]] | None = None,
     boundaries: list[dict[str, Any]] | None = None,
     test_scope: str | None = None,
+    stopped_early: str | None = None,
 ) -> dict[str, Any]:
     """`test_scope` names what was run (e.g. a test directory or package): every "not
-    executed" statement is relative to it."""
+    executed" statement is relative to it. `stopped_early` says why the run ended before
+    all of it ran (a sandbox limit): "not executed" then also covers "not reached"."""
     execs = list(executions)
     changed = _changed_functions(change, index)
     lines = _changed_lines(change)
@@ -238,6 +240,7 @@ def build_runtime_evidence(
         "format": FORMAT,
         "universe": {
             "test_scope": test_scope,
+            "stopped_early": stopped_early,
             "executions": len(universe),
             "passed": sum(1 for o in outcomes.values() if o == "passed"),
             # skipped tests are not failures (falcon #2731 counted 90 skips as failed)

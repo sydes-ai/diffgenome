@@ -415,3 +415,21 @@ def test_overload_stubs_are_not_changed_functions(tmp_path: Path) -> None:
     )  # fmt: skip
     assert [f["symbol"] for f in rt["changed_functions"]] == ["py:app.req.Request.get_param"]
     assert rt["changed_functions"][0]["executed"] and rt["changed_functions"][0]["line"] == 11
+
+
+def test_a_run_stopped_by_the_cpu_limit_says_so_in_the_contract(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """datachain #2001 on Linux runners: the run hit the 600 s CPU limit after 336 tests and
+    the two functions not reached were reported as not run, with nothing saying why."""
+    monkeypatch.setenv("DIFFGENOME_CPU_SECONDS", "2")
+    rt = change(
+        tmp_path,
+        {"app/__init__.py": "", "app/svc.py": SVC,
+         "tests/test_a.py": "from app.svc import total\n\ndef test_a():\n    assert total([1]) == 1\n",
+         "tests/test_z.py": "def test_spin():\n    while True:\n        pass\n"},
+        {"app/svc.py": SVC2},
+        "--source-root", ".", "--test-root", "tests", "--tests", "tests", "--pythonpath", ".",
+    )  # fmt: skip
+    assert rt["universe"]["stopped_early"].startswith("stopped by the sandbox CPU-time limit")
+    assert fn(rt, "app.svc.total")["executed"]

@@ -121,8 +121,8 @@
     "head": "12c8b3440ee75a34a82cfccb0d28fb3b5773680b",
     "base": "0509279ffd26a187ae9525bf039cc57d88090984",
     "expect": {
-      "min_passed": 380,
-      "why": "field study: the tracer raised into the program (208 failures); setup errors were dropped. Remaining failures are mock remotes that need network"
+      "min_passed": 300,
+      "why": "field study: the tracer raised into the program (0.1.8: 73 passed, 208 failed); setup errors were dropped. Mock remotes need network; on Linux runners the run reaches the 600 s CPU limit after ~336 tests, which the contract states (universe.stopped_early)"
     }
   },
   "wemake-3810": {

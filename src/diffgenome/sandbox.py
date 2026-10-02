@@ -261,7 +261,8 @@ class Workspace:
             return None
         return backend.wrap(self, list(argv), allow_loopback)
 
-    cpu_seconds = 600  # RLIMIT_CPU for everything run in the workspace
+    # RLIMIT_CPU for everything run in the workspace; DIFFGENOME_CPU_SECONDS overrides it
+    cpu_seconds = int(os.environ.get("DIFFGENOME_CPU_SECONDS") or 600)
 
     @staticmethod
     def _limits(
