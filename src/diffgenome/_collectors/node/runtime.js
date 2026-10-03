@@ -349,6 +349,68 @@ function callf(f, args) {
   return f.apply(undefined, args);
 }
 
+// Call sites are instrumented at the callee, never around the call's value, so TypeScript
+// sees the original call: its signature, overloads, type predicates and contextual types.
+// Only a Jest mock is ever substituted -- by a wrapper that records the stand-in and calls
+// it exactly as the original call would have.
+
+function recordingStandIn(fn, receiver) {
+  return function (...args) {
+    const id = recordStandIn(fn, args);
+    try {
+      return finishStandIn(id, fn.apply(receiver, args));
+    } catch (e) {
+      if (id !== undefined) settle(id, "raised:" + errorSymbol(e), "");
+      throw e;
+    }
+  };
+}
+
+/** `f(args)` -> `__dg.f(f)(args)`: the function itself, or a recording stand-in for a mock. */
+function f(fn) {
+  return typeof fn === "function" && fn._isMockFunction ? recordingStandIn(fn, undefined) : fn;
+}
+
+/** `obj.key(args)` -> `__dg.m(obj, "key").key(args)`. The member is read once, here, and the
+ * call goes to it with `obj` as the receiver, exactly as the original call would. */
+function m(obj, key) {
+  const fn = obj[key]; // a null/undefined `obj` throws here, as the original member read would
+  // not callable: the call itself throws once its arguments are evaluated, as it would have
+  if (typeof fn !== "function") return { [key]: fn };
+  if (fn._isMockFunction) return { [key]: recordingStandIn(fn, obj) };
+  return { [key]: function (...args) { return fn.apply(obj, args); } };
+}
+
+// A statement `assertFoo(x);` / `this.check(x);` is left exactly as written -- an assertion
+// function only narrows when called through a plain or dotted name -- and observed from
+// either side: `const t = __dg.pre(callee); <statement>; __dg.post(t);`. A mock's own
+// record (`mock.calls`/`mock.results`) supplies the arguments and outcome, including a
+// throw that skips `post`, which end() settles.
+let pending = [];
+
+function pre(fn) {
+  if (!state.active || typeof fn !== "function" || !fn._isMockFunction || !fn.mock) return null;
+  const parent = currentNode();
+  const d = describeMock(fn);
+  const id = newSubstitution(parent === null ? 0 : parent, "mock_object", d.substitute, d.claimed, d.relation, d.pathParts, []);
+  const token = { id, fn, index: fn.mock.calls.length, done: false };
+  pending.push(token);
+  return token;
+}
+
+function post(token) {
+  if (!token || token.done) return;
+  token.done = true;
+  const node = state.nodes[token.id];
+  const call = token.fn.mock.calls[token.index];
+  const result = token.fn.mock.results[token.index];
+  if (!node || !call) return;
+  node.args = argShapes(null, call);
+  if (!result || result.type === "incomplete") return;
+  if (result.type === "throw") settle(token.id, "raised:" + errorSymbol(result.value), "");
+  else finishStandIn(token.id, result.value);
+}
+
 // ----------------------------------------------------------------------------- egress guard
 
 function isLoopback(host) {
@@ -384,6 +446,7 @@ function installEgressGuard() {
 // ----------------------------------------------------------------------------- stimulus
 
 function begin(ref) {
+  pending = [];
   state.active = true;
   state.ref = ref;
   state.nodes = [];
@@ -398,6 +461,8 @@ function begin(ref) {
 }
 
 function end(outcome) {
+  for (const token of pending) post(token);
+  pending = [];
   state.active = false;
   if (!state.outDir || state.ref === null) return null;
   const execution = {
@@ -423,4 +488,4 @@ function end(outcome) {
 
 installEgressGuard();
 
-module.exports = { enter, exit, ret, throwed, run, callm, callf, begin, end, registerClass, _state: state };
+module.exports = { enter, exit, ret, throwed, run, callm, callf, f, m, pre, post, begin, end, registerClass, _state: state };

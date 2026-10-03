@@ -171,6 +171,35 @@ function rootSuperIndex(node) {
     st.expression.expression.kind === ts.SyntaxKind.SuperKeyword);
 }
 
+// ----------------------------------------------------------------------------- call sites
+
+/** A call the instrumenter may observe: not `super`/`import()`/`require`/our own runtime, no
+ * optional chaining, no explicit type arguments (left exactly as before). */
+function instrumentableCall(node) {
+  const callee = node.expression;
+  if (node.questionDotToken || node.typeArguments) return false;
+  if (callee.kind === ts.SyntaxKind.SuperKeyword || callee.kind === ts.SyntaxKind.ImportKeyword) return false;
+  if (ts.isIdentifier(callee) && (callee.text === "require" || callee.text === "__dg")) return false;
+  if (ts.isPropertyAccessExpression(callee) || ts.isElementAccessExpression(callee)) {
+    if (callee.questionDotToken) return false;
+    if (callee.expression.kind === ts.SyntaxKind.SuperKeyword) return false;
+    if (ts.isIdentifier(callee.expression) && callee.expression.text === "__dg") return false;
+  }
+  return true;
+}
+
+/** `a`, `this.a`, `a.b.c`: the call targets TypeScript accepts for an assertion function.
+ * Reading one twice has no effect beyond the property reads themselves. */
+function isDottedName(e) {
+  if (ts.isIdentifier(e) || e.kind === ts.SyntaxKind.ThisKeyword) return true;
+  return ts.isPropertyAccessExpression(e) && !e.questionDotToken && ts.isIdentifier(e.name) && isDottedName(e.expression);
+}
+
+/** An element key that evaluates to the same value when read twice, with no side effects. */
+function isRepeatableKey(k) {
+  return ts.isStringLiteral(k) || ts.isNumericLiteral(k) || ts.isNoSubstitutionTemplateLiteral(k) || ts.isIdentifier(k);
+}
+
 // ----------------------------------------------------------------------------- transform
 
 function instrumentFile(file, ctxInfo, index) {
@@ -201,34 +230,46 @@ function instrumentFile(file, ctxInfo, index) {
   const transformer = (context) => {
     const ctxStack = []; // the __dgc identifier for the innermost instrumented function
     function visit(node) {
-      // ---- call sites: obj.m(args) -> __dg.callm(obj, "m", [args]); f(args) -> __dg.callf(f, [args])
-      if (ts.isCallExpression(node) && ctxStack.length > 0 && !node.questionDotToken) {
+      // ---- call sites. The callee is instrumented, never the call's value: TypeScript keeps
+      // seeing the original call -- its overloads, type predicates (`x is T`) and contextual
+      // types -- because `__dg.f`/`__dg.m` are typed as identities (see `typedHeader`).
+      //   f(args)        -> __dg.f(f)(args)
+      //   obj.m(args)    -> __dg.m(obj, "m").m(args)
+      //   obj[k](args)   -> __dg.m(obj, k)[k](args)        (k a literal or identifier)
+      // A call statement through a plain or dotted name -- the only form in which an
+      // assertion function (`asserts x is T`) narrows -- is kept exactly as written:
+      //   check(x);      -> { const t = __dg.pre(check); check(x); __dg.post(t); }
+      if (ts.isExpressionStatement(node) && ctxStack.length > 0 && ts.isCallExpression(node.expression) &&
+          instrumentableCall(node.expression) && isDottedName(node.expression.expression)) {
+        const call = node.expression;
+        const t = f.createUniqueName("__dgt");
+        changed = true;
+        return f.createBlock([
+          f.createVariableStatement(undefined, f.createVariableDeclarationList([
+            f.createVariableDeclaration(t, undefined, undefined, f.createCallExpression(f.createPropertyAccessExpression(DG, "pre"), undefined, [call.expression])),
+          ], ts.NodeFlags.Const)),
+          f.updateExpressionStatement(node, f.updateCallExpression(call, call.expression, call.typeArguments, call.arguments.map((a) => ts.visitNode(a, visit)))),
+          f.createExpressionStatement(f.createCallExpression(f.createPropertyAccessExpression(DG, "post"), undefined, [t])),
+        ], true);
+      }
+      if (ts.isCallExpression(node) && ctxStack.length > 0 && instrumentableCall(node)) {
         const callee = node.expression;
         const args = node.arguments.map((a) => ts.visitNode(a, visit));
-        const skip =
-          callee.kind === ts.SyntaxKind.SuperKeyword || callee.kind === ts.SyntaxKind.ImportKeyword ||
-          (ts.isIdentifier(callee) && (callee.text === "require" || callee.text === "__dg")) ||
-          (ts.isPropertyAccessExpression(callee) && (callee.questionDotToken || (ts.isIdentifier(callee.expression) && callee.expression.text === "__dg"))) ||
-          (ts.isPropertyAccessExpression(callee) && callee.expression.kind === ts.SyntaxKind.SuperKeyword) ||
-          node.typeArguments;
-        if (!skip) {
-          const arr = f.createArrayLiteralExpression(args, false);
-          if (ts.isPropertyAccessExpression(callee)) {
-            const obj = ts.visitNode(callee.expression, visit);
-            changed = true;
-            return f.createCallExpression(f.createPropertyAccessExpression(DG, "callm"), undefined, [obj, f.createStringLiteral(callee.name.text), arr]);
-          }
-          if (ts.isElementAccessExpression(callee) && !callee.questionDotToken) {
-            const obj = ts.visitNode(callee.expression, visit);
-            const key = ts.visitNode(callee.argumentExpression, visit);
-            changed = true;
-            return f.createCallExpression(f.createPropertyAccessExpression(DG, "callm"), undefined, [obj, key, arr]);
-          }
-          if (ts.isIdentifier(callee) || ts.isParenthesizedExpression(callee)) {
-            const fn = ts.visitNode(callee, visit);
-            changed = true;
-            return f.createCallExpression(f.createPropertyAccessExpression(DG, "callf"), undefined, [fn, arr]);
-          }
+        if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.name)) {
+          const obj = ts.visitNode(callee.expression, visit);
+          const wrapped = f.createCallExpression(f.createPropertyAccessExpression(DG, "m"), undefined, [obj, f.createStringLiteral(callee.name.text)]);
+          changed = true;
+          return f.updateCallExpression(node, f.updatePropertyAccessExpression(callee, wrapped, callee.name), undefined, args);
+        }
+        if (ts.isElementAccessExpression(callee) && !callee.questionDotToken && isRepeatableKey(callee.argumentExpression)) {
+          const obj = ts.visitNode(callee.expression, visit);
+          const wrapped = f.createCallExpression(f.createPropertyAccessExpression(DG, "m"), undefined, [obj, callee.argumentExpression]);
+          changed = true;
+          return f.updateCallExpression(node, f.updateElementAccessExpression(callee, wrapped, callee.argumentExpression), undefined, args);
+        }
+        if (ts.isIdentifier(callee) || (ts.isParenthesizedExpression(callee) && ts.isIdentifier(callee.expression))) {
+          changed = true;
+          return f.updateCallExpression(node, f.createCallExpression(f.createPropertyAccessExpression(DG, "f"), undefined, [callee]), undefined, args);
         }
       }
       // ---- returns inside an instrumented function (not inside a nested function)
@@ -347,7 +388,12 @@ function instrumentFile(file, ctxInfo, index) {
   if (!changed) return false;
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed, removeComments: false });
   let printed = printer.printFile(out);
-  const header = `const __dg = require(${JSON.stringify(ctxInfo.runtime)});\n`;
+  // In TypeScript the call-site helpers are declared as identities, so an instrumented call
+  // has the original call's static type; everything else on the runtime stays `any`.
+  const typed = /\.(tsx?|mts|cts)$/.test(file)
+    ? ": { f<T>(fn: T): T; m<T>(obj: T, key: PropertyKey): T; [name: string]: any }"
+    : "";
+  const header = `const __dg${typed} = require(${JSON.stringify(ctxInfo.runtime)});\n`;
   // Keep a leading shebang / 'use strict' / reflect-metadata import order intact enough:
   // our require is side-effect free, so putting it first is safe.
   printed = header + printed;
