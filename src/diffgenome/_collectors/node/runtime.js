@@ -26,6 +26,9 @@ const ArrayIsArray = Array.isArray;
 const JSONStringify = JSON.stringify;
 
 const als = new AsyncLocalStorage();
+/** Experiment (off by default): keep a node for a call into external code when, and only
+ * when, repo or test code runs inside it. See `bridged`. */
+const BRIDGES = process.env.DIFFGENOME_EXTERNAL_BRIDGES === "1";
 const MAX_ARGS = 8;
 const DIGEST_DEPTH = 3;
 const DIGEST_WIDTH = 16;
@@ -227,8 +230,13 @@ function enter(meta, values, thisArg) {
   const args = argShapes(meta.params, values);
   let parent = currentNode();
   if (parent === null) parent = 0; // the stimulus root created by begin()
+  // Entered from inside an external call: the bridge node, made now, is the parent. Whether
+  // this is a fake is still judged by the repo/test frame that made the external call.
+  const store = als.getStore();
+  const caller = parent;
+  if (store && store.bridge) parent = materializeBridge(store.bridge);
   let sub = null;
-  if (meta.origin === "test" && nodeOrigin(parent) === "repo") {
+  if (meta.origin === "test" && nodeOrigin(caller) === "repo") {
     // Production code called into test-defined code: a fake/stub that executes.
     const mechanism = meta.sym.includes(".") && !/\.<anon>@\d+$/.test(meta.sym) ? "fake" : "stub";
     let claimed = null;
@@ -378,7 +386,86 @@ function m(obj, key) {
   // not callable: the call itself throws once its arguments are evaluated, as it would have
   if (typeof fn !== "function") return { [key]: fn };
   if (fn._isMockFunction) return { [key]: recordingStandIn(fn, obj) };
+  if (BRIDGES && state.active) {
+    const owner = externalOwner(obj, key);
+    if (owner !== null) return { [key]: bridged(fn, obj, `${owner}.${String(key)}`) };
+  }
   return { [key]: function (...args) { return fn.apply(obj, args); } };
+}
+
+// ----------------------------------------------------------------------------- external bridges
+//
+// Experiment. A call from instrumented code into a member of a class that was not
+// instrumented runs inside a provisional bridge scope. Nothing is recorded unless repo or
+// test code is entered while it runs -- synchronously or after the external code awaits,
+// since AsyncLocalStorage carries the scope into continuations it creates. Then exactly one
+// call node, origin `external`, is made for that external invocation, as the child of the
+// frame that called out and the parent of whatever repo/test code it reached. Nothing of
+// the external code's own frames is kept.
+
+/** Classes whose code was instrumented, marked from inside their own body (`static {}`),
+ * so this also covers nested, unnamed and expression classes; registerClass covers the
+ * named top-level ones. */
+const instrumentedClasses = new WeakSet();
+
+function markClass(cls) {
+  if (typeof cls === "function") instrumentedClasses.add(cls);
+}
+
+/** The class that defines `key` as seen from `obj`, when that class was not instrumented;
+ * else null. Conservative: a member owned by a plain object (an object literal, a module
+ * namespace), by `Object`/`Function` themselves, or by an instrumented class is not treated
+ * as external, so an unknown case loses a bridge rather than inventing one. */
+function externalOwner(obj, key) {
+  if (obj === null || (typeof obj !== "object" && typeof obj !== "function")) return null;
+  let owner = obj;
+  for (let hops = 0; owner !== null && hops < 50; hops++) {
+    if (Object.prototype.hasOwnProperty.call(owner, key)) break;
+    owner = ObjectGetPrototypeOf(owner);
+  }
+  if (owner === null) return null;
+  let cls = null;
+  if (typeof owner === "function") cls = owner; // a static member: the owner is the class
+  else if (Object.prototype.hasOwnProperty.call(owner, "constructor") &&
+           typeof owner.constructor === "function" && owner.constructor.prototype === owner) cls = owner.constructor;
+  if (cls === null || cls === Object || cls === Function) return null;
+  if (instrumentedClasses.has(cls) || classSymbols.has(cls)) return null;
+  return cls.name || null;
+}
+
+function bridged(fn, receiver, name) {
+  return function (...args) {
+    const bridge = { name, parent: currentNode(), args, id: null, outcome: null, result: "" };
+    const done = (outcome, result) => {
+      bridge.outcome = outcome;
+      bridge.result = result;
+      if (bridge.id !== null) settle(bridge.id, outcome, result);
+    };
+    let value;
+    try {
+      value = als.run({ node: bridge.parent, bridge }, () => fn.apply(receiver, args));
+    } catch (e) {
+      done("raised:" + errorSymbol(e), "");
+      throw e;
+    }
+    if (value && typeof value.then === "function") {
+      value.then((v) => done("returned", digest(v)), (e) => done("raised:" + errorSymbol(e), ""));
+    } else {
+      done("returned", digest(value));
+    }
+    return value;
+  };
+}
+
+/** The bridge's node: made on the first repo/test entry under it, reused by later ones. */
+function materializeBridge(bridge) {
+  if (bridge.id === null) {
+    const sym = `js:external:${bridge.name}`;
+    intern(sym, "external", null, 0);
+    bridge.id = newCall(sym, argShapes(null, bridge.args), bridge.parent === null ? 0 : bridge.parent, []);
+    if (bridge.outcome !== null) settle(bridge.id, bridge.outcome, bridge.result);
+  }
+  return bridge.id;
 }
 
 // A statement `assertFoo(x);` / `this.check(x);` is left exactly as written -- an assertion
@@ -488,4 +575,4 @@ function end(outcome) {
 
 installEgressGuard();
 
-module.exports = { enter, exit, ret, throwed, run, callm, callf, f, m, pre, post, begin, end, registerClass, _state: state };
+module.exports = { enter, exit, ret, throwed, run, callm, callf, f, m, pre, post, begin, end, registerClass, markClass, _state: state };

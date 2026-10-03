@@ -271,6 +271,9 @@ class NodeJestRuntime:
         }
         if getattr(self, "_chain_setup", None):
             env["DIFFGENOME_CHAIN_SETUP"] = self._chain_setup or ""
+        # experiment: external-bridge nodes (the sandbox passes no variables through itself)
+        if os.environ.get("DIFFGENOME_EXTERNAL_BRIDGES") == "1":
+            env["DIFFGENOME_EXTERNAL_BRIDGES"] = "1"
         argv = [
             str(self.node), str(ws.repo / "node_modules" / "jest" / "bin" / "jest.js"),
             "--config", "diffgenome.jest.config.js", "--runInBand", "--forceExit",

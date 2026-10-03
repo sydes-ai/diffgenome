@@ -40,6 +40,10 @@ function parseArgs(argv) {
   return out;
 }
 
+// Experiment (off by default): mark every instrumented class so the runtime can tell a
+// call into external code from a call into this repository's own (see runtime.js bridges).
+const MARK_CLASSES = process.env.DIFFGENOME_EXTERNAL_BRIDGES === "1";
+
 const EXCLUDED = new Set(["node_modules", "dist", "build", "coverage", "__pycache__"]);
 const EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
 
@@ -359,6 +363,20 @@ function instrumentFile(file, ctxInfo, index) {
           if (ts.isGetAccessorDeclaration(node)) return f.updateGetAccessorDeclaration(node, node.modifiers, node.name, node.parameters, node.type, newBody);
           return f.updateSetAccessorDeclaration(node, node.modifiers, node.name, node.parameters, newBody);
         }
+      }
+      // ---- classes: `static { __dg.markClass(this); }` first, inside the class's own body,
+      // so no expression is wrapped and nothing about the class's type changes.
+      if (MARK_CLASSES && (ts.isClassDeclaration(node) || ts.isClassExpression(node)) &&
+          !(node.modifiers || []).some((mod) => mod.kind === ts.SyntaxKind.DeclareKeyword)) {
+        const visited = ts.visitEachChild(node, visit, context);
+        const mark = f.createClassStaticBlockDeclaration(f.createBlock([
+          f.createExpressionStatement(f.createCallExpression(f.createPropertyAccessExpression(DG, "markClass"), undefined, [f.createThis()])),
+        ], false));
+        changed = true;
+        const members = [mark, ...visited.members];
+        return ts.isClassDeclaration(visited)
+          ? f.updateClassDeclaration(visited, visited.modifiers, visited.name, visited.typeParameters, visited.heritageClauses, members)
+          : f.updateClassExpression(visited, visited.modifiers, visited.name, visited.typeParameters, visited.heritageClauses, members);
       }
       return ts.visitEachChild(node, visit, context);
     }
