@@ -151,6 +151,26 @@ function receiverFor(node) {
   return usesOwnThis(node.body) ? "this" : null;
 }
 
+// ----------------------------------------------------------------------------- constructors
+
+/** Index of the root-level `super(...)` statement of a derived class's constructor, or -1.
+ *
+ * Such a call must stay a root-level statement of the constructor (TS2401 once the class has
+ * initialized fields, parameter properties or private names), and `this` does not exist
+ * until it returns. So the statements up to and including it are left at the root exactly as
+ * written; entry is recorded once it has returned and only the remainder is wrapped. A
+ * derived constructor whose `super` is not a root-level statement (conditional, say) is only
+ * legal without such fields, and keeps the whole-body wrap. */
+function rootSuperIndex(node) {
+  if (!ts.isConstructorDeclaration(node) || !node.body) return -1;
+  const cls = node.parent;
+  const derived = cls && (cls.heritageClauses || []).some((h) => h.token === ts.SyntaxKind.ExtendsKeyword);
+  if (!derived) return -1;
+  return node.body.statements.findIndex((st) =>
+    ts.isExpressionStatement(st) && ts.isCallExpression(st.expression) &&
+    st.expression.expression.kind === ts.SyntaxKind.SuperKeyword);
+}
+
 // ----------------------------------------------------------------------------- transform
 
 function instrumentFile(file, ctxInfo, index) {
@@ -212,7 +232,8 @@ function instrumentFile(file, ctxInfo, index) {
         }
       }
       // ---- returns inside an instrumented function (not inside a nested function)
-      if (ts.isReturnStatement(node) && ctxStack.length > 0) {
+      // (a `null` context: constructor statements that run before entry is recorded)
+      if (ts.isReturnStatement(node) && ctxStack.length > 0 && ctxStack[ctxStack.length - 1] !== null) {
         const c = ctxStack[ctxStack.length - 1];
         const expr = node.expression ? ts.visitNode(node.expression, visit) : f.createIdentifier("undefined");
         changed = true;
@@ -228,10 +249,19 @@ function instrumentFile(file, ctxInfo, index) {
         const sym = `js:${mod}.${qualname(node, sf)}`;
         const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
         const c = f.createUniqueName("__dgc");
-        ctxStack.push(c);
         // visit the body with the new context
         let body = node.body;
         if (!ts.isBlock(body)) body = f.createBlock([f.createReturnStatement(body)], true);
+        const superAt = rootSuperIndex(node);
+        let beforeEntry = [];
+        if (superAt >= 0) {
+          // up to and including `super(...)`: root-level, unwrapped, no context of their own
+          ctxStack.push(null);
+          beforeEntry = body.statements.slice(0, superAt + 1).map((st) => ts.visitNode(st, visit));
+          ctxStack.pop();
+          body = f.createBlock(body.statements.slice(superAt + 1), true);
+        }
+        ctxStack.push(c);
         const visitedBody = ts.visitEachChild(body, visit, context);
         ctxStack.pop();
         const meta = f.createObjectLiteralExpression([
@@ -276,7 +306,7 @@ function instrumentFile(file, ctxInfo, index) {
             ], true)),
             f.createBlock([f.createExpressionStatement(f.createCallExpression(f.createPropertyAccessExpression(DG, "exit"), undefined, [c]))], true),
           );
-          newBody = f.createBlock([decl, tryStmt], true);
+          newBody = f.createBlock([...beforeEntry, decl, tryStmt], true);
         }
         changed = true;
         if (ts.isFunctionDeclaration(node)) return f.updateFunctionDeclaration(node, node.modifiers, node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, newBody);
