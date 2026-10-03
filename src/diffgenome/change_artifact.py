@@ -35,6 +35,9 @@ FORMAT = "diffgenome-change/1"
 # different standing; the rest are places where DiffGenome's knowledge stops.
 EVIDENCE_OBSERVED = "observed"
 EVIDENCE_COMPOSED = "composed"
+# The caller is an external bridge: the callee ran while that external invocation was active.
+# Observed, but not a call by the caller; a consumer must not read it as "observed".
+EVIDENCE_THROUGH_EXTERNAL = "through_external"
 EVIDENCE_EXTERNAL = "external"
 EVIDENCE_UNRESOLVED = "unresolved"
 EVIDENCE_GAP = "gap"
@@ -168,7 +171,13 @@ def build_change_artifact(
             continue
         composed = [e for e in raw if e.kind is EvidenceKind.COMPOSED]
         observed = be.observed_executions
-        evidence = EVIDENCE_OBSERVED if observed else EVIDENCE_COMPOSED
+        evidence = (
+            EVIDENCE_OBSERVED
+            if observed
+            else EVIDENCE_THROUGH_EXTERNAL
+            if be.through_external_executions
+            else EVIDENCE_COMPOSED
+        )
         best = be.best_grade
         state = "n/a"
         exit_ = None

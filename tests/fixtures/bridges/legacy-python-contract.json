@@ -1,0 +1,201 @@
+{
+ "format": "diffgenome-runtime/1",
+ "universe": {
+  "test_scope": "tests/",
+  "stopped_early": null,
+  "executions": 2,
+  "passed": 2,
+  "failed": 0,
+  "skipped": 0,
+  "tracer_errors": 0,
+  "untraced_python_subprocesses": 0,
+  "tests": [
+   {
+    "id": "t::a",
+    "outcome": "passed"
+   },
+   {
+    "id": "t::b",
+    "outcome": "passed"
+   }
+  ]
+ },
+ "changed_functions": [
+  {
+   "symbol": "py:app.handler",
+   "file": "app.py",
+   "line": 1,
+   "origin": "repo",
+   "executed": true,
+   "calls": 2,
+   "tests": [
+    "t::a",
+    "t::b"
+   ],
+   "tests_total": 2,
+   "ran_at_import": false,
+   "exits": {
+    "returned": 2
+   },
+   "raised_inside": {
+    "raised:py:ValueError": 1
+   },
+   "arg_shapes": [
+    []
+   ],
+   "callers": [
+    {
+     "symbol": "py:tests.test_x",
+     "file": "tests/test_x.py",
+     "line": 1,
+     "origin": "test",
+     "calls": 2,
+     "tests": 2
+    }
+   ],
+   "stand_ins": {},
+   "changed_sites": []
+  },
+  {
+   "symbol": "py:app.service",
+   "file": "app.py",
+   "line": 10,
+   "origin": "repo",
+   "executed": true,
+   "calls": 2,
+   "tests": [
+    "t::a",
+    "t::b"
+   ],
+   "tests_total": 2,
+   "ran_at_import": false,
+   "exits": {
+    "returned": 1,
+    "raised:py:ValueError": 1
+   },
+   "raised_inside": {},
+   "arg_shapes": [
+    [
+     [
+      "amount",
+      "int"
+     ]
+    ]
+   ],
+   "callers": [
+    {
+     "symbol": "py:app.handler",
+     "file": "app.py",
+     "line": 1,
+     "origin": "repo",
+     "calls": 2,
+     "tests": 2
+    }
+   ],
+   "stand_ins": {
+    "py:db.save": 1
+   },
+   "changed_sites": [
+    {
+     "site": "br:1",
+     "line": 12,
+     "predicate": "amount > 0",
+     "true": 2,
+     "false": 0
+    }
+   ]
+  },
+  {
+   "symbol": "py:app.unused",
+   "file": "app.py",
+   "line": 30,
+   "origin": "unknown",
+   "executed": false,
+   "calls": 0,
+   "tests": [],
+   "tests_total": 0,
+   "ran_at_import": false,
+   "exits": {},
+   "raised_inside": {},
+   "arg_shapes": [],
+   "callers": [],
+   "stand_ins": {},
+   "changed_sites": []
+  }
+ ],
+ "edges": [
+  {
+   "caller": {
+    "symbol": "py:app.handler",
+    "file": "app.py",
+    "line": 1,
+    "origin": "repo"
+   },
+   "callee": {
+    "symbol": "py:app.service",
+    "file": "app.py",
+    "line": 10,
+    "origin": "repo"
+   },
+   "executions": 2,
+   "tests": [
+    "t::a",
+    "t::b"
+   ],
+   "tests_total": 2
+  },
+  {
+   "caller": {
+    "symbol": "py:tests.test_x",
+    "file": "tests/test_x.py",
+    "line": 1,
+    "origin": "test"
+   },
+   "callee": {
+    "symbol": "py:app.handler",
+    "file": "app.py",
+    "line": 1,
+    "origin": "repo"
+   },
+   "executions": 4,
+   "tests": [
+    "t::a",
+    "t::b"
+   ],
+   "tests_total": 2
+  }
+ ],
+ "boundaries": [],
+ "gaps": [
+  {
+   "kind": "branch_outcome_not_observed",
+   "symbol": "py:app.service",
+   "file": "app.py",
+   "line": 12,
+   "origin": "repo",
+   "predicate": "amount > 0",
+   "outcome": "false"
+  },
+  {
+   "kind": "stand_in_reached",
+   "symbol": "py:app.service",
+   "file": "app.py",
+   "line": 10,
+   "origin": "repo",
+   "target": "py:db.save",
+   "calls": 1
+  },
+  {
+   "kind": "function_not_executed",
+   "symbol": "py:app.unused",
+   "file": "app.py",
+   "line": 30,
+   "origin": "unknown"
+  }
+ ],
+ "not_reported": [
+  "values (only type shapes and opaque fingerprints are recorded)",
+  "except-handler coverage (handlers are not decision sites)",
+  "per-line coverage"
+ ]
+}

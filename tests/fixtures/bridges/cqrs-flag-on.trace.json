@@ -1,0 +1,221 @@
+{
+ "id": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+ "stimulus": "existing_test",
+ "stimulus_ref": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+ "outcome": "passed",
+ "revision": null,
+ "collectors": [
+  {
+   "name": "node-source-instrumentation",
+   "plane": "symbol",
+   "fidelity": "complete"
+  },
+  {
+   "name": "node-egress-guard",
+   "plane": "os",
+   "fidelity": "complete"
+  }
+ ],
+ "symbols": [
+  {
+   "id": "js:Error",
+   "origin": "external",
+   "location": null
+  },
+  {
+   "id": "js:external:CommandBus.execute",
+   "origin": "external",
+   "location": null
+  },
+  {
+   "id": "js:external:TestingModuleBuilder.compile",
+   "origin": "external",
+   "location": null
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserCommand.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 12
+   }
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 19
+   }
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 24
+   }
+  },
+  {
+   "id": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "origin": "test",
+   "location": {
+    "path": "tests/diffgenome-cqrs.e2e-spec.ts",
+    "line": 13
+   }
+  },
+  {
+   "id": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+   "origin": "test",
+   "location": null
+  }
+ ],
+ "nodes": [
+  {
+   "type": "call",
+   "id": 0,
+   "parent": null,
+   "symbol": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "unknown",
+   "result": "",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 1,
+   "parent": 0,
+   "symbol": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "returned",
+   "result": "eb045d78d2731073",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 2,
+   "parent": 1,
+   "symbol": "js:external:TestingModuleBuilder.compile",
+   "collector": 0,
+   "args": [],
+   "thread": 0,
+   "outcome": "returned",
+   "result": "",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 3,
+   "parent": 2,
+   "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.constructor",
+   "collector": 0,
+   "args": [
+    [
+     "userRepo",
+     "object[2]",
+     ""
+    ]
+   ],
+   "thread": 0,
+   "outcome": "returned",
+   "result": "",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 4,
+   "parent": 1,
+   "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserCommand.constructor",
+   "collector": 0,
+   "args": [
+    [
+     "props",
+     "object[1]",
+     "9f17fc757a1dcc17"
+    ]
+   ],
+   "thread": 0,
+   "outcome": "returned",
+   "result": "",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 5,
+   "parent": 1,
+   "symbol": "js:external:CommandBus.execute",
+   "collector": 0,
+   "args": [
+    [
+     "arg0",
+     "DeleteUserCommand",
+     "0f96c5d5a6b0eacf"
+    ]
+   ],
+   "thread": 0,
+   "outcome": "raised:js:Error",
+   "result": "",
+   "state": []
+  },
+  {
+   "type": "call",
+   "id": 6,
+   "parent": 5,
+   "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "collector": 0,
+   "args": [
+    [
+     "command",
+     "DeleteUserCommand",
+     "0f96c5d5a6b0eacf"
+    ]
+   ],
+   "thread": 0,
+   "outcome": "raised:js:Error",
+   "result": "",
+   "state": [
+    [
+     "self:type",
+     "obj:DeleteUserService",
+     "6159cd16007360a4"
+    ],
+    [
+     "self.userRepo",
+     "coll:many",
+     ""
+    ]
+   ]
+  },
+  {
+   "type": "substitution",
+   "id": 7,
+   "parent": 6,
+   "collector": 0,
+   "mechanism": "mock_object",
+   "substitute": "js:jest.fn",
+   "claimed_target": null,
+   "relation": "none",
+   "path": [],
+   "args": [
+    [
+     "arg0",
+     "string",
+     "edc1269143667b6c"
+    ]
+   ],
+   "outcome": "raised:js:Error",
+   "result": "",
+   "state": []
+  }
+ ],
+ "diagnostics": [
+  [
+   "egress_attempts",
+   "0"
+  ]
+ ]
+}

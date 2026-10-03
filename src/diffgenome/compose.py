@@ -356,6 +356,19 @@ def _node_symbol(node: Node) -> SymbolId:
     return f"os:{node.kind.value}:{node.target}"
 
 
+def _is_external_bridge(corpus: Corpus, ex: Execution, node_id: int) -> bool:
+    """An external bridge: a call node for code outside the repository, kept only because
+    repository or test code was entered while it was active (the Node collector's
+    DIFFGENOME_EXTERNAL_BRIDGES). Its children were entered under it, not called by it."""
+    node = ex.nodes[node_id] if 0 <= node_id < len(ex.nodes) else None
+    if node is not None and node.id != node_id:  # ids are positions in every collector today
+        node = next((n for n in ex.nodes if n.id == node_id), None)
+    if not isinstance(node, CallNode) or node.parent is None:
+        return False
+    sym = corpus.symbols.get(node.symbol)
+    return sym is not None and sym.origin is Origin.EXTERNAL
+
+
 def _invoked(sub: SubstitutionNode, target: SymbolId | None) -> SymbolId:
     """What the stand-in call invoked, as an edge callee. The claim names the first member
     of the path; a longer path (a call on a return value) is appended so that
@@ -387,6 +400,9 @@ def compose(
             if isinstance(child, CallNode):
                 complete = ex.collectors[child.collector].fidelity is Fidelity.COMPLETE
                 kind = EvidenceKind.OBSERVED if complete else EvidenceKind.OBSERVED_SAMPLED
+                if _is_external_bridge(corpus, ex, node_id):
+                    # entered while an external invocation was active; not called by it
+                    kind = EvidenceKind.OBSERVED_THROUGH_EXTERNAL
                 ev = Evidence(kind, site, probe_derived=probe(ex.id))
                 out.append(Branch(Edge(caller, child.symbol, ev),
                                   expand(ex, child.id, child.symbol, on_path, depth)))  # fmt: skip

@@ -68,6 +68,7 @@ def render_execution(execution: Execution) -> str:
 _GLYPH = {
     EvidenceKind.OBSERVED: "→ ",
     EvidenceKind.OBSERVED_SAMPLED: "→?",
+    EvidenceKind.OBSERVED_THROUGH_EXTERNAL: "→ [through external]",
     EvidenceKind.COMPOSED: "⇢ ",
     EvidenceKind.STATIC: "--→",
     EvidenceKind.INTERNAL_GAP: "→ [gap]",

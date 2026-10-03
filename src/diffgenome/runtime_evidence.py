@@ -13,6 +13,16 @@ Per changed function (a changed symbol whose definition is a function):
   fakes) it reached, and the outcomes observed at every decision site on a changed line.
 Edges: observed caller -> callee pairs on the call chains that reached changed functions, with
   closures, lambdas and decorator wrappers looked through, each end located (file, line).
+  The caller is the innermost instrumented frame active when the callee was entered. That is
+  not by itself proof of a direct call: uninstrumented code (a framework, a library) running in
+  between is invisible. An edge or caller carries `relation` only when its relationship was
+  positively classified; a missing `relation` means unspecified (legacy), never "direct" and
+  never "within". The one value today:
+    "through_external": the caller invoked external code (`via`: symbol, origin, owner,
+    member, arg_shapes, exits) and the callee was entered while that invocation was active.
+    The external code is never itself reported as a caller; it did not necessarily call the
+    callee. Recorded only by collectors that keep external bridges (Node, behind
+    DIFFGENOME_EXTERNAL_BRIDGES).
 Boundaries: where observation stopped (external, unresolved stand-in).
 Gaps: changed functions no test executed, changed-line decision outcomes never observed, and
   stand-ins reached directly from changed code. Coverage is never inferred: only these
@@ -37,10 +47,21 @@ MAX_SHAPES = 5
 MAX_CALLERS = 12
 MAX_EDGE_TESTS = 5
 _WRAPPER_MARKERS = ("<locals>", "<lambda>", "<anon>")
+_JS_BRIDGE_PREFIX = "js:external:"
 
 
 def _is_wrapper(symbol: str) -> bool:
     return any(m in symbol for m in _WRAPPER_MARKERS)
+
+
+def _bridge_parts(symbol: str) -> tuple[str | None, str | None]:
+    """Owner and member of an external bridge symbol. The Node runtime writes
+    `js:external:<Owner>.<member>` with a dot-free owner (a class name), so the first dot
+    separates them; any other symbol shape yields (None, None) rather than a guess."""
+    if not symbol.startswith(_JS_BRIDGE_PREFIX):
+        return None, None
+    owner, dot, member = symbol[len(_JS_BRIDGE_PREFIX) :].partition(".")
+    return (owner, member) if dot and owner and member else (None, None)
 
 
 def _changed_functions(change: ChangeSet, index: SymbolIndex) -> dict[str, dict[str, Any]]:
@@ -83,12 +104,16 @@ def build_runtime_evidence(
     exits: dict[str, Counter[str]] = defaultdict(Counter)
     raised_inside: dict[str, Counter[str]] = defaultdict(Counter)
     shapes: dict[str, Counter[tuple[tuple[str, str], ...]]] = defaultdict(Counter)
-    callers: dict[str, Counter[str]] = defaultdict(Counter)
-    caller_tests: dict[tuple[str, str], set[str]] = defaultdict(set)
+    # a caller is keyed with the external bridge it was reached through (None: legacy)
+    callers: dict[str, Counter[tuple[str, str | None]]] = defaultdict(Counter)
+    caller_tests: dict[tuple[str, str, str | None], set[str]] = defaultdict(set)
+    # what each bridge was seen as, per relationship: argument shapes and exits
+    via_shapes: dict[tuple[str, ...], Counter[tuple[str, ...]]] = defaultdict(Counter)
+    via_exits: dict[tuple[str, ...], Counter[str]] = defaultdict(Counter)
     stand_ins: dict[str, Counter[str]] = defaultdict(Counter)
     site_out: dict[str, Counter[bool]] = defaultdict(Counter)
-    edges: dict[tuple[str, str], set[str]] = defaultdict(set)
-    edge_count: Counter[tuple[str, str]] = Counter()
+    edges: dict[tuple[str, str, str | None], set[str]] = defaultdict(set)
+    edge_count: Counter[tuple[str, str, str | None]] = Counter()
     locations: dict[str, tuple[str, int] | None] = {}
     origins: dict[str, str] = {}
     universe = []
@@ -110,11 +135,27 @@ def build_runtime_evidence(
                 )
         nodes = {n.id: n for n in ex.nodes}
 
-        def real_parent(n: Any, nodes: dict[int, Any] = nodes) -> CallNode | None:
+        def is_bridge(n: Any) -> bool:
+            # an external call node kept because repo/test code ran inside it
+            return isinstance(n, CallNode) and origins.get(n.symbol) == "external"
+
+        def parent_via(n: Any, nodes: dict[int, Any] = nodes) -> tuple[CallNode | None, Any]:
+            """The real caller, looking through wrappers and an external bridge, and the
+            bridge it was reached through (None when there was none)."""
+            via = None
             p = nodes.get(n.parent) if n.parent is not None else None
-            while isinstance(p, CallNode) and _is_wrapper(p.symbol):
+            while isinstance(p, CallNode) and (_is_wrapper(p.symbol) or is_bridge(p)):
+                if via is None and is_bridge(p):
+                    via = p
                 p = nodes.get(p.parent) if p.parent is not None else None
-            return p if isinstance(p, CallNode) else None
+            return (p if isinstance(p, CallNode) else None), via
+
+        def real_parent(n: Any) -> CallNode | None:
+            return parent_via(n)[0]
+
+        def note_via(key: tuple[str, ...], via: CallNode) -> None:
+            via_shapes[key][tuple(a[1] for a in via.args)] += 1
+            via_exits[key][str(via.outcome)] += 1
 
         for n in ex.nodes:
             if isinstance(n, SubstitutionNode):
@@ -123,9 +164,9 @@ def build_runtime_evidence(
                     target = n.claimed_target or n.substitute or "?"
                     stand_ins[p.symbol][str(target)] += 1
                 continue
-            if not isinstance(n, CallNode):
-                continue
-            p = real_parent(n)
+            if not isinstance(n, CallNode) or is_bridge(n):
+                continue  # a bridge is reported as `via` on what it reached, never by itself
+            p, via = parent_via(n)
             if (
                 p is not None
                 and p.symbol in changed
@@ -139,18 +180,24 @@ def build_runtime_evidence(
             exits[n.symbol][str(n.outcome)] += 1
             shapes[n.symbol][tuple((a[0], a[1]) for a in n.args)] += 1
             if p is not None:
-                callers[n.symbol][p.symbol] += 1
-                caller_tests[(n.symbol, p.symbol)].add(ex.stimulus_ref)
-            # the observed chain into this changed call, wrappers looked through
+                vs = via.symbol if via is not None else None
+                callers[n.symbol][(p.symbol, vs)] += 1
+                caller_tests[(n.symbol, p.symbol, vs)].add(ex.stimulus_ref)
+                if via is not None:
+                    note_via(("caller", n.symbol, p.symbol, via.symbol), via)
+            # the observed chain into this changed call, wrappers (and bridges) looked through
             child: Any = n
             while True:
-                parent = real_parent(child)
+                parent, edge_via = parent_via(child)
                 if parent is None:
                     break
-                key = (parent.symbol, child.symbol)
+                ev_sym = edge_via.symbol if edge_via is not None else None
+                key = (parent.symbol, child.symbol, ev_sym)
                 if key[0] != key[1]:
                     edges[key].add(ex.stimulus_ref)
                     edge_count[key] += 1
+                    if edge_via is not None:
+                        note_via(("edge", *key[:2], edge_via.symbol), edge_via)
                 child = parent
         for b in ex.branches:
             site_out[b.site][b.outcome] += 1
@@ -169,6 +216,27 @@ def build_runtime_evidence(
             "file": where[0] if where else None,
             "line": where[1] if where else None,
             "origin": origin,
+        }
+
+    def related(
+        entry: dict[str, Any], kind: str, a: str, b: str, via: str | None
+    ) -> dict[str, Any]:
+        """`entry` unchanged when no bridge was crossed; else with relation and via."""
+        if via is None:
+            return entry
+        owner, member = _bridge_parts(via)
+        key = (kind, a, b, via)
+        return {
+            **entry,
+            "relation": "through_external",
+            "via": {
+                "symbol": via,
+                "origin": origins.get(via, "external"),
+                "owner": owner,
+                "member": member,
+                "arg_shapes": [list(s) for s, _ in via_shapes[key].most_common(MAX_SHAPES)],
+                "exits": dict(via_exits[key]),
+            },
         }
 
     functions = []
@@ -202,8 +270,11 @@ def build_runtime_evidence(
                     [list(a) for a in shape] for shape, _ in shapes[sym].most_common(MAX_SHAPES)
                 ],
                 "callers": [
-                    {**loc(c), "calls": k, "tests": len(caller_tests[(sym, c)])}
-                    for c, k in callers[sym].most_common(MAX_CALLERS)
+                    related(
+                        {**loc(c), "calls": k, "tests": len(caller_tests[(sym, c, v)])},
+                        "caller", sym, c, v,
+                    )
+                    for (c, v), k in callers[sym].most_common(MAX_CALLERS)
                 ],
                 "stand_ins": dict(stand_ins[sym]),
                 "changed_sites": sites,
@@ -260,14 +331,17 @@ def build_runtime_evidence(
         },
         "changed_functions": functions,
         "edges": [
-            {
-                "caller": loc(a),
-                "callee": loc(b),
-                "executions": edge_count[(a, b)],
-                "tests": sorted(edges[(a, b)])[:MAX_EDGE_TESTS],
-                "tests_total": len(edges[(a, b)]),
-            }
-            for (a, b) in sorted(edges)
+            related(
+                {
+                    "caller": loc(a),
+                    "callee": loc(b),
+                    "executions": edge_count[(a, b, v)],
+                    "tests": sorted(edges[(a, b, v)])[:MAX_EDGE_TESTS],
+                    "tests_total": len(edges[(a, b, v)]),
+                },
+                "edge", a, b, v,
+            )
+            for (a, b, v) in sorted(edges, key=lambda k: (k[0], k[1], k[2] or ""))
         ],
         "boundaries": [
             {

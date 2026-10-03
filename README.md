@@ -98,6 +98,13 @@ Every "not executed" is relative to `universe.test_scope`: the tests that were r
 carry `origin` (`repo`, `test`, `external`) so a consumer can tell application frames from test
 frames.
 
+A caller is the innermost instrumented frame active when the callee was entered, which does not
+by itself prove a direct call. An edge or caller may carry `relation` only when its relationship
+was positively classified (a missing `relation` is unspecified): `through_external` with a
+`via` naming the external call it ran inside, e.g. `CommandBus.execute` with argument shape
+`DeleteUserCommand` (Node, behind the experimental `DIFFGENOME_EXTERNAL_BRIDGES=1`). See
+[docs/integration-artifact.md](docs/integration-artifact.md).
+
 The artifact's other sections (`nodes`, `edges`, `executions`, `boundaries`, `facts`) describe
 the observed behavioral neighborhood of the change; `report.md` and `behavioral-map.md` render
 it for people.

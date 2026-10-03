@@ -1,0 +1,221 @@
+{
+ "format": "diffgenome-graph/1",
+ "symbols": [
+  {
+   "id": "py:app.deco.<locals>.wrapper",
+   "origin": "repo",
+   "location": {
+    "path": "app.py",
+    "line": 1
+   },
+   "kind": "callable",
+   "executed_by": [
+    "t::a",
+    "t::b"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:app.handler",
+   "origin": "repo",
+   "location": {
+    "path": "app.py",
+    "line": 1
+   },
+   "kind": "callable",
+   "executed_by": [
+    "t::a",
+    "t::b"
+   ],
+   "outcomes": {
+    "returned": 2
+   }
+  },
+  {
+   "id": "py:app.service",
+   "origin": "repo",
+   "location": {
+    "path": "app.py",
+    "line": 1
+   },
+   "kind": "callable",
+   "executed_by": [
+    "t::a",
+    "t::b"
+   ],
+   "outcomes": {
+    "returned": 1,
+    "raised": 1
+   }
+  },
+  {
+   "id": "py:tests.test_x",
+   "origin": "test",
+   "location": {
+    "path": "app.py",
+    "line": 1
+   },
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  }
+ ],
+ "edges": [
+  {
+   "caller": "py:app.deco.<locals>.wrapper",
+   "callee": "py:app.service",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "t::a",
+    "t::b"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::a",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::b",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:app.handler",
+   "callee": "py:app.deco.<locals>.wrapper",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "t::a",
+    "t::b"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::a",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::b",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:app.service",
+   "callee": "py:db.save",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "claim-unknown-origin"
+   ],
+   "executions": [
+    "t::b"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "t::b",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": "claim-unknown-origin",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "py:tests.test_x",
+   "callee": "py:app.handler",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "t::a",
+    "t::b"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::a",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    },
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "t::b",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  }
+ ],
+ "gaps": [],
+ "join_attempts": []
+}

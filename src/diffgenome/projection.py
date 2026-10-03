@@ -38,6 +38,8 @@ class BehaviorEdge:
         str | None
     )  # None for production continuations; else external/os/unresolved/gap/declaration
     observed_executions: set[str] = field(default_factory=set)
+    # entered while an external invocation (the caller, a bridge) was active; not called by it
+    through_external_executions: set[str] = field(default_factory=set)
     composed: Counter[str] = field(default_factory=Counter)  # grade -> distinct fragment shapes
     alternates: int = 0
     tests: set[str] = field(default_factory=set)
@@ -50,7 +52,9 @@ class BehaviorEdge:
         if self.boundary:
             return {"external": "→ [external]", "os": "→ [os]", "unresolved": "→ [unresolved]",
                     "gap": "→ [gap]", "declaration": "→ [declaration]"}[self.boundary]  # fmt: skip
-        return "→" if self.observed_executions else "⇢"
+        if self.observed_executions:
+            return "→"
+        return "→ [through external]" if self.through_external_executions else "⇢"
 
     @property
     def best_grade(self) -> str | None:
@@ -62,6 +66,8 @@ class BehaviorEdge:
         bits = []
         if self.observed_executions:
             bits.append(f"observed {len(self.observed_executions)} exec")
+        if self.through_external_executions:
+            bits.append(f"through external {len(self.through_external_executions)} exec")
         for grade in sorted(self.composed, key=lambda g: JoinStrength[g].value, reverse=True):
             bits.append(f"composed {grade} x{self.composed[grade]}")
         if self.alternates:
@@ -105,6 +111,8 @@ def project(graph: BehavioralGraph) -> dict[tuple[SymbolId, SymbolId], BehaviorE
             be.boundary = None  # a real continuation exists; the boundary was one seed's view
         if e.kind is EvidenceKind.OBSERVED:
             be.observed_executions.update(e.executions)
+        if e.kind is EvidenceKind.OBSERVED_THROUGH_EXTERNAL:
+            be.through_external_executions.update(e.executions)
         if e.kind is EvidenceKind.COMPOSED:
             per_site: dict[Any, int] = defaultdict(int)
             for ev in e.evidence:

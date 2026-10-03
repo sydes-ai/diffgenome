@@ -288,7 +288,16 @@ class JoinStrength(Enum):
 
 
 class EvidenceKind(Enum):
-    OBSERVED = "observed"  # complete trace: caller called callee, same execution
+    OBSERVED = "observed"  # complete trace: callee entered under caller, same execution
+    # The parent link of an OBSERVED edge is the innermost *instrumented* frame active when
+    # the callee was entered. Where uninstrumented code (a framework, a library, an event
+    # loop) runs in between, its frames are invisible, so OBSERVED by itself does not prove
+    # that the caller invoked the callee directly.
+    OBSERVED_THROUGH_EXTERNAL = "observed_through_external"
+    """The caller is an external bridge X: X was invoked from an observed call site, and the
+    callee was entered while that invocation of X was active (synchronously or after X's
+    own awaits). It does NOT mean X called the callee directly: whatever X did in between
+    was not observed. Not a boundary: unlike EXTERNAL_BOUNDARY, observation continues."""
     OBSERVED_SAMPLED = "observed_sampled"  # sampled: callee seen under caller; order/count unknown
     COMPOSED = "composed"  # call hit an internal stand-in; continuation is another execution
     STATIC = "static"  # statically possible, never executed (reserved; not produced yet)
@@ -305,7 +314,12 @@ _RULE_REQUIRED = {
     EvidenceKind.EXTERNAL_BOUNDARY,
     EvidenceKind.UNRESOLVED_BOUNDARY,
 }
-_RULE_FORBIDDEN = {EvidenceKind.OBSERVED, EvidenceKind.OBSERVED_SAMPLED, EvidenceKind.OS_BOUNDARY}
+_RULE_FORBIDDEN = {
+    EvidenceKind.OBSERVED,
+    EvidenceKind.OBSERVED_SAMPLED,
+    EvidenceKind.OBSERVED_THROUGH_EXTERNAL,
+    EvidenceKind.OS_BOUNDARY,
+}
 
 
 @dataclass(frozen=True)

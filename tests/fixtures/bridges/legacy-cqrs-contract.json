@@ -1,0 +1,98 @@
+{
+ "format": "diffgenome-runtime/1",
+ "universe": {
+  "test_scope": "tests/",
+  "stopped_early": null,
+  "executions": 1,
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "tracer_errors": 0,
+  "untraced_python_subprocesses": 0,
+  "tests": [
+   {
+    "id": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+    "outcome": "passed"
+   }
+  ]
+ },
+ "changed_functions": [
+  {
+   "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "file": "src/modules/user/commands/delete-user/delete-user.service.ts",
+   "line": 25,
+   "origin": "repo",
+   "executed": true,
+   "calls": 1,
+   "tests": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService"
+   ],
+   "tests_total": 1,
+   "ran_at_import": false,
+   "exits": {
+    "raised:js:Error": 1
+   },
+   "raised_inside": {},
+   "arg_shapes": [
+    [
+     [
+      "command",
+      "DeleteUserCommand"
+     ]
+    ]
+   ],
+   "callers": [
+    {
+     "symbol": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+     "file": null,
+     "line": null,
+     "origin": "test",
+     "calls": 1,
+     "tests": 1
+    }
+   ],
+   "stand_ins": {
+    "js:jest.fn": 1
+   },
+   "changed_sites": []
+  }
+ ],
+ "edges": [
+  {
+   "caller": {
+    "symbol": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+    "file": null,
+    "line": null,
+    "origin": "test"
+   },
+   "callee": {
+    "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+    "file": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 25,
+    "origin": "repo"
+   },
+   "executions": 1,
+   "tests": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService"
+   ],
+   "tests_total": 1
+  }
+ ],
+ "boundaries": [],
+ "gaps": [
+  {
+   "kind": "stand_in_reached",
+   "symbol": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "file": "src/modules/user/commands/delete-user/delete-user.service.ts",
+   "line": 25,
+   "origin": "repo",
+   "target": "js:jest.fn",
+   "calls": 1
+  }
+ ],
+ "not_reported": [
+  "values (only type shapes and opaque fingerprints are recorded)",
+  "except-handler coverage (handlers are not decision sites)",
+  "per-line coverage"
+ ]
+}

@@ -1,0 +1,222 @@
+{
+ "format": "diffgenome-graph/1",
+ "symbols": [
+  {
+   "id": "js:Error",
+   "origin": "external",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserCommand.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 12
+   },
+   "kind": "callable",
+   "executed_by": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.constructor",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 19
+   },
+   "kind": "callable",
+   "executed_by": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "origin": "repo",
+   "location": {
+    "path": "src/modules/user/commands/delete-user/delete-user.service.ts",
+    "line": 24
+   },
+   "kind": "callable",
+   "executed_by": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "outcomes": {
+    "raised": 1
+   }
+  },
+  {
+   "id": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "origin": "test",
+   "location": {
+    "path": "tests/diffgenome-cqrs.e2e-spec.ts",
+    "line": 13
+   },
+   "kind": "callable",
+   "executed_by": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "outcomes": {
+    "returned": 1
+   }
+  },
+  {
+   "id": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+   "origin": "test",
+   "location": null,
+   "kind": "callable",
+   "executed_by": [],
+   "outcomes": {}
+  }
+ ],
+ "edges": [
+  {
+   "caller": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "callee": "stand-in:js:jest.fn",
+   "kind": "unresolved_boundary",
+   "best_join": null,
+   "joins": {},
+   "rules": [
+    "no-claim"
+   ],
+   "executions": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "unresolved_boundary",
+     "site": {
+      "execution": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+      "node": 5
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": "no-claim",
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "callee": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserCommand.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+      "node": 3
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "callee": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.constructor",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+      "node": 2
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "callee": "js:src/modules/user/commands/delete-user/delete-user.service.DeleteUserService.execute",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+      "node": 4
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  },
+  {
+   "caller": "js:tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService",
+   "callee": "js:tests/diffgenome-cqrs.e2e-spec.<anon>@9.<anon>@13",
+   "kind": "observed",
+   "best_join": null,
+   "joins": {},
+   "rules": [],
+   "executions": [
+    "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown"
+   ],
+   "probe_derived": false,
+   "evidence": [
+    {
+     "kind": "observed",
+     "site": {
+      "execution": "tests/diffgenome-cqrs.e2e-spec.ts::DiffGenome CQRS dispatch dispatches DeleteUserCommand to DeleteUserService@unknown",
+      "node": 1
+     },
+     "fragment": null,
+     "alternates": [],
+     "join": null,
+     "exit": null,
+     "rule": null,
+     "probe_derived": false
+    }
+   ]
+  }
+ ],
+ "gaps": [],
+ "join_attempts": []
+}

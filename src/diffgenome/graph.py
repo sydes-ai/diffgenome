@@ -30,7 +30,27 @@ _TERMINAL = {
     EvidenceKind.UNRESOLVED_BOUNDARY,
     EvidenceKind.INTERNAL_GAP,
 }
-_TRAVERSABLE = {EvidenceKind.OBSERVED, EvidenceKind.OBSERVED_SAMPLED, EvidenceKind.COMPOSED}
+_TRAVERSABLE = {
+    EvidenceKind.OBSERVED,
+    EvidenceKind.OBSERVED_SAMPLED,
+    EvidenceKind.OBSERVED_THROUGH_EXTERNAL,
+    EvidenceKind.COMPOSED,
+}
+
+
+def bridge_label(graph: BehavioralGraph, symbol: SymbolId) -> str:
+    """`Owner.member(ArgShape, ...)` for an external bridge symbol, from the argument shapes
+    recorded on its nodes (distinct call shapes joined by ` | `). Display only."""
+    js = symbol.startswith("js:external:")
+    name = symbol.split(":", 2)[-1] if js else symbol.split(":", 1)[-1]
+    shapes: list[str] = []
+    for ex in (graph.corpus.executions.values() if graph.corpus is not None else ()):
+        for n in ex.nodes:
+            if isinstance(n, CallNode) and n.symbol == symbol:
+                text = ", ".join(a[1] for a in n.args)
+                if text not in shapes:
+                    shapes.append(text)
+    return f"{name}({' | '.join(shapes)})"
 
 
 @dataclass

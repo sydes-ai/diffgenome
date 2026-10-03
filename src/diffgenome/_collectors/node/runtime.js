@@ -388,7 +388,8 @@ function m(obj, key) {
   if (fn._isMockFunction) return { [key]: recordingStandIn(fn, obj) };
   if (BRIDGES && state.active) {
     const owner = externalOwner(obj, key);
-    if (owner !== null) return { [key]: bridged(fn, obj, `${owner}.${String(key)}`) };
+    // `<Owner>.<member>`: the owner is kept dot-free so the first dot always separates them
+    if (owner !== null) return { [key]: bridged(fn, obj, `${owner.replace(/\./g, "_")}.${String(key)}`) };
   }
   return { [key]: function (...args) { return fn.apply(obj, args); } };
 }

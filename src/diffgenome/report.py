@@ -8,13 +8,14 @@ from dataclasses import asdict
 from typing import Any
 
 from diffgenome.change import ChangeSet
-from diffgenome.graph import BehavioralGraph, GraphEdge, Metrics, Neighborhood
+from diffgenome.graph import BehavioralGraph, GraphEdge, Metrics, Neighborhood, bridge_label
 from diffgenome.model import EvidenceKind
 from diffgenome.probe import ProbeAttempt
 
 _GLYPH = {
     EvidenceKind.OBSERVED: "→",
     EvidenceKind.OBSERVED_SAMPLED: "→?",
+    EvidenceKind.OBSERVED_THROUGH_EXTERNAL: "→",
     EvidenceKind.COMPOSED: "⇢",
     EvidenceKind.INTERNAL_GAP: "→ [gap]",
     EvidenceKind.EXTERNAL_BOUNDARY: "→ [external]",
@@ -28,7 +29,19 @@ def _short(symbol: str) -> str:
     return symbol.split(":", 1)[-1]
 
 
-def _edge_line(d: int, e: GraphEdge) -> str:
+# Edges a reader follows from caller to callee. An edge out of an external bridge is one of
+# them: the callee did run under that external invocation, it was just not called by it.
+_WALK = (EvidenceKind.OBSERVED, EvidenceKind.OBSERVED_THROUGH_EXTERNAL, EvidenceKind.COMPOSED)
+
+
+def _caller_label(e: GraphEdge, graph: BehavioralGraph | None) -> str:
+    if e.kind is not EvidenceKind.OBSERVED_THROUGH_EXTERNAL:
+        return _short(e.caller)
+    shown = bridge_label(graph, e.caller) if graph is not None else _short(e.caller)
+    return f"[through external: {shown}]"
+
+
+def _edge_line(d: int, e: GraphEdge, graph: BehavioralGraph | None = None) -> str:
     tail = f"  tests={len(e.executions)}"
     if e.kind is EvidenceKind.COMPOSED and e.best_join:
         tail += f"  join={e.best_join.name.lower()}"
@@ -36,7 +49,7 @@ def _edge_line(d: int, e: GraphEdge) -> str:
         tail += f"  rule={'/'.join(sorted(e.rules))}"
     if e.probe_derived:
         tail += "  probe-derived"
-    return f"  d{d}  {_short(e.caller)} {_GLYPH[e.kind]} {_short(e.callee)}{tail}"
+    return f"  d{d}  {_caller_label(e, graph)} {_GLYPH[e.kind]} {_short(e.callee)}{tail}"
 
 
 def render_neighborhood(nb: Neighborhood, graph: BehavioralGraph, title: str) -> str:
@@ -46,7 +59,7 @@ def render_neighborhood(nb: Neighborhood, graph: BehavioralGraph, title: str) ->
     down = [(d, e) for d, e in nb.edges.values()]
     # Partition by direction relative to the seeds using the walk that found them: an
     # edge whose callee is a seed or whose callee leads to a seed is upstream.
-    traversable = (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+    traversable = _WALK
     upstream = sorted(
         ((d, e) for d, e in up if e.kind in traversable and _leads_to(e, seeds, graph)),
         key=lambda x: (x[0], x[1].caller, x[1].callee),
@@ -56,12 +69,12 @@ def render_neighborhood(nb: Neighborhood, graph: BehavioralGraph, title: str) ->
         key=lambda x: (x[0], x[1].caller, x[1].callee),
     )
     lines.append("### Upstream (what reaches the change)")
-    lines.extend(_edge_line(d, e) for d, e in upstream[:60] or [])
+    lines.extend(_edge_line(d, e, graph) for d, e in upstream[:60] or [])
     if not upstream:
         lines.append("  (nothing observed reaches the changed symbols)")
     lines.append("")
     lines.append("### Downstream (what continues from the change)")
-    lines.extend(_edge_line(d, e) for d, e in downstream[:120])
+    lines.extend(_edge_line(d, e, graph) for d, e in downstream[:120])
     lines.append("")
     lines.append(f"### Tests establishing these paths ({len(nb.tests)})")
     lines.extend(f"  {t.split('@')[0]}" for t in sorted(nb.tests)[:40])
@@ -84,7 +97,7 @@ def _leads_to(e: GraphEdge, seeds: set[str], graph: BehavioralGraph, depth: int 
             nxt.extend(
                 x.callee
                 for x in graph.out.get(s, [])
-                if x.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+                if x.kind in _WALK
             )
         frontier, depth = nxt, depth - 1
     return any(s in seeds for s in frontier)
@@ -313,7 +326,7 @@ def render_map_slice(graph: BehavioralGraph, seeds: list[str], up: int = 3, down
                 f"{prefix}{branch}{label}{_annotate(e, graph)}"
                 + ("  (see above)" if repeat else "")
             )
-            traversable = e.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+            traversable = e.kind in _WALK
             if traversable and not repeat and depth < down and e.callee not in path:
                 down_tree(
                     e.callee, prefix + ("   " if last else "│  "), depth + 1, path | {e.callee}
@@ -324,7 +337,7 @@ def render_map_slice(graph: BehavioralGraph, seeds: list[str], up: int = 3, down
             (
                 e
                 for e in graph.inc.get(sym, [])
-                if e.kind in (EvidenceKind.OBSERVED, EvidenceKind.COMPOSED)
+                if e.kind in _WALK
             ),
             key=lambda e: (e.kind.value, e.caller),
         )
@@ -332,7 +345,7 @@ def render_map_slice(graph: BehavioralGraph, seeds: list[str], up: int = 3, down
             last = i == len(parents) - 1
             branch = "└" if last else "├"
             lines.append(
-                f"{prefix}{branch}{_short(e.caller)} {_GLYPH[e.kind]}{_annotate(e, graph)}"
+                f"{prefix}{branch}{_caller_label(e, graph)} {_GLYPH[e.kind]}{_annotate(e, graph)}"
             )
             if depth < up and e.caller not in path:
                 up_tree(e.caller, prefix + ("   " if last else "│  "), depth + 1, path | {e.caller})

@@ -40,7 +40,7 @@ command produced no executions. A consumer in another CI job shows that reason i
 | `neighborhood` | `up`/`down` bounds and symbol count |
 | `budget` | writer, probes requested, attempts, `llm_calls`, whether traces were reused |
 | `nodes` | `id` (stable: `<lang>:<qualified name>`), `name`, `file`, `line`, `kind` (callable/declaration), `origin` (repo/test/external/unknown), `changed`, `executed_by` (existing executions that ran the real symbol) |
-| `edges` | one per production caller→callee: `evidence` (`observed` / `composed`), `distance`, `join` (composed only: `SYMBOL`/`ARG_SHAPE`/`VALUE`/`STATE`), `state` (`matched` / `unavailable` / `not_consulted` / `n/a`), `exit` (`same` / `kind` / `unknown`), `probe_derived`, `executions` (tests: for a composed edge, the seed that exposed the seam and the fragment that continued it), `probes`, `composed_shapes_by_grade`, `same_shape_alternates`, `ambiguous`, `rules` (resolver rules that fired) |
+| `edges` | one per production caller→callee: `evidence` (`observed` / `composed` / `through_external`), `distance`, `join` (composed only: `SYMBOL`/`ARG_SHAPE`/`VALUE`/`STATE`), `state` (`matched` / `unavailable` / `not_consulted` / `n/a`), `exit` (`same` / `kind` / `unknown`), `probe_derived`, `executions` (tests: for a composed edge, the seed that exposed the seam and the fragment that continued it), `probes`, `composed_shapes_by_grade`, `same_shape_alternates`, `ambiguous`, `rules` (resolver rules that fired) |
 | `boundaries` | where knowledge stops: `kind` = `external` (stays substituted), `unresolved` (stand-in not attributed), `gap` (no execution of the target), `declaration` (no in-repo body), `os`; with rules, distance and executions |
 | `executions` | tests and probes contributing to the neighborhood, with `stimulus`, `outcome` (`passed` / `failed` in DiffGenome's isolated run; only passing executions are composition sources) and the test source `file` (location of the first located test-origin call; null when the collector recorded none) |
 | `ambiguous_seams` | seams with several accepted continuations or rejected candidates, with rejection reasons counted |
@@ -53,6 +53,14 @@ command produced no executions. A consumer in another CI job shows that reason i
 
 - `observed` was seen in one execution; `composed` was reconstructed across a stand-in seam
   and is never presented as observed. The grade is the evidence class, not a probability.
+- `observed` means the callee was entered while the caller was the innermost *instrumented*
+  frame. Uninstrumented code running in between (a framework, a library) is invisible, so it
+  does not by itself prove the caller invoked the callee directly.
+- `through_external` (only with the Node collector's experimental
+  `DIFFGENOME_EXTERNAL_BRIDGES=1`): the caller is an external call kept as a bridge, and the
+  callee was entered while that external invocation was active. It is not a call by the
+  external code; whatever happened inside it was not observed. Not a boundary: observation
+  continues below it.
 - STATE is only consulted after VALUE holds; `state: unavailable` means no fact could be
   compared, never that state matched.
 - `structural_coverage_ratio_NOT_correctness` counts symbol pairs with evidence.
@@ -60,4 +68,21 @@ command produced no executions. A consumer in another CI job shows that reason i
   corroborates a static hop; a static hop with no runtime edge stays *possible*; a runtime
   edge the static view lacks is kept and marked runtime-only.
 
+## Runtime contract: `relation` and `via`
+
+An entry in `runtime.edges` or `runtime.changed_functions[].callers` may carry:
+
+- `relation`: present only when the relationship was positively classified. **A missing
+  `relation` is unspecified (legacy semantics); it never means `direct` or `within`.** The
+  only value today is `through_external`.
+- `via` (with `through_external`): the external code the caller invoked and inside which the
+  callee was entered: `symbol`, `origin` (`external`), `owner` and `member` (null when the
+  symbol does not have the `js:external:<Owner>.<member>` shape), `arg_shapes` (distinct
+  argument type shapes of that external call) and `exits` (its observed outcomes).
+
+The caller is unchanged by this: it is the instrumented frame that made the external call, the
+same caller reported without the bridge. The external code is never a `caller`.
+
 Versioning: additive changes keep `/1`; renaming or re-meaning a field bumps the format.
+`relation` and `via` are additive under `diffgenome-runtime/1`; `through_external` is an added
+value of the artifact's `edges[].evidence`.
