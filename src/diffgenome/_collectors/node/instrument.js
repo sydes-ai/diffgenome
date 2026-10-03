@@ -15,6 +15,8 @@
  * uses for lambdas.
  *
  * Sync functions get try/catch/finally around the body (keeps `this`/`arguments`);
+ * the receiver reported to the runtime is `this` only where the function has one (see
+ * receiverFor), never a bare `this` injected into a free function;
  * async functions and generators get their body moved into a callback run under the
  * runtime's AsyncLocalStorage scope, which is what makes attribution across `await`
  * correct.
@@ -90,12 +92,63 @@ function qualname(node, sf) {
   return parts.join(".");
 }
 
+// A TypeScript `this` parameter (`function f(this: Foo, x)`) declares the receiver's type;
+// it is not an argument and has no runtime value of its own.
+function isThisParameter(p) {
+  return ts.isIdentifier(p.name) && p.name.text === "this";
+}
+
 function paramNames(node) {
-  return node.parameters.map((p) => (ts.isIdentifier(p.name) ? p.name.text : "<pattern>"));
+  return node.parameters.filter((p) => !isThisParameter(p)).map((p) => (ts.isIdentifier(p.name) ? p.name.text : "<pattern>"));
 }
 
 function paramIdentifiers(node) {
-  return node.parameters.filter((p) => ts.isIdentifier(p.name)).map((p) => p.name.text);
+  return node.parameters.filter((p) => ts.isIdentifier(p.name) && !isThisParameter(p)).map((p) => p.name.text);
+}
+
+// ----------------------------------------------------------------------------- receiver
+
+/** Does `body` evaluate `this` bound to the enclosing function? Arrow functions share it;
+ * any other function, and a class's members, bind their own -- except the parts of a
+ * class evaluated in the enclosing scope (heritage clauses, computed names, decorators). */
+function usesOwnThis(body) {
+  let found = false;
+  function scan(n) {
+    if (found) return;
+    if (n.kind === ts.SyntaxKind.ThisKeyword) { found = true; return; }
+    if (isFunctionLike(n) && !ts.isArrowFunction(n)) return;
+    if (ts.isClassDeclaration(n) || ts.isClassExpression(n)) {
+      for (const d of ts.canHaveDecorators(n) ? ts.getDecorators(n) || [] : []) scan(d);
+      for (const h of n.heritageClauses || []) scan(h);
+      for (const m of n.members) {
+        if (m.name && ts.isComputedPropertyName(m.name)) scan(m.name);
+        for (const d of ts.canHaveDecorators(m) ? ts.getDecorators(m) || [] : []) scan(d);
+      }
+      return;
+    }
+    ts.forEachChild(n, scan);
+  }
+  scan(body);
+  return found;
+}
+
+/** The receiver handed to the runtime (`__dg.enter`/`__dg.run`).
+ *
+ * `this` only where the function has a receiver that the source can already name:
+ * methods and accessors (class or object literal), a function expression assigned to an
+ * object-literal property, a function that declares a `this` parameter, or one whose own
+ * body already reads `this`. Everywhere else -- a free/top-level function that never
+ * mentions `this` -- `undefined`: under `noImplicitThis` a bare `this` there is TS2683,
+ * and the runtime treats an absent receiver as "no receiver state", which is what such a
+ * function has. Arrow functions have no receiver of their own; a constructor's `this` is
+ * unusable before `super()`, where entry is recorded. */
+function receiverFor(node) {
+  if (ts.isArrowFunction(node) || ts.isConstructorDeclaration(node)) return null;
+  if (ts.isMethodDeclaration(node) || ts.isGetAccessorDeclaration(node) || ts.isSetAccessorDeclaration(node)) return "this";
+  if (node.parameters.some(isThisParameter)) return "this";
+  if (ts.isFunctionExpression(node) && node.parent && ts.isPropertyAssignment(node.parent) &&
+      ts.isObjectLiteralExpression(node.parent.parent)) return "this";
+  return usesOwnThis(node.body) ? "this" : null;
 }
 
 // ----------------------------------------------------------------------------- transform
@@ -107,6 +160,7 @@ function instrumentFile(file, ctxInfo, index) {
   const rel = path.relative(ctxInfo.root, file).split(path.sep).join("/");
   const f = ts.factory;
   const DG = f.createIdentifier("__dg");
+  const isTs = /\.(tsx?|mts|cts)$/.test(file);
   let changed = false;
 
   // Index definitions (functions and classes) from the original tree.
@@ -188,14 +242,22 @@ function instrumentFile(file, ctxInfo, index) {
           f.createPropertyAssignment("params", f.createArrayLiteralExpression(paramNames(node).map((n) => f.createStringLiteral(n)))),
         ]);
         const values = f.createArrayLiteralExpression(paramIdentifiers(node).map((n) => f.createIdentifier(n)));
+        const receiver = () => (receiverFor(node) ? f.createThis() : f.createIdentifier("undefined"));
         let newBody;
         if (useRun) {
           // return __dg.run(meta, [args], this, async/function* (c) { body })  (yield* for generators)
+          // In TypeScript the generated parameters are typed so the copy still compiles under
+          // `noImplicitAny`/`noImplicitThis`: the context is `any`, and the generator body,
+          // now inside a `function*` of its own, declares the receiver run() hands it.
+          const anyType = () => (isTs ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword) : undefined);
+          const ctxParam = f.createParameterDeclaration(undefined, undefined, c, undefined, anyType());
           const inner = isGen
-            ? f.createFunctionExpression(isAsync ? [f.createModifier(ts.SyntaxKind.AsyncKeyword)] : undefined, f.createToken(ts.SyntaxKind.AsteriskToken), undefined, undefined, [f.createParameterDeclaration(undefined, undefined, c)], undefined, visitedBody)
-            : f.createArrowFunction([f.createModifier(ts.SyntaxKind.AsyncKeyword)], undefined, [f.createParameterDeclaration(undefined, undefined, c)], undefined, undefined, visitedBody);
-          const thisArg = ts.isArrowFunction(node) ? f.createIdentifier("undefined") : f.createThis();
-          const call = f.createCallExpression(f.createPropertyAccessExpression(DG, "run"), undefined, [meta, values, thisArg, inner]);
+            ? f.createFunctionExpression(isAsync ? [f.createModifier(ts.SyntaxKind.AsyncKeyword)] : undefined, f.createToken(ts.SyntaxKind.AsteriskToken), undefined, undefined,
+                [...(isTs ? [f.createParameterDeclaration(undefined, undefined, "this", undefined, anyType())] : []), ctxParam], undefined, visitedBody)
+            : f.createArrowFunction([f.createModifier(ts.SyntaxKind.AsyncKeyword)], undefined, [ctxParam], undefined, undefined, visitedBody);
+          // The generator body becomes a `function*` that run() calls with this receiver, so a
+          // body that reads `this` gets the real one (receiverFor says so whenever it does).
+          const call = f.createCallExpression(f.createPropertyAccessExpression(DG, "run"), undefined, [meta, values, receiver(), inner]);
           const stmt = isGen
             ? f.createReturnStatement(f.createYieldExpression(f.createToken(ts.SyntaxKind.AsteriskToken), call))
             : f.createReturnStatement(call);
@@ -204,7 +266,7 @@ function instrumentFile(file, ctxInfo, index) {
           // const c = __dg.enter(meta, [args]); try { body } catch (e) { __dg.throwed(c, e); throw e } finally { __dg.exit(c) }
           const e = f.createUniqueName("__dge");
           const decl = f.createVariableStatement(undefined, f.createVariableDeclarationList([
-            f.createVariableDeclaration(c, undefined, undefined, f.createCallExpression(f.createPropertyAccessExpression(DG, "enter"), undefined, [meta, values, (ts.isArrowFunction(node) || isCtor) ? f.createIdentifier("undefined") : f.createThis()])),
+            f.createVariableDeclaration(c, undefined, undefined, f.createCallExpression(f.createPropertyAccessExpression(DG, "enter"), undefined, [meta, values, receiver()])),
           ], ts.NodeFlags.Const));
           const tryStmt = f.createTryStatement(
             visitedBody,
