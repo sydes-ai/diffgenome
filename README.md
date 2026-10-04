@@ -140,6 +140,7 @@ missing. `--source-root`, `--test-root` and `--pythonpath` are repeatable.
 
 ```bash
 uv sync
+npm ci --prefix src/diffgenome/_collectors/node   # pinned TypeScript for the Node collector tests
 uv run pytest
 uv run ruff check src tests ci && uv run mypy src
 ```

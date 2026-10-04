@@ -34,6 +34,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      # the Node collector tests type-check instrumented output with the collector's pinned
+      # TypeScript (its package-lock.json); at run time a target's own node_modules is used
+      - run: npm ci --prefix src/diffgenome/_collectors/node
       - name: Linux sandbox (bubblewrap, unprivileged user namespaces)
         if: runner.os == 'Linux'
         run: |
