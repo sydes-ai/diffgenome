@@ -15,10 +15,17 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
-from tests.test_node_receiver import CHECK, COLLECTOR, TYPES, TYPESCRIPT, _node, pytestmark  # noqa: F401
+from tests.test_node_receiver import (  # noqa: F401
+    CHECK,
+    COLLECTOR,
+    TYPES,
+    TYPESCRIPT,
+    _node,
+    pytestmark,
+)
 
 FIXTURE = """\
 interface Foo { foo: number }
@@ -86,7 +93,11 @@ function mockFn(impl) {
   const fn = function (...args) {
     fn.mock.calls.push(args);
     const i = fn.mock.results.push({ type: "incomplete", value: undefined }) - 1;
-    try { const v = impl.apply(this, args); fn.mock.results[i] = { type: "return", value: v }; return v; }
+    try {
+      const v = impl.apply(this, args);
+      fn.mock.results[i] = { type: "return", value: v };
+      return v;
+    }
     catch (e) { fn.mock.results[i] = { type: "throw", value: e }; throw e; }
   };
   fn._isMockFunction = true;
@@ -94,7 +105,9 @@ function mockFn(impl) {
   fn.getMockName = () => "jest.fn()";
   return fn;
 }
-const caught = (fn) => { try { return fn(); } catch (e) { return e.constructor.name + ":" + e.message; } };
+const caught = (fn) => {
+  try { return fn(); } catch (e) { return e.constructor.name + ":" + e.message; }
+};
 
 runtime.begin("t");
 const results = {
@@ -105,7 +118,8 @@ const results = {
   overloaded: m.overloaded(),
   contextual: m.contextual([1, 2, 3]),
   notifier: m.useNotifier({ notify: mockFn((s) => s.length) }, mockFn(() => 10)),
-  throwingStatement: caught(() => m.useNotifier({ notify: mockFn(() => { throw new RangeError("down"); }) }, mockFn(() => 0))),
+  throwingStatement: caught(() => m.useNotifier(
+    { notify: mockFn(() => { throw new RangeError("down"); }) }, mockFn(() => 0))),
 };
 runtime.end("passed");
 const nodes = runtime._state.nodes.map((n) => ({
@@ -126,15 +140,28 @@ def _instrument(tmp_path: Path) -> Path:
     (tmp_path / "check.js").write_text(CHECK)
     (tmp_path / "run.js").write_text(RUN)
     subprocess.run(
-        ["node", str(COLLECTOR / "instrument.js"), "--root", str(tmp_path), "--src", "src",
-         "--runtime", str(COLLECTOR / "runtime.js")],
-        check=True, capture_output=True, text=True, timeout=120,
+        [
+            "node",
+            str(COLLECTOR / "instrument.js"),
+            "--root",
+            str(tmp_path),
+            "--src",
+            "src",
+            "--runtime",
+            str(COLLECTOR / "runtime.js"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
     return app
 
 
 def _diagnostics(root: Path, file: Path) -> list[str]:
-    out = json.loads(_node(root / "check.js", str(TYPESCRIPT), str(file), str(root / "types" / "globals.d.ts")))
+    out = json.loads(
+        _node(root / "check.js", str(TYPESCRIPT), str(file), str(root / "types" / "globals.d.ts"))
+    )
     return [f"TS{d['code']}: {d['message']}" for d in out]
 
 
@@ -154,17 +181,32 @@ def test_call_shapes_leave_the_original_call_visible(tmp_path: Path) -> None:
     # an assertion statement is left exactly as written, observed from either side
     for target in ("assertFoo", "Checks.assertFoo"):
         name = re.escape(target)
-        assert re.search(rf"const (__dgt_\d+) = __dg\.pre\({name}\);\s+{name}\(value\);\s+__dg\.post\(\1\);", text)
+        assert re.search(
+            rf"const (__dgt_\d+) = __dg\.pre\({name}\);\s+{name}\(value\);\s+__dg\.post\(\1\);",
+            text,
+        )
 
 
 def test_runtime_behaviour_and_call_evidence_are_preserved(tmp_path: Path) -> None:
     app = _instrument(tmp_path)
-    out = json.loads(_node(tmp_path / "run.js", str(TYPESCRIPT), str(app), str(tmp_path / "app.js"),
-                           str(COLLECTOR / "runtime.js")))
+    out = json.loads(
+        _node(
+            tmp_path / "run.js",
+            str(TYPESCRIPT),
+            str(app),
+            str(tmp_path / "app.js"),
+            str(COLLECTOR / "runtime.js"),
+        )
+    )
     assert out["results"] == {
-        "lengthOf": [3, -1], "fooOf": [4, -1], "asserted": [5, "TypeError:not a Foo"],
-        "assertedViaClass": 6, "overloaded": "AB2.0", "contextual": [4, 6],
-        "notifier": 20, "throwingStatement": "RangeError:down",
+        "lengthOf": [3, -1],
+        "fooOf": [4, -1],
+        "asserted": [5, "TypeError:not a Foo"],
+        "assertedViaClass": 6,
+        "overloaded": "AB2.0",
+        "contextual": [4, 6],
+        "notifier": 20,
+        "throwingStatement": "RangeError:down",
     }
     nodes = out["nodes"]
     by_id = {n["id"]: n for n in nodes}
@@ -172,7 +214,9 @@ def test_runtime_behaviour_and_call_evidence_are_preserved(tmp_path: Path) -> No
 
     # ordinary calls still nest under their caller
     def parent_sym(sym: str) -> set[str]:
-        return {by_id[n["parent"]]["sym"] for n in calls if n["sym"] == sym and n["parent"] in by_id}
+        return {
+            by_id[n["parent"]]["sym"] for n in calls if n["sym"] == sym and n["parent"] in by_id
+        }
 
     assert parent_sym("isFoo") >= {"fooOf", "assertFoo", "Checks.isFoo"}
     assert parent_sym("assertFoo") >= {"asserted", "Checks.assertFoo"}
@@ -180,9 +224,16 @@ def test_runtime_behaviour_and_call_evidence_are_preserved(tmp_path: Path) -> No
 
     # mocks are still recorded as stand-ins, from every call shape, with args and outcome
     stand_ins = [n for n in nodes if n["type"] == "substitution"]
-    assert all(n["mechanism"] == "mock_object" and n["substitute"] == "js:jest.fn" for n in stand_ins)
+    assert all(
+        n["mechanism"] == "mock_object" and n["substitute"] == "js:jest.fn" for n in stand_ins
+    )
     first = [n for n in stand_ins if by_id[n["parent"]]["sym"] == "useNotifier"]
     # statement notify (pre/post), expression notify (m), cb (f); then the throwing statement
-    assert [n["outcome"].split(":")[0] for n in first] == ["returned", "returned", "returned", "raised"]
+    assert [n["outcome"].split(":")[0] for n in first] == [
+        "returned",
+        "returned",
+        "returned",
+        "raised",
+    ]
     assert first[3]["outcome"] == "raised:js:RangeError"
     assert all(n["args"] for n in first)  # argument shapes recorded for each

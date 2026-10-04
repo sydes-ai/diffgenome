@@ -14,8 +14,8 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from tests.test_node_receiver import CHECK, COLLECTOR, TYPES, TYPESCRIPT, pytestmark  # noqa: F401
 
@@ -48,8 +48,12 @@ function busWithHandler(): any {
   return bus;
 }
 export function bridge(): string { return busWithHandler().dispatch(new Cmd("a")); }
-export function two(): string[] { return busWithHandler().dispatchAll([new Cmd("b"), new Cmd("c")]); }
-export async function later(): Promise<string> { return await busWithHandler().dispatchLater(new Cmd("d")); }
+export function two(): string[] {
+  return busWithHandler().dispatchAll([new Cmd("b"), new Cmd("c")]);
+}
+export async function later(): Promise<string> {
+  return await busWithHandler().dispatchLater(new Cmd("d"));
+}
 export function leaf(): string { const bus = new ExternalThing(); return bus.leaf(1); }
 export function double(n: number): number { return n * 2; }
 export function mapped(): number[] { return [1, 2].map(double); }
@@ -79,7 +83,8 @@ const m = require(process.argv[4]);
     const label = (n) => n.symbol.replace(/^js:src\/app\./, "");
     out[name] = {
       result,
-      nodes: nodes.map((n) => ({ id: n.id, parent: n.parent, sym: n.type === "call" ? label(n) : n.type,
+      nodes: nodes.map((n) => ({ id: n.id, parent: n.parent,
+                                 sym: n.type === "call" ? label(n) : n.type,
                                  origin: n.type === "call" ? symbols.get(n.symbol).origin : null,
                                  args: n.args.map((a) => a[1]), outcome: n.outcome })),
     };
@@ -112,13 +117,36 @@ def _run(tmp_path: Path, flag: bool) -> tuple[dict, str]:
     (tmp_path / "types" / "globals.d.ts").write_text(TYPES)
     (tmp_path / "check.js").write_text(CHECK)
     (tmp_path / "run.js").write_text(RUN)
-    _node(_env(flag), str(COLLECTOR / "instrument.js"), "--root", str(tmp_path), "--src", "src",
-          "--runtime", str(COLLECTOR / "runtime.js"))
+    _node(
+        _env(flag),
+        str(COLLECTOR / "instrument.js"),
+        "--root",
+        str(tmp_path),
+        "--src",
+        "src",
+        "--runtime",
+        str(COLLECTOR / "runtime.js"),
+    )
     text = app.read_text()
-    out = json.loads(_node(_env(flag), str(tmp_path / "run.js"), str(TYPESCRIPT), str(app),
-                           str(tmp_path / "src" / "app.js"), str(COLLECTOR / "runtime.js")))
-    diagnostics = json.loads(_node(_env(flag), str(tmp_path / "check.js"), str(TYPESCRIPT), str(app),
-                                   str(tmp_path / "types" / "globals.d.ts")))
+    out = json.loads(
+        _node(
+            _env(flag),
+            str(tmp_path / "run.js"),
+            str(TYPESCRIPT),
+            str(app),
+            str(tmp_path / "src" / "app.js"),
+            str(COLLECTOR / "runtime.js"),
+        )
+    )
+    diagnostics = json.loads(
+        _node(
+            _env(flag),
+            str(tmp_path / "check.js"),
+            str(TYPESCRIPT),
+            str(app),
+            str(tmp_path / "types" / "globals.d.ts"),
+        )
+    )
     assert diagnostics == [], diagnostics
     return out, text
 

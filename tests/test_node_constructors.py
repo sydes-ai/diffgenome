@@ -10,10 +10,17 @@ returns, and only the rest is wrapped.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
-from tests.test_node_receiver import CHECK, COLLECTOR, TYPES, TYPESCRIPT, _node, pytestmark  # noqa: F401
+from tests.test_node_receiver import (  # noqa: F401
+    CHECK,
+    COLLECTOR,
+    TYPES,
+    TYPESCRIPT,
+    _node,
+    pytestmark,
+)
 
 FIXTURE = """\
 export class Base {
@@ -64,7 +71,9 @@ const js = ts.transpileModule(fs.readFileSync(process.argv[3], "utf8"), { compil
 fs.writeFileSync(process.argv[4], js);
 const runtime = require(process.argv[5]);
 const m = require(process.argv[4]);
-const caught = (fn) => { try { fn(); return null; } catch (e) { return e.constructor.name + ":" + e.message; } };
+const caught = (fn) => {
+  try { fn(); return null; } catch (e) { return e.constructor.name + ":" + e.message; }
+};
 runtime.begin("t");
 const d = new m.Derived("ab", 2);
 const early = new m.Derived("cd", 1, true);
@@ -78,7 +87,8 @@ const r = {
   probe: m.probe(),
 };
 const nodes = runtime._state.nodes.filter((n) => n.type === "call")
-  .map((n) => ({ sym: n.symbol.replace(/^js:src\/app\./, ""), parent: n.parent, outcome: n.outcome }));
+  .map((n) => ({ sym: n.symbol.replace(/^js:src\/app\./, ""), parent: n.parent,
+                 outcome: n.outcome }));
 process.stdout.write(JSON.stringify({ results: r, nodes }));
 """
 
@@ -93,15 +103,28 @@ def _instrument(tmp_path: Path) -> dict[str, Path]:
     (tmp_path / "check.js").write_text(CHECK)
     (tmp_path / "run.js").write_text(RUN)
     subprocess.run(
-        ["node", str(COLLECTOR / "instrument.js"), "--root", str(tmp_path), "--src", "src",
-         "--runtime", str(COLLECTOR / "runtime.js")],
-        check=True, capture_output=True, text=True, timeout=120,
+        [
+            "node",
+            str(COLLECTOR / "instrument.js"),
+            "--root",
+            str(tmp_path),
+            "--src",
+            "src",
+            "--runtime",
+            str(COLLECTOR / "runtime.js"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
     return {"root": tmp_path, "app": app}
 
 
 def _diagnostics(root: Path, file: Path) -> list[dict]:
-    return json.loads(_node(root / "check.js", str(TYPESCRIPT), str(file), str(root / "types" / "globals.d.ts")))
+    return json.loads(
+        _node(root / "check.js", str(TYPESCRIPT), str(file), str(root / "types" / "globals.d.ts"))
+    )
 
 
 def test_derived_constructors_type_check_after_instrumentation(tmp_path: Path) -> None:
@@ -112,20 +135,34 @@ def test_derived_constructors_type_check_after_instrumentation(tmp_path: Path) -
 
 def test_super_stays_a_root_level_statement_and_entry_follows_it(tmp_path: Path) -> None:
     text = _instrument(tmp_path)["app"].read_text()
-    derived = text[text.index("class Derived"):text.index("class Conditional")]
-    body = derived[derived.index("constructor("):]
+    derived = text[text.index("class Derived") : text.index("class Conditional")]
+    body = derived[derived.index("constructor(") :]
     # the pre-super statement, then super, then entry, then the wrapped remainder
-    assert body.index("toUpperCase") < body.index("super(") < body.index("__dg.enter(") < body.index("try {")
-    assert "this" not in body[:body.index("__dg.enter(")].split("{", 1)[1].split("super(")[0]
+    assert (
+        body.index("toUpperCase")
+        < body.index("super(")
+        < body.index("__dg.enter(")
+        < body.index("try {")
+    )
+    assert "this" not in body[: body.index("__dg.enter(")].split("{", 1)[1].split("super(")[0]
     # a derived constructor without a root-level super keeps the whole-body wrap
-    conditional = text[text.index("class Conditional"):text.index("class Implicit")]
-    assert conditional.index("__dg.enter(") < conditional.index("try {") < conditional.index("super(")
+    conditional = text[text.index("class Conditional") : text.index("class Implicit")]
+    assert (
+        conditional.index("__dg.enter(") < conditional.index("try {") < conditional.index("super(")
+    )
 
 
 def test_constructor_semantics_and_outcomes_are_preserved(tmp_path: Path) -> None:
     paths = _instrument(tmp_path)
-    out = json.loads(_node(tmp_path / "run.js", str(TYPESCRIPT), str(paths["app"]),
-                           str(tmp_path / "app.js"), str(COLLECTOR / "runtime.js")))
+    out = json.loads(
+        _node(
+            tmp_path / "run.js",
+            str(TYPESCRIPT),
+            str(paths["app"]),
+            str(tmp_path / "app.js"),
+            str(COLLECTOR / "runtime.js"),
+        )
+    )
     assert out["results"] == {
         "derived": ["AB", "base:AB", 3, 42, 5],
         "early": ["CD", 2, 41],

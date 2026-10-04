@@ -13,9 +13,9 @@ it to show `this` semantics and receiver capture are unchanged where a receiver 
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import shutil
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -120,22 +120,44 @@ def instrumented(tmp_path: Path) -> dict[str, Path]:
     (tmp_path / "check.js").write_text(CHECK)
     (tmp_path / "run.js").write_text(RUN)
     subprocess.run(
-        ["node", str(COLLECTOR / "instrument.js"), "--root", str(tmp_path), "--src", "src",
-         "--runtime", str(COLLECTOR / "runtime.js"), "--index", str(tmp_path / "index.json")],
-        check=True, capture_output=True, text=True, timeout=120,
+        [
+            "node",
+            str(COLLECTOR / "instrument.js"),
+            "--root",
+            str(tmp_path),
+            "--src",
+            "src",
+            "--runtime",
+            str(COLLECTOR / "runtime.js"),
+            "--index",
+            str(tmp_path / "index.json"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
-    return {"root": tmp_path, "app": app, "original": original,
-            "globals": tmp_path / "types" / "globals.d.ts"}
+    return {
+        "root": tmp_path,
+        "app": app,
+        "original": original,
+        "globals": tmp_path / "types" / "globals.d.ts",
+    }
 
 
 def _diagnostics(paths: dict[str, Path], file: Path) -> list[dict]:
-    return json.loads(_node(paths["root"] / "check.js", str(TYPESCRIPT), str(file), str(paths["globals"])))
+    return json.loads(
+        _node(paths["root"] / "check.js", str(TYPESCRIPT), str(file), str(paths["globals"]))
+    )
 
 
 def test_the_check_reproduces_the_failure_class(instrumented: dict[str, Path]) -> None:
     """Control: a bare `this` handed out of a free function is TS2683 under this config."""
     bad = instrumented["root"] / "types" / "bad.ts"
-    bad.write_text("declare const __dg: any;\nexport function getTestServer(): number { return __dg.enter({}, [], this); }\n")
+    bad.write_text(
+        "declare const __dg: any;\n"
+        "export function getTestServer(): number { return __dg.enter({}, [], this); }\n"
+    )
     assert [d["code"] for d in _diagnostics(instrumented, bad)] == [2683]
 
 
@@ -144,15 +166,19 @@ def test_instrumented_output_type_checks_under_strict(instrumented: dict[str, Pa
     assert _diagnostics(instrumented, instrumented["app"]) == []
 
 
-def test_free_functions_report_no_receiver_and_methods_report_theirs(instrumented: dict[str, Path]) -> None:
+def test_free_functions_report_no_receiver_and_methods_report_theirs(
+    instrumented: dict[str, Path],
+) -> None:
     text = instrumented["app"].read_text()
 
     def receiver_of(name: str) -> str:
         start = text.index(name)
-        call = min(i for i in (text.find("__dg.enter(", start), text.find("__dg.run(", start)) if i >= 0)
+        call = min(
+            i for i in (text.find("__dg.enter(", start), text.find("__dg.run(", start)) if i >= 0
+        )
         depth, i = 0, text.index("(", call)
         args, current = [], ""
-        for ch in text[i + 1:]:
+        for ch in text[i + 1 :]:
             if ch in "([{":
                 depth += 1
             elif ch in ")]}":
@@ -167,23 +193,59 @@ def test_free_functions_report_no_receiver_and_methods_report_theirs(instrumente
             current += ch
         return args[2]
 
-    for free in ("function generateTestingApplication", "function getTestServer", "function* counter",
-                 "function outer", "function inner", "addOne ="):
+    for free in (
+        "function generateTestingApplication",
+        "function getTestServer",
+        "function* counter",
+        "function outer",
+        "function inner",
+        "addOne =",
+    ):
         assert receiver_of(free) == "undefined", free
-    for bound in ("get size", "set size", "find(id", "async load", "*ids", "static make", "m()",
-                  "fe: function", "function withThis", "function* genThis", "function asyncThis"):
+    for bound in (
+        "get size",
+        "set size",
+        "find(id",
+        "async load",
+        "*ids",
+        "static make",
+        "m()",
+        "fe: function",
+        "function withThis",
+        "function* genThis",
+        "function asyncThis",
+    ):
         assert receiver_of(bound) == "this", bound
     # a `this` parameter is a type annotation, not an argument
-    assert '"params": ["a"]' in text or "params: [\"a\"]" in text
+    assert '"params": ["a"]' in text or 'params: ["a"]' in text
 
 
 def test_semantics_and_receiver_capture_are_preserved(instrumented: dict[str, Path]) -> None:
     root = instrumented["root"]
-    out = json.loads(_node(root / "run.js", str(TYPESCRIPT), str(instrumented["app"]),
-                           str(root / "app.js"), str(COLLECTOR / "runtime.js")))
+    out = json.loads(
+        _node(
+            root / "run.js",
+            str(TYPESCRIPT),
+            str(instrumented["app"]),
+            str(root / "app.js"),
+            str(COLLECTOR / "runtime.js"),
+        )
+    )
     assert out["results"] == {
-        "app": 1, "server": 2, "counter": [1, 2], "addOne": 2, "outer": 3, "find": 5, "size": 4,
-        "load": 4, "ids": [4], "make": 7, "objM": 2, "objFe": 2, "withThis": 6, "genThis": [9],
+        "app": 1,
+        "server": 2,
+        "counter": [1, 2],
+        "addOne": 2,
+        "outer": 3,
+        "find": 5,
+        "size": 4,
+        "load": 4,
+        "ids": [4],
+        "make": 7,
+        "objM": 2,
+        "objFe": 2,
+        "withThis": 6,
+        "genThis": [9],
         "asyncThis": 3,
     }
     facts = out["facts"]
@@ -204,15 +266,27 @@ def test_javascript_files_get_no_type_annotations(tmp_path: Path) -> None:
         "module.exports = { free, o };\n"
     )
     subprocess.run(
-        ["node", str(COLLECTOR / "instrument.js"), "--root", str(tmp_path), "--src", "src",
-         "--runtime", str(COLLECTOR / "runtime.js")],
-        check=True, capture_output=True, text=True, timeout=120,
+        [
+            "node",
+            str(COLLECTOR / "instrument.js"),
+            "--root",
+            str(tmp_path),
+            "--src",
+            "src",
+            "--runtime",
+            str(COLLECTOR / "runtime.js"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
     text = (tmp_path / "src" / "lib.js").read_text()
     assert ": any" not in text and "this:" not in text
     probe = tmp_path / "probe.js"
     probe.write_text(
         f"const m = require({json.dumps(str(tmp_path / 'src' / 'lib.js'))});\n"
-        "m.o.a().then((a) => process.stdout.write(JSON.stringify([[...m.free()], [...m.o.g()], a])));\n"
+        "m.o.a().then((a) =>\n"
+        "  process.stdout.write(JSON.stringify([[...m.free()], [...m.o.g()], a])));\n"
     )
     assert json.loads(_node(probe)) == [[1], [3], 3]
